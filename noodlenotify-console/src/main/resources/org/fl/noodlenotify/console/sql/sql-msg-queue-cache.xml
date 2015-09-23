@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="msg-queue-cache-query-list">
+	<![CDATA[
+		SELECT 
+				msgQueueCache_Id,
+				name,
+				ip,
+				port,
+				system_Status,
+				manual_Status
+		FROM 	CSL_MSG_QUEUE_CACHE
+		WHERE 	1=1
+		 		#if($msgQueueCache_Id)
+					AND msgQueueCache_Id = :msgQueueCache_Id
+				#end
+		 		#if($name)
+					AND name LIKE :name
+				#end
+		 		#if($ip)
+					AND ip LIKE :ip
+				#end
+		 		#if($port)
+					AND port = :port
+				#end
+		 		#if($system_Status)
+					AND system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND manual_Status = :manual_Status
+				#end
+				
+		ORDER BY msgQueueCache_Id desc
+	]]>
+	</query>
+
+</dynamic-hibernate>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="trace-storage-query-list">
+	<![CDATA[
+		SELECT 
+				traceStorage_Id,
+				name,
+				ip,
+				port,
+				system_Status,
+				manual_Status
+		FROM 	CSL_TRACE_STORAGE
+		WHERE 	1=1
+		 		#if($traceStorage_Id)
+					AND traceStorage_Id = :traceStorage_Id
+				#end
+		 		#if($name)
+					AND name LIKE :name
+				#end
+		 		#if($ip)
+					AND ip LIKE :ip
+				#end
+		 		#if($port)
+					AND port = :port
+				#end
+		 		#if($system_Status)
+					AND system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND manual_Status = :manual_Status
+				#end
+				
+		ORDER BY traceStorage_Id desc
+	]]>
+	</query>
+
+</dynamic-hibernate>

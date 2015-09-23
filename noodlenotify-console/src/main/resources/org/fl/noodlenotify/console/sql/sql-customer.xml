@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="customer-query-list">
+	<![CDATA[
+		SELECT 
+				customer_Id,
+				name,
+				ip,
+				port,
+				url,
+				type,
+				check_Port,
+				check_Url,
+				check_Type,
+				system_Status,
+				manual_Status,
+				customerGroup_Nm
+		FROM 	CSL_CUSTOMER
+		WHERE 	1=1
+		 		#if($customer_Id)
+					AND customer_Id = :customer_Id
+				#end
+		 		#if($name)
+					AND name LIKE :name
+				#end
+		 		#if($ip)
+					AND ip LIKE :ip
+				#end
+		 		#if($port)
+					AND port = :port
+				#end
+				#if($type)
+					AND type = :type
+				#end
+				#if($url)
+					AND url = :url
+				#end
+		 		#if($check_Port)
+					AND check_Port = :check_Port
+				#end
+				#if($check_Type)
+					AND check_Type = :check_Type
+				#end
+		 		#if($system_Status)
+					AND system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND manual_Status = :manual_Status
+				#end
+		 		#if($customerGroup_Nm)
+					AND customerGroup_Nm LIKE :customerGroup_Nm
+				#end		
+		ORDER BY customer_Id desc
+	]]>
+	</query>
+
+	<query name="customer-query-list-equal">
+	<![CDATA[
+		SELECT 
+				customer_Id,
+				name,
+				ip,
+				port,
+				url,
+				type,
+				check_Port,
+				check_Url,
+				check_Type,
+				system_Status,
+				manual_Status,
+				customerGroup_Nm
+		FROM 	CSL_CUSTOMER
+		WHERE 	1=1
+		 		#if($customer_Id)
+					AND customer_Id = :customer_Id
+				#end
+		 		#if($name)
+					AND name = :name
+				#end
+		 		#if($ip)
+					AND ip = :ip
+				#end
+		 		#if($port)
+					AND port = :port
+				#end
+				#if($type)
+					AND type = :type
+				#end
+		 		#if($check_Port)
+					AND check_Port = :check_Port
+				#end
+				#if($check_Type)
+					AND check_Type = :check_Type
+				#end
+		 		#if($system_Status)
+					AND system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND manual_Status = :manual_Status
+				#end
+		 		#if($customerGroup_Nm)
+					AND customerGroup_Nm = :customerGroup_Nm
+				#end		
+		ORDER BY customer_Id desc
+	]]>
+	</query>
+
+	<query name="customer-update-customernm">
+	<![CDATA[
+		UPDATE  CSL_CUSTOMER SET CUSTOMERGROUP_NM = null 
+		WHERE 	1=1
+		 		#if($customerGroup_Nm)
+					AND customerGroup_Nm = :customerGroup_Nm
+				#end
+	]]>
+	</query>
+
+</dynamic-hibernate>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="queue-exchanger-query-list">
+	<![CDATA[
+		SELECT 
+				queue_Nm,
+				exchanger_Id
+		FROM 	CSL_QUEUE_EXCHANGER
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND queue_Nm = :queue_Nm
+				#end
+		 		#if($exchanger_Id)
+					AND exchanger_Id = :exchanger_Id
+				#end
+		ORDER BY exchanger_Id DESC
+	]]>
+	</query>
+	
+	<query name="queue-exchanger-query-includelist">
+	<![CDATA[
+		SELECT 
+				qe.queue_Nm,
+				e.exchanger_Id,
+				e.name,
+				e.ip,
+				e.port,
+				e.url,
+				e.type,
+				e.check_Port,
+				e.system_Status,
+				e.manual_Status
+		FROM 	CSL_EXCHANGER e, CSL_QUEUE_EXCHANGER qe
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND qe.queue_Nm = :queue_Nm
+				#end
+				#if($name)
+					AND e.name LIKE :name
+				#end
+		 		#if($ip)
+					AND e.ip LIKE :ip
+				#end
+		 		#if($port)
+					AND e.port = :port
+				#end
+				#if($type)
+					AND type = :type
+				#end
+		 		#if($check_Port)
+					AND e.check_Port = :check_Port
+				#end
+		 		#if($system_Status)
+					AND e.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND e.manual_Status = :manual_Status
+				#end
+				AND qe.exchanger_Id = e.exchanger_Id
+		ORDER BY e.exchanger_Id DESC
+	]]>
+	</query>
+	
+	<query name="queue-exchanger-query-excludelist">
+	<![CDATA[
+		SELECT 
+				e.exchanger_Id,
+				e.name,
+				e.ip,
+				e.port,
+				e.url,
+				e.type,
+				e.check_Port,
+				e.system_Status,
+				e.manual_Status
+		FROM 	CSL_EXCHANGER e 
+		WHERE 	1=1
+				#if($name)
+					AND e.name LIKE :name
+				#end
+		 		#if($ip)
+					AND e.ip LIKE :ip
+				#end
+		 		#if($port)
+					AND e.port = :port
+				#end
+				#if($type)
+					AND type = :type
+				#end
+		 		#if($check_Port)
+					AND e.check_Port = :check_Port
+				#end
+		 		#if($system_Status)
+					AND e.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND e.manual_Status = :manual_Status
+				#end
+				AND e.exchanger_Id NOT IN (SELECT qe.exchanger_Id FROM CSL_QUEUE_EXCHANGER qe WHERE qe.queue_Nm = :queue_Nm)
+		ORDER BY e.exchanger_Id DESC
+	]]>
+	</query>
+	
+	<query name="queue-exchanger-query-queue">
+	<![CDATA[
+		SELECT 
+				q.queue_Nm,
+				q.is_Repeat,
+				q.expire_Time,
+				q.is_Trace,
+				q.manual_Status,
+				qe.exchanger_Id
+		FROM 	CSL_QUEUE q, CSL_QUEUE_EXCHANGER qe
+		WHERE 	1=1
+		 		#if($exchanger_Id)
+					AND qe.exchanger_Id = :exchanger_Id
+				#end
+		 		#if($manual_Status)
+					AND q.manual_Status = :manual_Status
+				#end
+				AND q.queue_Nm = qe.queue_Nm
+	]]>
+	</query>
+	
+	<query name="queue-exchanger-query-queue-tree">
+	<![CDATA[
+		SELECT 
+				q.queue_Nm,
+				q.is_Repeat,
+				q.expire_Time,
+				q.is_Trace,
+				q.manual_Status,
+				qe.exchanger_Id
+		FROM 	CSL_QUEUE q, CSL_QUEUE_EXCHANGER qe
+		WHERE 	1=1
+		 		#if($exchanger_Id)
+					AND qe.exchanger_Id = :exchanger_Id
+				#end
+				#if($queue_Nm)
+					AND q.queue_Nm LIKE :queue_Nm
+				#end
+		 		#if($manual_Status)
+					AND q.manual_Status = :manual_Status
+				#end
+				AND q.queue_Nm = qe.queue_Nm
+	]]>
+	</query>
+	<query name="queue-exchanger-query-exchanger">
+	<![CDATA[
+		SELECT 
+				e.exchanger_Id,
+				e.name,
+				e.ip,
+				e.port,
+				e.url,
+				e.type,
+				e.system_Status,
+				e.manual_Status,
+                qe.queue_Nm
+        FROM 	CSL_EXCHANGER e, CSL_QUEUE_EXCHANGER qe
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND qe.queue_Nm = :queue_Nm
+				#end
+		 		#if($system_Status)
+					AND e.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND e.manual_Status = :manual_Status
+				#end
+				AND e.exchanger_Id = qe.exchanger_Id
+	]]>
+	</query>
+</dynamic-hibernate>

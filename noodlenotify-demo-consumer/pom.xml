@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>org.fl.noodlenotify</groupId>
+    <artifactId>noodlenotify</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  
+  <groupId>org.fl.noodlenotify.demo.consumer</groupId>
+  <artifactId>noodlenotify-demo-consumer</artifactId>
+  <version>${noodlenotify.demo.consumer.version}</version>
+  <name>noodlenotify-demo-consumer</name>
+  <url>http://maven.apache.org</url>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <dependencies>
+  
+	<dependency>
+	  <groupId>org.fl.noodlenotify.core.client.consumer.jetty</groupId>
+	  <artifactId>noodlenotify-core-client-consumer-jetty</artifactId>
+	  <version>${noodlenotify.core.client.consumer.jetty.version}</version>
+	</dependency>
+	
+	<dependency>
+	  <groupId>org.fl.noodlenotify.core.client.consumer.netty</groupId>
+	  <artifactId>noodlenotify-core-client-consumer-netty</artifactId>
+	  <version>${noodlenotify.core.client.consumer.netty.version}</version>
+	</dependency>
+	
+	<dependency>
+	  <groupId>org.fl.noodlenotify.core.client.consumer.rmi</groupId>
+	  <artifactId>noodlenotify-core-client-consumer-rmi</artifactId>
+	  <version>${noodlenotify.core.client.consumer.rmi.version}</version>
+	</dependency>
+	
+	<!-- spring framework -->
+    <dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-context</artifactId>
+	</dependency>
+
+	<!-- log -->
+	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-api</artifactId>
+	</dependency>
+	<dependency>   
+		<groupId>ch.qos.logback</groupId>  
+		<artifactId>logback-classic</artifactId> 
+	</dependency>
+	<dependency>  
+	  <groupId>org.slf4j</groupId>  
+	  <artifactId>jcl-over-slf4j</artifactId>  
+	</dependency>
+ 	<dependency>
+	    <groupId>org.logback-extensions</groupId>
+	    <artifactId>logback-ext-spring</artifactId>
+	</dependency>
+	
+  </dependencies>
+  
+</project>

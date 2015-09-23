@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
+	default-autowire="byName">
+	
+	<bean id="consumerClientCheckAbstract" abstract="true">
+		<property name="port" value="${noodlenotify.consumer.check.port}"/>
+	</bean>
+	
+	<bean id="consumerJettyNetConnectServerCheckHandler" class="org.fl.noodlenotify.core.connect.net.jetty.server.JettyNetConnectServerCheckHandler" />
+	<bean id="consumerJettyNetConnectCheckServer" class="org.fl.noodlenotify.core.connect.net.jetty.server.JettyNetConnectServer"
+			init-method="start" destroy-method="destroy" 
+			parent="consumerClientCheckAbstract">
+		<property name="servletHandler" ref="consumerJettyNetConnectServerCheckHandler" />
+	</bean>
+
+	<bean id="consoleRemotingInvoke" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
+	    <property name="serviceUrl" value="http://${noodlenotify.console.remoting.ip}:${noodlenotify.console.remoting.port}/${noodlenotify.console.remoting.url}/remoting/ConsoleRemotingInvokeService"/>
+	    <property name="serviceInterface" value="org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke"/>
+	</bean>
+	
+	<bean id="consumerClientAbstract" abstract="true"/>
+	
+	<bean id="consumerClientPortCommonAbstract" abstract="true" parent="consumerClientAbstract" >
+		<property name="localPort" value="${noodlenotify.consumer.local.port}" />
+		<property name="checkPort" value="${noodlenotify.consumer.check.port}" />
+	</bean>
+	
+	<bean id="consumerClientPortAbstract" abstract="true" parent="consumerClientPortCommonAbstract" />
+	
+	<bean id="consumerClient" class="org.fl.noodlenotify.core.cclient.ConsumerClient"
+			init-method="start" destroy-method="destroy"
+			depends-on="consumerJettyNetConnectReceiveServer"
+			parent="consumerClientPortAbstract">
+		<property name="url" value="${noodlenotify.consumer.local.url}"/>
+		<property name="type" value="HTTP"/>
+		<property name="checkUrl" value="/noodlenotify"/>
+		<property name="checkType" value="HTTP"/>
+		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
+	</bean>
+    
+    <bean id="consumerClientReceiveAbstract" abstract="true">
+		<property name="port" value="${noodlenotify.consumer.local.port}"/>
+    </bean>
+    
+    <bean id="consumerJettyNetConnectServerReceiveHandler" class="org.fl.noodlenotify.core.connect.net.jetty.server.JettyNetConnectServerReceiveHandler">
+		<property name="url" value="${noodlenotify.consumer.local.url}"/>
+		<property name="netConnectReceiver" ref="consumerClient" />
+	</bean>
+	<bean id="consumerJettyNetConnectReceiveServer" class="org.fl.noodlenotify.core.connect.net.jetty.server.JettyNetConnectServer"
+			init-method="start" destroy-method="destroy"  
+			parent="consumerClientReceiveAbstract">
+		<property name="servletHandler" ref="consumerJettyNetConnectServerReceiveHandler" />
+	</bean>
+
+</beans>

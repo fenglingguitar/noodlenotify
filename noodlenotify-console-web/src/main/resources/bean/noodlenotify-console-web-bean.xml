@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
+	default-autowire="byName">
+	
+	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
+	<import resource="classpath:org/fl/noodlenotify/trace/bean/noodlenotify-trace-msg-service.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/bean/schedule/noodlenotify-monitor-schedule-status.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/performance/receiver/noodlenotify-monitor-performance-receiver.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/performance/clean/noodlenotify-monitor-performance-clean.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/bean/client/noodlenotify-pclient-console.xml" />
+	
+ 	<bean name="consoleRemotingInvokeExporter" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
+    	<property name="service" ref="consoleRemotingInvoke"/>
+    	<property name="serviceInterface" value="org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke"/>
+	</bean>
+	
+</beans>

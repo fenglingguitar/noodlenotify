@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="queue-distributer-query-list">
+	<![CDATA[
+		SELECT 
+				queue_Nm,
+				distributer_Id
+		FROM CSL_QUEUE_DISTRIBUTER
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND queue_Nm = :queue_Nm
+				#end
+		 		#if($distributer_Id)
+					AND distributer_Id = :distributer_Id
+				#end
+		ORDER BY distributer_Id DESC
+	]]>
+	</query>
+	
+	<query name="queue-distributer-query-includelist">
+	<![CDATA[
+		SELECT 
+				qd.queue_Nm,
+				d.distributer_Id,
+				d.name,
+				d.ip,
+				d.port,
+				d.check_Port,
+				d.system_Status,
+				d.manual_Status
+		FROM 	CSL_DISTRIBUTER d, CSL_QUEUE_DISTRIBUTER qd
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND qd.queue_Nm = :queue_Nm
+				#end
+				#if($name)
+					AND d.name LIKE :name
+				#end
+		 		#if($ip)
+					AND d.ip LIKE :ip
+				#end
+		 		#if($port)
+					AND d.port = :port
+				#end
+		 		#if($check_Port)
+					AND d.check_Port = :check_Port
+				#end
+		 		#if($system_Status)
+					AND d.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND d.manual_Status = :manual_Status
+				#end
+				AND d.distributer_Id = qd.distributer_Id
+		ORDER BY d.distributer_Id DESC
+	]]>
+	</query>
+	
+	<query name="queue-distributer-query-excludelist">
+	<![CDATA[
+		SELECT 
+				d.distributer_Id,
+				d.name,
+				d.ip,
+				d.port,
+				d.check_Port,
+				d.system_Status,
+				d.manual_Status
+		FROM 	CSL_DISTRIBUTER d
+		WHERE 	1=1
+				#if($name)
+					AND d.name LIKE :name
+				#end
+		 		#if($ip)
+					AND d.ip LIKE :ip
+				#end
+		 		#if($port)
+					AND d.port = :port
+				#end
+		 		#if($check_Port)
+					AND d.check_Port = :check_Port
+				#end
+		 		#if($system_Status)
+					AND d.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND d.manual_Status = :manual_Status
+				#end
+				AND d.distributer_Id NOT IN (SELECT distributer_Id FROM CSL_QUEUE_DISTRIBUTER  WHERE queue_Nm = :queue_Nm)
+		ORDER BY d.distributer_Id DESC
+	]]>
+	</query>
+	
+	<query name="queue-distributer-query-queue">
+	<![CDATA[
+		SELECT 	
+				q.queue_Nm,
+				q.is_Repeat,
+				q.expire_Time,
+				q.interval_Time,
+				q.dph_Delay_Time,
+				q.dph_Timeout,
+				q.new_Pop_ThreadNum,
+				q.new_Exe_ThreadNum,
+				q.portion_Pop_ThreadNum,
+				q.portion_Exe_ThreadNum,
+				q.is_Trace,
+				q.manual_Status,
+				qd.distributer_Id
+		FROM 	CSL_QUEUE q, CSL_QUEUE_DISTRIBUTER qd
+		WHERE 	1=1
+		 		#if($distributer_Id)
+					AND qd.distributer_Id = :distributer_Id
+				#end
+				#if($queue_Nm)
+					AND q.queue_Nm = :queue_Nm
+				#end
+		 		#if($manual_Status)
+					AND q.manual_Status = :manual_Status
+				#end
+				AND q.queue_Nm = qd.queue_Nm
+	]]>
+	</query>
+	
+	<query name="queue-distributer-query-queue-tree">
+	<![CDATA[
+		SELECT 	
+				q.queue_Nm,
+				q.is_Repeat,
+				q.expire_Time,
+				q.interval_Time,
+				q.new_Pop_ThreadNum,
+				q.new_Exe_ThreadNum,
+				q.portion_Pop_ThreadNum,
+				q.portion_Exe_ThreadNum,
+				q.is_Trace,
+				q.manual_Status,
+				qd.distributer_Id
+		FROM 	CSL_QUEUE q, CSL_QUEUE_DISTRIBUTER qd
+		WHERE 	1=1
+		 		#if($distributer_Id)
+					AND qd.distributer_Id = :distributer_Id
+				#end
+				#if($queue_Nm)
+					AND q.queue_Nm LIKE :queue_Nm
+				#end
+		 		#if($manual_Status)
+					AND q.manual_Status = :manual_Status
+				#end
+				AND q.queue_Nm = qd.queue_Nm
+	]]>
+	</query>
+	
+	<query name="queue-distributer-query-distributer">
+	<![CDATA[
+		SELECT 
+				d.distributer_Id,
+				d.name,
+				d.ip,
+				d.port,
+				d.check_Port,
+				d.system_Status,
+				d.manual_Status
+                qd.queue_Nm
+        FROM 	CSL_DISTRIBUTER d, CSL_QUEUE_DISTRIBUTER qd
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND qd.queue_Nm = :queue_Nm
+				#end
+		 		#if($name)
+					AND d.name LIKE :name
+				#end
+		 		#if($ip)
+					AND d.ip LIKE :ip
+				#end
+		 		#if($port)
+					AND d.port = :port
+				#end
+		 		#if($check_Port)
+					AND d.check_Port = :check_Port
+				#end
+		 		#if($system_Status)
+					AND d.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND d.manual_Status = :manual_Status
+				#end
+				AND d.distributer_Id = qd.distributer_Id
+	]]>
+	</query>
+</dynamic-hibernate>

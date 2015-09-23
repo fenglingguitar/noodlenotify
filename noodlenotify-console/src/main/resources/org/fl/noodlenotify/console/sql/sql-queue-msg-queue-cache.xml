@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="queue-msgqueuecache-query-list">
+	<![CDATA[
+		SELECT 
+				queue_Nm,
+				msgQueueCache_Id
+		FROM 	CSL_QUEUE_MSG_QUEUE_CACHE
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND queue_Nm = :queue_Nm
+				#end
+		 		#if($msgQueueCache_Id)
+					AND msgQueueCache_Id = :msgQueueCache_Id
+				#end
+		ORDER BY msgQueueCache_Id DESC
+	]]>
+	</query>
+	
+	<query name="queue-msgqueuecache-query-includelist">
+	<![CDATA[
+		SELECT 
+				qmqc.queue_Nm,
+				mqc.msgQueueCache_Id,
+				mqc.name,
+				mqc.ip,
+				mqc.port,
+				mqc.system_Status,
+				mqc.manual_Status
+		FROM    CSL_MSG_QUEUE_CACHE mqc, CSL_QUEUE_MSG_QUEUE_CACHE qmqc
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND qmqc.queue_Nm = :queue_Nm
+				#end
+				#if($name)
+					AND mqc.name LIKE :name
+				#end
+		 		#if($ip)
+					AND mqc.ip LIKE :ip
+				#end
+		 		#if($port)
+					AND mqc.port = :port
+				#end
+		 		#if($system_Status)
+					AND mqc.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND mqc.manual_Status = :manual_Status
+				#end
+				AND mqc.msgQueueCache_Id = qmqc.msgQueueCache_Id
+		ORDER BY mqc.msgQueueCache_Id DESC
+	]]>
+	</query>
+	
+	<query name="queue-msgqueuecache-query-excludelist">
+	<![CDATA[
+		SELECT 
+				mqc.msgQueueCache_Id,
+				mqc.name,
+				mqc.ip,
+				mqc.port,
+				mqc.system_Status,
+				mqc.manual_Status
+		FROM    CSL_MSG_QUEUE_CACHE mqc
+		WHERE 	1=1
+				#if($name)
+					AND mqc.name LIKE :name
+				#end
+		 		#if($ip)
+					AND mqc.ip LIKE :ip
+				#end
+		 		#if($port)
+					AND mqc.port = :port
+				#end
+		 		#if($system_Status)
+					AND mqc.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND mqc.manual_Status = :manual_Status
+				#end
+				AND mqc.msgQueueCache_Id NOT IN (SELECT msgQueueCache_Id FROM CSL_QUEUE_MSG_QUEUE_CACHE  WHERE queue_Nm = :queue_Nm)
+		ORDER BY mqc.msgQueueCache_Id DESC
+	]]>
+	</query>
+	
+	<query name="queue-msgqueuecache-query-queue">
+	<![CDATA[
+		SELECT 
+				q.queue_Nm,
+				q.manual_Status,
+				q.is_Repeat,
+				q.expire_Time,
+                qmqc.msgQueueCache_Id,
+                qmqc.is_Active,
+                qmqc.new_Len,
+                qmqc.portion_Len
+        FROM    CSL_QUEUE q, CSL_QUEUE_MSG_QUEUE_CACHE qmqc
+		WHERE 	1=1
+				#if($msgQueueCache_Id)
+					AND qmqc.msgQueueCache_Id = :msgQueueCache_Id
+				#end
+		 		#if($queue_Nm)
+					AND q.queue_Nm = :queue_Nm
+				#end
+		 		#if($manual_Status)
+					AND q.manual_Status = :manual_Status
+				#end
+				AND q.queue_Nm = qmqc.queue_Nm
+	]]>
+	</query>
+	
+	<query name="queue-msgqueuecache-query-queue-tree">
+	<![CDATA[
+		SELECT 
+				q.queue_Nm,
+				q.manual_Status,
+				q.is_Repeat,
+				q.expire_Time,
+                qmqc.msgQueueCache_Id,
+                qmqc.is_Active,
+                qmqc.new_Len,
+                qmqc.portion_Len
+        FROM    CSL_QUEUE q, CSL_QUEUE_MSG_QUEUE_CACHE qmqc
+		WHERE 	1=1
+				#if($msgQueueCache_Id)
+					AND qmqc.msgQueueCache_Id = :msgQueueCache_Id
+				#end
+		 		#if($queue_Nm)
+					AND q.queue_Nm LIKE :queue_Nm
+				#end
+		 		#if($manual_Status)
+					AND q.manual_Status = :manual_Status
+				#end
+				AND q.queue_Nm = qmqc.queue_Nm
+	]]>
+	</query>
+	
+	
+	<query name="queue-msgqueuecache-query-msgqueuecache">
+	<![CDATA[
+		SELECT 
+				mqc.msgQueueCache_Id,
+				mqc.name,
+				mqc.ip,
+				mqc.port,
+				mqc.system_Status,
+				mqc.manual_Status,
+                qmqc.queue_Nm,
+                qmqc.is_Active
+        FROM    CSL_MSG_QUEUE_CACHE mqc, CSL_QUEUE_MSG_QUEUE_CACHE qmqc
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND qmqc.queue_Nm = :queue_Nm
+				#end
+		 		#if($system_Status)
+					AND mqc.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND mqc.manual_Status = :manual_Status
+				#end
+				AND mqc.msgQueueCache_Id = qmqc.msgQueueCache_Id
+	]]>
+	</query>
+	
+</dynamic-hibernate>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
+	default-autowire="byName">
+	
+	<bean id="distributeConfParam" class="org.fl.noodlenotify.core.distribute.DistributeConfParam">
+	
+		<property name="setThreadPriorityFresh" value="10"/>
+		<property name="setThreadPriorityNew" value="10"/>
+		<property name="setThreadPriorityPortion" value="10"/>
+		<property name="setThreadPriorityDeleteTimeout" value="10"/>
+		
+		<property name="selectByIdIntervalFresh" value="10000"/>
+		<property name="selectMinMaxTimeIntervalFresh" value="1000"/>
+		<property name="selectLenTimeIntervalFresh" value="120000"/>
+		<property name="selectTimeIntervalFresh" value="3000"/>
+		
+		<property name="selectByIdIntervalNew" value="10000"/>
+		<property name="selectMinMaxTimeIntervalNew" value="10000"/>
+		<property name="selectEmptyTimeIntervalNew" value="10000"/>
+		<property name="selectLenTimeIntervalNew" value="300000"/>
+		<property name="selectLenTimeIntervalRatioNew" value="50"/>
+		<property name="selectCountDownTimeIntervalNew" value="300000"/>
+		<property name="selectCountDownTimeIntervalRatioNew" value="50"/>
+		<property name="selectCountDownTimeIntervalMinNew" value="60000"/>
+		
+		<property name="selectByIdIntervalPortion" value="10000"/>
+		<property name="selectMinMaxTimeIntervalPortion" value="20000"/>
+		<property name="selectEmptyTimeIntervalPortion" value="20000"/>
+		<property name="selectLenTimeIntervalPortion" value="60000"/>
+		<property name="selectLenTimeIntervalRatioPortion" value="50"/>
+		<property name="selectCountDownTimeIntervalPortion" value="60000"/>
+		<property name="selectCountDownTimeIntervalRatioPortion" value="50"/>
+		<property name="selectCountDownTimeIntervalMinPortion" value="60000"/>
+		
+		<property name="selectByIdIntervalDelete" value="10000"/>
+		<property name="selectMinMaxTimeIntervalDelete" value="10000"/>
+		<property name="selectEmptyTimeIntervalDelete" value="10000"/>
+		
+		<property name="selectByIdIntervalDeleteTimeout" value="10000"/>
+		<property name="selectMinMaxTimeIntervalDeleteTimeout" value="10000"/>
+		<property name="selectEmptyTimeIntervalDeleteTimeout" value="150000"/>
+		<property name="selectDeleteTimeout" value="300000"/>
+		
+		<property name="checkActiveTimeInterval" value="3000"/>
+		
+		<property name="queueCacheCapacityNew" value="100000"/>
+		<property name="queueCacheCapacityPortion" value="50000"/>
+		
+		<property name="executeCapacityNew" value="2000"/>
+		<property name="executeCapacityPortion" value="1000"/>
+		
+		<property name="executeOfferTimeoutWait" value="2.5"/>
+		
+		<property name="executeBatchNum" value="10"/>
+		<property name="executeCapacityBatch" value="10000"/>
+		<property name="executeBatchWaitTime" value="1000"/>
+		
+	</bean>
+	
+	<bean id="distribute" class="org.fl.noodlenotify.core.distribute.Distribute" 
+			init-method="start" destroy-method="destroy"
+			parent="distributeParam">
+		<property name="localIp" value="127.0.0.1" />
+		<property name="dbConnectManager" ref="distributeDbConnectManager" />
+		<property name="queueCacheConnectManager" ref="distributeQueueCacheConnectManager" />
+		<property name="bodyCacheConnectManager" ref="distributeBodyCacheConnectManager" />
+		<property name="netConnectManager" ref="distributeNetConnectManager" />
+		<property name="traceCacheConnectManager" ref="distributeTraceCacheConnectManager" />
+		<property name="distributeConfParam" ref="distributeConfParam" />
+		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
+	</bean>
+
+</beans>

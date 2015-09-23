@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="exchanger-query-list">
+	<![CDATA[
+		SELECT 
+				exchanger_Id,
+				name,
+				ip,
+				port,
+				url,
+				type,
+				check_Port,
+				system_Status,
+				manual_Status
+		FROM 	CSL_EXCHANGER
+		WHERE 	1=1
+		 		#if($exchanger_Id)
+					AND exchanger_Id = :exchanger_Id
+				#end
+		 		#if($name)
+					AND name LIKE :name
+				#end
+		 		#if($ip)
+					AND ip LIKE :ip
+				#end
+		 		#if($port)
+					AND port = :port
+				#end
+				#if($url)
+					AND url = :url
+				#end
+				#if($type)
+					AND type = :type
+				#end
+		 		#if($check_Port)
+					AND check_Port = :check_Port
+				#end
+		 		#if($system_Status)
+					AND system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND manual_Status = :manual_Status
+				#end
+				
+		ORDER BY exchanger_Id desc
+	]]>
+	</query>
+	
+</dynamic-hibernate>

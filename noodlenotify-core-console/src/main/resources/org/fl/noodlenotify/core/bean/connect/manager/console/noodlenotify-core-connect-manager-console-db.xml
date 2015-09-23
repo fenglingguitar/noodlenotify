@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
+	default-autowire="byName">
+	
+	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/bean/connect/manager/console/noodlenotify-core-connect-manager-console-common.xml" />
+		
+	<bean id="dbDataSourceFactory" class="org.fl.noodlenotify.core.connect.db.datasource.C3p0DbDataSourceFactory">
+		<property name="dbName" value="noodlenotify_dev"/>
+	</bean>
+	<bean id="dbConnectAgentConfParam" class="org.fl.noodlenotify.core.connect.db.DbConnectAgentConfParam">
+		<property name="insertThreadCount" value="0"/>
+		<property name="insertBatchSize" value="10000"/>
+		<property name="insertTimeout" value="300000"/>
+		<property name="insertWaitTime" value="10"/>
+		<property name="insertCapacity" value="10000000"/>
+		<property name="insertThreadPriority" value="5"/>
+		<property name="updateThreadCount" value="0"/>
+		<property name="updateBatchSize" value="10000"/>
+		<property name="updateTimeout" value="300000"/>
+		<property name="updateWaitTime" value="10"/>
+		<property name="updateCapacity" value="1000000"/>
+		<property name="updateThreadPriority" value="5"/>
+		<property name="deleteThreadCount" value="0"/>
+		<property name="deleteBatchSize" value="100000"/>
+		<property name="deleteTimeout" value="0"/>
+		<property name="deleteWaitTime" value="100"/>
+		<property name="deleteCapacity" value="100000"/>
+		<property name="deleteThreadPriority" value="5"/>
+	</bean>
+	<bean id="dbConnectAgentFactory" class="org.fl.noodlenotify.core.connect.db.mysql.MysqlDbConnectAgentFactory">
+		<property name="dbDataSourceFactory" ref="dbDataSourceFactory" />
+		<property name="dbConnectAgentConfParam" ref="dbConnectAgentConfParam" />
+	</bean>
+	<bean id="consoleDbConnectManager" class="org.fl.noodlenotify.core.connect.db.manager.console.ConsoleDbConnectManager"
+			init-method="start" destroy-method="destroy"
+			parent="commonParam">
+		<constructor-arg ref="dbConnectAgentFactory" />
+	</bean>
+	
+</beans>

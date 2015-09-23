@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="producer-query-list">
+	<![CDATA[
+		SELECT 
+				producer_Id,
+				name,
+				ip,
+				check_Port,
+				check_Url,
+				check_Type,
+				manual_Status,
+                system_Status
+		FROM 	CSL_PRODUCER
+		WHERE 	1=1
+		 		#if($producer_Id)
+					AND producer_Id = :producer_Id
+				#end
+		 		#if($name)
+					AND name LIKE :name
+				#end
+		 		#if($ip)
+					AND ip LIKE :ip
+				#end
+		 		#if($check_Port)
+					AND check_Port = :check_Port
+				#end
+				#if($check_Type)
+					AND check_Type = :check_Type
+				#end
+		 		#if($manual_Status)
+					AND manual_Status = :manual_Status
+				#end
+		 		#if($system_Status)
+					AND system_Status = :system_Status
+				#end
+				
+		ORDER BY producer_Id desc
+	]]>
+	</query>
+
+</dynamic-hibernate>

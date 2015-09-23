@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.fl.noodlenotify</groupId>
+  <artifactId>noodlenotify</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+  <name>NoodleNotify</name>
+  <inceptionYear>2013</inceptionYear>
+  <url>http://maven.apache.org</url>
+  
+  <properties>
+  	
+  	<noodlenotify.version>1.0.0</noodlenotify.version>
+  	
+  	<noodlenotify.core.connect.api.version>1.0.0</noodlenotify.core.connect.api.version>
+  	<noodlenotify.core.connect.net.api.version>1.0.0</noodlenotify.core.connect.net.api.version>
+  	<noodlenotify.core.connect.net.jetty.client.version>1.0.0</noodlenotify.core.connect.net.jetty.client.version>
+  	<noodlenotify.core.connect.net.jetty.server.version>1.0.0</noodlenotify.core.connect.net.jetty.server.version>
+  	<noodlenotify.core.connect.net.netty.client.version>1.0.0</noodlenotify.core.connect.net.netty.client.version>
+  	<noodlenotify.core.connect.net.netty.server.version>1.0.0</noodlenotify.core.connect.net.netty.server.version>
+  	<noodlenotify.core.connect.net.rmi.api.version>1.0.0</noodlenotify.core.connect.net.rmi.api.version>
+  	<noodlenotify.core.connect.net.rmi.client.version>1.0.0</noodlenotify.core.connect.net.rmi.client.version>
+  	<noodlenotify.core.connect.net.rmi.server.version>1.0.0</noodlenotify.core.connect.net.rmi.server.version>
+  	<noodlenotify.core.connect.db.version>1.0.0</noodlenotify.core.connect.db.version>
+  	<noodlenotify.core.connect.cache.api.version>1.0.0</noodlenotify.core.connect.cache.api.version>
+  	<noodlenotify.core.connect.cache.body.version>1.0.0</noodlenotify.core.connect.cache.body.version>
+  	<noodlenotify.core.connect.cache.queue.version>1.0.0</noodlenotify.core.connect.cache.queue.version>
+  	<noodlenotify.core.connect.cache.trace.version>1.0.0</noodlenotify.core.connect.cache.trace.version>
+  	<noodlenotify.core.client.producer.version>1.0.0</noodlenotify.core.client.producer.version>
+  	<noodlenotify.core.client.consumer.api.version>1.0.0</noodlenotify.core.client.consumer.api.version>
+  	<noodlenotify.core.client.consumer.jetty.version>1.0.0</noodlenotify.core.client.consumer.jetty.version>
+  	<noodlenotify.core.client.consumer.netty.version>1.0.0</noodlenotify.core.client.consumer.netty.version>
+  	<noodlenotify.core.client.consumer.rmi.version>1.0.0</noodlenotify.core.client.consumer.rmi.version>
+  	<noodlenotify.core.exchange.version>1.0.0</noodlenotify.core.exchange.version>
+  	<noodlenotify.core.distribute.version>1.0.0</noodlenotify.core.distribute.version>
+  	<noodlenotify.core.console.version>1.0.0</noodlenotify.core.console.version>
+  	<noodlenotify.console.version>1.0.0</noodlenotify.console.version>
+  	<noodlenotify.console.vo.version>1.0.0</noodlenotify.console.vo.version>
+  	<noodlenotify.console.remoting.api.version>1.0.0</noodlenotify.console.remoting.api.version>
+  	<noodlenotify.console.web.version>1.0.0</noodlenotify.console.web.version>
+  	<noodlenotify.monitor.status.version>1.0.0</noodlenotify.monitor.status.version>
+  	<noodlenotify.monitor.performance.version>1.0.0</noodlenotify.monitor.performance.version>
+  	<noodlenotify.trace.version>1.0.0</noodlenotify.trace.version>
+  	<noodlenotify.core.run.version>1.0.0</noodlenotify.core.run.version>
+  	<noodlenotify.assembly.version>1.0.0</noodlenotify.assembly.version>
+	
+	<noodlenotify.demo.producer.version>1.0.0</noodlenotify.demo.producer.version>
+	<noodlenotify.demo.consumer.version>1.0.0</noodlenotify.demo.consumer.version>
+	<noodlenotify.demo.exchange.version>1.0.0</noodlenotify.demo.exchange.version>
+	<noodlenotify.demo.distribute.version>1.0.0</noodlenotify.demo.distribute.version>
+  	  	
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <modules>
+    <module>noodlenotify-core-connect-api</module>
+    <module>noodlenotify-core-connect-net-api</module>
+    <module>noodlenotify-core-connect-net-jetty-client</module>
+    <module>noodlenotify-core-connect-net-jetty-server</module>
+    <module>noodlenotify-core-connect-net-netty-client</module>
+    <module>noodlenotify-core-connect-net-netty-server</module>
+    <module>noodlenotify-core-connect-net-rmi-api</module>
+    <module>noodlenotify-core-connect-net-rmi-client</module>
+    <module>noodlenotify-core-connect-net-rmi-server</module>
+    <module>noodlenotify-core-connect-db</module>
+    <module>noodlenotify-core-connect-cache-api</module>
+    <module>noodlenotify-core-connect-cache-body</module>
+    <module>noodlenotify-core-connect-cache-queue</module>
+    <module>noodlenotify-core-connect-cache-trace</module>
+    <module>noodlenotify-core-client-producer</module>
+    <module>noodlenotify-core-client-consumer-api</module>
+    <module>noodlenotify-core-client-consumer-jetty</module>
+    <module>noodlenotify-core-client-consumer-netty</module>
+    <module>noodlenotify-core-client-consumer-rmi</module>
+    <module>noodlenotify-core-exchange</module>
+    <module>noodlenotify-core-distribute</module>
+    <module>noodlenotify-core-console</module>
+    <module>noodlenotify-console</module>
+    <module>noodlenotify-console-vo</module>
+    <module>noodlenotify-console-remoting-api</module>
+    <module>noodlenotify-console-web</module>
+    <module>noodlenotify-monitor-status</module>
+    <module>noodlenotify-monitor-performance</module>
+    <module>noodlenotify-trace</module>
+    <module>noodlenotify-core-run</module>
+    <module>noodlenotify-demo-producer</module>
+    <module>noodlenotify-demo-consumer</module>
+    <module>noodlenotify-demo-exchange</module>
+    <module>noodlenotify-demo-distribute</module>
+    <module>assembly</module>
+  </modules>
+
+	<dependencyManagement>
+	  <dependencies>
+	  	
+		<dependency>
+			<groupId>org.fl.noodle.common.net</groupId>
+			<artifactId>noodlecommon-net</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.fl.noodle.common.util</groupId>
+			<artifactId>noodlecommon-util</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.fl.noodle.common.test</groupId>
+			<artifactId>noodlecommon-test</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.fl.noodle.common.mvc</groupId>
+			<artifactId>noodlecommon-mvc</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.fl.noodle.common.mvc.vo</groupId>
+			<artifactId>noodlecommon-mvc-vo</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.fl.noodle.common.dynamicsql</groupId>
+			<artifactId>noodlecommon-dynamicsql</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.fl.noodle.common.dbseparate</groupId>
+			<artifactId>noodlecommon-dbseparate</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.fl.noodle.common.connect</groupId>
+			<artifactId>noodlecommon-connect-api</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.fl.noodle.common.connect.expand</groupId>
+			<artifactId>noodlecommon-connect-expand-api</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.fl.noodle.common.monitor</groupId>
+			<artifactId>noodlecommon-monitor-api</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.fl.noodle.common.monitor.performance</groupId>
+			<artifactId>noodlecommon-monitor-performance</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+	    <dependency>
+	      <groupId>junit</groupId>
+	      <artifactId>junit</artifactId>
+	      <version>4.8.1</version>
+	      <scope>test</scope>
+	    </dependency>
+	    
+	    <!-- spring framework -->
+	    <dependency>
+	    	<groupId>org.springframework</groupId>
+	    	<artifactId>spring-context</artifactId>
+	    	<version>3.1.0.RELEASE</version>
+	    </dependency>
+	    <dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context-support</artifactId>
+				<version>3.1.0.RELEASE</version>
+			</dependency>
+	    <dependency>
+	    	<groupId>org.springframework</groupId>
+	    	<artifactId>spring-orm</artifactId>
+	    	<version>3.1.0.RELEASE</version>
+	    </dependency>
+	    <dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-webmvc</artifactId>
+				<version>3.1.0.RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-web</artifactId>
+				<version>3.1.0.RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>3.1.0.RELEASE</version>
+				<scope>test</scope>
+			</dependency>
+			
+			<!-- log -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.7.5</version>
+			</dependency>
+			<dependency>   
+				<groupId>ch.qos.logback</groupId>  
+				<artifactId>logback-classic</artifactId>  
+				<version>1.0.13</version>
+			</dependency>
+			<dependency>  
+			  <groupId>org.slf4j</groupId>  
+			  <artifactId>jcl-over-slf4j</artifactId>  
+			  <version>1.7.5</version>  
+			</dependency>
+			<dependency>
+				<groupId>org.logback-extensions</groupId>
+				<artifactId>logback-ext-spring</artifactId>
+				<version>0.1.1</version>
+			</dependency>	
+	    
+	    <!-- DataSource -->
+	    <dependency>
+				<groupId>c3p0</groupId>
+				<artifactId>c3p0</artifactId>
+				<version>0.9.1.2</version>
+			</dependency>
+			
+			<!-- Mysql Java Connector -->
+			<dependency>
+	    	<groupId>mysql</groupId>
+	    	<artifactId>mysql-connector-java</artifactId>
+	    	<version>5.1.5</version>
+	    	<scope>runtime</scope>
+	    </dependency>
+	    
+	    <!-- Jedis -->
+    	<dependency>
+				<groupId>redis.clients</groupId>
+				<artifactId>jedis</artifactId>
+				<version>2.0.0</version>
+			</dependency>
+			
+			<!-- Fastjson -->
+			<dependency>
+	     	<groupId>com.alibaba</groupId>
+	     	<artifactId>fastjson</artifactId>
+	     	<version>1.1.26</version>
+			</dependency>
+			
+			<!-- PropertyUtils -->
+			<dependency>
+				<groupId>commons-beanutils</groupId>
+				<artifactId>commons-beanutils</artifactId>
+				<version>1.8.3</version>
+    	</dependency>
+
+			<!-- Netty -->
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty</artifactId>
+				<version>3.6.6.Final</version>
+			</dependency>  
+			
+			<!-- Hibernate -->
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-core</artifactId>
+				<version>3.6.3.Final</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-orm</artifactId>
+				<version>3.1.0.RELEASE</version>
+			</dependency>
+			
+			<!-- DynamicSqlTemplate -->
+			<dependency>
+	    	<groupId>avalon</groupId>
+	    	<artifactId>avalon-framework</artifactId>
+	    	<version>4.1.4</version>
+	    </dependency>
+	    <dependency>
+	    	<groupId>org.apache.velocity</groupId>
+	    	<artifactId>velocity</artifactId>
+	    	<version>1.6.4</version>
+	    </dependency>
+	    
+		  <dependency>
+	    	<groupId>org.aspectj</groupId>
+	    	<artifactId>aspectjweaver</artifactId>
+	    	<version>1.6.6</version>
+	    </dependency>
+	    
+		  <dependency>
+	    	<groupId>javassist</groupId>
+	    	<artifactId>javassist</artifactId>
+	    	<version>3.1</version>
+	    </dependency>
+	    
+	   	<dependency>
+	    	<groupId>net.sf.flexjson</groupId>
+	    	<artifactId>flexjson</artifactId>
+	    	<version>2.1</version>
+    	</dependency>
+    	
+    	<!-- mvc -->
+    	<dependency>
+				<groupId>org.apache.tomcat</groupId>
+				<artifactId>servlet-api</artifactId>
+				<version>6.0.32</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>jstl</artifactId>
+				<version>1.2</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-webmvc</artifactId>
+				<version>3.1.0.RELEASE</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-web</artifactId>
+				<version>3.1.0.RELEASE</version>
+			</dependency>
+			
+			<!-- jetty -->
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-servlet</artifactId>
+				<version>8.1.11.v20130520</version>
+			</dependency>
+			
+			<!-- commons pool -->
+			<dependency>
+			  <groupId>commons-pool</groupId>
+			  <artifactId>commons-pool</artifactId>
+			  <version>1.5.5</version>
+			</dependency>
+			
+	  </dependencies>
+  </dependencyManagement>
+  
+  <build>
+    <plugins>
+      <plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-source-plugin</artifactId>
+	      <executions>
+	        <execution>
+	          <phase>package</phase>
+	          <goals>
+	            <goal>jar</goal>
+	          </goals>
+	        </execution>
+	      </executions>
+	    </plugin>
+    </plugins>
+  </build>
+  
+  <profiles>
+	<profile>
+		<id>dev</id>
+		<build>
+			<filters>
+				<filter>${user.dir}/assembly/src/profile/env.properties.dev</filter>
+			</filters>
+		</build>
+	</profile>
+	<profile>
+		<id>test</id>
+		<build>
+			<filters>
+				<filter>${user.dir}/assembly/src/profile/env.properties.test</filter>
+			</filters>
+		</build>
+	</profile>
+	<profile>
+		<id>image</id>
+		<build>
+			<filters>
+				<filter>${user.dir}/assembly/src/profile/env.properties.image</filter>
+			</filters>
+		</build>
+	</profile>
+	<profile>
+		<id>product</id>
+		<build>
+			<filters>
+				<filter>${user.dir}/assembly/src/profile/env.properties.product</filter>
+			</filters>
+		</build>
+    </profile>
+  </profiles>
+  	
+</project>

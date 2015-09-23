@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
+	default-autowire="byName">
+	
+	<bean id="udpClient" class="org.fl.noodlenotify.monitor.performance.net.UdpServer"
+		init-method="start" destroy-method="destroy" >
+		<property name="port" value="${noodlenotify.console.monitor.performance.port}" />
+	</bean>
+	
+	<bean id="redisPersistenceTemplateImpl" class="org.fl.noodlenotify.monitor.performance.persistence.RedisPersistenceTemplateImpl" 
+			init-method="start" destroy-method="destroy" >
+		<property name="ip" value="${noodlenotify.console.monitor.performance.persistence.ip}"/>
+		<property name="port" value="${noodlenotify.console.monitor.performance.persistence.port}"/>
+		<property name="maxActive" value="3000"/>
+		<property name="minIdle" value="8"/>
+		<property name="maxIdle" value="40"/>
+		<property name="maxWait" value="3000"/>
+		<property name="minEvictableIdleTimeMillis" value="600000"/>
+		<property name="timeBetweenEvictionRunsMillis" value="60000"/>
+		<property name="timeout" value="10000"/>
+	</bean>
+	
+	<bean id="executerReceiver" class="org.fl.noodlenotify.monitor.performance.receiver.ExecuterReceiver"
+		init-method="start" destroy-method="destroy" >
+	</bean>
+	
+	<bean id="executerClean" class="org.fl.noodlenotify.monitor.performance.clean.ExecuterClean"
+		init-method="start" destroy-method="destroy" >
+		<property name="timeSpan" value="3"/>
+		<property name="interval" value="60"/>
+	</bean>
+	
+</beans>

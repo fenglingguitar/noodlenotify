@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="distributer-query-list">
+	<![CDATA[
+		SELECT 
+				distributer_Id,
+				name,
+				ip,
+				port,
+				check_Port,
+				system_Status,
+				manual_Status
+		FROM 	CSL_DISTRIBUTER
+		WHERE 	1=1
+		 		#if($distributer_Id)
+					AND distributer_Id = :distributer_Id
+				#end
+		 		#if($name)
+					AND name LIKE :name
+				#end
+		 		#if($ip)
+					AND ip LIKE :ip
+				#end
+		 		#if($port)
+					AND port = :port
+				#end
+		 		#if($check_Port)
+					AND check_Port = :check_Port
+				#end
+		 		#if($system_Status)
+					AND system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND manual_Status = :manual_Status
+				#end
+				
+		ORDER BY distributer_Id desc
+	]]>
+	</query>
+
+</dynamic-hibernate>

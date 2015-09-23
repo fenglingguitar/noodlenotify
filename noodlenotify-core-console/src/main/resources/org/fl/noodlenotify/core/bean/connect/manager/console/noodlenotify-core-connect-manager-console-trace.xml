@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
+	default-autowire="byName">
+	
+	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/bean/connect/manager/console/noodlenotify-core-connect-manager-console-common.xml" />
+	
+	<bean id="cacheConnectAgentConfParamTrace" class="org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam">
+		<property name="setThreadCount" value="0"/>
+		<property name="setBatchSize" value="1000"/>
+		<property name="setTimeout" value="3000"/>
+		<property name="setWaitTime" value="10"/>
+		<property name="setCapacity" value="100000"/>
+		<property name="setThreadPriority" value="5"/>
+		<property name="removeThreadCount" value="0"/>
+		<property name="removeBatchSize" value="1000"/>
+		<property name="removeTimeout" value="0"/>
+		<property name="removeWaitTime" value="10"/>
+		<property name="removeCapacity" value="100000"/>
+		<property name="removeThreadPriority" value="5"/>
+	</bean>
+	<bean id="traceCacheConnectAgentConfParam" class="org.fl.noodlenotify.core.connect.cache.trace.TraceCacheConnectAgentConfParam">
+		<property name="newExpire" value="604800"/>
+		<property name="successExpire" value="86400"/>
+	</bean>
+	<bean id="redisTraceCacheConnectAgentFactory" class="org.fl.noodlenotify.core.connect.cache.trace.redis.RedisTraceCacheConnectAgentFactory">
+		<property name="cacheConnectAgentConfParam" ref="cacheConnectAgentConfParamTrace" />
+		<property name="traceCacheConnectAgentConfParam" ref="traceCacheConnectAgentConfParam" />
+	</bean>
+	<bean id="consoleTraceCacheConnectManager" class="org.fl.noodlenotify.core.connect.cache.trace.manager.console.ConsoleTraceCacheConnectManager"
+			init-method="start" destroy-method="destroy"
+			parent="commonParam">
+		<constructor-arg ref="redisTraceCacheConnectAgentFactory" />
+	</bean>
+	
+</beans>

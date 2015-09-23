@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="queue-query-list">
+	<![CDATA[
+		SELECT 
+				queue_Nm,
+				manual_Status,
+				is_Repeat,
+				expire_Time,
+				interval_Time,
+				dph_Delay_Time,
+				dph_Timeout,
+				is_Trace,
+				new_Pop_ThreadNum,
+				new_Exe_ThreadNum,
+				portion_Pop_ThreadNum,
+				portion_Exe_ThreadNum,
+				create_Tm
+		FROM 	CSL_QUEUE
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND queue_Nm LIKE :queue_Nm
+				#end
+		 		#if($manual_Status)
+					AND manual_Status = :manual_Status
+				#end
+				#if($is_Repeat)
+					AND is_Repeat = :is_Repeat
+				#end
+				#if($is_Trace)
+					AND is_Trace = :is_Trace
+				#end
+	]]>
+	</query>
+	
+	<query name="queue-query-monitor-list">
+	<![CDATA[
+		SELECT 
+		       	cq.queue_Nm,
+			   	cq.manual_Status,
+		       	SUM(cqms.NEW_LEN) new_Len, 
+		       	SUM(cqms.PORTION_LEN) portion_Len,
+		       	rev_T_Cnt_Mit,
+		       	rev_T_Cnt_Hor,
+		       	rev_O_Rate_Mit,
+		       	rev_O_Rate_Hor,
+		       	rev_E_Rate_Mit,
+		       	rev_E_Rate_Hor,
+		       	dph_T_Cnt_Mit,
+		       	dph_T_Cnt_Hor,
+		       	dph_O_Rate_Mit,
+		       	dph_O_Rate_Hor,
+		       	dph_E_Rate_Mit,
+		       	dph_E_Rate_Hor,
+		       	dph_OD_Cnt_Mit,
+		       	dph_OD_Cnt_Hor
+ 		FROM 	CSL_QUEUE cq LEFT JOIN CSL_QUEUE_MSG_STORAGE cqms ON cq.QUEUE_NM = cqms.QUEUE_NM 
+ 		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND cq.queue_Nm LIKE :queue_Nm
+				#end
+		 		#if($manual_Status)
+					AND cq.manual_Status = :manual_Status
+				#end
+ 		GROUP BY cq.QUEUE_NM
+	]]>
+	</query>
+
+</dynamic-hibernate>

@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>org.fl.noodlenotify</groupId>
+    <artifactId>noodlenotify</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  
+  <groupId>org.fl.noodlenotify.console.web</groupId>
+  <artifactId>noodlenotify-console-web</artifactId>
+  <version>${noodlenotify.console.web.version}</version>
+  <packaging>war</packaging>
+  <name>noodlenotify-console-web Maven Webapp</name>
+  <url>http://maven.apache.org</url>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <dependencies>
+	
+	<dependency>
+		<groupId>org.fl.noodle.common.mvc</groupId>
+		<artifactId>noodlecommon-mvc</artifactId>
+	</dependency>
+	
+	<dependency>
+		<groupId>org.fl.noodle.common.mvc.vo</groupId>
+		<artifactId>noodlecommon-mvc-vo</artifactId>
+	</dependency>
+	
+	<dependency>
+		<groupId>org.fl.noodlenotify.console</groupId>
+		<artifactId>noodlenotify-console</artifactId>
+		<version>${noodlenotify.console.version}</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>org.fl.noodlenotify.trace</groupId>
+		<artifactId>noodlenotify-trace</artifactId>
+		<version>${noodlenotify.trace.version}</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.fl.noodlenotify.monitor.status</groupId>
+		<artifactId>noodlenotify-monitor-status</artifactId>
+		<version>${noodlenotify.monitor.status.version}</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>org.fl.noodlenotify.monitor.performance</groupId>
+  		<artifactId>noodlenotify-monitor-performance</artifactId>
+  		<version>${noodlenotify.monitor.performance.version}</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>org.fl.noodlenotify.core.client.producer</groupId>
+		<artifactId>noodlenotify-core-client-producer</artifactId>
+		<version>${noodlenotify.core.client.producer.version}</version>
+	</dependency>
+  	  	
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    
+    <!-- spring framework -->
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-context</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-context-support</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-orm</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-webmvc</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-web</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-test</artifactId>
+		<scope>test</scope>
+	</dependency>
+
+	<!-- log -->
+	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-api</artifactId>
+	</dependency>
+	<dependency>   
+		<groupId>ch.qos.logback</groupId>  
+		<artifactId>logback-classic</artifactId> 
+	</dependency>
+	<dependency>  
+	  <groupId>org.slf4j</groupId>  
+	  <artifactId>jcl-over-slf4j</artifactId>  
+	</dependency>
+ 	<dependency>
+	    <groupId>org.logback-extensions</groupId>
+	    <artifactId>logback-ext-spring</artifactId>
+	</dependency>
+	
+	<dependency>
+    	<groupId>net.sf.flexjson</groupId>
+    	<artifactId>flexjson</artifactId>
+   	</dependency>
+
+	<!-- mvc -->
+	<dependency>
+		<groupId>org.apache.tomcat</groupId>
+		<artifactId>servlet-api</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>javax.servlet</groupId>
+		<artifactId>jstl</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-webmvc</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-web</artifactId>
+	</dependency>
+    
+  </dependencies>
+  
+  <build>
+  
+    <finalName>noodlenotify</finalName>
+
+	<resources>
+		<resource>
+			<directory>${basedir}/src/main/resources</directory>
+			<filtering>false</filtering>
+		</resource>
+		<resource>
+			<directory>${basedir}/src/main/resources-release</directory>
+			<filtering>false</filtering>
+			<excludes>
+				<exclude>**/*</exclude>
+			</excludes>
+		</resource>
+	</resources>
+
+	<plugins>
+
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-resources-plugin</artifactId>
+			<executions>
+				<execution>
+					<id>copy-resources</id>
+					<phase>process-resources</phase>
+					<goals>
+              			<goal>copy-resources</goal>
+            		</goals>
+					<configuration>
+						<outputDirectory>${basedir}/target/classes/</outputDirectory>
+						<resources>
+							<resource>
+								<directory>src/main/resources-release</directory>
+								<filtering>true</filtering>
+								<includes>
+									<include>**/*.xml</include>
+								</includes>
+							</resource>
+						</resources>
+						<overwrite>true</overwrite>
+					</configuration>
+				</execution>
+			</executions>
+		</plugin>
+		
+		<plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-install-plugin</artifactId>
+	      <configuration>
+	        <skip>true</skip>
+	      </configuration>
+	    </plugin>
+	    
+	</plugins>
+    
+  </build>
+  
+</project>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="msg-storage-query-list">
+	<![CDATA[
+		SELECT 
+				msgStorage_Id,
+				name,
+				ip,
+				port,
+				system_Status,
+				manual_Status
+		FROM 	CSL_MSG_STORAGE
+		WHERE 	1=1
+		 		#if($msgStorage_Id)
+					AND msgStorage_Id = :msgStorage_Id
+				#end
+		 		#if($name)
+					AND name LIKE :name
+				#end
+		 		#if($ip)
+					AND ip LIKE :ip
+				#end
+		 		#if($port)
+					AND port = :port
+				#end
+		 		#if($system_Status)
+					AND system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND manual_Status = :manual_Status
+				#end
+				
+		ORDER BY msgStorage_Id desc
+	]]>
+	</query>
+	
+	<query name="msg-storage-query-list-exclude">
+	<![CDATA[
+		SELECT 
+				msgStorage_Id,
+				name,
+				ip,
+				port,
+				system_Status,
+				manual_Status
+		FROM 	CSL_MSG_STORAGE
+		WHERE 	1=1
+		 		#if($msgStorage_Id)
+					AND msgStorage_Id = :msgStorage_Id
+				#end
+		 		#if($name)
+					AND name LIKE :name
+				#end
+		 		#if($ip)
+					AND ip LIKE :ip
+				#end
+		 		#if($port)
+					AND port = :port
+				#end
+		 		#if($system_Status)
+					AND system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND manual_Status <> :manual_Status
+				#end
+				
+		ORDER BY msgStorage_Id desc
+	]]>
+	</query>
+
+</dynamic-hibernate>

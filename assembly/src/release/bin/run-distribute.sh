@@ -1,0 +1,1 @@
+java -server -Xmx${noodlenotify.distribute.jvm.xmx} -Xms${noodlenotify.distribute.jvm.xms} -classpath "../lib/*" org.fl.noodlenotify.core.run.Main -d -f ../conf/noodlenotify-core-distribute.xml -l ../conf/logback.distribute.xml

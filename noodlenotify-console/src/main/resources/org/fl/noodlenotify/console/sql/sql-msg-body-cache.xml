@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="msg-body-cache-query-list">
+	<![CDATA[
+		SELECT 
+				msgBodyCache_Id,
+				name,
+				ip,
+				port,
+				system_Status,
+				manual_Status,
+				size
+		FROM 	CSL_MSG_BODY_CACHE
+		WHERE 	1=1
+		 		#if($msgBodyCache_Id)
+					AND msgBodyCache_Id = :msgBodyCache_Id
+				#end
+		 		#if($name)
+					AND name LIKE :name
+				#end
+		 		#if($ip)
+					AND ip LIKE :ip
+				#end
+		 		#if($port)
+					AND port = :port
+				#end
+		 		#if($system_Status)
+					AND system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND manual_Status = :manual_Status
+				#end
+				
+		ORDER BY msgBodyCache_Id desc
+	]]>
+	</query>
+
+</dynamic-hibernate>

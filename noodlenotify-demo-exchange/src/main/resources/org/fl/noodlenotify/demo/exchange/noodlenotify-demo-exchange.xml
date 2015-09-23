@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
+	default-autowire="byName">
+	
+	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/db/manager/noodlenotify-core-connect-db-manager-exchange.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/body/manager/noodlenotify-core-connect-cache-body-manager-exchange.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/performance/schedule/noodlenotify-monitor-performance-schedule.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/trace/manager/noodlenotify-core-connect-cache-trace-manager-exchange.xml" />
+	
+	<bean id="netConnectReceiver" class="org.fl.noodlenotify.core.exchange.Exchange" 
+			init-method="start" destroy-method="destroy"
+			parent="exchangeParam"  
+			depends-on="netConnectReceiveServer">
+		<property name="localIp" value="127.0.0.1" />
+		<property name="dbConnectManager" ref="exchangeDbConnectManager" />
+		<property name="bodyCacheConnectManager" ref="exchangeBodyCacheConnectManager" />
+		<property name="traceCacheConnectManager" ref="exchangeTraceCacheConnectManager" />
+		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
+	</bean>
+    
+</beans>

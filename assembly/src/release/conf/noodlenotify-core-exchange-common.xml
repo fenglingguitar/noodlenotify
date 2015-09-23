@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
+	default-autowire="byName">
+	
+	<import resource="./noodlenotify-trace-exchange.xml" />
+	<import resource="./noodlenotify-monitor-performance-schedule.xml" />
+
+	<bean id="consoleRemotingInvoke" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
+	    <property name="serviceUrl" value="http://${noodlenotify.console.remoting.ip}:${noodlenotify.console.remoting.port}/${noodlenotify.console.remoting.url}/remoting/ConsoleRemotingInvokeService"/>
+	    <property name="serviceInterface" value="org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke"/>
+	</bean>
+	
+	<bean id="commonParam" abstract="true">
+		<property name="suspendTime" value="60000"/>
+	</bean>
+	
+	<bean id="dbDataSourceFactory" class="org.fl.noodlenotify.core.connect.db.datasource.C3p0DbDataSourceFactory">
+		<property name="dbName" value="${noodlenotify.message.db.name}"/>
+		<property name="user" value="${noodlenotify.message.db.user}"/>
+		<property name="password" value="${noodlenotify.message.db.password}"/>
+		<property name="idleConnectionTestPeriod" value="3"/>
+	</bean>
+	<bean id="dbConnectAgentConfParam" class="org.fl.noodlenotify.core.connect.db.DbConnectAgentConfParam">
+		<property name="insertThreadCount" value="10"/>
+		<property name="insertBatchSize" value="10000"/>
+		<property name="insertTimeout" value="300000"/>
+		<property name="insertWaitTime" value="1"/>
+		<property name="insertCapacity" value="10000000"/>
+		<property name="insertThreadPriority" value="6"/>
+		<property name="updateThreadCount" value="0"/>
+		<property name="updateBatchSize" value="10000"/>
+		<property name="updateTimeout" value="300000"/>
+		<property name="updateWaitTime" value="10"/>
+		<property name="updateCapacity" value="1000000"/>
+		<property name="updateThreadPriority" value="5"/>
+		<property name="deleteThreadCount" value="0"/>
+		<property name="deleteBatchSize" value="100000"/>
+		<property name="deleteTimeout" value="0"/>
+		<property name="deleteWaitTime" value="100"/>
+		<property name="deleteCapacity" value="100000"/>
+		<property name="deleteThreadPriority" value="5"/>
+	</bean>
+	<bean id="dbConnectAgentFactory" class="org.fl.noodlenotify.core.connect.db.mysql.MysqlDbConnectAgentFactory">
+		<property name="dbDataSourceFactory" ref="dbDataSourceFactory" />
+		<property name="dbConnectAgentConfParam" ref="dbConnectAgentConfParam" />
+	</bean>
+	<bean id="dbConnectManager" class="org.fl.noodlenotify.core.connect.db.manager.ExchangeDbConnectManager"
+			parent="commonParam">
+		<constructor-arg ref="dbConnectAgentFactory" />
+	</bean>
+	
+	<bean id="cacheConnectAgentConfParam" class="org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam">
+		<property name="maxActive" value="3000"/>
+		<property name="minIdle" value="8"/>
+		<property name="maxIdle" value="40"/>
+		<property name="maxWait" value="3000"/>
+		<property name="minEvictableIdleTimeMillis" value="600000"/>
+		<property name="timeBetweenEvictionRunsMillis" value="60000"/>
+		<property name="timeout" value="10000"/>
+		<property name="setThreadCount" value="10"/>
+		<property name="setBatchSize" value="1000"/>
+		<property name="setTimeout" value="1000"/>
+		<property name="setWaitTime" value="10"/>
+		<property name="setCapacity" value="100000"/>
+		<property name="setThreadPriority" value="5"/>
+		<property name="removeThreadCount" value="0"/>
+		<property name="removeBatchSize" value="1000"/>
+		<property name="removeTimeout" value="1000"/>
+		<property name="removeWaitTime" value="10"/>
+		<property name="removeCapacity" value="100000"/>
+		<property name="removeThreadPriority" value="5"/>
+	</bean>
+	<bean id="bodyCacheConnectAgentConfParam" class="org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgentConfParam">
+		<property name="expire" value="10800"/>
+		<property name="capacity" value="3000000"/>
+	</bean>
+	<bean id="redisBodyCacheConnectAgentFactory" class="org.fl.noodlenotify.core.connect.cache.body.redis.RedisBodyCacheConnectAgentFactory">
+		<property name="cacheConnectAgentConfParam" ref="cacheConnectAgentConfParam" />
+		<property name="bodyCacheConnectAgentConfParam" ref="bodyCacheConnectAgentConfParam" />
+	</bean>
+	<bean id="bodyCacheConnectManager" class="org.fl.noodlenotify.core.connect.cache.body.manager.ExchangeBodyCacheConnectManager"
+			parent="commonParam">
+		<constructor-arg ref="redisBodyCacheConnectAgentFactory" />
+	</bean>
+	
+	<bean id="netConnectReceiver" class="org.fl.noodlenotify.core.exchange.Exchange" 
+			init-method="start" destroy-method="destroy" 
+			depends-on="netConnectReceiveServer"
+			parent="exchangeAbstract">
+		<property name="exchangeName" value="${noodlenotify.exchange.name}" />
+		<property name="dbConnectManager" ref="dbConnectManager" />
+		<property name="bodyCacheConnectManager" ref="bodyCacheConnectManager" />
+		<property name="traceCacheConnectManager" ref="traceCacheConnectManager" />
+		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
+	</bean>
+	
+	<bean id="jettyNetConnectServerCheckHandler" class="org.fl.noodlenotify.core.connect.net.jetty.server.JettyNetConnectServerCheckHandler" />
+	<bean id="jettyNetConnectCheckServer" class="org.fl.noodlenotify.core.connect.net.jetty.server.JettyNetConnectServer"
+			init-method="start" destroy-method="destroy" 
+			parent="exchangeCheckAbstract">
+		<property name="servletHandler" ref="jettyNetConnectServerCheckHandler" />
+	</bean>
+    
+</beans>

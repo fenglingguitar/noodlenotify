@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="queue-customer-query-list">
+	<![CDATA[
+		SELECT 
+				queue_Nm,
+				customer_Id
+		FROM 	CSL_QUEUE_CUSTOMER
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND queue_Nm = :queue_Nm
+				#end
+		 		#if($customer_Id)
+					AND customer_Id = :customer_Id
+				#end
+		ORDER BY customer_Id DESC
+	]]>
+	</query>
+	
+	<query name="queue-customer-query-includelist">
+	<![CDATA[
+		SELECT 
+				qc.queue_Nm,
+				c.customer_Id,
+				c.name,
+				c.ip,
+				c.port,
+				c.url,
+				c.type,
+				c.check_Port,
+				c.check_Url,
+				c.check_Type,
+				c.system_Status,
+				c.manual_Status,
+				c.customerGroup_Nm
+		FROM CSL_CUSTOMER c, CSL_QUEUE_CUSTOMER qc
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND qc.queue_Nm = :queue_Nm
+				#end
+				#if($name)
+					AND c.name LIKE :name
+				#end
+		 		#if($ip)
+					AND c.ip LIKE :ip
+				#end
+		 		#if($port)
+					AND c.port = :port
+				#end
+				#if($type)
+					AND c.type = :type
+				#end
+		 		#if($check_Port)
+					AND c.check_Port = :check_Port
+				#end
+				#if($check_Type)
+					AND c.check_Type = :check_Type
+				#end
+		 		#if($system_Status)
+					AND c.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND c.manual_Status = :manual_Status
+				#end
+		 		#if($customerGroup_Nm)
+					AND c.customerGroup_Nm = :customerGroup_Nm
+				#end
+				AND c.customer_Id = qc.customer_Id
+		ORDER BY c.customer_Id DESC
+	]]>
+	</query>
+	
+	<query name="queue-customer-query-excludelist">
+	<![CDATA[
+		SELECT 
+				c.customer_Id,
+				c.name,
+				c.ip,
+				c.port,
+				c.url,
+				c.type,
+				c.check_Port,
+				c.check_Url,
+				c.check_Type,
+				c.system_Status,
+				c.manual_Status,
+				c.customerGroup_Nm
+		FROM CSL_CUSTOMER c
+		WHERE 	1=1
+				#if($name)
+					AND c.name LIKE :name
+				#end
+		 		#if($ip)
+					AND c.ip LIKE :ip
+				#end
+		 		#if($port)
+					AND c.port = :port
+				#end
+				#if($type)
+					AND c.type = :type
+				#end
+		 		#if($check_Port)
+					AND c.check_Port = :check_Port
+				#end
+				#if($check_Type)
+					AND c.check_Type = :check_Type
+				#end
+		 		#if($system_Status)
+					AND c.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND c.manual_Status = :manual_Status
+				#end
+		 		#if($customerGroup_Nm)
+					AND c.customerGroup_Nm = :customerGroup_Nm
+				#end
+				AND c.customer_Id NOT IN (SELECT customer_Id FROM CSL_QUEUE_CUSTOMER  WHERE queue_Nm = :queue_Nm)
+		ORDER BY c.customer_Id DESC
+	]]>
+	</query>
+	
+	<query name="queue-customer-query-queue">
+	<![CDATA[
+		SELECT 	
+				q.queue_Nm,
+				q.is_Repeat,
+				q.expire_Time,
+				q.manual_Status,
+				qc.customer_Id
+		FROM 	CSL_QUEUE q, CSL_QUEUE_CUSTOMER qc
+		WHERE 	1=1
+		 		#if($customer_Id)
+					AND qc.customer_Id = :customer_Id
+				#end
+				#if($queue_Nm)
+					AND q.queue_Nm = :queue_Nm
+				#end
+		 		#if($manual_Status)
+					AND q.manual_Status = :manual_Status
+				#end
+				AND q.queue_Nm = qc.queue_Nm
+	]]>
+	</query>
+	
+	<query name="queue-customer-query-customer">
+	<![CDATA[
+		SELECT 
+				c.customer_Id,
+				c.name,
+				c.ip,
+				c.port,
+				c.url,
+				c.type,
+				c.check_Port,
+				c.check_Url,
+				c.check_Type,
+				c.system_Status,
+				c.manual_Status,
+				c.customerGroup_Nm,
+                qc.queue_Nm
+        FROM 	CSL_CUSTOMER c, CSL_QUEUE_CUSTOMER qc
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND qc.queue_Nm = :queue_Nm
+				#end
+		 		#if($system_Status)
+					AND c.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND c.manual_Status = :manual_Status
+				#end
+				#if($customerGroup_Nm)
+					AND c.customerGroup_Nm = :customerGroup_Nm
+				#end
+				AND c.customer_Id = qc.customer_Id
+	]]>
+	</query>
+</dynamic-hibernate>
