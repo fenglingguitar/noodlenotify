@@ -18,6 +18,12 @@
 	<bean id="consoleRemotingInvoke" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
 	    <property name="serviceUrl" value="http://${noodlenotify.console.remoting.ip}:${noodlenotify.console.remoting.port}/${noodlenotify.console.remoting.url}/remoting/ConsoleRemotingInvokeService"/>
 	    <property name="serviceInterface" value="org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke"/>
+		<property name="httpInvokerRequestExecutor" ref="httpInvokerRequestExecutor"/>
+	</bean>
+	
+	<bean id="httpInvokerRequestExecutor" class="org.springframework.remoting.httpinvoker.SimpleHttpInvokerRequestExecutor">
+	    <property name="connectTimeout" value="10000"/>
+	    <property name="readTimeout" value="10000"/>
 	</bean>
 	
 	<bean id="commonParam" abstract="true">
