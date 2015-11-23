@@ -324,6 +324,7 @@ public class Distribute {
 							if (queueDistributerVoOld.getIs_Repeat() != queueDistributerVo.getIs_Repeat() 
 									|| queueDistributerVoOld.getExpire_Time() != queueDistributerVo.getExpire_Time()
 										|| queueDistributerVoOld.getIs_Trace() != queueDistributerVo.getIs_Trace()
+											|| queueDistributerVoOld.getInterval_Time() != queueDistributerVo.getInterval_Time()
 							) {
 								DistributeGet distributeGet = distributeGetMap.get(queueDistributerVo.getQueue_Nm());
 								distributeGet.setQueueDistributerVo(queueDistributerVo);
