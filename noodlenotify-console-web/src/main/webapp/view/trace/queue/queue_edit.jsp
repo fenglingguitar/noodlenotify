@@ -141,6 +141,8 @@
 			<input type="hidden" id="is_Repeat"/>
 			<input type="hidden" id="interval_Time"/>
 			<input type="hidden" id="expire_Time"/>
+			<input type="hidden" id="dph_Delay_Time"/>
+			<input type="hidden" id="dph_Timeout"/>
 			<input type="hidden" id="new_Pop_ThreadNum"/>
 			<input type="hidden" id="new_Exe_ThreadNum"/>
 			<input type="hidden" id="portion_Pop_ThreadNum"/>

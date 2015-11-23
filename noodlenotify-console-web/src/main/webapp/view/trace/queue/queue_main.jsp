@@ -62,6 +62,8 @@
 					'是否重发',
 					'过期时间',
 					'间隔时间',
+					'推送延迟时间',
+					'推送超时时间',
 					'是否跟踪',
 					'新消息POP线程数量',
 					'新消息EXE线程数量',
@@ -77,6 +79,12 @@
 					, hidden:true},
 					{name:'interval_Time', index:'interval_Time', width:100, align:'center', formatter:'select', 
 						editoptions:{value:'60000:1分钟;120000:2分钟;180000:3分钟;300000:5分钟;600000:10分钟;900000:15分钟;1800000:30分钟;3600000:1小时;10800000:3小时;21600000:6小时;43200000:12小时;86400000:1天;'}
+					, hidden:true},
+					{name:'dph_Delay_Time', index:'dph_Delay_Time', width:100, align:'center',formatter:'select', 
+						editoptions:{value:'0:不延迟;1000:1秒;2000:2秒;3000:3秒;5000:5秒;10000:10秒;30000:30秒;60000:1分钟;120000:2分钟;180000:3分钟;300000:5分钟;600000:10分钟;900000:15分钟;1800000:30分钟;3600000:1小时;10800000:3小时;21600000:6小时;43200000:12小时;86400000:1天;'}
+					, hidden:true},
+					{name:'dph_Timeout', index:'dph_Timeout', width:100, align:'center',formatter:'select', 
+						editoptions:{value:'0:;1000:1秒;2000:2秒;3000:3秒;5000:5秒;10000:10秒;30000:30秒;60000:1分钟;120000:2分钟;180000:3分钟;300000:5分钟;600000:10分钟;900000:15分钟;1800000:30分钟;3600000:1小时;'}
 					, hidden:true},
 					{name:'is_Trace', index:'is_Trace', width:100, align:'center', formatter:'checkbox', editoptions:{value:'1:0'}},
 					{name:'new_Pop_ThreadNum', index:'new_Pop_ThreadNum', width:150, align:'center', formatter:'select', 

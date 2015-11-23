@@ -32,7 +32,7 @@ public class OvertimeCharController {
 	
 	@RequestMapping(value = "/querychartsinglenow")
 	@NoodleResponseBody
-	public List<OvertimeVo> queryChartSingleNow(@NoodleRequestParam KeyVo keyVo, @NoodleRequestParam(type = "string") String region) throws Exception {
+	public List<OvertimeVo> queryChartSingleNow(@NoodleRequestParam KeyVo keyVo, String region) throws Exception {
 		long regionLong = region != null && !region.equals("") ? Long.valueOf(region) : 60;
 		long nowTime = System.currentTimeMillis();
 		return redisPersistenceTemplate.queryList(keyVo.toKeyString(), nowTime - regionLong * 60000, nowTime, OvertimeVo.class);
@@ -46,7 +46,7 @@ public class OvertimeCharController {
 	
 	@RequestMapping(value = "/querychartsinglenowlast")
 	@NoodleResponseBody
-	public List<OvertimeVo> queryChartSinglenowlast(@NoodleRequestParam KeyVo keyVo, @NoodleRequestParam(type = "string") String intervalLastTime) throws Exception {
+	public List<OvertimeVo> queryChartSinglenowlast(@NoodleRequestParam KeyVo keyVo, String intervalLastTime) throws Exception {
 		long intervalLastTimeLong = intervalLastTime != null && !intervalLastTime.equals("") ? Long.valueOf(intervalLastTime) : System.currentTimeMillis();
 		return redisPersistenceTemplate.queryList(keyVo.toKeyString(), intervalLastTimeLong, Long.MAX_VALUE, OvertimeVo.class);
 	}
