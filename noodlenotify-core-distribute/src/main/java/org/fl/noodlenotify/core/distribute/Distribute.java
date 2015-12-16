@@ -1,6 +1,5 @@
 package org.fl.noodlenotify.core.distribute;
 
-import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.ConnectAgent;
@@ -76,9 +75,9 @@ public class Distribute {
 		
 		if (distributeName == null || 
 				(distributeName != null && distributeName.equals("hostname"))) {
-			distributeName = InetAddress.getLocalHost().getHostName();
+			distributeName = NetAddressUtil.getLocalHostName();
 		}
-		localIp = localIp == null ? InetAddress.getLocalHost().getHostAddress() : localIp;
+		localIp = localIp == null ? NetAddressUtil.getLocalIp(): localIp;
 		moduleId = consoleRemotingInvoke.distributerRegister(localIp, checkPort, distributeName);
 		
 		MemoryStorage.moduleName = MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE;

@@ -1,6 +1,5 @@
 package org.fl.noodlenotify.core.exchange;
 
-import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,7 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.core.connect.ConnectAgent;
@@ -83,9 +82,9 @@ public class Exchange implements NetConnectReceiver {
 		
 		if (exchangeName == null || 
 				(exchangeName != null && exchangeName.equals("hostname"))) {
-			exchangeName = InetAddress.getLocalHost().getHostName();
+			exchangeName = NetAddressUtil.getLocalHostName();
 		}
-		localIp = localIp == null ? InetAddress.getLocalHost().getHostAddress() : localIp;
+		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
 		moduleId = consoleRemotingInvoke.exchangerRegister(localIp, localPort, url, type, checkPort, exchangeName);
 		
 		MemoryStorage.moduleName = MonitorPerformanceConstant.MODULE_ID_EXCHANGE;

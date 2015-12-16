@@ -1,10 +1,10 @@
 package org.fl.noodlenotify.core.cclient;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.core.connect.exception.ConnectionInvokeException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionStopException;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
@@ -36,9 +36,9 @@ public class ConsumerClient implements NetConnectReceiver {
 		
 		if (consumerClientName == null || 
 				(consumerClientName != null && consumerClientName.equals("hostname"))) {
-			consumerClientName = InetAddress.getLocalHost().getHostName();
+			consumerClientName = NetAddressUtil.getLocalHostName();
 		}		
-		localIp = localIp == null ? InetAddress.getLocalHost().getHostAddress() : localIp;
+		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
 		moduleId = consoleRemotingInvoke.customerRegister(localIp, localPort, url, type, checkPort,
 					checkUrl, checkType, consumerClientName, customerGroupName, 
 					new ArrayList<String>(consumerReceiverMap.keySet()));

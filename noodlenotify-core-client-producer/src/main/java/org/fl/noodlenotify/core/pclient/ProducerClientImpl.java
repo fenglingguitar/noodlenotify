@@ -1,10 +1,10 @@
 package org.fl.noodlenotify.core.pclient;
 
-import java.net.InetAddress;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.core.connect.ConnectAgent;
 import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
@@ -45,9 +45,9 @@ public class ProducerClientImpl implements ProducerClient {
 		
 		if (producerClientName == null || 
 				(producerClientName != null && producerClientName.equals("hostname"))) {
-			producerClientName = InetAddress.getLocalHost().getHostName();
+			producerClientName = NetAddressUtil.getLocalHostName();
 		}
-		localIp = localIp == null ? InetAddress.getLocalHost().getHostAddress() : localIp;
+		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
 		moduleId = consoleRemotingInvoke.producerRegister(localIp, checkPort, checkUrl, checkType, producerClientName);		
 
 		netConnectManager.setModuleId(moduleId);
