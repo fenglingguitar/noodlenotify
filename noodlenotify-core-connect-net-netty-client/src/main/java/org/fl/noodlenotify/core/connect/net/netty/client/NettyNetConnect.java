@@ -79,9 +79,11 @@ public class NettyNetConnect {
                 && !socket.isOutputShutdown();
     }
 	
-	public String send(Object object) throws Exception {
+	public String send(Object object, int readTimeout) throws Exception {
 		
 		connect();
+		
+		socket.setSoTimeout(readTimeout);
 		
 		String jMessage = JsonTranslator.toString(object);
 		

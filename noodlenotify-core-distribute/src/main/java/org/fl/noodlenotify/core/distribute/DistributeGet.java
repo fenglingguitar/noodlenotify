@@ -644,7 +644,7 @@ public class DistributeGet {
 																		messageDm.getQueueName(), 
 																		messageDm.getUuid(), 
 																		new String(messageDm.getContent(), "UTF-8")
-																		));
+																		), (int)queueDistributerVo.getDph_Timeout());
 											overtimePerformanceExecuterService.after(
 													MonitorPerformanceConstant.MODULE_ID_CUSTOMER,
 													((ConnectAgent)netConnectAgent).getConnectId(),

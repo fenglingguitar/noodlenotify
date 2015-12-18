@@ -75,6 +75,11 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 
 	@Override
 	public String send(Message message) throws Exception {
+		return send(message, nettyNetConnectPoolConfParam.getTimeout());
+	}
+	
+	@Override
+	public String send(Message message, int readTimeout) throws Exception {
 
 		if (connectStatus.get() == false) {
 			throw new ConnectionUnableException("Connection disable for the net netty connect agent");
@@ -85,7 +90,7 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 		String uuid = null;
 		
 		try {
-			uuid = nettyNetConnect.send(message);
+			uuid = nettyNetConnect.send(message, readTimeout);
 		} catch (NettyConnectionException e) { 
 			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
@@ -162,7 +167,7 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 		NettyNetConnect nettyNetConnect = getConnect();
 
 		try {
-			nettyNetConnect.send("CheckHealth");
+			nettyNetConnect.send("CheckHealth", nettyNetConnectPoolConfParam.getTimeout());
 		} catch (NettyConnectionException e) { 
 			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {

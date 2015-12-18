@@ -32,6 +32,13 @@
 		<version>${noodlenotify.core.connect.net.api.version}</version>
 	</dependency>
   
+  	<dependency>
+		<groupId>org.fl.noodlenotify.core.connect.net.netty.server</groupId>
+  		<artifactId>noodlenotify-core-connect-net-netty-server</artifactId>
+  		<version>${noodlenotify.core.connect.net.netty.server.version}</version>
+  		<scope>test</scope>
+	</dependency>
+  
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

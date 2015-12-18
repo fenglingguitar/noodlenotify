@@ -81,6 +81,11 @@ public class RmiNetConnectAgent extends ConnectAgentAbstract implements NetConne
 	
 	@Override
 	public String send(Message message) throws Exception {
+		return send(message, 0);
+	}
+	
+	@Override
+	public String send(Message message, int readTimeout) throws Exception {
 		
 		if (connectStatus.get() == false) {
 			throw new ConnectionUnableException("Connection disable for the net rmi connect agent");

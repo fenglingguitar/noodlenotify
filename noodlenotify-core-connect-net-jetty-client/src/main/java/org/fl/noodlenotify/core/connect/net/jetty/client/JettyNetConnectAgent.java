@@ -72,6 +72,11 @@ public class JettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 
 	@Override
 	public String send(Message message) throws Exception {
+		return send(message, timeout);
+	}
+	
+	@Override
+	public String send(Message message, int readTimeout) throws Exception {
 
 		if (connectStatus.get() == false) {
 			throw new ConnectionUnableException("Connection disable for the net jetty connect agent");
@@ -80,7 +85,7 @@ public class JettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 		String uuid = null;
 		
 		try {
-			uuid = jettyNetConnect.send(message);
+			uuid = jettyNetConnect.send(message, readTimeout);
 		} catch (java.net.ConnectException e) { 
 			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
@@ -159,7 +164,7 @@ public class JettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 		}
 		
 		try {
-			jettyNetConnect.send("CheckHealth");
+			jettyNetConnect.send("CheckHealth", timeout);
 		} catch (java.net.ConnectException e) { 
 			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {

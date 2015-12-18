@@ -53,12 +53,12 @@ public class JettyNetConnect {
 		}
 	}
 	
-	public String send(Object object) throws Exception {
+	public String send(Object object, int readTimeout) throws Exception {
 		
 		String jMessage = URLEncoder.encode(JsonTranslator.toString(object), "utf-8");
 		String request = new StringBuilder().append("input=").append(jMessage).toString();
 		
-		String jResult = requestTo(request);
+		String jResult = requestTo(request, readTimeout);
 		
 		MessageResult messageResult = JsonTranslator.fromString(jResult, MessageResult.class);
 		
@@ -73,7 +73,7 @@ public class JettyNetConnect {
 		return uuid;
 	}
 	
-	public String requestTo(String request) throws Exception {
+	public String requestTo(String request, int readTimeout) throws Exception {
 		
 		HttpURLConnection httpURLConnection = (HttpURLConnection) httpUrl.openConnection();
 		httpURLConnection.setDoOutput(true);
@@ -81,7 +81,7 @@ public class JettyNetConnect {
 		httpURLConnection.setRequestMethod("POST");
 		httpURLConnection.setUseCaches(false);  
 		httpURLConnection.setConnectTimeout(timeout);
-		httpURLConnection.setReadTimeout(timeout);             
+		httpURLConnection.setReadTimeout(readTimeout);             
 		httpURLConnection.setRequestProperty("Accept-Charset", "UTF-8");
 		httpURLConnection.setRequestProperty("Connection", "keepalive");
 		httpURLConnection.setRequestProperty("Keep-Alive", "30");

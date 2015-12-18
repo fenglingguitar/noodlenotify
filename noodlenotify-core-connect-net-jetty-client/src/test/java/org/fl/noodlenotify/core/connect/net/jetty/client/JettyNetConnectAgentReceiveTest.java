@@ -10,7 +10,6 @@ import org.fl.noodlenotify.core.connect.net.pojo.Message;
 @ContextConfiguration(locations = {
 		"classpath:org/fl/noodlenotify/core/connect/net/jetty/client/noodlenotify-core-connect-net-client-jetty-receive.xml"
 })
-
 public class JettyNetConnectAgentReceiveTest extends AbstractJUnit4SpringContextTests {
 
 	@Autowired
