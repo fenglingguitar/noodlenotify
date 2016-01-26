@@ -152,7 +152,7 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 											&& connectAgent.getPort() == queueCustomerVo.getPort()
 												&& (connectAgent.getUrl() != null && queueCustomerVo.getUrl() != null && connectAgent.getUrl().equals(queueCustomerVo.getUrl()) || (connectAgent.getUrl() == null && queueCustomerVo.getUrl() == null))
 													&& connectAgent.getType().equals(queueCustomerVo.getType())
-														&& (connectAgent.getTimeout() == 0 || queueCustomerVo.getDph_Timeout() == 0 || connectAgent.getTimeout() == queueCustomerVo.getDph_Timeout())
+														/*&& (connectAgent.getTimeout() == 0 || queueCustomerVo.getDph_Timeout() == 0 || connectAgent.getTimeout() == queueCustomerVo.getDph_Timeout())*/
 									) {
 										if (connectAgent.getConnectStatus() == false) {
 											try {
