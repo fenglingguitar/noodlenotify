@@ -208,7 +208,7 @@
 					<th><label id="check_Port_Label">监测PORT</label></th>
 				    <td><input type="text" id="check_Port" maxlength="11"/></td>
 			    	<th><label id="check_Url_Label">监测URL</label></th>
-			    	<td><input type="text" id="check_Url" maxlength="32"/></td>
+			    	<td><input type="text" id="check_Url" maxlength="512"/></td>
 				</tr>
 				<tr>
 					<th><label id="check_Type_Label">监测类型</label></th>
