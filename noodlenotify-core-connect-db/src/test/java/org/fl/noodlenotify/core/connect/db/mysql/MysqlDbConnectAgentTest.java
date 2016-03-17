@@ -9,12 +9,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
-
 import org.fl.noodlenotify.core.connect.ConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbStatusChecker;
 import org.fl.noodlenotify.core.connect.db.mysql.MysqlDbConnectAgent;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
+import org.fl.noodlenotify.core.domain.message.MessageVo;
 import org.fl.noodle.common.util.json.JsonTranslator;
 
 @ContextConfiguration(locations = {
@@ -236,6 +236,15 @@ public class MysqlDbConnectAgentTest extends AbstractJUnit4SpringContextTests {
 	public final void testCheckPortionLen() throws Exception {
 		DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbConnectAgent;
 		logger.info("CheckPortionLen: " + dbStatusChecker.checkPortionLen("TestQueue1"));
+	}
+	
+	@Test
+	public final void testQueryPortionMessage() throws Exception {
+		DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbConnectAgent;
+		List<MessageVo> messageVoList = dbStatusChecker.queryPortionMessage("TestQueue1", null, null, null, 0, 20);
+		for (MessageVo messageVoIt : messageVoList) {
+			logger.info("Message: " + messageVoIt.getUuid());
+		}
 	}
 	
 	@Test

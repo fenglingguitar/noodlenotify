@@ -14,7 +14,11 @@
 		<target>System.err</target>  
 	</appender>
 	
-	<logger name="org.fl" level="DEBUG" additivity="false">    
+	<logger name="org.fl.noodlecommon" level="INFO" additivity="false">    
+		<appender-ref ref="STDOUT-APPENDER" /> 
+	</logger>
+	
+	<logger name="org.fl.noodlenotify" level="DEBUG" additivity="false">    
 		<appender-ref ref="STDOUT-APPENDER" /> 
 	</logger>
 	

@@ -45,7 +45,7 @@
 					'队列名称', 
 					'控制状态',
 					'新消息数量',
-					'未完成消息数量',
+					'重试消息数量',
 					'1分钟接收吞吐量',
 					'1分钟接收超时率(%)',
 					'1分钟接收错误率(%)',
@@ -65,7 +65,7 @@
 					{name:'queue_Nm', index:'queue_Nm', width:300, align: 'center'},
 			   		{name:'manual_Status', index:'manual_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:有效;2:无效'}},
 					{name:'new_Len', index:'new_Len', width:150, align: 'center'},
-					{name:'portion_Len', index:'portion_Len', width:150, align: 'center'},
+					{name:'portion_Len', index:'portion_Len', width:150, align: 'center', formatter:portionLenOperator},
 					{name:'rev_T_Cnt_Mit', index:'rev_T_Cnt_Mit', width:150, align: 'center'},
 					{name:'rev_O_Rate_Mit', index:'rev_O_Rate_Mit', width:150, align: 'center'},
 					{name:'rev_E_Rate_Mit', index:'rev_E_Rate_Mit', width:150, align: 'center'},
@@ -136,6 +136,19 @@
 		    }).trigger('reloadGrid');
 		}
 		
+		function portionLenOperator(cellvalue, options, rawObject) {
+			if (cellvalue > 0) {
+				return '<a href="javascript:queryPortionLen(\'' + rawObject['queue_Nm'] + '\')" style="color:#CC3300;">' + cellvalue + '</a>';
+			}
+			return cellvalue;
+		}
+		
+		function queryPortionLen(queue_Nm) {
+			var paramObject = new Object();
+			paramObject['queue_Nm'] = queue_Nm;
+			paramObject['type'] = 2;
+			top.openDialog('消息查询', '<%=request.getContextPath()%>/view/monitor/queue/message_main.jsp', paramObject, 600, 1100, null);			
+		}
 	</script>
   </head>
 

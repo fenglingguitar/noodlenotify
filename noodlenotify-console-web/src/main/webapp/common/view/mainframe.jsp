@@ -240,6 +240,46 @@
 				}
 			}
 		}
+		
+		var dialogCallbackChild = null;
+		
+		function openDialogChild(title, url, urlParam, height, width, callback) {
+			height = height != null && height != '' ? height : window.screen.height - 190;
+			width = width != null && width != '' ? width : window.screen.width - 300;
+			if (urlParam != null && urlParam != '') {
+				var strParam = jsonToString(urlParam);
+				url = appendURLParam(url, 'urlParam', strParam);
+			}
+			$('#dialogChild').wijdialog({
+				showStatus: false,
+				showControlBox: false,
+				autoOpen: false,
+				modal: true,
+				height: height,
+				width: width,
+				title: title,
+				buttons: {
+					'Cancel': function () {
+						$(this).wijdialog('close');
+					}
+				},
+				close: function () {
+					$('#dialogChild').empty();
+				}
+			});
+			$('#dialogChild').append('<iframe src="'+ url +'" width="100%" height="100%" frameborder="0"></iframe>');
+			$('#dialogChild').wijdialog('open');
+			dialogCallbackChild = callback;
+		}
+		
+		function closeDialogChild(isCallback, param) {
+			$('#dialogChild').wijdialog('close');
+			if (isCallback) {
+				if (dialogCallbackChild != null) {
+					dialogCallbackChild(param);
+				}
+			}
+		}
 	    
 	</script>
   </head>
@@ -309,6 +349,7 @@
 			</div>
 		</div>
 		<div id="dialog" style="width:100%;"></div>
+		<div id="dialogChild" style="width:100%;"></div>
 	</div>
   </body>
 </html>

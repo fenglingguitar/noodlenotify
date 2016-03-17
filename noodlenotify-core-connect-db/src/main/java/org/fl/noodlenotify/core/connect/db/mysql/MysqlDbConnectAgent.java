@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -23,7 +25,6 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
-
 import org.fl.noodlenotify.core.connect.db.DbConnectAgentAbstract;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.db.datasource.DbDataSource;
@@ -33,6 +34,7 @@ import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
+import org.fl.noodlenotify.core.domain.message.MessageVo;
 import org.fl.noodlenotify.monitor.performance.constant.MonitorPerformanceConstant;
 import org.fl.noodlenotify.monitor.performance.executer.service.impl.OvertimePerformanceExecuterService;
 import org.fl.noodlenotify.monitor.performance.executer.service.impl.SuccessPerformanceExecuterService;
@@ -1294,6 +1296,160 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 		}
 		
 		return len;
+	}
+	
+
+	@Override
+	public List<MessageVo> queryPortionMessage(String queueName, String uuid, Long region, String content, Integer page, Integer rows) throws Exception {
+		
+		if (connectStatus.get() == false) {
+			throw new ConnectionUnableException("Connection disable for the db connect agent");
+		}
+		
+		List<Object> objectList = new ArrayList<Object>();
+		objectList.add(MessageConstant.MESSAGE_STATUS_PORTION);		
+		
+		String sql = "SELECT i.ID, UUID, CONTENT_ID, QUEUE_NAME, EXECUTE_QUEUE, RESULT_QUEUE, STATUS, BEGIN_TIME, FINISH_TIME, CONVERT(CONTENT USING utf8) CONTENT FROM MSG_" + queueName.toUpperCase().replace(".", "_") 
+				+ "_IF i LEFT JOIN MSG_" + queueName.toUpperCase().replace(".", "_") + "_CT c ON i.CONTENT_ID = c.ID WHERE STATUS = ? ";
+				
+		if (uuid != null && !uuid.isEmpty()) {
+			sql += "AND UUID = ? ";
+			objectList.add(uuid);
+		}
+		
+		if (region != null && region > 0) {
+			sql += "AND BEGIN_TIME > ? ";
+			objectList.add(System.currentTimeMillis() - region);
+		}
+		
+		if (content != null && !content.isEmpty()) {
+			sql += "AND CONVERT(CONTENT USING utf8) LIKE ? ";
+			objectList.add("%" + content + "%");
+		}
+				
+		final String sqlFinal = sql + "ORDER BY i.ID DESC LIMIT ?,?";
+		
+		objectList.add(page);
+		objectList.add(rows);
+		
+		List<MessageVo> messageDmList = null;
+		try {
+			messageDmList = jdbcTemplate.query(sqlFinal, objectList.toArray(), new RowMapper<MessageVo>() {
+				@Override
+				public MessageVo mapRow(ResultSet resultSet, int index)
+						throws SQLException {
+					MessageVo messageVo = new MessageVo();
+					messageVo.setId(resultSet.getLong("ID"));
+					messageVo.setUuid(resultSet.getString("UUID"));
+					messageVo.setQueueName(resultSet.getString("QUEUE_NAME"));
+					messageVo.setContentId(resultSet.getLong("CONTENT_ID"));
+					messageVo.setExecuteQueue(resultSet.getLong("EXECUTE_QUEUE"));
+					messageVo.setResultQueue(resultSet.getLong("RESULT_QUEUE"));
+					messageVo.setStatus(resultSet.getByte("STATUS"));
+					messageVo.setDb(connectId);
+					messageVo.setBeginTime(new Date(resultSet.getLong("BEGIN_TIME")));
+					messageVo.setFinishTime(new Date(resultSet.getLong("FINISH_TIME")));
+					messageVo.setContent(resultSet.getString("CONTENT"));
+					return messageVo;
+				}
+			});
+		} catch (RecoverableDataAccessException e) {	
+			connectStatus.set(false);
+			if (logger.isErrorEnabled()) {
+				logger.error("queryPortionMessage -> " 
+						+ "DB: " + connectId
+						+ ", Ip: " + ip
+						+ ", Port: " + port
+						+ ", query portion message -> " + e);
+			}
+			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+		} catch (Exception e) {	
+			if (logger.isErrorEnabled()) {
+				logger.error("queryPortionMessage -> " 
+						+ "DB: " + connectId
+						+ ", Ip: " + ip
+						+ ", Port: " + port
+						+ ", query portion message -> " + e);
+			}
+			throw e;
+		}
+		return messageDmList;
+	}
+	
+	@Override
+	public void savePortionMessage(String queueName, Long contentId, String content) throws Exception {
+		
+		if (connectStatus.get() == false) {
+			throw new ConnectionUnableException("Connection disable for the db connect agent");
+		}
+		
+		String sql = "UPDATE MSG_" + queueName.toUpperCase().replace(".", "_") + "_CT SET CONTENT = ? WHERE ID = ?";
+				
+		final String sqlFinal = sql;
+		
+		try {
+			jdbcTemplate.update(sqlFinal, new Object[]{
+					content,
+					contentId,
+			});
+		} catch (RecoverableDataAccessException e) {	
+			connectStatus.set(false);
+			if (logger.isErrorEnabled()) {
+				logger.error("savePortionMessage -> " 
+						+ "DB: " + connectId
+						+ ", Ip: " + ip
+						+ ", Port: " + port
+						+ ", save portion message -> " + e);
+			}
+			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+		} catch (Exception e) {	
+			if (logger.isErrorEnabled()) {
+				logger.error("savePortionMessage -> " 
+						+ "DB: " + connectId
+						+ ", Ip: " + ip
+						+ ", Port: " + port
+						+ ", save portion message -> " + e);
+			}
+			throw e;
+		}
+	}
+	
+	@Override
+	public void deletePortionMessage(String queueName, Long id) throws Exception {
+		
+		if (connectStatus.get() == false) {
+			throw new ConnectionUnableException("Connection disable for the db connect agent");
+		}
+		
+		String sql = "UPDATE MSG_" + queueName.toUpperCase().replace(".", "_") + "_IF SET STATUS = ? WHERE ID = ?";
+				
+		final String sqlFinal = sql;
+		
+		try {
+			jdbcTemplate.update(sqlFinal, new Object[]{
+					MessageConstant.MESSAGE_STATUS_FINISH,
+					id
+			});
+		} catch (RecoverableDataAccessException e) {	
+			connectStatus.set(false);
+			if (logger.isErrorEnabled()) {
+				logger.error("deletePortionMessage -> " 
+						+ "DB: " + connectId
+						+ ", Ip: " + ip
+						+ ", Port: " + port
+						+ ", delete portion message -> " + e);
+			}
+			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+		} catch (Exception e) {	
+			if (logger.isErrorEnabled()) {
+				logger.error("deletePortionMessage -> " 
+						+ "DB: " + connectId
+						+ ", Ip: " + ip
+						+ ", Port: " + port
+						+ ", delete portion message -> " + e);
+			}
+			throw e;
+		}
 	}
 	
 	public void setDbDataSourceFactory(DbDataSourceFactory dbDataSourceFactory) {
