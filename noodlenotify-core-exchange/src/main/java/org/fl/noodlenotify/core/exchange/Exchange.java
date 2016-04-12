@@ -316,7 +316,7 @@ public class Exchange implements NetConnectReceiver {
 				);
 		
 		if (messageDm.getContent().length > sizeLimit) {
-			if (logger.isDebugEnabled()) {
+			if (logger.isErrorEnabled()) {
 				logger.error("Receive -> "
 						+ "Queue: " + messageDm.getQueueName()
 						+ ", UUID: " + messageDm.getUuid()
@@ -344,7 +344,7 @@ public class Exchange implements NetConnectReceiver {
 			messageDm.setExecuteQueue(queueCustomerGroupNum);
 			messageDm.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
 		} else {
-			if (logger.isDebugEnabled()) {
+			if (logger.isErrorEnabled()) {
 				logger.error("Receive -> "
 						+ "Queue: " + messageDm.getQueueName()
 						+ ", UUID: " + messageDm.getUuid()
@@ -384,7 +384,7 @@ public class Exchange implements NetConnectReceiver {
 						}
 					} else {
 						bodyCacheConnectManager.startUpdateConnectAgent();
-						if (logger.isDebugEnabled()) {
+						if (logger.isErrorEnabled()) {
 							logger.error("Receive -> "
 									+ "Queue: " + messageDm.getQueueName()
 									+ ", UUID: " + messageDm.getUuid()
@@ -415,7 +415,7 @@ public class Exchange implements NetConnectReceiver {
 							}
 						} else {
 							bodyCacheConnectManager.startUpdateConnectAgent();
-							if (logger.isDebugEnabled()) {
+							if (logger.isErrorEnabled()) {
 								logger.error("Receive -> "
 										+ "Queue: " + messageDm.getQueueName()
 										+ ", UUID: " + messageDm.getUuid()
@@ -425,7 +425,7 @@ public class Exchange implements NetConnectReceiver {
 					} while (bodyCacheConnectAgentOther != null);
 				}
 			} else {
-				if (logger.isDebugEnabled()) {
+				if (logger.isErrorEnabled()) {
 					logger.error("Receive -> "
 							+ "Queue: " + messageDm.getQueueName()
 							+ ", UUID: " + messageDm.getUuid()
@@ -485,7 +485,7 @@ public class Exchange implements NetConnectReceiver {
 									+ ", Insert DB -> " + e);
 						}
 						trace(messageDm, TraceConstant.ACTION_TYPE_EXCHANGE_DB_INSERT, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_DB, ((ConnectAgent)dbConnectAgent).getConnectId()); 
-						continue;
+						//continue;
 					}
 				} else {
 					if (logger.isErrorEnabled()) {
@@ -572,7 +572,7 @@ public class Exchange implements NetConnectReceiver {
 						}
 					} else {
 						bodyCacheConnectManager.startUpdateConnectAgent();
-						if (logger.isDebugEnabled()) {
+						if (logger.isErrorEnabled()) {
 							logger.error("Trace -> "
 									+ "Queue: " + messageDm.getQueueName()
 									+ ", UUID: " + messageDm.getUuid()
