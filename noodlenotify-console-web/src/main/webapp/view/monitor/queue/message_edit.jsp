@@ -18,8 +18,19 @@
     <script type="text/javascript">
 
     	var contentCoat;
+    	
+    	var queue_Nm;
+    	var type;
+    	var uuid;
+    	var page = 0;
+    	var rows = 1;
     
 		function callback(trnId, data) {
+			
+			if (trnId == 'QUERY') {
+				contentCoat = stringToJson(data[0].content);
+				$('#content').val(contentCoat['content']);
+			}
 			
 			if (trnId == 'SAVE') {
     			if (data.result == 'false') {
@@ -37,7 +48,7 @@
 				save();
 			});
 			$('#cancel').button().click(function() {
-				top.closeDialog(false);
+				top.closeDialogChild(false);
 			});
 			
 			var urlParamObject = getURLParamObject();
@@ -45,8 +56,8 @@
 				$('#form :input').each(function(i){
 					if (urlParamObject[$(this).attr('id')] != null) {	
 						if ($(this).attr('id') == 'content') {
-							contentCoat = stringToJson(urlParamObject[$(this).attr('id')]);
-							$(this).val(contentCoat['content']);
+							//contentCoat = stringToJson(urlParamObject[$(this).attr('id')]);
+							//$(this).val(contentCoat['content']);
 						} else {							
 							$(this).val(urlParamObject[$(this).attr('id')]);
 						}
@@ -55,6 +66,35 @@
 				$('#queueName').attr('disabled', 'true');
 				$('#uuid').attr('disabled', 'true');
 			}
+			
+			queue_Nm = urlParamObject['queueName'];
+			type = urlParamObject['type'];
+			uuid = urlParamObject['uuid'];
+			
+			query();
+		}
+		
+		function query() {
+			
+			var vo = new Object();
+			
+			vo['queueName'] = queue_Nm;
+			vo['uuid'] = uuid;
+			
+			var jsonSet = new JsonSet();
+			jsonSet.put('input', vo);
+			
+			var url;
+			
+			if (type == 2) {
+				url = '<%=request.getContextPath()%>/console/message/queryportionmessage?page=' + page + '&rows=' + rows;
+			}
+			
+			transaction({
+				id: 'QUERY',
+				url: url,
+				jsonSet: jsonSet
+			});
 		}
 		
 		function check() {
@@ -124,7 +164,7 @@
 			    	<td><input type="text" id="queueName" maxlength="32"/></td>
 				</tr>
 				<tr>
-			    	<th><label id="content_Label">发送内容</label></th>
+			    	<th><label id="content_Label">消息内容</label></th>
 			    	<td>
 			    		<textarea id="content" rows="12" cols="50"></textarea>
 			    	</td>

@@ -177,7 +177,13 @@
 				return;
 			}
 			var ret = jQuery('#list').jqGrid('getRowData', index);
-			top.openDialogChild('详细消息', '<%=request.getContextPath()%>/view/monitor/queue/message_edit.jsp', ret, 400, 700, querystart);					
+			var param = new Object();
+			param['queueName'] = queue_Nm;
+			param['type'] = type;
+			param['uuid'] = ret['uuid'];
+			param['db'] = ret['db'];
+			param['contentId'] = ret['contentId'];
+			top.openDialogChild('详细消息', '<%=request.getContextPath()%>/view/monitor/queue/message_edit.jsp', param, 400, 700, querystart);					
 		}
 		
 		function deletes() {
