@@ -4,7 +4,7 @@
 
   <groupId>org.fl.noodlenotify</groupId>
   <artifactId>noodlenotify</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>NoodleNotify</name>
   <inceptionYear>2013</inceptionYear>
@@ -12,44 +12,44 @@
   
   <properties>
   	
-  	<noodlenotify.version>1.0.0</noodlenotify.version>
+  	<noodlenotify.version>1.1.0-SNAPSHOT</noodlenotify.version>
   	
-  	<noodlenotify.core.connect.api.version>1.0.0</noodlenotify.core.connect.api.version>
-  	<noodlenotify.core.connect.net.api.version>1.0.0</noodlenotify.core.connect.net.api.version>
-  	<noodlenotify.core.connect.net.jetty.client.version>1.0.0</noodlenotify.core.connect.net.jetty.client.version>
-  	<noodlenotify.core.connect.net.jetty.server.version>1.0.0</noodlenotify.core.connect.net.jetty.server.version>
-  	<noodlenotify.core.connect.net.netty.client.version>1.0.0</noodlenotify.core.connect.net.netty.client.version>
-  	<noodlenotify.core.connect.net.netty.server.version>1.0.0</noodlenotify.core.connect.net.netty.server.version>
-  	<noodlenotify.core.connect.net.rmi.api.version>1.0.0</noodlenotify.core.connect.net.rmi.api.version>
-  	<noodlenotify.core.connect.net.rmi.client.version>1.0.0</noodlenotify.core.connect.net.rmi.client.version>
-  	<noodlenotify.core.connect.net.rmi.server.version>1.0.0</noodlenotify.core.connect.net.rmi.server.version>
-  	<noodlenotify.core.connect.db.version>1.0.0</noodlenotify.core.connect.db.version>
-  	<noodlenotify.core.connect.cache.api.version>1.0.0</noodlenotify.core.connect.cache.api.version>
-  	<noodlenotify.core.connect.cache.body.version>1.0.0</noodlenotify.core.connect.cache.body.version>
-  	<noodlenotify.core.connect.cache.queue.version>1.0.0</noodlenotify.core.connect.cache.queue.version>
-  	<noodlenotify.core.connect.cache.trace.version>1.0.0</noodlenotify.core.connect.cache.trace.version>
-  	<noodlenotify.core.client.producer.version>1.0.0</noodlenotify.core.client.producer.version>
-  	<noodlenotify.core.client.consumer.api.version>1.0.0</noodlenotify.core.client.consumer.api.version>
-  	<noodlenotify.core.client.consumer.jetty.version>1.0.0</noodlenotify.core.client.consumer.jetty.version>
-  	<noodlenotify.core.client.consumer.netty.version>1.0.0</noodlenotify.core.client.consumer.netty.version>
-  	<noodlenotify.core.client.consumer.rmi.version>1.0.0</noodlenotify.core.client.consumer.rmi.version>
-  	<noodlenotify.core.exchange.version>1.0.0</noodlenotify.core.exchange.version>
-  	<noodlenotify.core.distribute.version>1.0.0</noodlenotify.core.distribute.version>
-  	<noodlenotify.core.console.version>1.0.0</noodlenotify.core.console.version>
-  	<noodlenotify.console.version>1.0.0</noodlenotify.console.version>
-  	<noodlenotify.console.vo.version>1.0.0</noodlenotify.console.vo.version>
-  	<noodlenotify.console.remoting.api.version>1.0.0</noodlenotify.console.remoting.api.version>
-  	<noodlenotify.console.web.version>1.0.0</noodlenotify.console.web.version>
-  	<noodlenotify.monitor.status.version>1.0.0</noodlenotify.monitor.status.version>
-  	<noodlenotify.monitor.performance.version>1.0.0</noodlenotify.monitor.performance.version>
-  	<noodlenotify.trace.version>1.0.0</noodlenotify.trace.version>
-  	<noodlenotify.core.run.version>1.0.0</noodlenotify.core.run.version>
-  	<noodlenotify.assembly.version>1.0.0</noodlenotify.assembly.version>
+  	<noodlenotify.core.connect.api.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.api.version>
+  	<noodlenotify.core.connect.net.api.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.net.api.version>
+  	<noodlenotify.core.connect.net.jetty.client.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.net.jetty.client.version>
+  	<noodlenotify.core.connect.net.jetty.server.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.net.jetty.server.version>
+  	<noodlenotify.core.connect.net.netty.client.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.net.netty.client.version>
+  	<noodlenotify.core.connect.net.netty.server.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.net.netty.server.version>
+  	<noodlenotify.core.connect.net.rmi.api.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.net.rmi.api.version>
+  	<noodlenotify.core.connect.net.rmi.client.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.net.rmi.client.version>
+  	<noodlenotify.core.connect.net.rmi.server.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.net.rmi.server.version>
+  	<noodlenotify.core.connect.db.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.db.version>
+  	<noodlenotify.core.connect.cache.api.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.cache.api.version>
+  	<noodlenotify.core.connect.cache.body.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.cache.body.version>
+  	<noodlenotify.core.connect.cache.queue.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.cache.queue.version>
+  	<noodlenotify.core.connect.cache.trace.version>1.1.0-SNAPSHOT</noodlenotify.core.connect.cache.trace.version>
+  	<noodlenotify.core.client.producer.version>1.1.0-SNAPSHOT</noodlenotify.core.client.producer.version>
+  	<noodlenotify.core.client.consumer.api.version>1.1.0-SNAPSHOT</noodlenotify.core.client.consumer.api.version>
+  	<noodlenotify.core.client.consumer.jetty.version>1.1.0-SNAPSHOT</noodlenotify.core.client.consumer.jetty.version>
+  	<noodlenotify.core.client.consumer.netty.version>1.1.0-SNAPSHOT</noodlenotify.core.client.consumer.netty.version>
+  	<noodlenotify.core.client.consumer.rmi.version>1.1.0-SNAPSHOT</noodlenotify.core.client.consumer.rmi.version>
+  	<noodlenotify.core.exchange.version>1.1.0-SNAPSHOT</noodlenotify.core.exchange.version>
+  	<noodlenotify.core.distribute.version>1.1.0-SNAPSHOT</noodlenotify.core.distribute.version>
+  	<noodlenotify.core.console.version>1.1.0-SNAPSHOT</noodlenotify.core.console.version>
+  	<noodlenotify.console.version>1.1.0-SNAPSHOT</noodlenotify.console.version>
+  	<noodlenotify.console.vo.version>1.1.0-SNAPSHOT</noodlenotify.console.vo.version>
+  	<noodlenotify.console.remoting.api.version>1.1.0-SNAPSHOT</noodlenotify.console.remoting.api.version>
+  	<noodlenotify.console.web.version>1.1.0-SNAPSHOT</noodlenotify.console.web.version>
+  	<noodlenotify.monitor.status.version>1.1.0-SNAPSHOT</noodlenotify.monitor.status.version>
+  	<noodlenotify.monitor.performance.version>1.1.0-SNAPSHOT</noodlenotify.monitor.performance.version>
+  	<noodlenotify.trace.version>1.1.0-SNAPSHOT</noodlenotify.trace.version>
+  	<noodlenotify.core.run.version>1.1.0-SNAPSHOT</noodlenotify.core.run.version>
+  	<noodlenotify.assembly.version>1.1.0-SNAPSHOT</noodlenotify.assembly.version>
 	
-	<noodlenotify.demo.producer.version>1.0.0</noodlenotify.demo.producer.version>
-	<noodlenotify.demo.consumer.version>1.0.0</noodlenotify.demo.consumer.version>
-	<noodlenotify.demo.exchange.version>1.0.0</noodlenotify.demo.exchange.version>
-	<noodlenotify.demo.distribute.version>1.0.0</noodlenotify.demo.distribute.version>
+	<noodlenotify.demo.producer.version>1.1.0-SNAPSHOT</noodlenotify.demo.producer.version>
+	<noodlenotify.demo.consumer.version>1.1.0-SNAPSHOT</noodlenotify.demo.consumer.version>
+	<noodlenotify.demo.exchange.version>1.1.0-SNAPSHOT</noodlenotify.demo.exchange.version>
+	<noodlenotify.demo.distribute.version>1.1.0-SNAPSHOT</noodlenotify.demo.distribute.version>
   	  	
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -98,67 +98,67 @@
 		<dependency>
 			<groupId>org.fl.noodle.common.net</groupId>
 			<artifactId>noodlecommon-net</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.util</groupId>
 			<artifactId>noodlecommon-util</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.test</groupId>
 			<artifactId>noodlecommon-test</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.mvc</groupId>
 			<artifactId>noodlecommon-mvc</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.mvc.vo</groupId>
 			<artifactId>noodlecommon-mvc-vo</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.dynamicsql</groupId>
 			<artifactId>noodlecommon-dynamicsql</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.dbseparate</groupId>
 			<artifactId>noodlecommon-dbseparate</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.connect</groupId>
 			<artifactId>noodlecommon-connect-api</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.connect.expand</groupId>
 			<artifactId>noodlecommon-connect-expand-api</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.monitor</groupId>
 			<artifactId>noodlecommon-monitor-api</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.monitor.performance</groupId>
 			<artifactId>noodlecommon-monitor-performance</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 		
 	    <dependency>
