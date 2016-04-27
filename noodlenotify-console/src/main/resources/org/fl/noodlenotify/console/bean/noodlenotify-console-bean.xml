@@ -19,39 +19,39 @@
 	
 	<bean id="masterDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
 		<property name="driverClass" value="com.mysql.jdbc.Driver" />
-		<property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/noodlenotify_console_dev?useUnicode=true&amp;characterEncoding=UTF-8" />
-		<property name="user" value="noodlenotify" />
-		<property name="password" value="noodlenotify" />
+		<property name="jdbcUrl" value="jdbc:mysql://${noodlenotify.console.master.db.ip}:${noodlenotify.console.master.db.port}/${noodlenotify.console.master.db.name}?useUnicode=true&amp;characterEncoding=UTF-8" />
+		<property name="user" value="${noodlenotify.console.master.db.uesr}" />
+		<property name="password" value="${noodlenotify.console.master.db.password}" />
 		
 		<property name="minPoolSize" value="20" />
 	    <property name="maxPoolSize" value="100" />  
 	    <property name="initialPoolSize" value="20" />
-	    <property name="maxIdleTime" value="25000" />
+	    <property name="maxIdleTime" value="600" />
 	    <property name="acquireIncrement" value="10" />
 	   
 	    <property name="acquireRetryAttempts" value="30" />
 	    <property name="acquireRetryDelay" value="1000" />
 	    <property name="testConnectionOnCheckin" value="true" />
-	    <property name="idleConnectionTestPeriod" value="18000" />
+	    <property name="idleConnectionTestPeriod" value="30" />
 	    <property name="checkoutTimeout" value="10000"/>
 	</bean>
 	
 	<bean id="slaveDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
 		<property name="driverClass" value="com.mysql.jdbc.Driver" />
-		<property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/noodlenotify_console_dev?useUnicode=true&amp;characterEncoding=UTF-8" />
-		<property name="user" value="noodlenotify" />
-		<property name="password" value="noodlenotify" />
+		<property name="jdbcUrl" value="jdbc:mysql://${noodlenotify.console.slave.db.ip}:${noodlenotify.console.slave.db.port}/${noodlenotify.console.slave.db.name}?useUnicode=true&amp;characterEncoding=UTF-8" />
+		<property name="user" value="${noodlenotify.console.slave.db.uesr}" />
+		<property name="password" value="${noodlenotify.console.slave.db.password}" />
 		
 		<property name="minPoolSize" value="20" />
 	    <property name="maxPoolSize" value="100" />  
 	    <property name="initialPoolSize" value="20" />
-	    <property name="maxIdleTime" value="25000" />
+	    <property name="maxIdleTime" value="600" />
 	    <property name="acquireIncrement" value="10" />
 	   
 	    <property name="acquireRetryAttempts" value="30" />
 	    <property name="acquireRetryDelay" value="1000" />
 	    <property name="testConnectionOnCheckin" value="true" />
-	    <property name="idleConnectionTestPeriod" value="18000" />
+	    <property name="idleConnectionTestPeriod" value="30" />
 	    <property name="checkoutTimeout" value="10000"/>
 	</bean>
 	

@@ -14,8 +14,8 @@
 
 	<bean id="redisPersistenceTemplate" class="org.fl.noodlenotify.monitor.performance.persistence.RedisPersistenceTemplateImpl" 
 			init-method="start" destroy-method="destroy" >
-		<property name="ip" value="127.0.0.1"/>
-		<property name="port" value="20801"/>
+		<property name="ip" value="${noodlenotify.console.monitor.performance.redis.ip}"/>
+		<property name="port" value="${noodlenotify.console.monitor.performance.redis.port}"/>
 		<property name="maxActive" value="500"/>
 		<property name="minIdle" value="100"/>
 		<property name="maxWait" value="3000"/>
