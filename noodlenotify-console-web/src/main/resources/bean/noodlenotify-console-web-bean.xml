@@ -12,6 +12,14 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:/env.properties</value>
+            </list>
+        </property>
+    </bean>
+	
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
 	<import resource="classpath:org/fl/noodlenotify/trace/bean/noodlenotify-trace-msg-service.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/bean/schedule/noodlenotify-monitor-schedule-status.xml" />

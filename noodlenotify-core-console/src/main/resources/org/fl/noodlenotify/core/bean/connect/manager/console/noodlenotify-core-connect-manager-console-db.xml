@@ -16,7 +16,7 @@
 	<import resource="classpath:org/fl/noodlenotify/core/bean/connect/manager/console/noodlenotify-core-connect-manager-console-common.xml" />
 		
 	<bean id="dbDataSourceFactory" class="org.fl.noodlenotify.core.connect.db.datasource.C3p0DbDataSourceFactory">
-		<property name="dbName" value="noodlenotify_dev"/>
+		<property name="dbName" value="${noodlenotify.core.db.name}"/>
 	</bean>
 	<bean id="dbConnectAgentConfParam" class="org.fl.noodlenotify.core.connect.db.DbConnectAgentConfParam">
 		<property name="insertThreadCount" value="0"/>
