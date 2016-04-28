@@ -1,1 +1,1 @@
-java -server -Xmx${noodlenotify.exchange.rmi.jvm.xmx} -Xms${noodlenotify.exchange.rmi.jvm.xms} -classpath "../lib/*" org.fl.noodlenotify.core.run.Main -e -f ../conf/noodlenotify-core-exchange-rmi.xml -l ../conf/logback.exchange.rmi.xml
+java -server -Xmx${noodlenotify.exchange.rmi.jvm.xmx} -Xms${noodlenotify.exchange.rmi.jvm.xms} -classpath "../lib/*" org.fl.noodlenotify.core.run.Main -e -f ../conf/noodlenotify-core-exchange-rmi.xml -l ../conf/logback.exchange.rmi.xml > /dev/null 2>&1 &
