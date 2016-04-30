@@ -23,16 +23,16 @@
 		<property name="user" value="${noodlenotify.console.db.uesr}" />
 		<property name="password" value="${noodlenotify.console.db.password}" />
 		
-		<property name="minPoolSize" value="20" />
+		<property name="minPoolSize" value="10" />
 	    <property name="maxPoolSize" value="100" />  
-	    <property name="initialPoolSize" value="20" />
-	    <property name="maxIdleTime" value="25000" />
-	    <property name="acquireIncrement" value="10" />
+	    <property name="initialPoolSize" value="10" />
+	    <property name="maxIdleTime" value="600" />
+	    <property name="acquireIncrement" value="3" />
 	   
 	    <property name="acquireRetryAttempts" value="30" />
 	    <property name="acquireRetryDelay" value="1000" />
 	    <property name="testConnectionOnCheckin" value="true" />
-	    <property name="idleConnectionTestPeriod" value="18000" />
+	    <property name="idleConnectionTestPeriod" value="30" />
 	    <property name="checkoutTimeout" value="10000"/>
 	</bean>
 	
@@ -42,16 +42,16 @@
 		<property name="user" value="${noodlenotify.console.db.uesr}" />
 		<property name="password" value="${noodlenotify.console.db.password}" />
 		
-		<property name="minPoolSize" value="20" />
+		<property name="minPoolSize" value="10" />
 	    <property name="maxPoolSize" value="100" />  
-	    <property name="initialPoolSize" value="20" />
-	    <property name="maxIdleTime" value="25000" />
-	    <property name="acquireIncrement" value="10" />
+	    <property name="initialPoolSize" value="10" />
+	    <property name="maxIdleTime" value="600" />
+	    <property name="acquireIncrement" value="3" />
 	   
 	    <property name="acquireRetryAttempts" value="30" />
 	    <property name="acquireRetryDelay" value="1000" />
 	    <property name="testConnectionOnCheckin" value="true" />
-	    <property name="idleConnectionTestPeriod" value="18000" />
+	    <property name="idleConnectionTestPeriod" value="30" />
 	    <property name="checkoutTimeout" value="10000"/>
 	</bean>
 	
@@ -120,7 +120,7 @@
 	
 	<bean id="dynamicSqlTemplate" class="org.fl.noodle.common.dynamicsql.DynamicSqlTemplateImpl">
 		<property name="hibernateTemplate" ref="hibernateTemplate" />
-		<property name="isRefresh" value="true" />
+		<property name="isRefresh" value="false" />
 		<property name="pageSize" value="10" />
 		<property name="fileNameList">
 			<list>

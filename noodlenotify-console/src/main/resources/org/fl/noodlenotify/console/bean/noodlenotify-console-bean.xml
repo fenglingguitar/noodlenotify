@@ -23,11 +23,11 @@
 		<property name="user" value="${noodlenotify.console.master.db.uesr}" />
 		<property name="password" value="${noodlenotify.console.master.db.password}" />
 		
-		<property name="minPoolSize" value="20" />
+		<property name="minPoolSize" value="10" />
 	    <property name="maxPoolSize" value="100" />  
-	    <property name="initialPoolSize" value="20" />
+	    <property name="initialPoolSize" value="10" />
 	    <property name="maxIdleTime" value="600" />
-	    <property name="acquireIncrement" value="10" />
+	    <property name="acquireIncrement" value="3" />
 	   
 	    <property name="acquireRetryAttempts" value="30" />
 	    <property name="acquireRetryDelay" value="1000" />
@@ -42,11 +42,11 @@
 		<property name="user" value="${noodlenotify.console.slave.db.uesr}" />
 		<property name="password" value="${noodlenotify.console.slave.db.password}" />
 		
-		<property name="minPoolSize" value="20" />
+		<property name="minPoolSize" value="10" />
 	    <property name="maxPoolSize" value="100" />  
-	    <property name="initialPoolSize" value="20" />
+	    <property name="initialPoolSize" value="10" />
 	    <property name="maxIdleTime" value="600" />
-	    <property name="acquireIncrement" value="10" />
+	    <property name="acquireIncrement" value="3" />
 	   
 	    <property name="acquireRetryAttempts" value="30" />
 	    <property name="acquireRetryDelay" value="1000" />
