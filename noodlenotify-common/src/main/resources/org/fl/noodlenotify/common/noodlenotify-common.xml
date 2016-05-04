@@ -11,11 +11,13 @@
 			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
-
-	<bean id="dbDataSourceFactory" class="org.fl.noodlenotify.core.connect.db.datasource.C3p0DbDataSourceFactory">
-		<property name="dbName" value="${noodlenotify.core.db.name}"/>
-		<property name="user" value="${noodlenotify.core.db.user}"/>
-		<property name="password" value="${noodlenotify.core.db.password}"/>
-	</bean>
-    
+	
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:/env.properties</value>
+            </list>
+        </property>
+    </bean>
+	
 </beans>

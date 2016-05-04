@@ -22,6 +22,12 @@
   <dependencies>
     
     <dependency>
+		<groupId>org.fl.noodlenotify.common</groupId>
+  		<artifactId>noodlenotify-common</artifactId>
+  		<version>${org.fl.noodlenotify.common.version}</version>
+	</dependency>
+    
+    <dependency>
 		<groupId>org.fl.noodlenotify.core.exchange</groupId>
   		<artifactId>noodlenotify-core-exchange</artifactId>
   		<version>${noodlenotify.core.exchange.version}</version>

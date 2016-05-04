@@ -44,15 +44,19 @@
   	<noodlenotify.monitor.performance.version>2.0.0-SNAPSHOT</noodlenotify.monitor.performance.version>
   	<noodlenotify.trace.version>2.0.0-SNAPSHOT</noodlenotify.trace.version>
   	<noodlenotify.core.run.version>2.0.0-SNAPSHOT</noodlenotify.core.run.version>
-  	<noodlenotify.assembly.version>2.0.0-SNAPSHOT</noodlenotify.assembly.version>
 	
 	<noodlenotify.demo.producer.version>2.0.0-SNAPSHOT</noodlenotify.demo.producer.version>
 	<noodlenotify.demo.consumer.version>2.0.0-SNAPSHOT</noodlenotify.demo.consumer.version>
 	<noodlenotify.demo.exchange.version>2.0.0-SNAPSHOT</noodlenotify.demo.exchange.version>
 	<noodlenotify.demo.distribute.version>2.0.0-SNAPSHOT</noodlenotify.demo.distribute.version>
+	
+	<org.fl.noodlenotify.common.version>2.0.0-SNAPSHOT</org.fl.noodlenotify.common.version>
   	  	
+  	<noodlenotify.assembly.version>2.0.0-SNAPSHOT</noodlenotify.assembly.version>
+
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+
+	</properties>
 
   <modules>
     <module>noodlenotify-core-connect-api</module>
@@ -89,6 +93,7 @@
     <module>noodlenotify-demo-consumer</module>
     <module>noodlenotify-demo-exchange</module>
     <module>noodlenotify-demo-distribute</module>
+    <module>noodlenotify-common</module>
     <module>assembly</module>
   </modules>
 

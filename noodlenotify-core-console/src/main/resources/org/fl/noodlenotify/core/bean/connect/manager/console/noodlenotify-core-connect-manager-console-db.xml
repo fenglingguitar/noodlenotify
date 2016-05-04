@@ -17,6 +17,8 @@
 		
 	<bean id="dbDataSourceFactory" class="org.fl.noodlenotify.core.connect.db.datasource.C3p0DbDataSourceFactory">
 		<property name="dbName" value="${noodlenotify.core.db.name}"/>
+		<property name="user" value="${noodlenotify.core.db.user}"/>
+		<property name="password" value="${noodlenotify.core.db.password}"/>
 	</bean>
 	<bean id="dbConnectAgentConfParam" class="org.fl.noodlenotify.core.connect.db.DbConnectAgentConfParam">
 		<property name="insertThreadCount" value="0"/>
