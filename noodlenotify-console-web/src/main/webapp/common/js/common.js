@@ -347,26 +347,9 @@ function collapseAdjustGrid(defaultHeight, expander, list, queryDiv) {
 }
 
 function repaintGrid(defaultHeight, expander, list, queryDiv, expanderChangeSize ) {
-	//var listHeight = $("#" + list).height();
 	var queryHeight = queryDiv != null ? $("#" + queryDiv).height() : 27;
 	var expanderHeight = expanderChangeSize != null ? $("#" + expander).height() + expanderChangeSize : $("#" + expander).height();
 	var maxHeight = $(parent.$("iframe")[parent.$("iframe").size()-1]).height() - queryHeight - 98 - expanderHeight;
-	
-	/*var rowNum = $("#" + list).jqGrid('getGridParam', 'rowNum');
-	var records = $("#" + list).jqGrid('getGridParam', 'records');
-	var page = $("#" + list).jqGrid('getGridParam', 'page');
-	
-	var actual = rowNum * page > records ? records - rowNum * (page - 1) : rowNum
-	
-	var beyondRowNum = actual > 10 ? actual - 10 : 0;
-	
-	var expectHeight = defaultHeight + beyondRowNum * 23;
-	var actualHeight = expectHeight;
-	
-	if (expectHeight > maxHeight) {
-		actualHeight = defaultHeight + Math.floor((maxHeight - defaultHeight) / 23) * 23;
-	}*/
-	var actualHeight = defaultHeight + Math.floor((maxHeight - defaultHeight) / 23) * 23;
-	$("#" + list + "_div .ui-jqgrid-bdiv").height(actualHeight);
+	$("#" + list + "_div .ui-jqgrid-bdiv").height(maxHeight);
 }
 
