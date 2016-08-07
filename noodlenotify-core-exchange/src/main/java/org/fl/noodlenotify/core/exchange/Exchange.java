@@ -10,9 +10,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
@@ -20,9 +17,6 @@ import org.fl.noodlenotify.core.connect.ConnectAgent;
 import org.fl.noodlenotify.core.connect.ConnectManager;
 import org.fl.noodlenotify.core.connect.QueueAgent;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
-import org.fl.noodlenotify.core.connect.cache.trace.TraceCacheConnectAgent;
-import org.fl.noodlenotify.core.connect.cache.trace.constant.TraceConstant;
-import org.fl.noodlenotify.core.connect.cache.trace.vo.TraceVo;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.exception.ConnectionInvokeException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
@@ -30,13 +24,16 @@ import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionStopException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
-import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
+import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.fl.noodlenotify.monitor.performance.constant.MonitorPerformanceConstant;
 import org.fl.noodlenotify.monitor.performance.executer.service.impl.OvertimePerformanceExecuterService;
 import org.fl.noodlenotify.monitor.performance.executer.service.impl.SuccessPerformanceExecuterService;
 import org.fl.noodlenotify.monitor.performance.storage.MemoryStorage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class Exchange implements NetConnectReceiver {
 
@@ -46,8 +43,6 @@ public class Exchange implements NetConnectReceiver {
 	
 	private ConnectManager dbConnectManager;
 	private ConnectManager bodyCacheConnectManager;
-	
-	private ConnectManager traceCacheConnectManager;
 	
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();	
 	
@@ -90,10 +85,6 @@ public class Exchange implements NetConnectReceiver {
 		MemoryStorage.moduleName = MonitorPerformanceConstant.MODULE_ID_EXCHANGE;
 		MemoryStorage.moduleId = moduleId;
 		
-		traceCacheConnectManager.setModuleId(moduleId);
-		traceCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		traceCacheConnectManager.start();
-		
 		bodyCacheConnectManager.setModuleId(moduleId);
 		bodyCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
 		bodyCacheConnectManager.start();
@@ -133,7 +124,6 @@ public class Exchange implements NetConnectReceiver {
 		
 		dbConnectManager.destroy();		
 		bodyCacheConnectManager.destroy();
-		traceCacheConnectManager.destroy();
 	}
 	
 	private synchronized void suspendUpdateConnectAgent() {
@@ -329,7 +319,6 @@ public class Exchange implements NetConnectReceiver {
 					messageDm.getQueueName(),
 					MonitorPerformanceConstant.MONITOR_ID_EXCHANGE_RECEIVE,
 					false);
-			trace(messageDm, TraceConstant.ACTION_TYPE_EXCHANGE_RECEIVE, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_EXCHANGE, moduleId); 
 			throw new ConnectionInvokeException("Message body bigger then max limit: " + sizeLimit);
 		}
 		
@@ -356,7 +345,6 @@ public class Exchange implements NetConnectReceiver {
 					messageDm.getQueueName(),
 					MonitorPerformanceConstant.MONITOR_ID_EXCHANGE_RECEIVE,
 					false);
-			trace(messageDm, TraceConstant.ACTION_TYPE_EXCHANGE_RECEIVE, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_EXCHANGE, moduleId); 
 			startUpdateConnectAgent();
 			throw new ConnectionInvokeException("Set execute queue error, can not get queue customer group num");
 		}
@@ -444,7 +432,6 @@ public class Exchange implements NetConnectReceiver {
 					try {
 						messageDm.setBeginTime(System.currentTimeMillis());
 						dbConnectAgent.insert(messageDm);
-						trace(messageDm, TraceConstant.ACTION_TYPE_EXCHANGE_DB_INSERT, TraceConstant.RESULT_TYPE_SUCCESS, TraceConstant.MODULE_TYPE_DB, ((ConnectAgent)dbConnectAgent).getConnectId()); 
 						break;
 					} catch (ConnectionUnableException e) {
 						if (logger.isErrorEnabled()) {
@@ -454,7 +441,6 @@ public class Exchange implements NetConnectReceiver {
 									+ ", DB: " + ((ConnectAgent)dbConnectAgent).getConnectId()
 									+ ", Insert DB -> " + e);
 						}
-						trace(messageDm, TraceConstant.ACTION_TYPE_EXCHANGE_DB_INSERT, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_DB, ((ConnectAgent)dbConnectAgent).getConnectId()); 
 						continue;
 					} catch (ConnectionRefusedException e) {
 						if (logger.isErrorEnabled()) {
@@ -464,7 +450,6 @@ public class Exchange implements NetConnectReceiver {
 									+ ", DB: " + ((ConnectAgent)dbConnectAgent).getConnectId()
 									+ ", Insert DB -> " + e);
 						}
-						trace(messageDm, TraceConstant.ACTION_TYPE_EXCHANGE_DB_INSERT, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_DB, ((ConnectAgent)dbConnectAgent).getConnectId()); 
 						continue;
 					} catch (ConnectionResetException e) {
 						if (logger.isErrorEnabled()) {
@@ -474,7 +459,6 @@ public class Exchange implements NetConnectReceiver {
 									+ ", DB: " + ((ConnectAgent)dbConnectAgent).getConnectId()
 									+ ", Insert DB -> " + e);
 						}
-						trace(messageDm, TraceConstant.ACTION_TYPE_EXCHANGE_DB_INSERT, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_DB, ((ConnectAgent)dbConnectAgent).getConnectId()); 
 						continue;
 					} catch (Exception e) {
 						if (logger.isErrorEnabled()) {
@@ -484,8 +468,6 @@ public class Exchange implements NetConnectReceiver {
 									+ ", DB: " + ((ConnectAgent)dbConnectAgent).getConnectId()
 									+ ", Insert DB -> " + e);
 						}
-						trace(messageDm, TraceConstant.ACTION_TYPE_EXCHANGE_DB_INSERT, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_DB, ((ConnectAgent)dbConnectAgent).getConnectId()); 
-						//continue;
 					}
 				} else {
 					if (logger.isErrorEnabled()) {
@@ -500,7 +482,6 @@ public class Exchange implements NetConnectReceiver {
 							messageDm.getQueueName(),
 							MonitorPerformanceConstant.MONITOR_ID_EXCHANGE_RECEIVE,
 							false);
-					trace(messageDm, TraceConstant.ACTION_TYPE_EXCHANGE_RECEIVE, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_EXCHANGE, moduleId); 
 					dbConnectManager.startUpdateConnectAgent();
 					throw new ConnectionInvokeException("Db connect agent insert message error, can not get db connect agent");
 				}
@@ -518,7 +499,6 @@ public class Exchange implements NetConnectReceiver {
 					messageDm.getQueueName(),
 					MonitorPerformanceConstant.MONITOR_ID_EXCHANGE_RECEIVE,
 					false);
-			trace(messageDm, TraceConstant.ACTION_TYPE_EXCHANGE_RECEIVE, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_EXCHANGE, moduleId); 
 			dbConnectManager.startUpdateConnectAgent();
 			throw new ConnectionInvokeException("Db connect agent insert message error, can not get db queue agent");
 		}
@@ -536,60 +516,7 @@ public class Exchange implements NetConnectReceiver {
 				MonitorPerformanceConstant.MONITOR_ID_EXCHANGE_RECEIVE,
 				true);
 		
-		trace(messageDm, TraceConstant.ACTION_TYPE_EXCHANGE_RECEIVE, TraceConstant.RESULT_TYPE_SUCCESS, TraceConstant.MODULE_TYPE_EXCHANGE, moduleId); 
-	}
-	
-	private void trace(MessageDm messageDm, int action, byte result, byte traceModuleType, long traceModuleId) {
-		QueueExchangerVo queueExchangerVo = queueExchangerVoMap.get(messageDm.getQueueName());
-		if (queueExchangerVo != null && queueExchangerVo.getIs_Trace() == TraceConstant.IS_TRACE_YES) {
-			QueueAgent queueAgentTrace = traceCacheConnectManager.getQueueAgent(messageDm.getQueueName());
-			if (queueAgentTrace != null) {
-				TraceCacheConnectAgent traceCacheConnectAgent = null;			
-				do {
-					traceCacheConnectAgent = (TraceCacheConnectAgent) queueAgentTrace.getConnectAgent();
-					if (traceCacheConnectAgent != null) {
-						try {
-							traceCacheConnectAgent.set(new TraceVo(
-															messageDm.getUuid(), 
-															action, 
-															System.currentTimeMillis(), 
-															result, 
-															traceModuleType,
-															traceModuleId,
-															TraceConstant.MODULE_TYPE_EXCHANGE,
-															moduleId
-															));
-							break;
-						} catch (Exception e) {
-							if (logger.isErrorEnabled()) {
-								logger.error("Trace -> "
-										+ "Queue: " + messageDm.getQueueName()
-										+ ", UUID: " + messageDm.getUuid()
-										+ ", TraceCache: " + ((ConnectAgent)traceCacheConnectAgent).getConnectId()
-										+ ", Set Trace Cache -> " + e);
-							}
-							continue;
-						}
-					} else {
-						bodyCacheConnectManager.startUpdateConnectAgent();
-						if (logger.isErrorEnabled()) {
-							logger.error("Trace -> "
-									+ "Queue: " + messageDm.getQueueName()
-									+ ", UUID: " + messageDm.getUuid()
-									+ ", Get Trace Cache Agent -> Null");
-						}
-					}
-				} while (traceCacheConnectAgent != null);
-			} else {
-				if (logger.isErrorEnabled()) {
-					logger.error("Trace -> "
-							+ "Queue: " + messageDm.getQueueName()
-							+ ", UUID: " + messageDm.getUuid()
-							+ ", Get Trace Queue Agent -> Null");
-				}
-			}
-		}
-	}
+	}	
 	
 	public void setDbConnectManager(ConnectManager dbConnectManager) {
 		this.dbConnectManager = dbConnectManager;
@@ -597,10 +524,6 @@ public class Exchange implements NetConnectReceiver {
 
 	public void setBodyCacheConnectManager(ConnectManager bodyCacheConnectManager) {
 		this.bodyCacheConnectManager = bodyCacheConnectManager;
-	}
-
-	public void setTraceCacheConnectManager(ConnectManager traceCacheConnectManager) {
-		this.traceCacheConnectManager = traceCacheConnectManager;
 	}
 
 	public void setSuspendTime(long suspendTime) {

@@ -77,7 +77,6 @@
 		<property name="queueCacheConnectManager" ref="distributeQueueCacheConnectManager" />
 		<property name="bodyCacheConnectManager" ref="distributeBodyCacheConnectManager" />
 		<property name="netConnectManager" ref="distributeNetConnectManager" />
-		<property name="traceCacheConnectManager" ref="distributeTraceCacheConnectManager" />
 		<property name="distributeConfParam" ref="distributeConfParam" />
 		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
 	</bean>

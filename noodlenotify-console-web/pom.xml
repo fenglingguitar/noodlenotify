@@ -45,12 +45,6 @@
 	</dependency>
 	
 	<dependency>
-		<groupId>org.fl.noodlenotify.trace</groupId>
-		<artifactId>noodlenotify-trace</artifactId>
-		<version>${noodlenotify.trace.version}</version>
-	</dependency>
-
-	<dependency>
 		<groupId>org.fl.noodlenotify.monitor.status</groupId>
 		<artifactId>noodlenotify-monitor-status</artifactId>
 		<version>${noodlenotify.monitor.status.version}</version>

@@ -15,7 +15,6 @@
 	<import resource="classpath:bean/noodlenotify-console-bean.xml" />
 	<import resource="classpath:bean/noodlenotify-core-connect-manager-console.xml" />
 	<import resource="classpath:bean/noodlenotify-pclient-console.xml" />
-	<import resource="classpath:bean/noodlenotify-trace-msg-service.xml" />
 	<import resource="classpath:bean/noodlenotify-monitor-status.xml" />
 	<import resource="classpath:bean/noodlenotify-monitor-performance.xml" />
 	<import resource="classpath:bean/noodlenotify-console-web-remoting.xml" />

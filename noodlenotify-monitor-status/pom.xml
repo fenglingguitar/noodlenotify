@@ -70,12 +70,6 @@
 	</dependency>
 	
 	<dependency>
-		<groupId>org.fl.noodlenotify.core.connect.cache.trace</groupId>
-		<artifactId>noodlenotify-core-connect-cache-trace</artifactId>
-		<version>${noodlenotify.core.connect.cache.trace.version}</version>
-	</dependency>
-	
-	<dependency>
     	<groupId>junit</groupId>
     	<artifactId>junit</artifactId>
     </dependency>

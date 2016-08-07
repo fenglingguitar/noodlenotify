@@ -11,30 +11,26 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.ConnectAgent;
 import org.fl.noodlenotify.core.connect.ConnectManager;
 import org.fl.noodlenotify.core.connect.QueueAgent;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
-import org.fl.noodlenotify.core.connect.cache.trace.TraceCacheConnectAgent;
-import org.fl.noodlenotify.core.connect.cache.trace.constant.TraceConstant;
-import org.fl.noodlenotify.core.connect.cache.trace.vo.TraceVo;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
-import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
+import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.fl.noodlenotify.monitor.performance.constant.MonitorPerformanceConstant;
 import org.fl.noodlenotify.monitor.performance.executer.service.impl.OvertimePerformanceExecuterService;
 import org.fl.noodlenotify.monitor.performance.executer.service.impl.SuccessPerformanceExecuterService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class DistributeGet {
 	
@@ -46,9 +42,7 @@ public class DistributeGet {
 	private ConnectManager queueCacheConnectManager;
 	private ConnectManager bodyCacheConnectManager;
 	private ConnectManager netConnectManager;
-	
-	private ConnectManager traceCacheConnectManager;
-	
+		
 	private DistributeConfParam distributeConfParam;
 	
 	private ExecutorService executorService = Executors.newCachedThreadPool();
@@ -79,7 +73,6 @@ public class DistributeGet {
 							ConnectManager queueCacheConnectManager,
 							ConnectManager bodyCacheConnectManager,
 							ConnectManager customerNetConnectManager,
-							ConnectManager traceCacheConnectManager,
 							DistributeConfParam distributeConfParam,
 							QueueDistributerVo queueDistributerVo,
 							long moduleId,
@@ -90,7 +83,6 @@ public class DistributeGet {
 		this.queueCacheConnectManager = queueCacheConnectManager;
 		this.bodyCacheConnectManager = bodyCacheConnectManager;
 		this.netConnectManager = customerNetConnectManager;
-		this.traceCacheConnectManager = traceCacheConnectManager;
 		this.distributeConfParam = distributeConfParam;
 		this.queueDistributerVo = queueDistributerVo;
 		this.moduleId = moduleId;
@@ -578,11 +570,6 @@ public class DistributeGet {
 								MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_PORTION_DISPATCH,
 								false);
 					}
-					if (queueType) {
-						trace(messageDm, TraceConstant.ACTION_TYPE_DISTRIBUTE_DISPATCH, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_DISTRIBUTE, moduleId);
-					} else {
-						trace(messageDm, TraceConstant.ACTION_TYPE_DISTRIBUTE_AGAIN_DISPATCH, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_DISTRIBUTE, moduleId);						
-					}
 					continue;
 				}
 				
@@ -611,11 +598,6 @@ public class DistributeGet {
 								messageDm.getQueueName(),
 								MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_PORTION_DISPATCH,
 								false);
-					}
-					if (queueType) {
-						trace(messageDm, TraceConstant.ACTION_TYPE_DISTRIBUTE_DISPATCH, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_DISTRIBUTE, moduleId);
-					} else {
-						trace(messageDm, TraceConstant.ACTION_TYPE_DISTRIBUTE_AGAIN_DISPATCH, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_DISTRIBUTE, moduleId);						
 					}
 					continue;
 				}
@@ -656,7 +638,6 @@ public class DistributeGet {
 													messageDm.getQueueName(),
 													MonitorPerformanceConstant.MONITOR_ID_CUSTOMER_SEND,
 													true);
-											trace(messageDm, TraceConstant.ACTION_TYPE_CUSTOMER_SEND, TraceConstant.RESULT_TYPE_SUCCESS, TraceConstant.MODULE_TYPE_CUSTOMER, ((ConnectAgent)netConnectAgent).getConnectId());
 											break;
 										} catch (ConnectionUnableException e) {
 											if (logger.isErrorEnabled()) {
@@ -672,7 +653,6 @@ public class DistributeGet {
 													messageDm.getQueueName(),
 													MonitorPerformanceConstant.MONITOR_ID_CUSTOMER_SEND,
 													false);
-											trace(messageDm, TraceConstant.ACTION_TYPE_CUSTOMER_SEND, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_CUSTOMER, ((ConnectAgent)netConnectAgent).getConnectId());
 											continue;
 										} catch (ConnectionResetException e) {
 											if (logger.isErrorEnabled()) {
@@ -688,7 +668,6 @@ public class DistributeGet {
 													messageDm.getQueueName(),
 													MonitorPerformanceConstant.MONITOR_ID_CUSTOMER_SEND,
 													false);
-											trace(messageDm, TraceConstant.ACTION_TYPE_CUSTOMER_SEND, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_CUSTOMER, ((ConnectAgent)netConnectAgent).getConnectId());
 											continue;
 										} catch (Exception e) {
 											successPerformanceExecuterService.result(
@@ -697,7 +676,6 @@ public class DistributeGet {
 													messageDm.getQueueName(),
 													MonitorPerformanceConstant.MONITOR_ID_CUSTOMER_SEND,
 													false);
-											trace(messageDm, TraceConstant.ACTION_TYPE_CUSTOMER_SEND, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_CUSTOMER, ((ConnectAgent)netConnectAgent).getConnectId());
 											throw e;
 										}
 									} else {
@@ -712,13 +690,11 @@ public class DistributeGet {
 											+ ", Group: " + executeQueueNum
 											+ ", Execute -> " + e);
 								}
-								trace(messageDm, TraceConstant.ACTION_TYPE_CUSTOMER_SEND, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_CUSTOMER_GROUP, executeQueueNum);
 								executeQueue >>= 1;
 								resultQueue >>= 1;
 								executeQueueNum <<= 1;
 								continue;
 							}
-							trace(messageDm, TraceConstant.ACTION_TYPE_CUSTOMER_SEND, TraceConstant.RESULT_TYPE_SUCCESS, TraceConstant.MODULE_TYPE_CUSTOMER_GROUP, executeQueueNum);
 							long resultQueueNew = messageDm.getResultQueue();
 							resultQueueNew |= executeQueueNum;
 							messageDm.setResultQueue(resultQueueNew);
@@ -730,7 +706,6 @@ public class DistributeGet {
 										+ ", Group: " + executeQueueNum
 										+ ", Get Net Group QueueAgent -> Null");
 							}
-							trace(messageDm, TraceConstant.ACTION_TYPE_CUSTOMER_SEND, TraceConstant.RESULT_TYPE_FAIL, TraceConstant.MODULE_TYPE_CUSTOMER_GROUP, executeQueueNum);
 						}
 					}
 					executeQueue >>= 1;
@@ -753,11 +728,6 @@ public class DistributeGet {
 									messageDm.getQueueName(),
 									MonitorPerformanceConstant.MONITOR_ID_QUEUE_EXPIRE,
 									false);
-							if (queueType) {
-								trace(messageDm, TraceConstant.ACTION_TYPE_DISTRIBUTE_DISPATCH, TraceConstant.RESULT_TYPE_EXPIRE, TraceConstant.MODULE_TYPE_DISTRIBUTE, moduleId);
-							} else {
-								trace(messageDm, TraceConstant.ACTION_TYPE_DISTRIBUTE_AGAIN_DISPATCH, TraceConstant.RESULT_TYPE_EXPIRE, TraceConstant.MODULE_TYPE_DISTRIBUTE, moduleId);						
-							}
 						} else {
 							messageDm.setStatus(MessageConstant.MESSAGE_STATUS_PORTION);
 							messageDm.setDelayTime(queueDistributerVo.getInterval_Time());
@@ -797,11 +767,6 @@ public class DistributeGet {
 								messageDm.getQueueName(),
 								MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_PORTION_DISPATCH,
 								false);
-					}
-					if (queueType) {
-						trace(messageDm, TraceConstant.ACTION_TYPE_DISTRIBUTE_DISPATCH, TraceConstant.RESULT_TYPE_DB_UPDATE_FAIL, TraceConstant.MODULE_TYPE_DISTRIBUTE, moduleId);
-					} else {
-						trace(messageDm, TraceConstant.ACTION_TYPE_DISTRIBUTE_AGAIN_DISPATCH, TraceConstant.RESULT_TYPE_DB_UPDATE_FAIL, TraceConstant.MODULE_TYPE_DISTRIBUTE, moduleId);						
 					}
 					continue;
 				}
@@ -907,11 +872,6 @@ public class DistributeGet {
 							MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_PORTION_DISPATCH,
 							false);
 				}
-				if (messageDm.getBool()) {
-					trace(messageDm, TraceConstant.ACTION_TYPE_DISTRIBUTE_DISPATCH, TraceConstant.RESULT_TYPE_DB_UPDATE_FAIL, TraceConstant.MODULE_TYPE_DISTRIBUTE, moduleId);
-				} else {
-					trace(messageDm, TraceConstant.ACTION_TYPE_DISTRIBUTE_AGAIN_DISPATCH, TraceConstant.RESULT_TYPE_DB_UPDATE_FAIL, TraceConstant.MODULE_TYPE_DISTRIBUTE, moduleId);						
-				}
 				continue;
 			}
 			
@@ -936,22 +896,6 @@ public class DistributeGet {
 						messageDm.getQueueName(),
 						MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_PORTION_DISPATCH,
 						success);
-			}
-			byte result = TraceConstant.RESULT_TYPE_SUCCESS;
-			if (messageDm.getResultQueue() != messageDm.getExecuteQueue()) {
-				if (messageDm.getResultQueue() == 0) {
-					result = TraceConstant.RESULT_TYPE_FAIL;
-				} else {						
-					result = TraceConstant.RESULT_TYPE_PORTION_SUCCESS;
-				}
-			}
-			if (messageDm.getBool()) {
-				trace(messageDm, TraceConstant.ACTION_TYPE_DISTRIBUTE_DISPATCH, result, TraceConstant.MODULE_TYPE_DISTRIBUTE, moduleId);
-			} else {
-				trace(messageDm, TraceConstant.ACTION_TYPE_DISTRIBUTE_AGAIN_DISPATCH, result, TraceConstant.MODULE_TYPE_DISTRIBUTE, moduleId);						
-			}		
-			if (result == TraceConstant.RESULT_TYPE_SUCCESS) {
-				removeTrace(messageDm);
 			}
 		}
 	}
@@ -1090,88 +1034,6 @@ public class DistributeGet {
 							+ "UUID: " + messageDm.getUuid()
 							+ ", BodyCacheTwo: " + messageDm.getRedisTwo()
 							+ ", Remove Body Redis Two -> " + e);
-				}
-			}
-		}
-	}
-	
-	private void trace(MessageDm messageDm, int action, byte result, byte traceModuleType, long traceModuleId) {
-		if (queueDistributerVo.getIs_Trace() == TraceConstant.IS_TRACE_YES) {
-			QueueAgent queueAgentTrace = traceCacheConnectManager.getQueueAgent(messageDm.getQueueName());
-			if (queueAgentTrace != null) {
-				TraceCacheConnectAgent traceCacheConnectAgent = null;			
-				do {
-					traceCacheConnectAgent = (TraceCacheConnectAgent) queueAgentTrace.getConnectAgent();
-					if (traceCacheConnectAgent != null) {
-						try {
-							traceCacheConnectAgent.set(new TraceVo(
-															messageDm.getUuid(), 
-															action, 
-															System.currentTimeMillis(), 
-															result, 
-															traceModuleType,
-															traceModuleId,
-															TraceConstant.MODULE_TYPE_DISTRIBUTE,
-															moduleId
-															));
-							break;
-						} catch (Exception e) {
-							if (logger.isErrorEnabled()) {
-								logger.error("Trace -> "
-										+ "Queue: " + messageDm.getQueueName()
-										+ ", UUID: " + messageDm.getUuid()
-										+ ", TraceCache: " + ((ConnectAgent)traceCacheConnectAgent).getConnectId()
-										+ ", Set Trace Cache -> " + e);
-							}
-							continue;
-						}
-					} else {
-						bodyCacheConnectManager.startUpdateConnectAgent();
-						if (logger.isDebugEnabled()) {
-							logger.error("Trace -> "
-									+ "Queue: " + messageDm.getQueueName()
-									+ ", UUID: " + messageDm.getUuid()
-									+ ", Get Trace Cache Agent -> Null");
-						}
-					}
-				} while (traceCacheConnectAgent != null);
-			} else {
-				if (logger.isErrorEnabled()) {
-					logger.error("Trace -> "
-							+ "Queue: " + messageDm.getQueueName()
-							+ ", UUID: " + messageDm.getUuid()
-							+ ", Get Trace Queue Agent -> Null");
-				}
-			}
-		}
-	}
-	
-	private void removeTrace(MessageDm messageDm) {
-		if (queueDistributerVo.getIs_Trace() == TraceConstant.IS_TRACE_YES) {
-			QueueAgent queueAgentTrace = traceCacheConnectManager.getQueueAgent(messageDm.getQueueName());
-			if (queueAgentTrace != null) {
-				List<ConnectAgent> connectAgentList = queueAgentTrace.getConnectAgentAll();
-				for (ConnectAgent connectAgent : connectAgentList) {
-					TraceCacheConnectAgent traceCacheConnectAgent = (TraceCacheConnectAgent) connectAgent;
-					try {
-						traceCacheConnectAgent.remove(messageDm.getUuid());
-					} catch (Exception e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("RemoveTrace -> "
-									+ "Queue: " + messageDm.getQueueName()
-									+ ", UUID: " + messageDm.getUuid()
-									+ ", TraceCache: " + connectAgent.getConnectId()
-									+ ", Remove Trace Cache -> " + e);
-						}
-						continue;
-					}
-				}
-			} else {
-				if (logger.isErrorEnabled()) {
-					logger.error("RemoveTrace -> "
-							+ "Queue: " + messageDm.getQueueName()
-							+ ", UUID: " + messageDm.getUuid()
-							+ ", Get Trace Queue Agent -> Null");
 				}
 			}
 		}

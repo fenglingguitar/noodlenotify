@@ -56,26 +56,6 @@
 		<constructor-arg ref="redisQueueCacheConnectAgentFactory" />
 	</bean>
     
-    <bean id="cacheConnectAgentConfParamTrace" class="org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam">
-		<property name="maxActive" value="3"/>
-		<property name="minIdle" value="1"/>
-		<property name="maxIdle" value="3"/>
-		<property name="maxWait" value="1000"/>
-		<property name="minEvictableIdleTimeMillis" value="60000"/>
-		<property name="timeBetweenEvictionRunsMillis" value="60000"/>
-		<property name="timeout" value="1000"/>
-		<property name="setThreadCount" value="0"/>
-		<property name="removeThreadCount" value="0"/>
-	</bean>
-	<bean id="redisTraceCacheConnectAgentFactory" class="org.fl.noodlenotify.core.connect.cache.trace.redis.RedisTraceCacheConnectAgentFactory">
-		<property name="cacheConnectAgentConfParam" ref="cacheConnectAgentConfParamTrace" />
-	</bean>
-	<bean id="consoleTraceCacheConnectManager" class="org.fl.noodlenotify.core.connect.cache.trace.manager.console.ConsoleTraceCacheConnectManager"
-			init-method="start" destroy-method="destroy"
-			parent="commonParam">
-		<constructor-arg ref="redisTraceCacheConnectAgentFactory" />
-	</bean>
-	
 	<bean id="dbDataSourceFactory" class="org.fl.noodlenotify.core.connect.db.datasource.C3p0DbDataSourceFactory">
 		<property name="dbName" value="${noodlenotify.message.db.name}"/>
 		<property name="user" value="${noodlenotify.message.db.user}" />

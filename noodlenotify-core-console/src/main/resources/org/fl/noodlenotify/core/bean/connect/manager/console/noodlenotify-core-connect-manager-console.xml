@@ -19,6 +19,5 @@
 	<import resource="classpath:org/fl/noodlenotify/core/bean/connect/manager/console/noodlenotify-core-connect-manager-console-exchange.xml" />
 	<!-- <import resource="classpath:org/fl/noodlenotify/core/bean/connect/manager/console/noodlenotify-core-connect-manager-console-producer.xml" /> -->
 	<import resource="classpath:org/fl/noodlenotify/core/bean/connect/manager/console/noodlenotify-core-connect-manager-console-queuecache.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/bean/connect/manager/console/noodlenotify-core-connect-manager-console-trace.xml" />
 	
 </beans>

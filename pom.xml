@@ -72,7 +72,6 @@
     <module>noodlenotify-core-connect-cache-api</module>
     <module>noodlenotify-core-connect-cache-body</module>
     <module>noodlenotify-core-connect-cache-queue</module>
-    <module>noodlenotify-core-connect-cache-trace</module>
     <module>noodlenotify-core-client-producer</module>
     <module>noodlenotify-core-client-consumer-api</module>
     <module>noodlenotify-core-client-consumer-jetty</module>
@@ -87,7 +86,6 @@
     <module>noodlenotify-console-web</module>
     <module>noodlenotify-monitor-status</module>
     <module>noodlenotify-monitor-performance</module>
-    <module>noodlenotify-trace</module>
     <module>noodlenotify-core-run</module>
     <module>noodlenotify-demo-producer</module>
     <module>noodlenotify-demo-consumer</module>

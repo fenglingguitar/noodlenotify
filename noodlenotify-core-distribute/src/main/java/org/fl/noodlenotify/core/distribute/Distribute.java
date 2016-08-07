@@ -39,9 +39,7 @@ public class Distribute {
 	private ConnectManager queueCacheConnectManager;
 	private ConnectManager bodyCacheConnectManager;
 	private ConnectManager netConnectManager;
-	
-	private ConnectManager traceCacheConnectManager;
-	
+		
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();	
 	
 	private volatile boolean stopSign = false;
@@ -99,10 +97,6 @@ public class Distribute {
 		dbConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
 		dbConnectManager.start();
 		
-		traceCacheConnectManager.setModuleId(moduleId);
-		traceCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		traceCacheConnectManager.start();
-		
 		updateConnectAgent();
 		
 		stopCountDownLatch = new CountDownLatch(1);
@@ -146,7 +140,6 @@ public class Distribute {
 		stopCountDownLatch.await();
 		executorService.shutdown();
 		
-		traceCacheConnectManager.destroy();
 		dbConnectManager.destroy();
 		queueCacheConnectManager.destroy();
 		bodyCacheConnectManager.destroy();
@@ -226,7 +219,6 @@ public class Distribute {
 								queueCacheConnectManager,
 								bodyCacheConnectManager,
 								netConnectManager,
-								traceCacheConnectManager,
 								distributeConfParam,
 								queueDistributerVo,
 								moduleId,
@@ -295,7 +287,6 @@ public class Distribute {
 										queueCacheConnectManager,
 										bodyCacheConnectManager,
 										netConnectManager,
-										traceCacheConnectManager,
 										distributeConfParam,
 										queueDistributerVo,
 										moduleId,
@@ -747,9 +738,5 @@ public class Distribute {
 	public void setSuccessPerformanceExecuterService(
 			SuccessPerformanceExecuterService successPerformanceExecuterService) {
 		this.successPerformanceExecuterService = successPerformanceExecuterService;
-	}
-
-	public void setTraceCacheConnectManager(ConnectManager traceCacheConnectManager) {
-		this.traceCacheConnectManager = traceCacheConnectManager;
 	}
 }
