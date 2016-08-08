@@ -104,7 +104,6 @@
 				q.new_Exe_ThreadNum,
 				q.portion_Pop_ThreadNum,
 				q.portion_Exe_ThreadNum,
-				q.is_Trace,
 				q.manual_Status,
 				qd.distributer_Id
 		FROM 	CSL_QUEUE q, CSL_QUEUE_DISTRIBUTER qd
@@ -133,7 +132,6 @@
 				q.new_Exe_ThreadNum,
 				q.portion_Pop_ThreadNum,
 				q.portion_Exe_ThreadNum,
-				q.is_Trace,
 				q.manual_Status,
 				qd.distributer_Id
 		FROM 	CSL_QUEUE q, CSL_QUEUE_DISTRIBUTER qd

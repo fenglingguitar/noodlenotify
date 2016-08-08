@@ -19,7 +19,6 @@ public class QueueMd implements java.io.Serializable {
 	private long expire_Time;
 	private long dph_Delay_Time;
 	private long dph_Timeout;
-	private byte is_Trace;
 	private int new_Pop_ThreadNum;
 	private int new_Exe_ThreadNum;
 	private int portion_Pop_ThreadNum;
@@ -79,15 +78,6 @@ public class QueueMd implements java.io.Serializable {
 
 	public void setExpire_Time(long expire_Time) {
 		this.expire_Time = expire_Time;
-	}
-
-	@Column(name = "IS_TRACE", nullable = false, length = 1)
-	public byte getIs_Trace() {
-		return is_Trace;
-	}
-
-	public void setIs_Trace(byte is_Trace) {
-		this.is_Trace = is_Trace;
 	}
 
 	@Column(name = "NEW_POP_THREADNUM", nullable = false, length = 16)

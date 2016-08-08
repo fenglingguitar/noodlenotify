@@ -91,7 +91,6 @@
 					'间隔时间',
 					'推送延迟时间',
 					'推送超时时间',
-					'是否跟踪',
 					'新消息POP线程数',
 					'新消息EXE线程数',
 					'未完成消息POP线程数',
@@ -114,7 +113,6 @@
 					{name:'dph_Timeout', index:'dph_Timeout', width:100, align:'center',formatter:'select', 
 						editoptions:{value:'0:;1000:1秒;2000:2秒;3000:3秒;5000:5秒;10000:10秒;30000:30秒;60000:1分钟;120000:2分钟;180000:3分钟;300000:5分钟;600000:10分钟;900000:15分钟;1800000:30分钟;3600000:1小时;'}
 					},
-					{name:'is_Trace', index:'is_Trace', width:100, align:'center', formatter:'checkbox', editoptions:{value:'1:0'}, hidden:true},
 					{name:'new_Pop_ThreadNum', index:'new_Pop_ThreadNum', width:140, align:'center', formatter:'select', 
 						editoptions:{value:'1:1;2:2;3:3;4:4;5:5;6:6;7:7;8:8;9:9;10:10;15:15;20:20;25:25;30:30;35:35;40:40;45:45;50:50;60:60;70:70;80:80;90:90;100:100;200:200;300:300;400:400;500:500;'}
 					},
@@ -416,7 +414,6 @@
 			    	<td>&nbsp;</td>
 				</tr>
 			</table>
-			<input type="hidden" id="is_Trace" value="-1"/>
 		</div>
 	</div>
 	<div id="list_div" style="width:auto;">

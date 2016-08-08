@@ -16,8 +16,6 @@ import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgQueueCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
-import org.fl.noodlenotify.console.vo.QueueTraceStorageVo;
-import org.fl.noodlenotify.console.vo.TraceStorageVo;
 
 public interface ConsoleRemotingInvoke {
 
@@ -72,15 +70,4 @@ public interface ConsoleRemotingInvoke {
 	public List<MsgBodyCacheVo> queryCheckMsgBodyCaches() throws Exception;
 
 	public List<MsgQueueCacheVo> queryCheckMsgQueueCaches() throws Exception;
-
-	public List<TraceStorageVo> queryCheckTracestorages() throws Exception;
-
-	public Map<String, List<QueueTraceStorageVo>> producterGetTraceStorages(long producerId) throws Exception;
-
-	public Map<String, List<QueueTraceStorageVo>> exchangerGetTraceStorages(long exchangerId) throws Exception;
-
-	public Map<String, List<QueueTraceStorageVo>> distributerGetTraceStorages(long distributerId) throws Exception;
-
-	public Map<String, List<QueueTraceStorageVo>> customerGetTraceStorages(long customerId) throws Exception;
-
 }

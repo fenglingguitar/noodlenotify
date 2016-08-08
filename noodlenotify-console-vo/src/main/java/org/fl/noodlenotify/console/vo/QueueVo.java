@@ -10,7 +10,6 @@ public class QueueVo implements java.io.Serializable {
 	private byte manual_Status;
 	private byte is_Repeat;
 	private long expire_Time;
-	private byte is_Trace;
 	private long interval_Time;
 	private long dph_Delay_Time;
 	private long dph_Timeout;
@@ -78,14 +77,6 @@ public class QueueVo implements java.io.Serializable {
 
 	public void setInterval_Time(long interval_Time) {
 		this.interval_Time = interval_Time;
-	}
-	
-	public byte getIs_Trace() {
-		return is_Trace;
-	}
-
-	public void setIs_Trace(byte is_Trace) {
-		this.is_Trace = is_Trace;
 	}
 
 	public int getNew_Pop_ThreadNum() {

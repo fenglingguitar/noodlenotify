@@ -2,9 +2,6 @@ package org.fl.noodlenotify.console.service.impl;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import org.fl.noodle.common.mvc.vo.PageVo;
 import org.fl.noodlenotify.console.dao.QueueCustomerDao;
 import org.fl.noodlenotify.console.dao.QueueCustomerGroupDao;
@@ -14,7 +11,6 @@ import org.fl.noodlenotify.console.dao.QueueExchangerDao;
 import org.fl.noodlenotify.console.dao.QueueMsgBodyCacheDao;
 import org.fl.noodlenotify.console.dao.QueueMsgQueueCacheDao;
 import org.fl.noodlenotify.console.dao.QueueMsgStorageDao;
-import org.fl.noodlenotify.console.dao.QueueTraceStorageDao;
 import org.fl.noodlenotify.console.service.QueueService;
 import org.fl.noodlenotify.console.vo.QueueCustomerGroupVo;
 import org.fl.noodlenotify.console.vo.QueueCustomerVo;
@@ -23,8 +19,9 @@ import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgQueueCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
-import org.fl.noodlenotify.console.vo.QueueTraceStorageVo;
 import org.fl.noodlenotify.console.vo.QueueVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service("queueService")
 public class QueueServiceImpl implements QueueService {
@@ -52,9 +49,6 @@ public class QueueServiceImpl implements QueueService {
 
 	@Autowired
 	private QueueMsgStorageDao queueMsgStorageDao;
-	
-	@Autowired
-	private QueueTraceStorageDao queueTraceStorageDao;
 
 	@Override
 	public PageVo<QueueVo> queryQueuePage(QueueVo vo, int page, int rows) throws Exception {
@@ -109,9 +103,6 @@ public class QueueServiceImpl implements QueueService {
 		QueueMsgQueueCacheVo queueMsgQueueCacheVo = new QueueMsgQueueCacheVo();
 		queueMsgQueueCacheVo.setQueue_Nm(vo.getQueue_Nm());
 		queueMsgQueueCacheDao.deleteQueueMsgQueueCacheByQueueNm(queueMsgQueueCacheVo);
-		QueueTraceStorageVo queueTraceStorageVo = new QueueTraceStorageVo();
-		queueTraceStorageVo.setQueue_Nm(vo.getQueue_Nm());
-		queueTraceStorageDao.deleteQueueTraceStorageByQueueNm(queueTraceStorageVo);
 		queueDao.deleteQueue(vo);
 	}
 
@@ -139,9 +130,6 @@ public class QueueServiceImpl implements QueueService {
 			QueueMsgQueueCacheVo queueMsgQueueCacheVo = new QueueMsgQueueCacheVo();
 			queueMsgQueueCacheVo.setQueue_Nm(vo.getQueue_Nm());
 			queueMsgQueueCacheDao.deleteQueueMsgQueueCacheByQueueNm(queueMsgQueueCacheVo);
-			QueueTraceStorageVo queueTraceStorageVo = new QueueTraceStorageVo();
-			queueTraceStorageVo.setQueue_Nm(vo.getQueue_Nm());
-			queueTraceStorageDao.deleteQueueTraceStorageByQueueNm(queueTraceStorageVo);
 			queueDao.deleteQueue(vo);
 		}
 	}

@@ -10,7 +10,6 @@
 				interval_Time,
 				dph_Delay_Time,
 				dph_Timeout,
-				is_Trace,
 				new_Pop_ThreadNum,
 				new_Exe_ThreadNum,
 				portion_Pop_ThreadNum,
@@ -26,9 +25,6 @@
 				#end
 				#if($is_Repeat)
 					AND is_Repeat = :is_Repeat
-				#end
-				#if($is_Trace)
-					AND is_Trace = :is_Trace
 				#end
 	]]>
 	</query>

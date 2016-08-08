@@ -107,7 +107,6 @@
 				q.queue_Nm,
 				q.is_Repeat,
 				q.expire_Time,
-				q.is_Trace,
 				q.manual_Status,
 				qe.exchanger_Id
 		FROM 	CSL_QUEUE q, CSL_QUEUE_EXCHANGER qe
@@ -128,7 +127,6 @@
 				q.queue_Nm,
 				q.is_Repeat,
 				q.expire_Time,
-				q.is_Trace,
 				q.manual_Status,
 				qe.exchanger_Id
 		FROM 	CSL_QUEUE q, CSL_QUEUE_EXCHANGER qe

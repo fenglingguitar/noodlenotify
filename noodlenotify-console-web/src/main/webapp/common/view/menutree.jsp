@@ -99,14 +99,7 @@
            		</li>
                </ul>
            </li>
-           <li><a href="#">消息跟踪</a>
-               <ul>
-                   <li><a href="#" onclick="javascript:top.addTab('mainframe_3_1', '跟踪-队列', '<%=request.getContextPath()%>/view/trace/queue/queue_main.jsp');">跟踪-队列</a></li>
-                   <li><a href="#" onclick="javascript:top.addTab('mainframe_3_2', '跟踪数据库', '<%=request.getContextPath()%>/view/trace/tracestorage/tracestorage_main.jsp');">跟踪数据库</a></li>
-                   <li><a href="#" onclick="javascript:top.addTab('mainframe_3_3', '跟踪消息', '<%=request.getContextPath()%>/view/trace/tracemsg/tracemsg_main.jsp');">跟踪消息</a></li>
-               </ul>
-           </li>
-	    </ul>
+      </ul>
 	</div>
   </body>
 </html>

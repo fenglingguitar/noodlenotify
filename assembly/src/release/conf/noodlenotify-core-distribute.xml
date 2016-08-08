@@ -12,7 +12,6 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="./noodlenotify-trace-distribute.xml" />
 	<import resource="./noodlenotify-monitor-performance-schedule.xml" />
 	
 	<bean id="consoleRemotingInvoke" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
@@ -225,7 +224,6 @@
 		<property name="queueCacheConnectManager" ref="queueCacheConnectManager" />
 		<property name="bodyCacheConnectManager" ref="bodyCacheConnectManager" />
 		<property name="netConnectManager" ref="netConnectManager" />
-		<property name="traceCacheConnectManager" ref="traceCacheConnectManager" />
 		<property name="distributeConfParam" ref="distributeConfParam" />
 		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
 	</bean>

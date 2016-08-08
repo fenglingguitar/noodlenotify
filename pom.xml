@@ -27,7 +27,6 @@
   	<noodlenotify.core.connect.cache.api.version>2.0.0-SNAPSHOT</noodlenotify.core.connect.cache.api.version>
   	<noodlenotify.core.connect.cache.body.version>2.0.0-SNAPSHOT</noodlenotify.core.connect.cache.body.version>
   	<noodlenotify.core.connect.cache.queue.version>2.0.0-SNAPSHOT</noodlenotify.core.connect.cache.queue.version>
-  	<noodlenotify.core.connect.cache.trace.version>2.0.0-SNAPSHOT</noodlenotify.core.connect.cache.trace.version>
   	<noodlenotify.core.client.producer.version>2.0.0-SNAPSHOT</noodlenotify.core.client.producer.version>
   	<noodlenotify.core.client.consumer.api.version>2.0.0-SNAPSHOT</noodlenotify.core.client.consumer.api.version>
   	<noodlenotify.core.client.consumer.jetty.version>2.0.0-SNAPSHOT</noodlenotify.core.client.consumer.jetty.version>
@@ -42,7 +41,6 @@
   	<noodlenotify.console.web.version>2.0.0-SNAPSHOT</noodlenotify.console.web.version>
   	<noodlenotify.monitor.status.version>2.0.0-SNAPSHOT</noodlenotify.monitor.status.version>
   	<noodlenotify.monitor.performance.version>2.0.0-SNAPSHOT</noodlenotify.monitor.performance.version>
-  	<noodlenotify.trace.version>2.0.0-SNAPSHOT</noodlenotify.trace.version>
   	<noodlenotify.core.run.version>2.0.0-SNAPSHOT</noodlenotify.core.run.version>
 	
 	<noodlenotify.demo.producer.version>2.0.0-SNAPSHOT</noodlenotify.demo.producer.version>

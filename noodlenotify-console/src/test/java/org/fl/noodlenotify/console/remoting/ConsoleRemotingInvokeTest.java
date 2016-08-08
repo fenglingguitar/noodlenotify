@@ -5,20 +5,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
-
 import org.fl.noodlenotify.console.vo.QueueCustomerVo;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgQueueCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
-import org.fl.noodlenotify.console.vo.QueueTraceStorageVo;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 @ContextConfiguration(locations = {
 		"classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" 
@@ -288,41 +286,5 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 	@Test
 	public void testQueryCheckCustomers() throws Exception {
 		remotingInvoke.queryCheckCustomers();
-	}
-
-	@Test
-	public void testQueryCheckTracestorages() throws Exception {
-		remotingInvoke.queryCheckTracestorages();
-	}
-
-	@Test
-	public void testProducterGetTraceStorages() throws Exception {
-		long producterId = 1;
-		remotingInvoke.producterGetTraceStorages(producterId);
-	}
-
-	@Test
-	public void testExchangerGetTraceStorages() throws Exception {
-		long exchangerId = 4;
-		Map<String, List<QueueTraceStorageVo>> map = remotingInvoke.exchangerGetTraceStorages(exchangerId);
-		Set<String> set = map.keySet();
-		for (String queueName : set) {
-			List<QueueTraceStorageVo> queueTraceStorageVoList = map.get(queueName);
-			for (QueueTraceStorageVo queueTraceStorageVo : queueTraceStorageVoList) {
-				logger.info("QueueName: " + queueName + ", CustomerId: " + queueTraceStorageVo.getTraceStorage_Id());
-			}
-		}
-	}
-
-	@Test
-	public void testDistributerGetTraceStorages() throws Exception {
-		long distributerId = 1;
-		remotingInvoke.distributerGetTraceStorages(distributerId);
-	}
-
-	@Test
-	public void testCustomerGetTraceStorages() throws Exception {
-		long customerId = 1;
-		remotingInvoke.customerGetTraceStorages(customerId);
 	}
 }

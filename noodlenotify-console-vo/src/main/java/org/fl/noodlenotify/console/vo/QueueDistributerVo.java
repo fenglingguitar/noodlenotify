@@ -17,7 +17,6 @@ public class QueueDistributerVo implements java.io.Serializable {
 	private long interval_Time;
 	private long dph_Delay_Time;
 	private long dph_Timeout;
-	private byte is_Trace;
 	private int new_Pop_ThreadNum;
 	private int new_Exe_ThreadNum;
 	private int portion_Pop_ThreadNum;
@@ -109,14 +108,6 @@ public class QueueDistributerVo implements java.io.Serializable {
 
 	public void setInterval_Time(long interval_Time) {
 		this.interval_Time = interval_Time;
-	}
-
-	public byte getIs_Trace() {
-		return is_Trace;
-	}
-
-	public void setIs_Trace(byte is_Trace) {
-		this.is_Trace = is_Trace;
 	}
 	
 	public int getNew_Pop_ThreadNum() {

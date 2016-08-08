@@ -29,8 +29,7 @@
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
 			<colgroup>
 				<col width="15%" />
-				<col width="15%" />
-				<col width="70%" />
+				<col width="85%" />
 			</colgroup>					
 		    <tr>
 		    	<td valign="top">
@@ -66,17 +65,6 @@
 					              		<li><a href="#" onclick="javascript:top.addTab('mainframe_2_3_1', '错误次数', '<%=request.getContextPath()%>/view/monitor/success/count/success_count_chart.jsp');">错误次数</a></li>
 									</ul>
 								</li>
-						    </ul>
-					    </li>
-				    </ul>
-		    	</td>
-		    	<td valign="top">
-			    	<ul>
-						<li>3、消息跟踪
-							<ul>
-                        		<li><a href="#" onclick="javascript:top.addTab('mainframe_3_1', '跟踪-队列', '<%=request.getContextPath()%>/view/trace/queue/queue_main.jsp');">跟踪-队列</a></li>
-				               	<li><a href="#" onclick="javascript:top.addTab('mainframe_3_2', '跟踪数据库', '<%=request.getContextPath()%>/view/trace/tracestorage/tracestorage_main.jsp');">跟踪数据库</a></li>
-				               	<li><a href="#" onclick="javascript:top.addTab('mainframe_3_3', '跟踪消息', '<%=request.getContextPath()%>/view/trace/tracemsg/tracemsg_main.jsp');">跟踪消息</a></li>
 						    </ul>
 					    </li>
 				    </ul>

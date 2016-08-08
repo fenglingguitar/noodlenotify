@@ -391,7 +391,6 @@
 					<td>&nbsp;</td>
 				</tr>
 			</table>
-			<input type="hidden" id="is_Trace" value="0"/>
 		</div>
 	</div>
   </body>

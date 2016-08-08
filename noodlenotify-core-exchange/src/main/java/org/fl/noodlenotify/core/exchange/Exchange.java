@@ -233,7 +233,6 @@ public class Exchange implements NetConnectReceiver {
 				for (QueueExchangerVo queueExchangerVo : consoleInfoMapQueues) {
 					logger.debug("UpdateConnectAgent -> ExchangerGetQueues -> " 
 							+ "QueueName: " + queueExchangerVo.getQueue_Nm() 
-							+ ", Is_Trace: " + queueExchangerVo.getIs_Trace()
 							);
 				}
 			}
@@ -247,28 +246,7 @@ public class Exchange implements NetConnectReceiver {
 					if (logger.isDebugEnabled()) {
 						logger.debug("UpdateConnectAgent -> Add Queue -> " 
 								+ "QueueName: " + queueExchangerVo.getQueue_Nm() 
-								+ ", Is_Trace: " + queueExchangerVo.getIs_Trace()
 								);
-					}
-				} else {
-					QueueExchangerVo queueExchangerVoOld = queueExchangerVoMap.get(queueExchangerVo.getQueue_Nm());
-					if (queueExchangerVoOld.getIs_Trace() != queueExchangerVo.getIs_Trace()) {
-						queueExchangerVoMap.remove(queueExchangerVoOld.getQueue_Nm());
-						if (logger.isDebugEnabled()) {
-							logger.debug("UpdateConnectAgent -> Remove Queue -> " 
-									+ "QueueName: " + queueExchangerVoOld.getQueue_Nm() 
-									+ ", Is_Trace: " + queueExchangerVoOld.getIs_Trace()
-									+ ", Queue Change"
-									);
-						}
-						queueExchangerVoMap.put(queueExchangerVo.getQueue_Nm(), queueExchangerVo);
-						if (logger.isDebugEnabled()) {
-							logger.debug("UpdateConnectAgent -> Add Queue -> " 
-									+ "QueueName: " + queueExchangerVo.getQueue_Nm() 
-									+ ", Is_Trace: " + queueExchangerVo.getIs_Trace()
-									+ ", Queue Change"
-									);
-						}
 					}
 				}
 			}
@@ -280,7 +258,6 @@ public class Exchange implements NetConnectReceiver {
 					if (logger.isDebugEnabled()) {
 						logger.debug("UpdateConnectAgent -> Remove Queue -> " 
 								+ "QueueName: " + queueExchangerVoOld.getQueue_Nm() 
-								+ ", Is_Trace: " + queueExchangerVoOld.getIs_Trace()
 								);
 					}
 				} 

@@ -16,7 +16,6 @@ public class QueueExchangerVo implements java.io.Serializable {
 	private byte manual_Status;
 	private byte is_Repeat;
 	private long expire_Time;
-	private byte is_Trace;
 	private int new_Pop_ThreadNum;
 	private int new_Exe_ThreadNum;
 	private int portion_Pop_ThreadNum;
@@ -116,14 +115,6 @@ public class QueueExchangerVo implements java.io.Serializable {
 
 	public void setExpire_Time(long expire_Time) {
 		this.expire_Time = expire_Time;
-	}
-	
-	public byte getIs_Trace() {
-		return is_Trace;
-	}
-
-	public void setIs_Trace(byte is_Trace) {
-		this.is_Trace = is_Trace;
 	}
 
 	public int getNew_Pop_ThreadNum() {

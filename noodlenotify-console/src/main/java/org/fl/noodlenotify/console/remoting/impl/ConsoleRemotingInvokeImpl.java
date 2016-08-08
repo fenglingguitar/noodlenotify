@@ -3,8 +3,6 @@ package org.fl.noodlenotify.console.remoting.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.service.CustomerService;
 import org.fl.noodlenotify.console.service.DistributerService;
@@ -20,8 +18,6 @@ import org.fl.noodlenotify.console.service.QueueExchangerService;
 import org.fl.noodlenotify.console.service.QueueMsgBodyCacheService;
 import org.fl.noodlenotify.console.service.QueueMsgQueueCacheService;
 import org.fl.noodlenotify.console.service.QueueMsgStorageService;
-import org.fl.noodlenotify.console.service.QueueTraceStorageService;
-import org.fl.noodlenotify.console.service.TraceStorageService;
 import org.fl.noodlenotify.console.vo.CustomerVo;
 import org.fl.noodlenotify.console.vo.DistributerVo;
 import org.fl.noodlenotify.console.vo.ExchangerVo;
@@ -35,8 +31,8 @@ import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgQueueCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
-import org.fl.noodlenotify.console.vo.QueueTraceStorageVo;
-import org.fl.noodlenotify.console.vo.TraceStorageVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ConsoleRemotingInvokeImpl implements ConsoleRemotingInvoke {
@@ -82,12 +78,6 @@ public class ConsoleRemotingInvokeImpl implements ConsoleRemotingInvoke {
 
 	@Autowired
 	private QueueCustomerGroupService queueCustomerGroupService;
-
-	@Autowired
-	private TraceStorageService traceStorageService;
-
-	@Autowired
-	private QueueTraceStorageService queueTraceStorageService;
 
 	@Override
 	public long producerRegister(String ip, int checkPort, String checkUrl, String checkType, String name) throws Exception {
@@ -218,30 +208,4 @@ public class ConsoleRemotingInvokeImpl implements ConsoleRemotingInvoke {
 	public List<MsgQueueCacheVo> queryCheckMsgQueueCaches() throws Exception {
 		return msgQueueCacheService.queryCheckMsgQueueCacheListWithCache();
 	}
-
-	@Override
-	public List<TraceStorageVo> queryCheckTracestorages() throws Exception {
-		return traceStorageService.queryCheckTracestorageListWithCache();
-	}
-
-	@Override
-	public Map<String, List<QueueTraceStorageVo>> producterGetTraceStorages(long producerId) throws Exception {
-		return queueTraceStorageService.getQueueTraceStorageByProducerId(producerId);
-	}
-
-	@Override
-	public Map<String, List<QueueTraceStorageVo>> exchangerGetTraceStorages(long exchangerId) throws Exception {
-		return queueTraceStorageService.getQueueTraceStorageByExchangerId(exchangerId);
-	}
-
-	@Override
-	public Map<String, List<QueueTraceStorageVo>> distributerGetTraceStorages(long distributerId) throws Exception {
-		return queueTraceStorageService.getQueueTraceStorageByDistributerId(distributerId);
-	}
-
-	@Override
-	public Map<String, List<QueueTraceStorageVo>> customerGetTraceStorages(long customerId) throws Exception {
-		return queueTraceStorageService.getQueueTraceStorageByCustomerId(customerId);
-	}
-
 }
