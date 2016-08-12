@@ -25,12 +25,8 @@ import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
-import org.fl.noodlenotify.monitor.performance.constant.MonitorPerformanceConstant;
-import org.fl.noodlenotify.monitor.performance.executer.service.impl.OvertimePerformanceExecuterService;
-import org.fl.noodlenotify.monitor.performance.executer.service.impl.SuccessPerformanceExecuterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class DistributeGet {
 	
@@ -60,24 +56,13 @@ public class DistributeGet {
 	
 	private QueueDistributerVo queueDistributerVo;
 	
-	private long moduleId;
-	
-	@Autowired
-	private OvertimePerformanceExecuterService overtimePerformanceExecuterService;
-	
-	@Autowired
-	private SuccessPerformanceExecuterService successPerformanceExecuterService;
-	
 	public DistributeGet(String queueName,
 							ConnectManager dbConnectManager,
 							ConnectManager queueCacheConnectManager,
 							ConnectManager bodyCacheConnectManager,
 							ConnectManager customerNetConnectManager,
 							DistributeConfParam distributeConfParam,
-							QueueDistributerVo queueDistributerVo,
-							long moduleId,
-							OvertimePerformanceExecuterService overtimePerformanceExecuterService,
-							SuccessPerformanceExecuterService successPerformanceExecuterService) {
+							QueueDistributerVo queueDistributerVo) {
 		this.queueName = queueName;
 		this.dbConnectManager = dbConnectManager;
 		this.queueCacheConnectManager = queueCacheConnectManager;
@@ -85,9 +70,6 @@ public class DistributeGet {
 		this.netConnectManager = customerNetConnectManager;
 		this.distributeConfParam = distributeConfParam;
 		this.queueDistributerVo = queueDistributerVo;
-		this.moduleId = moduleId;
-		this.overtimePerformanceExecuterService = overtimePerformanceExecuterService;
-		this.successPerformanceExecuterService = successPerformanceExecuterService;
 	}
 	
 	public void start() {
@@ -527,21 +509,7 @@ public class DistributeGet {
 					continue;
 				}
 				
-				updatingCount.incrementAndGet();
-				
-				if (queueType) {
-					overtimePerformanceExecuterService.before(
-							MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE,
-							moduleId,
-							messageDm.getQueueName(),
-							MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_NEW_DISPATCH);
-				} else {
-					overtimePerformanceExecuterService.before(
-							MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE,
-							moduleId,
-							messageDm.getQueueName(),
-							MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_PORTION_DISPATCH);		
-				}				
+				updatingCount.incrementAndGet();			
 				
 				DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectManager.getConnectAgent(messageDm.getDb());
 				if (dbConnectAgent == null) {
@@ -555,21 +523,6 @@ public class DistributeGet {
 					removeQueue(queueCacheName, messageDm);
 					executeBlockingQueueBatchCount.poll();
 					updatingCount.decrementAndGet();
-					if (queueType) {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE, 
-								moduleId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_NEW_DISPATCH,
-								false);
-					} else {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE, 
-								moduleId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_PORTION_DISPATCH,
-								false);
-					}
 					continue;
 				}
 				
@@ -584,21 +537,6 @@ public class DistributeGet {
 					removeQueue(queueCacheName, messageDm);
 					executeBlockingQueueBatchCount.poll();
 					updatingCount.decrementAndGet();
-					if (queueType) {
-						successPerformanceExecuterService.result(
-							MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE, 
-							moduleId,
-							messageDm.getQueueName(),
-							MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_NEW_DISPATCH,
-							false);
-					} else {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE, 
-								moduleId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_PORTION_DISPATCH,
-								false);
-					}
 					continue;
 				}
 				
@@ -617,27 +555,11 @@ public class DistributeGet {
 									if (connectAgent != null) {
 										NetConnectAgent netConnectAgent = (NetConnectAgent) connectAgent;
 										try {
-											overtimePerformanceExecuterService.before(
-													MonitorPerformanceConstant.MODULE_ID_CUSTOMER,
-													((ConnectAgent)netConnectAgent).getConnectId(),
-													messageDm.getQueueName(),
-													MonitorPerformanceConstant.MONITOR_ID_CUSTOMER_SEND);
 											netConnectAgent.send(new Message(
 																		messageDm.getQueueName(), 
 																		messageDm.getUuid(), 
 																		new String(messageDm.getContent(), "UTF-8")
 																		), (int)queueDistributerVo.getDph_Timeout());
-											overtimePerformanceExecuterService.after(
-													MonitorPerformanceConstant.MODULE_ID_CUSTOMER,
-													((ConnectAgent)netConnectAgent).getConnectId(),
-													messageDm.getQueueName(),
-													MonitorPerformanceConstant.MONITOR_ID_CUSTOMER_SEND);
-											successPerformanceExecuterService.result(
-													MonitorPerformanceConstant.MODULE_ID_CUSTOMER,
-													((ConnectAgent)netConnectAgent).getConnectId(),
-													messageDm.getQueueName(),
-													MonitorPerformanceConstant.MONITOR_ID_CUSTOMER_SEND,
-													true);
 											break;
 										} catch (ConnectionUnableException e) {
 											if (logger.isErrorEnabled()) {
@@ -647,12 +569,6 @@ public class DistributeGet {
 														+ ", Connect: " + connectAgent.getConnectId()
 														+ ", Execute -> " + e);
 											}
-											successPerformanceExecuterService.result(
-													MonitorPerformanceConstant.MODULE_ID_CUSTOMER,
-													((ConnectAgent)netConnectAgent).getConnectId(),
-													messageDm.getQueueName(),
-													MonitorPerformanceConstant.MONITOR_ID_CUSTOMER_SEND,
-													false);
 											continue;
 										} catch (ConnectionResetException e) {
 											if (logger.isErrorEnabled()) {
@@ -662,20 +578,8 @@ public class DistributeGet {
 														+ ", Connec: " + connectAgent.getConnectId()
 														+ ", Execute -> " + e);
 											}
-											successPerformanceExecuterService.result(
-													MonitorPerformanceConstant.MODULE_ID_CUSTOMER,
-													((ConnectAgent)netConnectAgent).getConnectId(),
-													messageDm.getQueueName(),
-													MonitorPerformanceConstant.MONITOR_ID_CUSTOMER_SEND,
-													false);
 											continue;
 										} catch (Exception e) {
-											successPerformanceExecuterService.result(
-													MonitorPerformanceConstant.MODULE_ID_CUSTOMER,
-													((ConnectAgent)netConnectAgent).getConnectId(),
-													messageDm.getQueueName(),
-													MonitorPerformanceConstant.MONITOR_ID_CUSTOMER_SEND,
-													false);
 											throw e;
 										}
 									} else {
@@ -722,12 +626,6 @@ public class DistributeGet {
 						if (queueDistributerVo.getExpire_Time() > 0 
 								&& System.currentTimeMillis() - messageDm.getBeginTime() > queueDistributerVo.getExpire_Time()) {
 							messageDm.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
-							successPerformanceExecuterService.result(
-									MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE, 
-									moduleId,
-									messageDm.getQueueName(),
-									MonitorPerformanceConstant.MONITOR_ID_QUEUE_EXPIRE,
-									false);
 						} else {
 							messageDm.setStatus(MessageConstant.MESSAGE_STATUS_PORTION);
 							messageDm.setDelayTime(queueDistributerVo.getInterval_Time());
@@ -753,36 +651,7 @@ public class DistributeGet {
 					removeQueue(queueCacheName, messageDm);
 					executeBlockingQueueBatchCount.poll();
 					updatingCount.decrementAndGet();
-					if (queueType) {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE, 
-								moduleId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_NEW_DISPATCH,
-								false);
-					} else {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE, 
-								moduleId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_PORTION_DISPATCH,
-								false);
-					}
 					continue;
-				}
-				
-				if (queueType) {
-					overtimePerformanceExecuterService.after(
-							MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE,
-							moduleId,
-							messageDm.getQueueName(),
-							MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_NEW_DISPATCH);
-				} else {
-					overtimePerformanceExecuterService.after(
-							MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE,
-							moduleId,
-							messageDm.getQueueName(),
-							MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_PORTION_DISPATCH);
 				}
 			}
 			
@@ -857,21 +726,6 @@ public class DistributeGet {
 							+ ", Execute Update -> " + messageDm.getException());
 				}
 				removeQueue("DistributeCheckRunnable -> CheckUpdateResult -> ", messageDm);
-				if (messageDm.getBool()) {
-					successPerformanceExecuterService.result(
-							MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE, 
-							moduleId,
-							messageDm.getQueueName(),
-							MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_NEW_DISPATCH,
-							false);
-				} else {
-					successPerformanceExecuterService.result(
-							MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE, 
-							moduleId,
-							messageDm.getQueueName(),
-							MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_PORTION_DISPATCH,
-							false);
-				}
 				continue;
 			}
 			
@@ -879,23 +733,6 @@ public class DistributeGet {
 				removeBody("DistributeCheckRunnable -> CheckUpdateResult -> ", messageDm);
 			} else {
 				removeQueue("DistributeCheckRunnable -> CheckUpdateResult -> ", messageDm);
-			}
-			
-			boolean success = messageDm.getResultQueue() == messageDm.getExecuteQueue() ? true : false;
-			if (messageDm.getBool()) {
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE, 
-						moduleId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_NEW_DISPATCH,
-						success);
-			} else {
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE, 
-						moduleId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_DISTRIBUTE_PORTION_DISPATCH,
-						success);
 			}
 		}
 	}
@@ -1086,19 +923,5 @@ public class DistributeGet {
 
 	public void setQueueDistributerVo(QueueDistributerVo queueDistributerVo) {
 		this.queueDistributerVo = queueDistributerVo;
-	}
-
-	public void setModuleId(long moduleId) {
-		this.moduleId = moduleId;
-	}
-	
-	public void setOvertimePerformanceExecuterService(
-			OvertimePerformanceExecuterService overtimePerformanceExecuterService) {
-		this.overtimePerformanceExecuterService = overtimePerformanceExecuterService;
-	}
-
-	public void setSuccessPerformanceExecuterService(
-			SuccessPerformanceExecuterService successPerformanceExecuterService) {
-		this.successPerformanceExecuterService = successPerformanceExecuterService;
 	}
 }

@@ -11,8 +11,6 @@
 			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
-	
-	<import resource="./noodlenotify-monitor-performance-schedule.xml" />
 
 	<bean id="consoleRemotingInvoke" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
 	    <property name="serviceUrl" value="http://${noodlenotify.console.remoting.ip}:${noodlenotify.console.remoting.port}/${noodlenotify.console.remoting.url}/remoting/ConsoleRemotingInvokeService"/>

@@ -18,7 +18,6 @@
 	<import resource="classpath:org/fl/noodlenotify/core/connect/db/manager/noodlenotify-core-connect-db-manager-exchange.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/body/manager/noodlenotify-core-connect-cache-body-manager-exchange.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/performance/schedule/noodlenotify-monitor-performance-schedule.xml" />
 	
 	<bean id="netConnectReceiver" class="org.fl.noodlenotify.core.exchange.Exchange" 
 			init-method="start" destroy-method="destroy"

@@ -17,7 +17,7 @@ import org.fl.noodlenotify.monitor.performance.vo.SuccessVo;
 @RequestMapping(value = "monitor/chart/success")
 public class SuccessCharController {
 	
-	@Autowired
+	@Autowired(required = false)
 	RedisPersistenceTemplate redisPersistenceTemplate;
 	
 	@RequestMapping(value = "/getdatetime")

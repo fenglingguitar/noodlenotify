@@ -11,6 +11,16 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.fl.noodlenotify.core.connect.db.DbConnectAgentAbstract;
+import org.fl.noodlenotify.core.connect.db.DbConnectAgentConfParam;
+import org.fl.noodlenotify.core.connect.db.datasource.DbDataSource;
+import org.fl.noodlenotify.core.connect.db.datasource.DbDataSourceFactory;
+import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
+import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
+import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
+import org.fl.noodlenotify.core.constant.message.MessageConstant;
+import org.fl.noodlenotify.core.domain.message.MessageDm;
+import org.fl.noodlenotify.core.domain.message.MessageVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.RecoverableDataAccessException;
@@ -25,19 +35,6 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.fl.noodlenotify.core.connect.db.DbConnectAgentAbstract;
-import org.fl.noodlenotify.core.connect.db.DbConnectAgentConfParam;
-import org.fl.noodlenotify.core.connect.db.datasource.DbDataSource;
-import org.fl.noodlenotify.core.connect.db.datasource.DbDataSourceFactory;
-import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
-import org.fl.noodlenotify.core.constant.message.MessageConstant;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
-import org.fl.noodlenotify.core.domain.message.MessageVo;
-import org.fl.noodlenotify.monitor.performance.constant.MonitorPerformanceConstant;
-import org.fl.noodlenotify.monitor.performance.executer.service.impl.OvertimePerformanceExecuterService;
-import org.fl.noodlenotify.monitor.performance.executer.service.impl.SuccessPerformanceExecuterService;
 
 public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	
@@ -66,9 +63,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	private ConcurrentMap<String, String> keepAliveSqlMap = new ConcurrentHashMap<String, String>();
 	private ConcurrentMap<String, String> releaseAliveSqlMap = new ConcurrentHashMap<String, String>();
 	private ConcurrentMap<String, String> checkLenSqlMap = new ConcurrentHashMap<String, String>();
-	
-	private OvertimePerformanceExecuterService overtimePerformanceExecuterService;
-	private SuccessPerformanceExecuterService successPerformanceExecuterService;
 
 	public MysqlDbConnectAgent(String ip, int port, long connectId,
 			DbDataSourceFactory dbDataSourceFactory) {
@@ -242,12 +236,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 					
 					for (final MessageDm messageDm : messageDmList) {
 						
-						overtimePerformanceExecuterService.before(
-								MonitorPerformanceConstant.MODULE_ID_DB,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DB_INSERT);
-						
 						String queueName =  messageDm.getQueueName();
 						String contentsql = insertContentSqlMap.get(queueName);
 						if (contentsql == null) {
@@ -277,12 +265,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 							}
 							messageDm.setResult(false);
 							messageDm.setException(e);
-							successPerformanceExecuterService.result(
-									MonitorPerformanceConstant.MODULE_ID_DB,
-									connectId,
-									messageDm.getQueueName(),
-									MonitorPerformanceConstant.MONITOR_ID_DB_INSERT,
-									false);
 							continue;
 						}
 						
@@ -329,26 +311,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 							}
 							messageDm.setResult(false);
 							messageDm.setException(e);
-							successPerformanceExecuterService.result(
-									MonitorPerformanceConstant.MODULE_ID_DB,
-									connectId,
-									messageDm.getQueueName(),
-									MonitorPerformanceConstant.MONITOR_ID_DB_INSERT,
-									false);
 						}
-						
-						overtimePerformanceExecuterService.after(
-								MonitorPerformanceConstant.MODULE_ID_DB,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DB_INSERT);
-						
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_DB,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DB_INSERT,
-								true);
 					}
 				}
 			});
@@ -364,12 +327,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 			for (MessageDm messageDm : messageDmList) {
 				messageDm.setResult(false);
 				messageDm.setException(new ConnectionResetException("Connection reset for insert by db connect agent"));
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_DB,
-						connectId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_DB_INSERT,
-						false);
 			}
 		}
 	}
@@ -381,14 +338,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 			transactionTemplate.execute(new TransactionCallbackWithoutResult() {
 				@Override
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
-					for (final MessageDm messageDm : messageDmList) {
-						
-						overtimePerformanceExecuterService.before(
-								MonitorPerformanceConstant.MODULE_ID_DB,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DB_UPDATE);
-						
+					for (final MessageDm messageDm : messageDmList) {						
 						String queueName =  messageDm.getQueueName();
 						String sql = updateSqlMap.get(queueName);
 						if (sql == null) {
@@ -417,26 +367,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 							}
 							messageDm.setResult(false);
 							messageDm.setException(e);
-							successPerformanceExecuterService.result(
-									MonitorPerformanceConstant.MODULE_ID_DB,
-									connectId,
-									messageDm.getQueueName(),
-									MonitorPerformanceConstant.MONITOR_ID_DB_UPDATE,
-									false);
 						}
-						
-						overtimePerformanceExecuterService.after(
-								MonitorPerformanceConstant.MODULE_ID_DB,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DB_UPDATE);
-						
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_DB,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DB_UPDATE,
-								true);
 					}
 				}
 			});
@@ -452,12 +383,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 			for (MessageDm messageDm : messageDmList) {
 				messageDm.setResult(false);
 				messageDm.setException(new ConnectionResetException("Connection reset for update by db connect agent"));
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_DB,
-						connectId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_DB_UPDATE,
-						false);
 			}
 		}
 	}
@@ -470,13 +395,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 				@Override
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
 					for (final MessageDm messageDm : messageDmList) {
-						
-						overtimePerformanceExecuterService.before(
-								MonitorPerformanceConstant.MODULE_ID_DB,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DB_DELETE);
-						
 						String queueName =  messageDm.getQueueName();
 						String sqlBackup = backupSqlMap.get(queueName);
 						if (sqlBackup == null) {
@@ -500,12 +418,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 										+ ", UUID: " + messageDm.getUuid()
 										+ ", Backup Message -> " + e);
 							}
-							successPerformanceExecuterService.result(
-									MonitorPerformanceConstant.MODULE_ID_DB,
-									connectId,
-									messageDm.getQueueName(),
-									MonitorPerformanceConstant.MONITOR_ID_DB_DELETE,
-									false);
 						}
 						String sqlDelete = deleteSqlMap.get(queueName);
 						if (sqlDelete == null) {
@@ -526,26 +438,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 										+ ", UUID: " + messageDm.getUuid()
 										+ ", Delete Message -> " + e);
 							}
-							successPerformanceExecuterService.result(
-									MonitorPerformanceConstant.MODULE_ID_DB,
-									connectId,
-									messageDm.getQueueName(),
-									MonitorPerformanceConstant.MONITOR_ID_DB_DELETE,
-									false);
 						}
-						
-						overtimePerformanceExecuterService.after(
-								MonitorPerformanceConstant.MODULE_ID_DB,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DB_DELETE);
-						
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_DB,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_DB_DELETE,
-								true);
 					}
 				}
 			});
@@ -557,14 +450,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Ip: " + ip
 						+ ", Port: " + port
 						+ ", Transaction -> " + e);
-			}
-			for (MessageDm messageDm : messageDmList) {
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_DB,
-						connectId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_DB_DELETE,
-						false);
 			}
 		}
 	}
@@ -1454,15 +1339,5 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	
 	public void setDbDataSourceFactory(DbDataSourceFactory dbDataSourceFactory) {
 		this.dbDataSourceFactory = dbDataSourceFactory;
-	}
-	
-	public void setOvertimePerformanceExecuterService(
-			OvertimePerformanceExecuterService overtimePerformanceExecuterService) {
-		this.overtimePerformanceExecuterService = overtimePerformanceExecuterService;
-	}
-
-	public void setSuccessPerformanceExecuterService(
-			SuccessPerformanceExecuterService successPerformanceExecuterService) {
-		this.successPerformanceExecuterService = successPerformanceExecuterService;
 	}
 }

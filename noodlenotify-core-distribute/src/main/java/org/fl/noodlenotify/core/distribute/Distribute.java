@@ -10,9 +10,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
@@ -23,9 +20,9 @@ import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.distribute.locker.DistributeSetLocker;
 import org.fl.noodlenotify.core.distribute.locker.cache.queue.QueueCacheDistributeSetLocker;
 import org.fl.noodlenotify.monitor.performance.constant.MonitorPerformanceConstant;
-import org.fl.noodlenotify.monitor.performance.executer.service.impl.OvertimePerformanceExecuterService;
-import org.fl.noodlenotify.monitor.performance.executer.service.impl.SuccessPerformanceExecuterService;
 import org.fl.noodlenotify.monitor.performance.storage.MemoryStorage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Distribute {
 	
@@ -62,12 +59,6 @@ public class Distribute {
 	private long moduleId;
 	private String localIp;
 	private int checkPort;
-	
-	@Autowired
-	private OvertimePerformanceExecuterService overtimePerformanceExecuterService;
-	
-	@Autowired
-	private SuccessPerformanceExecuterService successPerformanceExecuterService;
 	
 	public void start() throws Exception {
 		
@@ -219,10 +210,7 @@ public class Distribute {
 								bodyCacheConnectManager,
 								netConnectManager,
 								distributeConfParam,
-								queueDistributerVo,
-								moduleId,
-								overtimePerformanceExecuterService,
-								successPerformanceExecuterService);
+								queueDistributerVo);
 					distributeGet.start();
 					distributeGetMap.put(queueDistributerVo.getQueue_Nm(), distributeGet);
 					if (logger.isDebugEnabled()) {
@@ -284,10 +272,7 @@ public class Distribute {
 										bodyCacheConnectManager,
 										netConnectManager,
 										distributeConfParam,
-										queueDistributerVo,
-										moduleId,
-										overtimePerformanceExecuterService,
-										successPerformanceExecuterService);
+										queueDistributerVo);
 							distributeGet.start();
 							distributeGetMap.put(queueDistributerVo.getQueue_Nm(), distributeGet);
 							if (logger.isDebugEnabled()) {
@@ -712,15 +697,5 @@ public class Distribute {
 	
 	public void setModuleId(long moduleId) {
 		this.moduleId = moduleId;
-	}
-
-	public void setOvertimePerformanceExecuterService(
-			OvertimePerformanceExecuterService overtimePerformanceExecuterService) {
-		this.overtimePerformanceExecuterService = overtimePerformanceExecuterService;
-	}
-
-	public void setSuccessPerformanceExecuterService(
-			SuccessPerformanceExecuterService successPerformanceExecuterService) {
-		this.successPerformanceExecuterService = successPerformanceExecuterService;
 	}
 }

@@ -17,7 +17,7 @@ import org.fl.noodlenotify.monitor.performance.vo.OvertimeVo;
 @RequestMapping(value = "monitor/chart/overtime")
 public class OvertimeCharController {
 	
-	@Autowired
+	@Autowired(required = false)
 	RedisPersistenceTemplate redisPersistenceTemplate;
 	
 	@RequestMapping(value = "/getdatetime")

@@ -28,12 +28,9 @@ import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.fl.noodlenotify.monitor.performance.constant.MonitorPerformanceConstant;
-import org.fl.noodlenotify.monitor.performance.executer.service.impl.OvertimePerformanceExecuterService;
-import org.fl.noodlenotify.monitor.performance.executer.service.impl.SuccessPerformanceExecuterService;
 import org.fl.noodlenotify.monitor.performance.storage.MemoryStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class Exchange implements NetConnectReceiver {
 
@@ -61,12 +58,6 @@ public class Exchange implements NetConnectReceiver {
 	private String url;
 	private String type; 
 	private int checkPort;
-	
-	@Autowired
-	OvertimePerformanceExecuterService overtimePerformanceExecuterService;
-	
-	@Autowired
-	SuccessPerformanceExecuterService successPerformanceExecuterService;
 	
 	private long sizeLimit = 8192;
 		
@@ -290,20 +281,8 @@ public class Exchange implements NetConnectReceiver {
 						+ ", Limit: " + sizeLimit
 						+ ", Message Body Bigger Then Max Limit");
 			}
-			successPerformanceExecuterService.result(
-					MonitorPerformanceConstant.MODULE_ID_EXCHANGE, 
-					moduleId,
-					messageDm.getQueueName(),
-					MonitorPerformanceConstant.MONITOR_ID_EXCHANGE_RECEIVE,
-					false);
 			throw new ConnectionInvokeException("Message body bigger then max limit: " + sizeLimit);
 		}
-		
-		overtimePerformanceExecuterService.before(
-				MonitorPerformanceConstant.MODULE_ID_EXCHANGE,
-				moduleId,
-				messageDm.getQueueName(),
-				MonitorPerformanceConstant.MONITOR_ID_EXCHANGE_RECEIVE);
 		
 		Long queueCustomerGroupNum = queueCustomerGroupNumMap.get(messageDm.getQueueName());
 		if (queueCustomerGroupNum != null) {
@@ -316,12 +295,6 @@ public class Exchange implements NetConnectReceiver {
 						+ ", UUID: " + messageDm.getUuid()
 						+ ", Get Queue Customer Group Num -> Null");
 			}
-			successPerformanceExecuterService.result(
-					MonitorPerformanceConstant.MODULE_ID_EXCHANGE, 
-					moduleId,
-					messageDm.getQueueName(),
-					MonitorPerformanceConstant.MONITOR_ID_EXCHANGE_RECEIVE,
-					false);
 			startUpdateConnectAgent();
 			throw new ConnectionInvokeException("Set execute queue error, can not get queue customer group num");
 		}
@@ -453,12 +426,6 @@ public class Exchange implements NetConnectReceiver {
 								+ ", UUID: " + messageDm.getUuid()
 								+ ", Get DB Agent -> Null");
 					}
-					successPerformanceExecuterService.result(
-							MonitorPerformanceConstant.MODULE_ID_EXCHANGE, 
-							moduleId,
-							messageDm.getQueueName(),
-							MonitorPerformanceConstant.MONITOR_ID_EXCHANGE_RECEIVE,
-							false);
 					dbConnectManager.startUpdateConnectAgent();
 					throw new ConnectionInvokeException("Db connect agent insert message error, can not get db connect agent");
 				}
@@ -470,29 +437,9 @@ public class Exchange implements NetConnectReceiver {
 						+ ", UUID: " + messageDm.getUuid()
 						+ ", Get DB Queue Agent -> Null");
 			}
-			successPerformanceExecuterService.result(
-					MonitorPerformanceConstant.MODULE_ID_EXCHANGE, 
-					moduleId,
-					messageDm.getQueueName(),
-					MonitorPerformanceConstant.MONITOR_ID_EXCHANGE_RECEIVE,
-					false);
 			dbConnectManager.startUpdateConnectAgent();
 			throw new ConnectionInvokeException("Db connect agent insert message error, can not get db queue agent");
 		}
-		
-		overtimePerformanceExecuterService.after(
-				MonitorPerformanceConstant.MODULE_ID_EXCHANGE,
-				moduleId,
-				messageDm.getQueueName(),
-				MonitorPerformanceConstant.MONITOR_ID_EXCHANGE_RECEIVE);
-		
-		successPerformanceExecuterService.result(
-				MonitorPerformanceConstant.MODULE_ID_EXCHANGE, 
-				moduleId,
-				messageDm.getQueueName(),
-				MonitorPerformanceConstant.MONITOR_ID_EXCHANGE_RECEIVE,
-				true);
-		
 	}	
 	
 	public void setDbConnectManager(ConnectManager dbConnectManager) {

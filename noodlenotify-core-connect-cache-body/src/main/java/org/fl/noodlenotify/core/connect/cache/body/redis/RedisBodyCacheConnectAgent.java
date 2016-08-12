@@ -2,14 +2,6 @@ package org.fl.noodlenotify.core.connect.cache.body.redis;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Transaction;
-import redis.clients.jedis.exceptions.JedisConnectionException;
-
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentAbstract;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
@@ -19,9 +11,13 @@ import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
-import org.fl.noodlenotify.monitor.performance.constant.MonitorPerformanceConstant;
-import org.fl.noodlenotify.monitor.performance.executer.service.impl.OvertimePerformanceExecuterService;
-import org.fl.noodlenotify.monitor.performance.executer.service.impl.SuccessPerformanceExecuterService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Transaction;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 
 public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implements BodyCacheConnectAgent, BodyCacheStatusChecker {
@@ -31,9 +27,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 	private JedisPool jedisPool;
 	
 	private BodyCacheConnectAgentConfParam bodyCacheConnectAgentConfParam;
-	
-	private OvertimePerformanceExecuterService overtimePerformanceExecuterService;
-	private SuccessPerformanceExecuterService successPerformanceExecuterService;
 	
 	public RedisBodyCacheConnectAgent(String ip, int port, long connectId) {
 		super(ip, port, connectId);
@@ -109,13 +102,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 		}
 		
 		for (MessageDm messageDm : messageDmList) {
-			
-			overtimePerformanceExecuterService.before(
-					MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-					connectId,
-					messageDm.getQueueName(),
-					MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_SET);
-			
 			try {
 				if (messageDm.getContent() != null) {	
 					long dbSize = jedis.dbSize();
@@ -135,12 +121,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 									+ ", DbSize: " + dbSize
 									+ ", Beyond Capacity");
 						}
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_SET,
-								false);
 						continue;
 					}
 				}
@@ -154,12 +134,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 							+ ", Set -> " + e);
 				}
 				jedisPool.returnBrokenResource(jedis);
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-						connectId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_SET,
-						false);
 				return;
 			} catch (Exception e) {
 				if (logger.isErrorEnabled()) {
@@ -170,27 +144,8 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 							+ ", Message: " + messageDm.getUuid()
 							+ ", Set -> " + e);
 				}
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-						connectId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_SET,
-						false);
 				continue;
 			} 
-			
-			overtimePerformanceExecuterService.after(
-					MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-					connectId,
-					messageDm.getQueueName(),
-					MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_SET);
-			
-			successPerformanceExecuterService.result(
-					MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-					connectId,
-					messageDm.getQueueName(),
-					MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_SET,
-					true);
 		}
 		
 		jedisPool.returnResource(jedis);
@@ -215,11 +170,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 		}
 		
 		for (MessageDm messageDm : messageDmList) {
-			overtimePerformanceExecuterService.before(
-					MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-					connectId,
-					messageDm.getQueueName(),
-					MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_REMOVE);
 			try {
 				jedis.del(messageDm.getUuid());
 			} catch (JedisConnectionException e) {
@@ -232,12 +182,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 							+ ", Set -> " + e);
 				}
 				jedisPool.returnBrokenResource(jedis);
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-						connectId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_REMOVE,
-						false);
 				return;
 			} catch (Exception e) {
 				if (logger.isErrorEnabled()) {
@@ -248,26 +192,8 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 							+ ", Message: " + messageDm.getUuid()
 							+ ", Remove -> " + e);
 				}
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-						connectId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_REMOVE,
-						false);
 				continue;
 			}
-			
-			overtimePerformanceExecuterService.after(
-					MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-					connectId,
-					messageDm.getQueueName(),
-					MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_REMOVE);
-			successPerformanceExecuterService.result(
-					MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-					connectId,
-					messageDm.getQueueName(),
-					MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_REMOVE,
-					true);
 		}
 		
 		jedisPool.returnResource(jedis);
@@ -292,12 +218,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 		
 		Jedis jedis = getConnect();
 		
-		overtimePerformanceExecuterService.before(
-				MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-				connectId,
-				messageDm.getQueueName(),
-				MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_GET);
-		
 		try {
 			String messageDmContentStr = jedis.get(messageDm.getUuid());
 			if (messageDmContentStr == null) {
@@ -315,12 +235,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 						+ ", Set -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			successPerformanceExecuterService.result(
-					MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-					connectId,
-					messageDm.getQueueName(),
-					MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_GET,
-					false);
 			throw new ConnectionResetException("Connection reset for body redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
@@ -331,26 +245,8 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 						+ ", Get -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			successPerformanceExecuterService.result(
-					MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-					connectId,
-					messageDm.getQueueName(),
-					MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_GET,
-					false);
 			throw e;
 		}
-		
-		overtimePerformanceExecuterService.after(
-				MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-				connectId,
-				messageDm.getQueueName(),
-				MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_GET);
-		successPerformanceExecuterService.result(
-				MonitorPerformanceConstant.MODULE_ID_BODYCACHE,
-				connectId,
-				messageDm.getQueueName(),
-				MonitorPerformanceConstant.MONITOR_ID_BODYCACHE_GET,
-				true);
 		
 		jedisPool.returnResource(jedis);
 		
@@ -468,15 +364,5 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 	public void setBodyCacheConnectAgentConfParam(
 			BodyCacheConnectAgentConfParam bodyCacheConnectAgentConfParam) {
 		this.bodyCacheConnectAgentConfParam = bodyCacheConnectAgentConfParam;
-	}
-	
-	public void setOvertimePerformanceExecuterService(
-			OvertimePerformanceExecuterService overtimePerformanceExecuterService) {
-		this.overtimePerformanceExecuterService = overtimePerformanceExecuterService;
-	}
-
-	public void setSuccessPerformanceExecuterService(
-			SuccessPerformanceExecuterService successPerformanceExecuterService) {
-		this.successPerformanceExecuterService = successPerformanceExecuterService;
 	}
 }

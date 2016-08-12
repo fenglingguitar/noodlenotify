@@ -7,14 +7,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Transaction;
-import redis.clients.jedis.exceptions.JedisConnectionException;
-
+import org.fl.noodle.common.util.json.JsonTranslator;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentAbstract;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
@@ -26,10 +19,13 @@ import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 //import org.fl.noodlenotify.core.distribute.locker.DistributeSetLocker;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.fl.noodlenotify.core.domain.message.MessageQueueDm;
-import org.fl.noodle.common.util.json.JsonTranslator;
-import org.fl.noodlenotify.monitor.performance.constant.MonitorPerformanceConstant;
-import org.fl.noodlenotify.monitor.performance.executer.service.impl.OvertimePerformanceExecuterService;
-import org.fl.noodlenotify.monitor.performance.executer.service.impl.SuccessPerformanceExecuterService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Transaction;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract implements QueueCacheConnectAgent, QueueCacheStatusChecker {
 
@@ -60,9 +56,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	private ConcurrentMap<String, String> hashPortionFullMap = new ConcurrentHashMap<String, String>();
 	private ConcurrentMap<String, String> activeFullMap = new ConcurrentHashMap<String, String>();
 	private ConcurrentMap<String, String> lockerFullMap = new ConcurrentHashMap<String, String>();
-	
-	private OvertimePerformanceExecuterService overtimePerformanceExecuterService;
-	private SuccessPerformanceExecuterService successPerformanceExecuterService;
 
 	public RedisQueueCacheConnectAgent(String ip, int port, long connectId) {
 		super(ip, port, connectId);
@@ -172,57 +165,13 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 				activeFullMap.putIfAbsent(messageDm.getQueueName(), activeFullName);
 			}
 			
-			if (messageDm.getBool()) {
-				overtimePerformanceExecuterService.before(
-						MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-						connectId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_SET);
-			} else {
-				overtimePerformanceExecuterService.before(
-						MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-						connectId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_SET);
-			}
-			
 			try {
 				if (!jedis.exists(activeFullName)) {
 					queueIsActiveMap.put(messageDm.getQueueName(), false);
-					if (messageDm.getBool()) {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_SET,
-								false);
-					} else {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_SET,
-								false);
-					}
 					continue;
 				}
 				
 				if (jedis.exists(messageDm.getUuid())) {
-					if (messageDm.getBool()) {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_SET,
-								false);
-					} else {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_SET,
-								false);
-					}
 					continue;
 				}
 				
@@ -235,41 +184,11 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 							jedis.hdel(hashFullName, messageDm.getUuid());
 						}
 					}
-					if (messageDm.getBool()) {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_SET,
-								false);
-					} else {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_SET,
-								false);
-					}
 					continue;
 				}
 				
 				if (jedis.exists(messageDm.getUuid())) {
 					jedis.hdel(hashFullName, messageDm.getUuid());
-					if (messageDm.getBool()) {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_SET,
-								false);
-					} else {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-								connectId,
-								messageDm.getQueueName(),
-								MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_SET,
-								false);
-					}
 					continue;
 				}
 				
@@ -303,21 +222,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 							+ ", Set -> " + e);
 				}
 				jedisPool.returnBrokenResource(jedis);
-				if (messageDm.getBool()) {
-					successPerformanceExecuterService.result(
-							MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-							connectId,
-							messageDm.getQueueName(),
-							MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_SET,
-							false);
-				} else {
-					successPerformanceExecuterService.result(
-							MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-							connectId,
-							messageDm.getQueueName(),
-							MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_SET,
-							false);
-				}
 				return;
 			} catch (Exception e) {
 				if (logger.isErrorEnabled()) {
@@ -328,53 +232,8 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 							+ ", Message: " + messageDm.getUuid()
 							+ ", Set -> " + e);
 				}
-				if (messageDm.getBool()) {
-					successPerformanceExecuterService.result(
-							MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-							connectId,
-							messageDm.getQueueName(),
-							MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_SET,
-							false);
-				} else {
-					successPerformanceExecuterService.result(
-							MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-							connectId,
-							messageDm.getQueueName(),
-							MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_SET,
-							false);
-				}
 				continue;
 			} 
-			
-			if (messageDm.getBool()) {
-				overtimePerformanceExecuterService.after(
-						MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-						connectId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_SET);
-			} else {
-				overtimePerformanceExecuterService.after(
-						MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-						connectId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_SET);
-			}
-			
-			if (messageDm.getBool()) {
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-						connectId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_SET,
-						true);
-			} else {
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-						connectId,
-						messageDm.getQueueName(),
-						MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_SET,
-						true);
-			}
 		}
 		
 		jedisPool.returnResource(jedis);
@@ -491,40 +350,11 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 			activeFullMap.putIfAbsent(queueName, activeFullName);
 		}
 		
-		if (queueType) {
-			overtimePerformanceExecuterService.before(
-					MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-					connectId,
-					queueName,
-					MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_POP);
-		} else {
-			overtimePerformanceExecuterService.before(
-					MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-					connectId,
-					queueName,
-					MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_POP);
-		}
-		
 		try {
 			
 			if (!jedis.exists(activeFullName)) {
 				queueIsActiveMap.put(queueName, false);
 				jedisPool.returnResource(jedis);
-				if (queueType) {
-					successPerformanceExecuterService.result(
-							MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-							connectId,
-							queueName,
-							MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_POP,
-							false);
-				} else {
-					successPerformanceExecuterService.result(
-							MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-							connectId,
-							queueName,
-							MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_POP,
-							false);
-				}
 				return null;
 			}
 			
@@ -544,35 +374,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 					transaction.exec();
 					
 					jedisPool.returnResource(jedis);
-					if (queueType) {
-						overtimePerformanceExecuterService.after(
-								MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-								connectId,
-								queueName,
-								MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_POP);
-					} else {
-						overtimePerformanceExecuterService.after(
-								MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-								connectId,
-								queueName,
-								MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_POP);
-					}
-					
-					if (queueType) {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-								connectId,
-								queueName,
-								MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_POP,
-								true);
-					} else {
-						successPerformanceExecuterService.result(
-								MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-								connectId,
-								queueName,
-								MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_POP,
-								true);
-					}
 					return messageDm;
 				}
 			}
@@ -587,21 +388,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Pop -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			if (queueType) {
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-						connectId,
-						queueName,
-						MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_POP,
-						false);
-			} else {
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-						connectId,
-						queueName,
-						MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_POP,
-						false);
-			}
 			throw new ConnectionResetException("Connection reset for queue redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
@@ -612,38 +398,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Pop -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			if (queueType) {
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-						connectId,
-						queueName,
-						MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_POP,
-						false);
-			} else {
-				successPerformanceExecuterService.result(
-						MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-						connectId,
-						queueName,
-						MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_POP,
-						false);
-			}
 			throw e;
-		}
-		
-		if (queueType) {
-			successPerformanceExecuterService.result(
-					MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-					connectId,
-					queueName,
-					MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_NEW_POP,
-					false);
-		} else {
-			successPerformanceExecuterService.result(
-					MonitorPerformanceConstant.MODULE_ID_QUEUECACHE,
-					connectId,
-					queueName,
-					MonitorPerformanceConstant.MONITOR_ID_QUEUECACHE_PORTION_POP,
-					false);
 		}
 		
 		jedisPool.returnResource(jedis);
@@ -1243,15 +998,5 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	@Override
 	public long checkPortionLen(String queueName) throws Exception {
 		return len(queueName, false);
-	}
-	
-	public void setOvertimePerformanceExecuterService(
-			OvertimePerformanceExecuterService overtimePerformanceExecuterService) {
-		this.overtimePerformanceExecuterService = overtimePerformanceExecuterService;
-	}
-
-	public void setSuccessPerformanceExecuterService(
-			SuccessPerformanceExecuterService successPerformanceExecuterService) {
-		this.successPerformanceExecuterService = successPerformanceExecuterService;
 	}
 }
