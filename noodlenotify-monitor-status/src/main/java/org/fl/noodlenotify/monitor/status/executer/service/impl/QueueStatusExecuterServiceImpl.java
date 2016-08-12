@@ -1,25 +1,14 @@
 package org.fl.noodlenotify.monitor.status.executer.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.fl.noodlenotify.console.service.QueueDistributerService;
+import org.fl.noodlenotify.console.service.QueueExchangerService;
+import org.fl.noodlenotify.console.service.QueueService;
+import org.fl.noodlenotify.monitor.performance.persistence.RedisPersistenceTemplate;
+import org.fl.noodlenotify.monitor.status.executer.service.ExecuterServiceAbstract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import org.fl.noodlenotify.console.service.QueueDistributerService;
-import org.fl.noodlenotify.console.service.QueueExchangerService;
-import org.fl.noodlenotify.console.service.QueueService;
-import org.fl.noodlenotify.console.vo.QueueDistributerVo;
-import org.fl.noodlenotify.console.vo.QueueExchangerVo;
-import org.fl.noodlenotify.console.vo.QueueVo;
-import org.fl.noodlenotify.monitor.performance.constant.MonitorPerformanceConstant;
-import org.fl.noodlenotify.monitor.performance.persistence.RedisPersistenceTemplate;
-import org.fl.noodlenotify.monitor.performance.storage.vo.KeyVo;
-import org.fl.noodlenotify.monitor.performance.vo.OvertimeVo;
-import org.fl.noodlenotify.monitor.performance.vo.SuccessVo;
-import org.fl.noodlenotify.monitor.status.executer.service.ExecuterServiceAbstract;
 
 @Service("queueStatusExecuterService")
 public class QueueStatusExecuterServiceImpl extends ExecuterServiceAbstract {
@@ -36,18 +25,18 @@ public class QueueStatusExecuterServiceImpl extends ExecuterServiceAbstract {
 	@Autowired
 	private QueueDistributerService queueDistributerService;
 
-	@Autowired
+	@Autowired(required = false)
 	private RedisPersistenceTemplate redisPersistenceTemplate;
 	
-	private long currentTimeMillis = 0;
+	//private long currentTimeMillis = 0;
 	
-	private long sampleSpaceMinute = 1;
-	private long sampleSpaceHoure = 1;
+	//private long sampleSpaceMinute = 1;
+	//private long sampleSpaceHoure = 1;
 
 	@Override
 	public void execute() throws Exception {
 
-		currentTimeMillis = System.currentTimeMillis();
+		/*currentTimeMillis = System.currentTimeMillis();
 		
 		List<QueueVo> queueVoListResult = new ArrayList<QueueVo>();
 		
@@ -126,10 +115,10 @@ public class QueueStatusExecuterServiceImpl extends ExecuterServiceAbstract {
 			queueVoListResult.add(queueVo);
 		}
 		
-		queueService.updatesQueueStatus(queueVoListResult);
+		queueService.updatesQueueStatus(queueVoListResult);*/
 	}
 	
-	private void sumOverTime(String queueName, long moduleId, String moduleName, String monitorName, long interval, long unit, SumOverTimeVo sumOverTimeVo) throws Exception {
+	/*private void sumOverTime(String queueName, long moduleId, String moduleName, String monitorName, long interval, long unit, SumOverTimeVo sumOverTimeVo) throws Exception {
 		
 		KeyVo keyVo = new KeyVo();
 		keyVo.setExecuterName(MonitorPerformanceConstant.MONITOR_TYPE_OVERTIME);
@@ -198,5 +187,5 @@ public class QueueStatusExecuterServiceImpl extends ExecuterServiceAbstract {
 	
 	public void setSampleSpaceHoure(long sampleSpaceHoure) {
 		this.sampleSpaceHoure = sampleSpaceHoure;
-	}
+	}*/
 }
