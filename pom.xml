@@ -48,7 +48,7 @@
 	<noodlenotify.demo.exchange.version>2.0.0-SNAPSHOT</noodlenotify.demo.exchange.version>
 	<noodlenotify.demo.distribute.version>2.0.0-SNAPSHOT</noodlenotify.demo.distribute.version>
 	
-	<org.fl.noodlenotify.common.version>2.0.0-SNAPSHOT</org.fl.noodlenotify.common.version>
+	<noodlenotify.common.version>2.0.0-SNAPSHOT</noodlenotify.common.version>
   	  	
   	<noodlenotify.assembly.version>2.0.0-SNAPSHOT</noodlenotify.assembly.version>
 

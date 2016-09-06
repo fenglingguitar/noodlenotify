@@ -11,7 +11,7 @@
   
   <groupId>org.fl.noodlenotify.common</groupId>
   <artifactId>noodlenotify-common</artifactId>
-  <version>${org.fl.noodlenotify.common.version}</version>
+  <version>${noodlenotify.common.version}</version>
   <name>noodlenotify-common</name>
   <url>http://maven.apache.org</url>
   
