@@ -45,7 +45,6 @@
 	<bean id="connectAgentFactoryNetty" class="org.fl.noodlenotify.core.connect.net.netty.client.NettyNetConnectAgentFactory">
 		<property name="nettyNetConnectPoolConfParam" ref="nettyNetConnectPoolConfParam"/>
 	</bean>
-	<bean id="connectAgentFactoryRmi" class="org.fl.noodlenotify.core.connect.net.rmi.client.RmiNetConnectAgentFactory" />
 	<bean id="connectAgentFactoryJetty" class="org.fl.noodlenotify.core.connect.net.jetty.client.JettyNetConnectAgentFactory" 
 		parent="connectParam" />
 	
@@ -53,7 +52,6 @@
 			parent="commonParam">
 		<property name="connectAgentFactoryMap">
 			<map>
-				<entry key="RMI" value-ref="connectAgentFactoryRmi" />
 				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />
 				<entry key="HTTP" value-ref="connectAgentFactoryJetty" />
 			</map>

@@ -110,10 +110,10 @@
 					{name:'ip', index:'ip', width:130, align: 'center'},
 					{name:'port', index:'port', width:100, align: 'center'},
 					{name:'url', index:'url', width:200, align: 'left'},
-					{name:'type', index:'type', width:100, align: 'center', formatter:'select', editoptions:{value:'NETTY:NETTY;RMI:RMI;HTTP:HTTP'}},
+					{name:'type', index:'type', width:100, align: 'center', formatter:'select', editoptions:{value:'NETTY:NETTY;HTTP:HTTP'}},
 					{name:'check_Port', index:'check_Port', width:100, align: 'center'},
 					{name:'check_Url', index:'check_Url', width:200, align: 'left'},
-					{name:'check_Type', index:'check_Type', width:100, align:'center', formatter:'select', editoptions:{value:'NETTY:NETTY;RMI:RMI;HTTP:HTTP'}},
+					{name:'check_Type', index:'check_Type', width:100, align:'center', formatter:'select', editoptions:{value:'NETTY:NETTY;HTTP:HTTP'}},
 			   		{name:'system_Status', index:'system_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:在线;2:离线'}},
 			   		{name:'manual_Status', index:'manual_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:有效;2:无效'}}
 			   	],
@@ -163,10 +163,10 @@
 					{name:'ip', index:'ip', width:130, align: 'center'},
 					{name:'port', index:'port', width:100, align: 'center'},
 					{name:'url', index:'url', width:200, align: 'left'},
-					{name:'type', index:'type', width:100, align: 'center', formatter:'select', editoptions:{value:'NETTY:NETTY;RMI:RMI;HTTP:HTTP'}},
+					{name:'type', index:'type', width:100, align: 'center', formatter:'select', editoptions:{value:'NETTY:NETTY;HTTP:HTTP'}},
 					{name:'check_Port', index:'check_Port', width:100, align: 'center'},
 					{name:'check_Url', index:'check_Url', width:200, align: 'left'},
-					{name:'check_Type', index:'check_Type', width:100, align:'center', formatter:'select', editoptions:{value:'NETTY:NETTY;RMI:RMI;HTTP:HTTP'}},
+					{name:'check_Type', index:'check_Type', width:100, align:'center', formatter:'select', editoptions:{value:'NETTY:NETTY;HTTP:HTTP'}},
 			   		{name:'system_Status', index:'system_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:在线;2:离线'}},
 			   		{name:'manual_Status', index:'manual_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:有效;2:无效'}}
 			   	],
@@ -387,7 +387,6 @@
 							    		<select id="type_left">
 							    			<option value="">--all--</option>
 							    			<option value="NETTY">NETTY</option>
-							    			<option value="RMI">RMI</option>
 							    			<option value="HTTP">HTTP</option>
 							    		</select>
 							    	</td>
@@ -400,7 +399,6 @@
 							    		<select id="check_Type_left">
 							    			<option value="">--all--</option>
 							    			<option value="NETTY">NETTY</option>
-							    			<option value="RMI">RMI</option>
 							    			<option value="HTTP">HTTP</option>
 							    		</select>
 							    	</td>
@@ -471,7 +469,6 @@
 							    		<select id="type">
 							    			<option value="">--all--</option>
 							    			<option value="NETTY">NETTY</option>
-							    			<option value="RMI">RMI</option>
 							    			<option value="HTTP">HTTP</option>
 							    		</select>
 							    	</td>
@@ -484,7 +481,6 @@
 							    		<select id="check_Type">
 							    			<option value="">--all--</option>
 							    			<option value="NETTY">NETTY</option>
-							    			<option value="RMI">RMI</option>
 							    			<option value="HTTP">HTTP</option>
 							    		</select>
 							    	</td>

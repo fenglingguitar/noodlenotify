@@ -75,7 +75,7 @@
 					{name:'ip', index:'ip', width:130, align: 'center'},
 					{name:'check_Port', hidden:true, index:'check_Port', width:100, align: 'center'},
 					{name:'check_Url', hidden:true, index:'check_Url', width:200, align: 'left'},
-					{name:'check_Type', hidden:true, index:'check_Type', width:100, align:'center', formatter:'select', editoptions:{value:'NETTY:NETTY;RMI:RMI;HTTP:HTTP'}},
+					{name:'check_Type', hidden:true, index:'check_Type', width:100, align:'center', formatter:'select', editoptions:{value:'NETTY:NETTY;HTTP:HTTP'}},
 			   		{name:'system_Status', hidden:true, index:'system_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:在线;2:离线'}},
 			   		{name:'manual_Status', index:'manual_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:有效;2:无效'}}
 			   	],
@@ -246,7 +246,6 @@
 			    		<select style="display:none" id="check_Type">
 			    			<option value="">--all--</option>
 			    			<option value="NETTY">NETTY</option>
-			    			<option value="RMI">RMI</option>
 			    			<option value="HTTP">HTTP</option>
 			    		</select>
 			    	</td>

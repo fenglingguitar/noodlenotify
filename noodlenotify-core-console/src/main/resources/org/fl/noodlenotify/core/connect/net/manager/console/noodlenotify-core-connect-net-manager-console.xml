@@ -15,9 +15,6 @@
 	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
 	
-	<bean id="connectAgentFactory" class="org.fl.noodlenotify.core.connect.net.rmi.client.RmiNetConnectAgentFactory" />
-	
-	<bean id="connectAgentFactoryRmi" class="org.fl.noodlenotify.core.connect.net.rmi.client.RmiNetConnectAgentFactory" />
 	<bean id="connectAgentFactoryNetty" class="org.fl.noodlenotify.core.connect.net.netty.client.NettyNetConnectAgentFactory" />
 	<bean id="connectAgentFactoryJetty" class="org.fl.noodlenotify.core.connect.net.jetty.client.JettyNetConnectAgentFactory" />
 	
@@ -25,7 +22,6 @@
 			parent="commonParam">
 		<property name="connectAgentFactoryMap">
 			<map>
-				<entry key="RMI" value-ref="connectAgentFactoryRmi" />
 				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />
 				<entry key="HTTP" value-ref="connectAgentFactoryJetty" />
 			</map>
@@ -46,7 +42,6 @@
 			parent="commonParam">
 		<property name="connectAgentFactoryMap">
 			<map>
-				<entry key="RMI" value-ref="connectAgentFactoryRmi" />
 				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />
 				<entry key="HTTP" value-ref="connectAgentFactoryJetty" />
 			</map>

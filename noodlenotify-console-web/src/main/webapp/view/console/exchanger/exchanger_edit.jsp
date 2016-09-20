@@ -178,7 +178,6 @@
 			    		<select id="type">
 			    			<option value="">--select--</option>
 			    			<option value="NETTY">NETTY</option>
-			    			<option value="RMI">RMI</option>
 			    			<option value="HTTP">HTTP</option>
 			    		</select>
 			    	</td>

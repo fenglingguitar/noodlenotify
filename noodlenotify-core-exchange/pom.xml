@@ -34,12 +34,6 @@
 	</dependency>
 	
 	<dependency>
-		<groupId>org.fl.noodlenotify.core.connect.net.rmi.server</groupId>
-		<artifactId>noodlenotify-core-connect-net-rmi-server</artifactId>
-		<version>${noodlenotify.core.connect.net.rmi.server.version}</version>
-	</dependency>
-	
-	<dependency>
 		<groupId>org.fl.noodlenotify.core.connect.cache.body</groupId>
 		<artifactId>noodlenotify-core-connect-cache-body</artifactId>
 		<version>${noodlenotify.core.connect.cache.body.version}</version>

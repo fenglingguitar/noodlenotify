@@ -44,12 +44,6 @@
 		<artifactId>noodlenotify-core-connect-net-netty-client</artifactId>
 		<version>${noodlenotify.core.connect.net.netty.client.version}</version>
 	</dependency>
-	
-	<dependency>
-		<groupId>org.fl.noodlenotify.core.connect.net.rmi.client</groupId>
-		<artifactId>noodlenotify-core-connect-net-rmi-client</artifactId>
-		<version>${noodlenotify.core.connect.net.rmi.client.version}</version>
-	</dependency>
   
   	<dependency>
 		<groupId>org.fl.noodlenotify.core.connect.cache.body</groupId>

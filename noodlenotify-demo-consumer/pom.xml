@@ -33,12 +33,6 @@
 	  <version>${noodlenotify.core.client.consumer.netty.version}</version>
 	</dependency>
 	
-	<dependency>
-	  <groupId>org.fl.noodlenotify.core.client.consumer.rmi</groupId>
-	  <artifactId>noodlenotify-core-client-consumer-rmi</artifactId>
-	  <version>${noodlenotify.core.client.consumer.rmi.version}</version>
-	</dependency>
-	
 	<!-- spring framework -->
     <dependency>
 		<groupId>org.springframework</groupId>

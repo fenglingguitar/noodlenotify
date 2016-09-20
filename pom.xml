@@ -20,9 +20,6 @@
   	<noodlenotify.core.connect.net.jetty.server.version>2.0.0-SNAPSHOT</noodlenotify.core.connect.net.jetty.server.version>
   	<noodlenotify.core.connect.net.netty.client.version>2.0.0-SNAPSHOT</noodlenotify.core.connect.net.netty.client.version>
   	<noodlenotify.core.connect.net.netty.server.version>2.0.0-SNAPSHOT</noodlenotify.core.connect.net.netty.server.version>
-  	<noodlenotify.core.connect.net.rmi.api.version>2.0.0-SNAPSHOT</noodlenotify.core.connect.net.rmi.api.version>
-  	<noodlenotify.core.connect.net.rmi.client.version>2.0.0-SNAPSHOT</noodlenotify.core.connect.net.rmi.client.version>
-  	<noodlenotify.core.connect.net.rmi.server.version>2.0.0-SNAPSHOT</noodlenotify.core.connect.net.rmi.server.version>
   	<noodlenotify.core.connect.db.version>2.0.0-SNAPSHOT</noodlenotify.core.connect.db.version>
   	<noodlenotify.core.connect.cache.api.version>2.0.0-SNAPSHOT</noodlenotify.core.connect.cache.api.version>
   	<noodlenotify.core.connect.cache.body.version>2.0.0-SNAPSHOT</noodlenotify.core.connect.cache.body.version>
@@ -31,7 +28,6 @@
   	<noodlenotify.core.client.consumer.api.version>2.0.0-SNAPSHOT</noodlenotify.core.client.consumer.api.version>
   	<noodlenotify.core.client.consumer.jetty.version>2.0.0-SNAPSHOT</noodlenotify.core.client.consumer.jetty.version>
   	<noodlenotify.core.client.consumer.netty.version>2.0.0-SNAPSHOT</noodlenotify.core.client.consumer.netty.version>
-  	<noodlenotify.core.client.consumer.rmi.version>2.0.0-SNAPSHOT</noodlenotify.core.client.consumer.rmi.version>
   	<noodlenotify.core.exchange.version>2.0.0-SNAPSHOT</noodlenotify.core.exchange.version>
   	<noodlenotify.core.distribute.version>2.0.0-SNAPSHOT</noodlenotify.core.distribute.version>
   	<noodlenotify.core.console.version>2.0.0-SNAPSHOT</noodlenotify.core.console.version>
@@ -63,9 +59,6 @@
     <module>noodlenotify-core-connect-net-jetty-server</module>
     <module>noodlenotify-core-connect-net-netty-client</module>
     <module>noodlenotify-core-connect-net-netty-server</module>
-    <module>noodlenotify-core-connect-net-rmi-api</module>
-    <module>noodlenotify-core-connect-net-rmi-client</module>
-    <module>noodlenotify-core-connect-net-rmi-server</module>
     <module>noodlenotify-core-connect-db</module>
     <module>noodlenotify-core-connect-cache-api</module>
     <module>noodlenotify-core-connect-cache-body</module>
@@ -74,7 +67,6 @@
     <module>noodlenotify-core-client-consumer-api</module>
     <module>noodlenotify-core-client-consumer-jetty</module>
     <module>noodlenotify-core-client-consumer-netty</module>
-    <module>noodlenotify-core-client-consumer-rmi</module>
     <module>noodlenotify-core-exchange</module>
     <module>noodlenotify-core-distribute</module>
     <module>noodlenotify-core-console</module>

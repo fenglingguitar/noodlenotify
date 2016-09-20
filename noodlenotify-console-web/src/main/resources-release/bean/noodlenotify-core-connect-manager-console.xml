@@ -81,7 +81,6 @@
 		<constructor-arg ref="dbConnectAgentFactory" />
 	</bean>
 	
-	<bean id="connectAgentFactoryRmi" class="org.fl.noodlenotify.core.connect.net.rmi.client.RmiNetConnectAgentFactory" />
 	<bean id="nettyNetConnectPoolConfParam" class="org.fl.noodlenotify.core.connect.net.netty.client.NettyNetConnectPoolConfParam">
 		<property name="maxActive" value="3"/>
 		<property name="minIdle" value="1"/>
@@ -103,7 +102,6 @@
 			parent="commonParam">
 		<property name="connectAgentFactoryMap">
 			<map>
-				<entry key="RMI" value-ref="connectAgentFactoryRmi" />
 				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />
 				<entry key="HTTP" value-ref="connectAgentFactoryJetty" />
 			</map>
@@ -115,7 +113,6 @@
 			parent="commonParam">
 		<property name="connectAgentFactoryMap">
 			<map>
-				<entry key="RMI" value-ref="connectAgentFactoryRmi" />
 				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />
 				<entry key="HTTP" value-ref="connectAgentFactoryJetty" />
 			</map>
