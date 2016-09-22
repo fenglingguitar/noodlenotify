@@ -2,16 +2,14 @@ package org.fl.noodlenotify.console.service.impl;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import org.fl.noodlenotify.console.constant.ConsoleConstants;
+import org.fl.noodle.common.mvc.vo.PageVo;
 import org.fl.noodlenotify.console.dao.MsgQueueCacheDao;
 import org.fl.noodlenotify.console.dao.QueueMsgQueueCacheDao;
 import org.fl.noodlenotify.console.service.MsgQueueCacheService;
 import org.fl.noodlenotify.console.vo.MsgQueueCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgQueueCacheVo;
-import org.fl.noodle.common.mvc.vo.PageVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service("msgQueueCacheServiceImpl")
 public class MsgQueueCacheServiceImpl implements MsgQueueCacheService {
@@ -30,19 +28,6 @@ public class MsgQueueCacheServiceImpl implements MsgQueueCacheService {
 	@Override
 	public List<MsgQueueCacheVo> queryMsgQueueCacheList(MsgQueueCacheVo vo) throws Exception {
 		return msgQueueCacheDao.queryMsgQueueCacheList(vo);
-	}
-	
-	@Override
-	public List<MsgQueueCacheVo> queryCheckMsgQueueCacheListWithCache() throws Exception {
-		List<MsgQueueCacheVo> msgQueueCaches = queryCheckMsgQueueCacheList();
-		return msgQueueCaches;
-	}
-
-	@Override
-	public List<MsgQueueCacheVo> queryCheckMsgQueueCacheList() throws Exception {
-		MsgQueueCacheVo msgQueueCacheVo = new MsgQueueCacheVo();
-		msgQueueCacheVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		return msgQueueCacheDao.queryMsgQueueCacheList(msgQueueCacheVo);
 	}
 
 	@Override

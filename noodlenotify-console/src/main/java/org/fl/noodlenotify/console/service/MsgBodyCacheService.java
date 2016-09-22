@@ -10,10 +10,6 @@ public interface MsgBodyCacheService {
 
 	public List<MsgBodyCacheVo> queryMsgBodyCacheList(MsgBodyCacheVo vo) throws Exception;
 
-	public List<MsgBodyCacheVo> queryCheckMsgBodyCacheList() throws Exception;
-
-	public List<MsgBodyCacheVo> queryCheckMsgBodyCacheListWithCache() throws Exception;
-
 	public void insertMsgBodyCache(MsgBodyCacheVo vo) throws Exception;
 
 	public void insertsMsgBodyCache(MsgBodyCacheVo[] vos) throws Exception;

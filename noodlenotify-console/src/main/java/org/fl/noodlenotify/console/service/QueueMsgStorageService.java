@@ -1,12 +1,12 @@
 package org.fl.noodlenotify.console.service;
 
 import java.util.List;
-import java.util.Map;
 
-import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
 import org.fl.noodle.common.mvc.vo.PageVo;
+import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
 
 public interface QueueMsgStorageService {
+	
 	public PageVo<QueueMsgStorageVo> queryQueueMsgStoragePage(QueueMsgStorageVo vo, int page, int rows) throws Exception;
 
 	public PageVo<QueueMsgStorageVo> queryQueueMsgStorageIncludePage(QueueMsgStorageVo vo, int page, int rows) throws Exception;
@@ -36,9 +36,4 @@ public interface QueueMsgStorageService {
 	public void deleteQueueMsgStorage(QueueMsgStorageVo vo) throws Exception;
 
 	public void deletesQueueMsgStorage(QueueMsgStorageVo[] vos) throws Exception;
-
-	public Map<String, List<QueueMsgStorageVo>> getQueueMsgStorageByExchangerId(long exchangerId) throws Exception;
-
-	public Map<String, List<QueueMsgStorageVo>> getQueueMsgStorageByDistributerId(long distributerId) throws Exception;
-
 }

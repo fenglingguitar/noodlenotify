@@ -19,6 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 @ContextConfiguration(locations = {
+		"classpath:org/fl/noodlenotify/common/noodlenotify-common.xml",
 		"classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" 
 })
 public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests {
@@ -29,65 +30,65 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 	private ConsoleRemotingInvoke remotingInvoke;
 
 	@Test
-	public void testProducerRegist() throws Exception {
+	public void testSaveProducerRegist() throws Exception {
 		String ip = "127.0.0.1";
 		int checkPort = 123;
 		String checkUrl = "test/test";
 		String checkType = "NETTY";
 		String name = "生产者-注册-test";
-		remotingInvoke.producerRegister(ip, checkPort, checkUrl, checkType, name);
+		remotingInvoke.saveProducerRegister(ip, checkPort, checkUrl, checkType, name);
 	}
 
 	@Test
-	public void testProducerCancel() throws Exception {
+	public void testSaveProducerCancel() throws Exception {
 		String ip = "127.0.0.1";
 		int checkPort = 123;
 		String checkUrl = "test/test";
 		String checkType = "NETTY";
 		String name = "生产者-注册-test";
-		remotingInvoke.producerCancel(remotingInvoke.producerRegister(ip, checkPort, checkUrl, checkType, name));
+		remotingInvoke.saveProducerCancel(remotingInvoke.saveProducerRegister(ip, checkPort, checkUrl, checkType, name));
 	}
 
 	@Test
-	public void testExchangerRegist() throws Exception {
+	public void testSaveExchangerRegist() throws Exception {
 		String ip = "127.0.0.1";
 		int port = 123453;
 		String url = "test/test";
 		String type = "NETTY";
 		int checkPort = 123;
 		String name = "交换器-注册-test";
-		remotingInvoke.exchangerRegister(ip, port, url, type, checkPort, name);
+		remotingInvoke.saveExchangerRegister(ip, port, url, type, checkPort, name);
 	}
 
 	@Test
-	public void testExchangerCancel() throws Exception {
+	public void testSaveExchangerCancel() throws Exception {
 		String ip = "127.0.0.1";
 		int port = 123453;
 		String url = "test/test";
 		String type = "NETTY";
 		int checkPort = 123;
 		String name = "交换器-注册-test";
-		remotingInvoke.exchangerCancel(remotingInvoke.exchangerRegister(ip, port, url, type, checkPort, name));
+		remotingInvoke.saveExchangerCancel(remotingInvoke.saveExchangerRegister(ip, port, url, type, checkPort, name));
 	}
 
 	@Test
-	public void testDistributerRegist() throws Exception {
+	public void testSaveDistributerRegist() throws Exception {
 		String ip = "127.0.0.1";
 		int checkPort = 123;
 		String name = "分配器-注册-test";
-		remotingInvoke.distributerRegister(ip, checkPort, name);
+		remotingInvoke.saveDistributerRegister(ip, checkPort, name);
 	}
 
 	@Test
-	public void testDistributerCancel() throws Exception {
+	public void testSaveDistributerCancel() throws Exception {
 		String ip = "127.0.0.1";
 		int checkPort = 123;
 		String name = "分配器-注册-test";
-		remotingInvoke.distributerCancel(remotingInvoke.distributerRegister(ip, checkPort, name));
+		remotingInvoke.saveDistributerCancel(remotingInvoke.saveDistributerRegister(ip, checkPort, name));
 	}
 
 	@Test
-	public void testCustomerRegist() throws Exception {
+	public void testSaveCustomerRegist() throws Exception {
 		String ip = "127.0.0.1";
 		int port = 12345;
 		String url = "test/test";
@@ -99,11 +100,11 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 		String customerGroupName = "TestCustomerGroup1";
 		List<String> queueNameList = new ArrayList<String>();
 		queueNameList.add("TestQueue1");
-		remotingInvoke.customerRegister(ip, port, url, type, checkPort, checkUrl, checkType, name, customerGroupName, queueNameList);
+		remotingInvoke.saveCustomerRegister(ip, port, url, type, checkPort, checkUrl, checkType, name, customerGroupName, queueNameList);
 	}
 
 	@Test
-	public void testCustomerCancel() throws Exception {
+	public void testSaveCustomerCancel() throws Exception {
 		String ip = "127.0.0.1";
 		int port = 12345;
 		String url = "test/test";
@@ -115,7 +116,7 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 		String customerGroupName = "TestCustomerGroup1";
 		List<String> queueNameList = new ArrayList<String>();
 		queueNameList.add("TestQueue1");
-		remotingInvoke.customerCancel(remotingInvoke.customerRegister(ip, port, url, type, checkPort, checkUrl, checkType, name, customerGroupName, queueNameList));
+		remotingInvoke.saveCustomerCancel(remotingInvoke.saveCustomerRegister(ip, port, url, type, checkPort, checkUrl, checkType, name, customerGroupName, queueNameList));
 	}
 
 	@Test

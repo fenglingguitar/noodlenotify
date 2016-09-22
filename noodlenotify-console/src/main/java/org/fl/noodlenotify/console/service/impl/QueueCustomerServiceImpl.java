@@ -1,20 +1,15 @@
 package org.fl.noodlenotify.console.service.impl;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import org.fl.noodlenotify.console.constant.ConsoleConstants;
+import org.fl.noodle.common.mvc.vo.PageVo;
 import org.fl.noodlenotify.console.dao.DistributerDao;
 import org.fl.noodlenotify.console.dao.QueueCustomerDao;
 import org.fl.noodlenotify.console.dao.QueueDistributerDao;
 import org.fl.noodlenotify.console.service.QueueCustomerService;
 import org.fl.noodlenotify.console.vo.QueueCustomerVo;
-import org.fl.noodlenotify.console.vo.QueueDistributerVo;
-import org.fl.noodle.common.mvc.vo.PageVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service("queueCustomerService")
 public class QueueCustomerServiceImpl implements QueueCustomerService {
@@ -81,31 +76,5 @@ public class QueueCustomerServiceImpl implements QueueCustomerService {
 	@Override
 	public void deletesQueueCustomer(QueueCustomerVo[] vos) throws Exception {
 		queueCustomerDao.deletesQueueCustomer(vos);
-	}
-
-	@Override
-	public Map<String, List<QueueCustomerVo>> getQueueCustomerByDistributerId(long distributerId) throws Exception {
-		if (!distributerDao.ifDistributerValid(distributerId)) {
-			return new HashMap<String, List<QueueCustomerVo>>();
-		}
-
-		Map<String, List<QueueCustomerVo>> result = new HashMap<String, List<QueueCustomerVo>>();
-		QueueDistributerVo queueDistributerVo = new QueueDistributerVo();
-		queueDistributerVo.setDistributer_Id(distributerId);
-		queueDistributerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		List<QueueDistributerVo> queues = queueDistributerDao.queryQueuesByDistributer(queueDistributerVo);
-		if (queues == null) {
-			return result;
-		}
-		QueueCustomerVo queueCustomerVo = new QueueCustomerVo();
-		queueCustomerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
-		queueCustomerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		for (QueueDistributerVo qd : queues) {
-			String queueNm = qd.getQueue_Nm();
-			queueCustomerVo.setQueue_Nm(queueNm);
-			List<QueueCustomerVo> customers = queueCustomerDao.queryCustomersByQueue(queueCustomerVo);
-			result.put(queueNm, customers);
-		}
-		return result;
 	}
 }

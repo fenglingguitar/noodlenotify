@@ -2,16 +2,14 @@ package org.fl.noodlenotify.console.service.impl;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import org.fl.noodlenotify.console.constant.ConsoleConstants;
+import org.fl.noodle.common.mvc.vo.PageVo;
 import org.fl.noodlenotify.console.dao.MsgStorageDao;
 import org.fl.noodlenotify.console.dao.QueueMsgStorageDao;
 import org.fl.noodlenotify.console.service.MsgStorageService;
 import org.fl.noodlenotify.console.vo.MsgStorageVo;
 import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
-import org.fl.noodle.common.mvc.vo.PageVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service("msgStorageService")
 public class MsgStorageServiceImpl implements MsgStorageService {
@@ -30,19 +28,6 @@ public class MsgStorageServiceImpl implements MsgStorageService {
 	@Override
 	public List<MsgStorageVo> queryMsgStorageList(MsgStorageVo vo) throws Exception {
 		return msgStorageDao.queryMsgStorageList(vo);
-	}
-	
-	@Override
-	public List<MsgStorageVo> queryCheckMsgStorageListWithCache() throws Exception {
-		List<MsgStorageVo> msgStorages = queryCheckMsgStorageList();
-		return msgStorages;
-	}
-
-	@Override
-	public List<MsgStorageVo> queryCheckMsgStorageList() throws Exception {
-		MsgStorageVo msgStorageVo = new MsgStorageVo();
-		msgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
-		return msgStorageDao.queryMsgStorageListExclude(msgStorageVo);
 	}
 
 	@Override

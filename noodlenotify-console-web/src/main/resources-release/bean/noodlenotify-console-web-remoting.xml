@@ -13,7 +13,7 @@
 	default-autowire="byName">
 	
  	<bean name="consoleRemotingInvokeExporter" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
-    	<property name="service" ref="consoleRemotingInvoke"/>
+    	<property name="service" ref="consoleRemotingInvokeService"/>
     	<property name="serviceInterface" value="org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke"/>
 	</bean>
 	

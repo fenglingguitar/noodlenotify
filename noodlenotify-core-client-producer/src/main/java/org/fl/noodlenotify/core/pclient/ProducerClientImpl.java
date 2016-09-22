@@ -48,7 +48,7 @@ public class ProducerClientImpl implements ProducerClient {
 			producerClientName = NetAddressUtil.getLocalHostName();
 		}
 		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
-		moduleId = consoleRemotingInvoke.producerRegister(localIp, checkPort, checkUrl, checkType, producerClientName);		
+		moduleId = consoleRemotingInvoke.saveProducerRegister(localIp, checkPort, checkUrl, checkType, producerClientName);		
 
 		netConnectManager.setModuleId(moduleId);
 		netConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
@@ -57,7 +57,7 @@ public class ProducerClientImpl implements ProducerClient {
 
 	public void destroy() throws Exception {
 		
-		consoleRemotingInvoke.producerCancel(moduleId);
+		consoleRemotingInvoke.saveProducerCancel(moduleId);
 		netConnectManager.destroy();
 	}
 	

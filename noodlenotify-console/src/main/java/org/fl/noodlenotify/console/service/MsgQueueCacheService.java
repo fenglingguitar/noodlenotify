@@ -10,10 +10,6 @@ public interface MsgQueueCacheService {
 
 	public List<MsgQueueCacheVo> queryMsgQueueCacheList(MsgQueueCacheVo vo) throws Exception;
 
-	public List<MsgQueueCacheVo> queryCheckMsgQueueCacheList() throws Exception;
-
-	public List<MsgQueueCacheVo> queryCheckMsgQueueCacheListWithCache() throws Exception;
-
 	public void insertMsgQueueCache(MsgQueueCacheVo vo) throws Exception;
 
 	public void insertsMsgQueueCache(MsgQueueCacheVo[] vos) throws Exception;

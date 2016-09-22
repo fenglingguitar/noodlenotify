@@ -2,10 +2,11 @@ package org.fl.noodlenotify.console.service;
 
 import java.util.List;
 
-import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodle.common.mvc.vo.PageVo;
+import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 
 public interface QueueDistributerService {
+	
 	public PageVo<QueueDistributerVo> queryQueueDistributerPage(QueueDistributerVo vo, int page, int rows) throws Exception;
 
 	public PageVo<QueueDistributerVo> queryQueueDistributerIncludePage(QueueDistributerVo vo, int page, int rows) throws Exception;
@@ -31,7 +32,4 @@ public interface QueueDistributerService {
 	public void deleteQueueDistributer(QueueDistributerVo vo) throws Exception;
 
 	public void deletesQueueDistributer(QueueDistributerVo[] vos) throws Exception;
-
-	public List<QueueDistributerVo> getQueueDistributers(long distributerId) throws Exception;
-
 }

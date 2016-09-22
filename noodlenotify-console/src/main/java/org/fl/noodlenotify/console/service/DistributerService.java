@@ -11,10 +11,6 @@ public interface DistributerService {
 
 	public List<DistributerVo> queryDistributerList(DistributerVo vo) throws Exception;
 
-	public List<DistributerVo> queryCheckDistributeList() throws Exception;
-
-	public List<DistributerVo> queryCheckDistributeListWithCache() throws Exception;
-
 	public void insertDistributer(DistributerVo vo) throws Exception;
 
 	public void insertsDistributer(DistributerVo[] vos) throws Exception;
@@ -28,9 +24,4 @@ public interface DistributerService {
 	public void deleteDistributer(DistributerVo vo) throws Exception;
 
 	public void deletesDistributer(DistributerVo[] vos) throws Exception;
-
-	public long saveRegister(String ip, int checkPort, String name) throws Exception;
-
-	public void saveCancelRegister(long distributerId) throws Exception;
-
 }

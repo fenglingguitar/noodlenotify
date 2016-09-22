@@ -28,7 +28,9 @@ public class DistributerStatusExecuterServiceImpl extends ExecuterServiceAbstrac
 	@Override
 	public void execute() throws Exception {
 
-		List<DistributerVo> distributerVoList = distributerService.queryCheckDistributeList();
+		DistributerVo distributerVoParam = new DistributerVo();
+		distributerVoParam.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		List<DistributerVo> distributerVoList = distributerService.queryDistributerList(distributerVoParam);
 		for (DistributerVo distributerVo : distributerVoList) {
 			byte systemStatus = distributerVo.getSystem_Status();
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;

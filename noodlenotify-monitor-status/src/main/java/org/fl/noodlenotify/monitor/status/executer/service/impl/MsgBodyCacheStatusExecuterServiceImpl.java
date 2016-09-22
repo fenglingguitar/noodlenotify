@@ -28,7 +28,9 @@ public class MsgBodyCacheStatusExecuterServiceImpl extends ExecuterServiceAbstra
 	@Override
 	public void execute() throws Exception {
 		
-		List<MsgBodyCacheVo> msgBodyCacheVoList = msgBodyCacheService.queryCheckMsgBodyCacheList();
+		MsgBodyCacheVo msgBodyCacheVoParam = new MsgBodyCacheVo();
+		msgBodyCacheVoParam.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		List<MsgBodyCacheVo> msgBodyCacheVoList = msgBodyCacheService.queryMsgBodyCacheList(msgBodyCacheVoParam);
 		for (MsgBodyCacheVo msgBodyCacheVo : msgBodyCacheVoList) {
 			byte systemStatus = msgBodyCacheVo.getSystem_Status();
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;

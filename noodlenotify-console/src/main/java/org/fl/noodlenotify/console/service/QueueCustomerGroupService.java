@@ -1,13 +1,12 @@
 package org.fl.noodlenotify.console.service;
 
 import java.util.List;
-import java.util.Map;
 
-import org.fl.noodlenotify.console.vo.QueueCustomerGroupVo;
-import org.fl.noodlenotify.console.vo.QueueCustomerVo;
 import org.fl.noodle.common.mvc.vo.PageVo;
+import org.fl.noodlenotify.console.vo.QueueCustomerGroupVo;
 
 public interface QueueCustomerGroupService {
+	
 	public PageVo<QueueCustomerGroupVo> queryQueueCustomerGroupPage(QueueCustomerGroupVo vo, int page, int rows) throws Exception;
 
 	public PageVo<QueueCustomerGroupVo> queryQueueCustomerGroupIncludePage(QueueCustomerGroupVo vo, int page, int rows) throws Exception;
@@ -37,8 +36,4 @@ public interface QueueCustomerGroupService {
 	public void deleteQueueCustomerGroup(QueueCustomerGroupVo vo) throws Exception;
 
 	public void deletesQueueCustomerGroup(QueueCustomerGroupVo[] vos) throws Exception;
-
-	public Map<String, Long> getQueueCustomerGroupNumByExchangerId(long exchangerId) throws Exception;
-
-	public Map<String, Map<Long, List<QueueCustomerVo>>> getQueueCustomerGroupByDistributerId(long distributerId) throws Exception;
 }

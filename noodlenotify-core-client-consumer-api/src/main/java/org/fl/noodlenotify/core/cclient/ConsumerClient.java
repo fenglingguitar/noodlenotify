@@ -39,14 +39,14 @@ public class ConsumerClient implements NetConnectReceiver {
 			consumerClientName = NetAddressUtil.getLocalHostName();
 		}		
 		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
-		moduleId = consoleRemotingInvoke.customerRegister(localIp, localPort, url, type, checkPort,
+		moduleId = consoleRemotingInvoke.saveCustomerRegister(localIp, localPort, url, type, checkPort,
 					checkUrl, checkType, consumerClientName, customerGroupName, 
 					new ArrayList<String>(consumerReceiverMap.keySet()));
 		
 	}
 	
 	public void destroy() throws Exception {
-		consoleRemotingInvoke.customerCancel(moduleId);
+		consoleRemotingInvoke.saveCustomerCancel(moduleId);
 		stopSign = true;
 	}
 	

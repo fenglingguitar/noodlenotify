@@ -28,7 +28,9 @@ public class MsgQueueCacheStatusExecuterServiceImpl extends ExecuterServiceAbstr
 	@Override
 	public void execute() throws Exception {
 		
-		List<MsgQueueCacheVo> msgQueueCacheVoList = msgQueueCacheService.queryCheckMsgQueueCacheList();
+		MsgQueueCacheVo msgQueueCacheVoParam = new MsgQueueCacheVo();
+		msgQueueCacheVoParam.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		List<MsgQueueCacheVo> msgQueueCacheVoList = msgQueueCacheService.queryMsgQueueCacheList(msgQueueCacheVoParam);
 		for (MsgQueueCacheVo msgQueueCacheVo : msgQueueCacheVoList) {
 			byte systemStatus = msgQueueCacheVo.getSystem_Status();
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;

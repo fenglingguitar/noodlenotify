@@ -10,10 +10,6 @@ public interface MsgStorageService {
 
 	public List<MsgStorageVo> queryMsgStorageList(MsgStorageVo vo) throws Exception;
 
-	public List<MsgStorageVo> queryCheckMsgStorageList() throws Exception;
-
-	public List<MsgStorageVo> queryCheckMsgStorageListWithCache() throws Exception;
-
 	public void insertMsgStorage(MsgStorageVo vo) throws Exception;
 
 	public void insertsMsgStorage(MsgStorageVo[] vos) throws Exception;

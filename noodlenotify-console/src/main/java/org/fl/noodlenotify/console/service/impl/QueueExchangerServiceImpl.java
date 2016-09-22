@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.dao.ExchangerDao;
 import org.fl.noodlenotify.console.dao.ProducerDao;
@@ -98,6 +97,7 @@ public class QueueExchangerServiceImpl implements QueueExchangerService {
 		queueExchangerDao.deletesQueueExchanger(vos);
 	}
 
+	@Deprecated
 	@Override
 	public Map<String, List<QueueExchangerVo>> getQueueExchangersForProducer(long producerId) throws Exception {
 		if (producerId > 0 && !producerDao.ifProducerValid(producerId)) {
@@ -122,6 +122,7 @@ public class QueueExchangerServiceImpl implements QueueExchangerService {
 		return result;
 	}
 
+	@Deprecated
 	@Override
 	public List<QueueExchangerVo> getQueueExchangersByExchangerId(long exchangerId) throws Exception {
 		if (!exchangerDao.ifExchangerValid(exchangerId)) {

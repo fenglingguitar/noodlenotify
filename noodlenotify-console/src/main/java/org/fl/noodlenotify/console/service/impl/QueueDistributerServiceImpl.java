@@ -1,17 +1,14 @@
 package org.fl.noodlenotify.console.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import org.fl.noodlenotify.console.constant.ConsoleConstants;
+import org.fl.noodle.common.mvc.vo.PageVo;
 import org.fl.noodlenotify.console.dao.DistributerDao;
 import org.fl.noodlenotify.console.dao.QueueDistributerDao;
 import org.fl.noodlenotify.console.service.QueueDistributerService;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
-import org.fl.noodle.common.mvc.vo.PageVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service("queueDistributerService")
 public class QueueDistributerServiceImpl implements QueueDistributerService {
@@ -81,19 +78,7 @@ public class QueueDistributerServiceImpl implements QueueDistributerService {
 	public void deletesQueueDistributer(QueueDistributerVo[] vos) throws Exception {
 		queueDistributerDao.deletesQueueDistributer(vos);
 	}
-
-	@Override
-	public List<QueueDistributerVo> getQueueDistributers(long distributerId) throws Exception {
-		if (!distributerDao.ifDistributerValid(distributerId)) {
-			return new ArrayList<QueueDistributerVo>();
-		}
-		QueueDistributerVo queueDistributerVo = new QueueDistributerVo();
-		queueDistributerVo.setDistributer_Id(distributerId);
-		queueDistributerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		List<QueueDistributerVo> queueDistributers = queueDistributerDao.queryQueuesByDistributer(queueDistributerVo);
-		return queueDistributers;
-	}
-
+	
 	@Override
 	public List<QueueDistributerVo> queryQueuesByDistributerTree(
 			QueueDistributerVo vo) throws Exception {

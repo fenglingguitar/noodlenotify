@@ -27,7 +27,9 @@ public class CustomerStatusExecuterServiceImpl extends ExecuterServiceAbstract {
 	@Override
 	public void execute() throws Exception {
 
-		List<CustomerVo> customerVoList = customerService.queryCheckCustomerList();
+		CustomerVo customerVoParam = new CustomerVo();
+		customerVoParam.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		List<CustomerVo> customerVoList = customerService.queryCustomerList(customerVoParam);
 		for (CustomerVo customerVo : customerVoList) {
 			byte systemStatus = customerVo.getSystem_Status();
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;

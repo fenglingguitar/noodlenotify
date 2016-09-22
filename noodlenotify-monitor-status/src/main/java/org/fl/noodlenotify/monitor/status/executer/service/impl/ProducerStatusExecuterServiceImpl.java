@@ -28,7 +28,9 @@ public class ProducerStatusExecuterServiceImpl extends ExecuterServiceAbstract {
 	@Override
 	public void execute() throws Exception {
 		
-		List<ProducerVo> producerVoList = producerService.queryCheckProducerList();
+		ProducerVo producerVoParam = new ProducerVo();
+		producerVoParam.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		List<ProducerVo> producerVoList = producerService.queryProducerList(producerVoParam);
 		for (ProducerVo producerVo : producerVoList) {
 			byte systemStatus = producerVo.getSystem_Status();
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;

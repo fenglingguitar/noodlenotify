@@ -71,7 +71,7 @@ public class Exchange implements NetConnectReceiver {
 			exchangeName = NetAddressUtil.getLocalHostName();
 		}
 		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
-		moduleId = consoleRemotingInvoke.exchangerRegister(localIp, localPort, url, type, checkPort, exchangeName);
+		moduleId = consoleRemotingInvoke.saveExchangerRegister(localIp, localPort, url, type, checkPort, exchangeName);
 		
 		MemoryStorage.moduleName = MonitorPerformanceConstant.MODULE_ID_EXCHANGE;
 		MemoryStorage.moduleId = moduleId;
@@ -106,7 +106,7 @@ public class Exchange implements NetConnectReceiver {
 	
 	public void destroy() throws Exception {
 		
-		consoleRemotingInvoke.exchangerCancel(moduleId);
+		consoleRemotingInvoke.saveExchangerCancel(moduleId);
 
 		stopSign = true;
 		startUpdateConnectAgent();

@@ -28,7 +28,9 @@ public class ExchangerStatusExecuterServiceImpl extends ExecuterServiceAbstract 
 	@Override
 	public void execute() throws Exception {
 		
-		List<ExchangerVo> exchangerVoList = exchangerService.queryCheckExchangerList();
+		ExchangerVo exchangerVoParam = new ExchangerVo();
+		exchangerVoParam.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		List<ExchangerVo> exchangerVoList = exchangerService.queryExchangerList(exchangerVoParam);
 		for (ExchangerVo exchangerVo : exchangerVoList) {
 			byte systemStatus = exchangerVo.getSystem_Status();
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;

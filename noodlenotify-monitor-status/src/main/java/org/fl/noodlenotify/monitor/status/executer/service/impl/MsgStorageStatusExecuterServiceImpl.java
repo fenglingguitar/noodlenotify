@@ -28,7 +28,9 @@ public class MsgStorageStatusExecuterServiceImpl extends ExecuterServiceAbstract
 	@Override
 	public void execute() throws Exception {
 		
-		List<MsgStorageVo> msgStorageVoList = msgStorageService.queryCheckMsgStorageList();
+		MsgStorageVo msgStorageVoParam = new MsgStorageVo();
+		msgStorageVoParam.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
+		List<MsgStorageVo> msgStorageVoList = msgStorageService.queryMsgStorageList(msgStorageVoParam);
 		for (MsgStorageVo msgStorageVo : msgStorageVoList) {
 			byte systemStatus = msgStorageVo.getSystem_Status();
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;

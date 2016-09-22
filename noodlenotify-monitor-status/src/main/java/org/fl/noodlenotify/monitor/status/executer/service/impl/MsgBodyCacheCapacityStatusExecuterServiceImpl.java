@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.MsgBodyCacheService;
 import org.fl.noodlenotify.console.vo.MsgBodyCacheVo;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheStatusChecker;
@@ -28,7 +28,9 @@ public class MsgBodyCacheCapacityStatusExecuterServiceImpl extends ExecuterServi
 	@Override
 	public void execute() throws Exception {
 		
-		List<MsgBodyCacheVo> msgBodyCaches = msgBodyCacheService.queryCheckMsgBodyCacheList();
+		MsgBodyCacheVo msgBodyCacheVoParam = new MsgBodyCacheVo();
+		msgBodyCacheVoParam.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		List<MsgBodyCacheVo> msgBodyCaches = msgBodyCacheService.queryMsgBodyCacheList(msgBodyCacheVoParam);
 		for (MsgBodyCacheVo msgBodyCache : msgBodyCaches) {
 			BodyCacheStatusChecker queueCacheStatusChecker = (BodyCacheStatusChecker) consoleBodyCacheConnectManager.getConnectAgent(msgBodyCache.getMsgBodyCache_Id());
 			if (queueCacheStatusChecker != null) {

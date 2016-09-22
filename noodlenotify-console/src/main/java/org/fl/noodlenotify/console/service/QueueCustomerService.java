@@ -1,12 +1,12 @@
 package org.fl.noodlenotify.console.service;
 
 import java.util.List;
-import java.util.Map;
 
-import org.fl.noodlenotify.console.vo.QueueCustomerVo;
 import org.fl.noodle.common.mvc.vo.PageVo;
+import org.fl.noodlenotify.console.vo.QueueCustomerVo;
 
 public interface QueueCustomerService {
+	
 	public PageVo<QueueCustomerVo> queryQueueCustomerPage(QueueCustomerVo vo, int page, int rows) throws Exception;
 
 	public PageVo<QueueCustomerVo> queryQueueCustomerIncludePage(QueueCustomerVo vo, int page, int rows) throws Exception;
@@ -28,6 +28,4 @@ public interface QueueCustomerService {
 	public void deleteQueueCustomer(QueueCustomerVo vo) throws Exception;
 
 	public void deletesQueueCustomer(QueueCustomerVo[] vos) throws Exception;
-
-	public Map<String, List<QueueCustomerVo>> getQueueCustomerByDistributerId(long distributerId) throws Exception;
 }

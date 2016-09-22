@@ -2,17 +2,14 @@ package org.fl.noodlenotify.console.service.impl;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import org.fl.noodlenotify.console.constant.ConsoleConstants;
+import org.fl.noodle.common.mvc.vo.PageVo;
 import org.fl.noodlenotify.console.dao.ExchangerDao;
 import org.fl.noodlenotify.console.dao.QueueExchangerDao;
-import org.fl.noodlenotify.console.domain.ExchangerMd;
 import org.fl.noodlenotify.console.service.ExchangerService;
 import org.fl.noodlenotify.console.vo.ExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
-import org.fl.noodle.common.mvc.vo.PageVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service("exchangerService")
 public class ExchangerServiceImpl implements ExchangerService {
@@ -31,19 +28,6 @@ public class ExchangerServiceImpl implements ExchangerService {
 	@Override
 	public List<ExchangerVo> queryExchangerList(ExchangerVo vo) throws Exception {
 		return exchangerdao.queryExchangerList(vo);
-	}
-	
-	@Override
-	public List<ExchangerVo> queryCheckExchangerListWithCache() throws Exception {
-		List<ExchangerVo> exchangers = queryCheckExchangerList();
-		return exchangers;
-	}
-
-	@Override
-	public List<ExchangerVo> queryCheckExchangerList() throws Exception {
-		ExchangerVo exchangerVo = new ExchangerVo();
-		exchangerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		return exchangerdao.queryExchangerList(exchangerVo);
 	}
 
 	@Override
@@ -87,34 +71,5 @@ public class ExchangerServiceImpl implements ExchangerService {
 			queueExchangerDao.deleteQueueExchangerByExchangerId(queueExchangerVo);
 			exchangerdao.deleteExchanger(vo);
 		}
-	}
-
-	@Override
-	public long saveRegister(String ip, int port, String url, String type, int checkPort, String name) throws Exception {
-		ExchangerVo exchangerVo = new ExchangerVo();
-		exchangerVo.setIp(ip);
-		exchangerVo.setCheck_Port(checkPort);
-		List<ExchangerVo> exchangerList = exchangerdao.queryExchangerList(exchangerVo);
-		if (exchangerList == null || exchangerList.size() == 0) {
-			exchangerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
-			exchangerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		} else {
-			exchangerVo = exchangerList.get(0);
-		}
-		exchangerVo.setPort(port);
-		exchangerVo.setUrl(url);
-		exchangerVo.setType(type);
-		exchangerVo.setName(name);
-		ExchangerMd exchangerMd = exchangerdao.insertOrUpdate(exchangerVo);
-		
-		return exchangerMd.getExchanger_Id();
-	}
-
-	@Override
-	public void saveCancelRegister(long exchangerId) throws Exception {
-		ExchangerVo exchangerVo = new ExchangerVo();
-		exchangerVo.setExchanger_Id(exchangerId);
-		exchangerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
-		exchangerdao.updateExchangerSystemStatus(exchangerVo);
 	}
 }

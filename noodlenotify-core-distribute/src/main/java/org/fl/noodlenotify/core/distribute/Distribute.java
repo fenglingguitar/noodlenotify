@@ -67,7 +67,7 @@ public class Distribute {
 			distributeName = NetAddressUtil.getLocalHostName();
 		}
 		localIp = localIp == null ? NetAddressUtil.getLocalIp(): localIp;
-		moduleId = consoleRemotingInvoke.distributerRegister(localIp, checkPort, distributeName);
+		moduleId = consoleRemotingInvoke.saveDistributerRegister(localIp, checkPort, distributeName);
 		
 		MemoryStorage.moduleName = MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE;
 		MemoryStorage.moduleId = moduleId;
@@ -124,7 +124,7 @@ public class Distribute {
 	
 	public void destroy() throws Exception {
 		
-		consoleRemotingInvoke.distributerCancel(moduleId);
+		consoleRemotingInvoke.saveDistributerCancel(moduleId);
 
 		stopSign = true;
 		startUpdateConnectAgent();
