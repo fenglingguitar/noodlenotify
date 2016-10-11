@@ -26,7 +26,7 @@
 		<property name="dbDataSourceFactory" ref="dbDataSourceFactory" />
 		<property name="dbConnectAgentConfParam" ref="dbConnectAgentConfParam" />
 	</bean>
-	
-	<bean id="msgStorageStatusExecuterService" class="org.fl.noodlenotify.monitor.status.executer.service.impl.MsgStorageStatusExecuterServiceImpl" />
+
+	<bean id="msgStorageStatusExecuter" class="org.fl.noodlenotify.monitor.status.executer.service.impl.MsgStorageStatusExecuterServiceImpl" />
 	
 </beans>

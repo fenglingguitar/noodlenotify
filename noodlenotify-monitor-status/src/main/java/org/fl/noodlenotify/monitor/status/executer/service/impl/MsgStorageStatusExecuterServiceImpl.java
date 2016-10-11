@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service("msgStorageStatusExecuterService")
+@Service("msgStorageStatusExecuter")
 public class MsgStorageStatusExecuterServiceImpl extends ExecuterServiceAbstract {
 
 	private final static Logger logger = LoggerFactory.getLogger(MsgStorageStatusExecuterServiceImpl.class);
