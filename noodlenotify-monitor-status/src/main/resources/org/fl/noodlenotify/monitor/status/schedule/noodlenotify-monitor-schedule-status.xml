@@ -12,19 +12,16 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/core/bean/connect/manager/console/noodlenotify-core-connect-manager-console.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
 	
-	<context:component-scan base-package="org.fl.noodlenotify.monitor.status.executer" use-default-filters="false" >
-		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
-	</context:component-scan>
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgstorage.xml" />
 
 	<bean id="statusExecuterSchedule" class="org.fl.noodlenotify.monitor.status.schedule.StatusExecuterSchedule"
 		init-method="start" destroy-method="destroy" >
 		<property name="delay" value="30" />
 		<property name="mappedNameList">
 			<list>
-				<value>*StatusExecuterService</value>
+				<value>*StatusExecuter</value>
 			</list>
 		</property>
 	</bean>

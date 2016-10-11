@@ -9,15 +9,15 @@ public interface QueueMsgStorageService {
 	
 	public PageVo<QueueMsgStorageVo> queryQueueMsgStoragePage(QueueMsgStorageVo vo, int page, int rows) throws Exception;
 
+	public List<QueueMsgStorageVo> queryQueueMsgStorageList(QueueMsgStorageVo vo) throws Exception;
+
 	public PageVo<QueueMsgStorageVo> queryQueueMsgStorageIncludePage(QueueMsgStorageVo vo, int page, int rows) throws Exception;
 
 	public PageVo<QueueMsgStorageVo> queryQueueMsgStorageExcludePage(QueueMsgStorageVo vo, int page, int rows) throws Exception;
-
-	public List<QueueMsgStorageVo> queryQueueMsgStorageList(QueueMsgStorageVo vo) throws Exception;
+	
+	public List<QueueMsgStorageVo> queryQueueMsgStorageIncludeList(QueueMsgStorageVo vo) throws Exception;
 
 	public List<QueueMsgStorageVo> queryMsgStoragesByQueueExclude(QueueMsgStorageVo vo) throws Exception;
-	
-	public List<QueueMsgStorageVo> queryQueueByMsgstorageList(QueueMsgStorageVo vo) throws Exception;
 	
 	public List<QueueMsgStorageVo> queryQueueByMsgstorageListTree(QueueMsgStorageVo queueMsgStorageVo) throws Exception;
 

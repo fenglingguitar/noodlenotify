@@ -17,7 +17,7 @@
 	]]>
 	</query>
 
-	<query name="queue-msgstorage-query-includelist">
+	<query name="queue-msgstorage-query-includepage">
 	<![CDATA[
 		SELECT 
 				qms.queue_Nm,
@@ -52,7 +52,7 @@
 	]]>
 	</query>
 
-	<query name="queue-msgstorage-query-excludelist">
+	<query name="queue-msgstorage-query-excludepage">
 	<![CDATA[
 		SELECT 
 				ms.msgStorage_Id,
@@ -82,32 +82,41 @@
 		ORDER BY ms.msgStorage_Id DESC
 	]]>
 	</query>
-
-	<query name="queue-msgstorage-query-queue">
+	
+	<query name="queue-msgstorage-query-includelist">
 	<![CDATA[
 		SELECT 
-				q.queue_Nm,
-				q.manual_Status,
-				q.is_Repeat,
-				q.expire_Time,
-                qms.msgStorage_Id,
-                qms.new_Len,
-                qms.portion_Len
-        FROM    CSL_QUEUE q, CSL_QUEUE_MSG_STORAGE qms
+				qms.queue_Nm,
+				ms.msgStorage_Id,
+				ms.name,
+				ms.ip,
+				ms.port,
+				ms.system_Status,
+				ms.manual_Status
+		FROM    CSL_MSG_STORAGE ms, CSL_QUEUE_MSG_STORAGE qms
 		WHERE 	1=1
-				#if($msgStorage_Id)
-					AND qms.msgStorage_Id = :msgStorage_Id
-				#end
 		 		#if($queue_Nm)
-					AND q.queue_Nm = :queue_Nm
+					AND qms.queue_Nm = :queue_Nm
+				#end
+				#if($name)
+					AND ms.name = :name
+				#end
+		 		#if($ip)
+					AND ms.ip = :ip
+				#end
+		 		#if($port)
+					AND ms.port = :port
+				#end
+		 		#if($system_Status)
+					AND ms.system_Status = :system_Status
 				#end
 		 		#if($manual_Status)
-					AND q.manual_Status = :manual_Status
+					AND ms.manual_Status = :manual_Status
 				#end
-				AND q.queue_Nm = qms.queue_Nm
+				AND ms.msgStorage_Id = qms.msgStorage_Id
+		ORDER BY ms.msgStorage_Id DESC
 	]]>
 	</query>
-	
 
 	<query name="queue-msgstorage-query-queue-tree">
 	<![CDATA[
