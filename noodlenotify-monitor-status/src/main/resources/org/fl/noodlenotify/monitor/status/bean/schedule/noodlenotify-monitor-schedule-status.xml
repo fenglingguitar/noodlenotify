@@ -24,7 +24,7 @@
 		<property name="delay" value="30" />
 		<property name="mappedNameList">
 			<list>
-				<value>*StatusExecuterService</value>
+				<value>*StatusExecuter</value>
 			</list>
 		</property>
 	</bean>

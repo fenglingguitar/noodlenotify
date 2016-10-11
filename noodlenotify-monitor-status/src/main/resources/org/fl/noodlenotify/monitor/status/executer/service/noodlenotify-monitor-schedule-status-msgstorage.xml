@@ -12,18 +12,21 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/core/bean/connect/manager/console/noodlenotify-core-connect-manager-console-db.xml" />
+	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/db/mysql/noodlenotify-core-connect-db-datasource.xml" />
 	
-	<bean id="msgStorageStatusExecuterService" class="org.fl.noodlenotify.monitor.status.executer.service.impl.MsgStorageStatusExecuterServiceImpl" />
-
-	<bean id="statusExecuterSchedule" class="org.fl.noodlenotify.monitor.status.schedule.StatusExecuterSchedule"
-		init-method="start" destroy-method="destroy" >
-		<property name="mappedNameList">
-			<list>
-				<value>*StatusExecuterService</value>
-			</list>
-		</property>
+	<bean id="dbConnectAgentConfParam" class="org.fl.noodlenotify.core.connect.db.DbConnectAgentConfParam">
+		<property name="insertThreadCount" value="0"/>
+		<property name="updateThreadCount" value="0"/>
+		<property name="deleteThreadCount" value="0"/>
 	</bean>
+	
+	<bean id="dbConnectAgentFactory" class="org.fl.noodlenotify.core.connect.db.mysql.MysqlDbConnectAgentFactory">
+		<property name="dbDataSourceFactory" ref="dbDataSourceFactory" />
+		<property name="dbConnectAgentConfParam" ref="dbConnectAgentConfParam" />
+	</bean>
+	
+	<bean id="msgStorageStatusExecuter" class="org.fl.noodlenotify.monitor.status.executer.service.impl.MsgStorageStatusExecuterServiceImpl" />
 	
 </beans>

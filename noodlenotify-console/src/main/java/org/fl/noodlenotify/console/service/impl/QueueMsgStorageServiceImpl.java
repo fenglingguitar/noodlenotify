@@ -34,6 +34,11 @@ public class QueueMsgStorageServiceImpl implements QueueMsgStorageService {
 	public PageVo<QueueMsgStorageVo> queryQueueMsgStoragePage(QueueMsgStorageVo vo, int page, int rows) throws Exception {
 		return queueMsgStorageDao.queryQueueMsgStoragePage(vo, page, rows);
 	}
+	
+	@Override
+	public List<QueueMsgStorageVo> queryQueueMsgStorageList(QueueMsgStorageVo vo) throws Exception {
+		return queueMsgStorageDao.queryQueueMsgStorageList(vo);
+	}
 
 	@Override
 	public PageVo<QueueMsgStorageVo> queryQueueMsgStorageIncludePage(QueueMsgStorageVo vo, int page, int rows) throws Exception {
@@ -44,20 +49,15 @@ public class QueueMsgStorageServiceImpl implements QueueMsgStorageService {
 	public PageVo<QueueMsgStorageVo> queryQueueMsgStorageExcludePage(QueueMsgStorageVo vo, int page, int rows) throws Exception {
 		return queueMsgStorageDao.queryQueueMsgStorageExcludePage(vo, page, rows);
 	}
-
+	
 	@Override
-	public List<QueueMsgStorageVo> queryQueueMsgStorageList(QueueMsgStorageVo vo) throws Exception {
-		return queueMsgStorageDao.queryQueueMsgStorageList(vo);
+	public List<QueueMsgStorageVo> queryQueueMsgStorageIncludeList(QueueMsgStorageVo vo) throws Exception {
+		return queueMsgStorageDao.queryQueueMsgStorageIncludeList(vo);
 	}
 
 	@Override
 	public List<QueueMsgStorageVo> queryMsgStoragesByQueueExclude(QueueMsgStorageVo vo) throws Exception {
 		return queueMsgStorageDao.queryMsgStoragesByQueueExclude(vo);
-	}
-
-	@Override
-	public List<QueueMsgStorageVo> queryQueueByMsgstorageList(QueueMsgStorageVo vo) throws Exception {
-		return queueMsgStorageDao.queryQueueByMsgstorageList(vo);
 	}
 	
 	@Override
