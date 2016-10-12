@@ -23,7 +23,7 @@ public class MsgStorageStatusExecuterServiceImpl extends ExecuterServiceAbstract
 	private MsgStorageService msgStorageService;
 	
 	@Autowired
-	ConnectAgentFactory dbConnectAgentFactory;
+	private ConnectAgentFactory dbConnectAgentFactory;
 
 	@Override
 	public void execute() throws Exception {
@@ -42,7 +42,7 @@ public class MsgStorageStatusExecuterServiceImpl extends ExecuterServiceAbstract
 				if (logger.isDebugEnabled()) {
 					logger.error("execute -> " + e);
 				}
-			}finally {
+			} finally {
 				connectAgent.close();
 			}
 			if (currentSysTemStatus != msgStorageVo.getSystem_Status()) {

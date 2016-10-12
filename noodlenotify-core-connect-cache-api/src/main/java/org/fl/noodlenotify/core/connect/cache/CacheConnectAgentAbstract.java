@@ -199,16 +199,18 @@ public abstract class CacheConnectAgentAbstract extends ConnectAgentAbstract {
 		
 		notifySleep();
 		
-		try {
-			stopCountDownLatch.await();
-		} catch (InterruptedException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("CloseActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port	
-						+ ", CountDownLatch Await -> " + e
-						);
+		if (stopCountDownLatch != null) {
+			try {
+				stopCountDownLatch.await();
+			} catch (InterruptedException e) {
+				if (logger.isErrorEnabled()) {
+					logger.error("CloseActual -> " 
+							+ "ConnectId: " + connectId
+							+ ", Ip: " + ip
+							+ ", Port: " + port	
+							+ ", CountDownLatch Await -> " + e
+							);
+				}
 			}
 		}
 		

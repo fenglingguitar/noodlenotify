@@ -23,7 +23,7 @@ public class MsgStorageCapacityStatusExecuterServiceImpl extends ExecuterService
 	private QueueMsgStorageService queueMsgStorageService;
 
 	@Autowired
-	ConnectAgentFactory dbConnectAgentFactory;
+	private ConnectAgentFactory dbConnectAgentFactory;
 
 	@Override
 	public void execute() throws Exception {

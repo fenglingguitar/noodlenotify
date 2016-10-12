@@ -12,18 +12,19 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/core/bean/connect/manager/console/noodlenotify-core-connect-manager-console-bodycache.xml" />
+	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
 	
-	<bean id="msgBodyCacheStatusExecuterService" class="org.fl.noodlenotify.monitor.status.executer.service.impl.MsgBodyCacheStatusExecuterServiceImpl" />
-
-	<bean id="statusExecuterSchedule" class="org.fl.noodlenotify.monitor.status.schedule.StatusExecuterSchedule"
-		init-method="start" destroy-method="destroy" >
-		<property name="mappedNameList">
-			<list>
-				<value>*StatusExecuterService</value>
-			</list>
-		</property>
+	<bean id="cacheConnectAgentConfParamBody" class="org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam">
+		<property name="timeout" value="3000"/>
+		<property name="setThreadCount" value="0"/>
+		<property name="removeThreadCount" value="0"/>
 	</bean>
+	
+	<bean id="redisBodyCacheConnectAgentFactory" class="org.fl.noodlenotify.core.connect.cache.body.redis.RedisBodyCacheConnectAgentFactory">
+		<property name="cacheConnectAgentConfParam" ref="cacheConnectAgentConfParamBody" />
+	</bean>
+	
+	<bean id="msgBodyCacheStatusExecuter" class="org.fl.noodlenotify.monitor.status.executer.service.impl.MsgBodyCacheStatusExecuterServiceImpl" />
 	
 </beans>
