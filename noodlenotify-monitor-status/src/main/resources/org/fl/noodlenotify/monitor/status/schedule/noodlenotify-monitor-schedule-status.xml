@@ -17,6 +17,7 @@
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgstorage.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgstorage-capacity.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgbodycache.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgbodycache-capacity.xml" />
 
 	<bean id="statusExecuterSchedule" class="org.fl.noodlenotify.monitor.status.schedule.StatusExecuterSchedule"
 		init-method="start" destroy-method="destroy" >
