@@ -46,6 +46,8 @@ public class CustomerStatusExecuterServiceImpl extends ExecuterServiceAbstract {
 					if (logger.isDebugEnabled()) {
 						logger.error("CheckHealth -> " + e);
 					}
+				} finally {
+					connectAgent.close();
 				}
 				if (systemStatus != currentSysTemStatus) {
 					CustomerVo currentCustomerVo = new CustomerVo();

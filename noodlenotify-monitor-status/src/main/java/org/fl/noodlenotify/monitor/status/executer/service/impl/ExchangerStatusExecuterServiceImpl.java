@@ -35,7 +35,7 @@ public class ExchangerStatusExecuterServiceImpl extends ExecuterServiceAbstract 
 		for (ExchangerVo exchangerVo : exchangerVoList) {
 			byte systemStatus = exchangerVo.getSystem_Status();
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;
-			ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get(exchangerVo.getType());
+			ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get("HTTP");
 			if (connectAgentFactory != null) {
 				ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(exchangerVo.getIp(), exchangerVo.getCheck_Port(), exchangerVo.getExchanger_Id());
 				try {
@@ -46,6 +46,8 @@ public class ExchangerStatusExecuterServiceImpl extends ExecuterServiceAbstract 
 					if (logger.isDebugEnabled()) {
 						logger.error("CheckHealth -> " + e);
 					}
+				} finally {
+					connectAgent.close();
 				}
 				if (systemStatus != currentSysTemStatus) {
 					ExchangerVo currentExchangerVo = new ExchangerVo();

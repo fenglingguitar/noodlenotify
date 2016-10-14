@@ -51,6 +51,8 @@ public class MsgQueueCacheCapacityStatusExecuterServiceImpl extends ExecuterServ
 				if (logger.isDebugEnabled()) {
 					logger.error("CheckIsActive And CheckNewLen And CheckPortionLen -> " + e);
 				}
+			} finally {
+				connectAgent.close();
 			}
 		}
 	}
