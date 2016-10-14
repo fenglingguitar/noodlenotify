@@ -12,18 +12,19 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/core/bean/connect/manager/console/noodlenotify-core-connect-manager-console-consumer.xml" />
+	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
+		
+	<bean id="connectAgentFactoryNetty" class="org.fl.noodlenotify.core.connect.net.netty.client.NettyNetConnectAgentFactory" />
+	<bean id="connectAgentFactoryJetty" class="org.fl.noodlenotify.core.connect.net.jetty.client.JettyNetConnectAgentFactory" />
 	
-	<bean id="customerStatusExecuterService" class="org.fl.noodlenotify.monitor.status.executer.service.impl.CustomerStatusExecuterServiceImpl" />
-
-	<bean id="statusExecuterSchedule" class="org.fl.noodlenotify.monitor.status.schedule.StatusExecuterSchedule"
-		init-method="start" destroy-method="destroy" >
-		<property name="mappedNameList">
-			<list>
-				<value>*StatusExecuterService</value>
-			</list>
+	<bean id="customerStatusExecuter" class="org.fl.noodlenotify.monitor.status.executer.service.impl.CustomerStatusExecuterServiceImpl" >
+		<property name="connectAgentFactoryMap">
+			<map>
+				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />
+				<entry key="HTTP" value-ref="connectAgentFactoryJetty" />
+			</map>
 		</property>
-	</bean>
+    </bean>
 	
 </beans>
