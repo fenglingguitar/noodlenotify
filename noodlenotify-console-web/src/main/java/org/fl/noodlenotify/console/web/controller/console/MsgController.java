@@ -3,18 +3,19 @@ package org.fl.noodlenotify.console.web.controller.console;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.fl.noodlenotify.console.constant.ConsoleConstants;
-import org.fl.noodlenotify.console.service.QueueMsgStorageService;
-import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
 import org.fl.noodle.common.mvc.annotation.NoodleRequestParam;
 import org.fl.noodle.common.mvc.annotation.NoodleResponseBody;
 import org.fl.noodle.common.mvc.vo.VoidVo;
+import org.fl.noodlenotify.console.constant.ConsoleConstants;
+import org.fl.noodlenotify.console.service.QueueMsgStorageService;
+import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
+import org.fl.noodlenotify.core.connect.ConnectAgent;
+import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
 import org.fl.noodlenotify.core.connect.db.DbStatusChecker;
-import org.fl.noodlenotify.core.connect.db.manager.console.ConsoleDbConnectManager;
 import org.fl.noodlenotify.core.domain.message.MessageVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @Controller
@@ -24,8 +25,8 @@ public class MsgController {
 	@Autowired
 	private QueueMsgStorageService queueMsgStorageService;
 
-	@Autowired
-	ConsoleDbConnectManager consoleDbConnectManager;
+	@Autowired(required = false)
+	private ConnectAgentFactory dbConnectAgentFactory;
 	
 	@RequestMapping(value = "/queryportionmessage")
 	@NoodleResponseBody(type = "json-millisecond")
@@ -42,9 +43,12 @@ public class MsgController {
 		queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
 		List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
 		for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
-			DbStatusChecker dbStatusChecker = (DbStatusChecker) consoleDbConnectManager.getConnectAgent(queueMsgStorage.getMsgStorage_Id());
-			if (dbStatusChecker != null) {
-				result.addAll(dbStatusChecker.queryPortionMessage(queueMsgStorage.getQueue_Nm(), vo.getUuid(), vo.getRegion(), vo.getContent(), pageInt * rowsInt, rowsInt));
+			ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getIp(), queueMsgStorage.getPort(), queueMsgStorage.getMsgStorage_Id());
+			try {
+				connectAgent.connect();	
+				result.addAll(((DbStatusChecker) connectAgent).queryPortionMessage(queueMsgStorage.getQueue_Nm(), vo.getUuid(), vo.getRegion(), vo.getContent(), pageInt * rowsInt, rowsInt));
+			} finally {
+				connectAgent.close();
 			}
 		}
 		
@@ -62,9 +66,12 @@ public class MsgController {
 		List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
 		for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
 			if (queueMsgStorage.getMsgStorage_Id() == vo.getDb()) {
-				DbStatusChecker dbStatusChecker = (DbStatusChecker) consoleDbConnectManager.getConnectAgent(queueMsgStorage.getMsgStorage_Id());
-				if (dbStatusChecker != null) {
-					dbStatusChecker.savePortionMessage(queueMsgStorage.getQueue_Nm(), vo.getContentId(), vo.getContent());
+				ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getIp(), queueMsgStorage.getPort(), queueMsgStorage.getMsgStorage_Id());
+				try {
+					connectAgent.connect();	
+					((DbStatusChecker) connectAgent).savePortionMessage(queueMsgStorage.getQueue_Nm(), vo.getContentId(), vo.getContent());
+				} finally {
+					connectAgent.close();
 				}
 			}
 		}
@@ -83,9 +90,12 @@ public class MsgController {
 			List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
 			for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
 				if (queueMsgStorage.getMsgStorage_Id() == vo.getDb()) {
-					DbStatusChecker dbStatusChecker = (DbStatusChecker) consoleDbConnectManager.getConnectAgent(queueMsgStorage.getMsgStorage_Id());
-					if (dbStatusChecker != null) {
-						dbStatusChecker.deletePortionMessage(queueMsgStorage.getQueue_Nm(), vo.getId());
+					ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getIp(), queueMsgStorage.getPort(), queueMsgStorage.getMsgStorage_Id());
+					try {
+						connectAgent.connect();	
+						((DbStatusChecker) connectAgent).deletePortionMessage(queueMsgStorage.getQueue_Nm(), vo.getId());
+					} finally {
+						connectAgent.close();
 					}
 				}
 			}
