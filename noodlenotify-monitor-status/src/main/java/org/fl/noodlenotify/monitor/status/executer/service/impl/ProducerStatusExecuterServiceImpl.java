@@ -1,34 +1,26 @@
 package org.fl.noodlenotify.monitor.status.executer.service.impl;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.fl.noodlenotify.console.service.ProducerService;
+//import org.fl.noodlenotify.core.connect.net.manager.console.ProducerConsoleNetConnectManager;
+import org.fl.noodlenotify.monitor.status.executer.service.ExecuterServiceAbstract;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Service;
 
-import org.fl.noodlenotify.console.constant.ConsoleConstants;
-import org.fl.noodlenotify.console.service.ProducerService;
-import org.fl.noodlenotify.console.vo.ProducerVo;
-import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
-import org.fl.noodlenotify.core.connect.net.manager.console.ProducerConsoleNetConnectManager;
-import org.fl.noodlenotify.monitor.status.executer.service.ExecuterServiceAbstract;
-
-//@Service("producerStatusExecuterService")
+//@Service("producerStatusExecuter")
 public class ProducerStatusExecuterServiceImpl extends ExecuterServiceAbstract {
 
-	private final static Logger logger = LoggerFactory.getLogger(ProducerStatusExecuterServiceImpl.class);
+	//private final static Logger logger = LoggerFactory.getLogger(ProducerStatusExecuterServiceImpl.class);
 	
 	@Autowired
 	private ProducerService producerService;
 
 	@Autowired
-	ProducerConsoleNetConnectManager producerConsoleNetConnectManager;
+	//ProducerConsoleNetConnectManager producerConsoleNetConnectManager;
 
 	@Override
 	public void execute() throws Exception {
 		
-		ProducerVo producerVoParam = new ProducerVo();
+		/*ProducerVo producerVoParam = new ProducerVo();
 		producerVoParam.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
 		List<ProducerVo> producerVoList = producerService.queryProducerList(producerVoParam);
 		for (ProducerVo producerVo : producerVoList) {
@@ -51,6 +43,6 @@ public class ProducerStatusExecuterServiceImpl extends ExecuterServiceAbstract {
 				currentProducer.setSystem_Status(currentSysTemStatus);
 				producerService.updateProducerSystemStatus(currentProducer);
 			}
-		}
+		}*/
 	}
 }

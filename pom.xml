@@ -69,7 +69,6 @@
     <module>noodlenotify-core-client-consumer-netty</module>
     <module>noodlenotify-core-exchange</module>
     <module>noodlenotify-core-distribute</module>
-    <module>noodlenotify-core-console</module>
     <module>noodlenotify-console</module>
     <module>noodlenotify-console-vo</module>
     <module>noodlenotify-console-remoting-api</module>

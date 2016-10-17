@@ -28,12 +28,6 @@
 	</dependency>
 	
 	<dependency>
-		<groupId>org.fl.noodlenotify.core.console</groupId>
-		<artifactId>noodlenotify-core-console</artifactId>
-		<version>${noodlenotify.core.console.version}</version>
-	</dependency>
-	
-	<dependency>
 		<groupId>org.fl.noodlenotify.core.connect.net.jetty.client</groupId>
 		<artifactId>noodlenotify-core-connect-net-jetty-client</artifactId>
 		<version>${noodlenotify.core.connect.net.jetty.client.version}</version>
