@@ -15,15 +15,6 @@
 	<!-- <import resource="classpath:org/fl/noodlenotify/core/bean/connect/manager/console/noodlenotify-core-connect-manager-console-producer.xml" /> -->
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
 	
-	<!-- <bean id="producerStatusExecuterService" class="org.fl.noodlenotify.monitor.status.executer.service.impl.ProducerStatusExecuterServiceImpl" /> -->
-
-	<!-- <bean id="statusExecuterSchedule" class="org.fl.noodlenotify.monitor.status.schedule.StatusExecuterSchedule"
-		init-method="start" destroy-method="destroy" >
-		<property name="mappedNameList">
-			<list>
-				<value>*StatusExecuterService</value>
-			</list>
-		</property>
-	</bean> -->
+	<!-- <bean id="producerStatusExecuter" class="org.fl.noodlenotify.monitor.status.executer.service.impl.ProducerStatusExecuter" /> -->
 	
 </beans>

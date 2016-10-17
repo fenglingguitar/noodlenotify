@@ -1,13 +1,13 @@
 package org.fl.noodlenotify.monitor.status.executer.service.impl;
 
+import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.service.ProducerService;
-//import org.fl.noodlenotify.core.connect.net.manager.console.ProducerConsoleNetConnectManager;
-import org.fl.noodlenotify.monitor.status.executer.service.ExecuterServiceAbstract;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Service;
+//import org.fl.noodlenotify.core.connect.net.manager.console.ProducerConsoleNetConnectManager;
 
 //@Service("producerStatusExecuter")
-public class ProducerStatusExecuterServiceImpl extends ExecuterServiceAbstract {
+public class ProducerStatusExecuter extends AbstractExecuter {
 
 	//private final static Logger logger = LoggerFactory.getLogger(ProducerStatusExecuterServiceImpl.class);
 	

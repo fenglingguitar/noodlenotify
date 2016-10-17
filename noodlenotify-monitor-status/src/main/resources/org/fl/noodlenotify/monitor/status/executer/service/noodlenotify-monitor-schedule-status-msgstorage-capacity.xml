@@ -27,6 +27,6 @@
 		<property name="dbConnectAgentConfParam" ref="dbConnectAgentConfParam" />
 	</bean>
 	
-	<bean id="msgStorageCapacityStatusExecuter" class="org.fl.noodlenotify.monitor.status.executer.service.impl.MsgStorageCapacityStatusExecuterServiceImpl" />
+	<bean id="msgStorageCapacityStatusExecuter" class="org.fl.noodlenotify.monitor.status.executer.service.impl.MsgStorageCapacityStatusExecuter" />
 	
 </beans>

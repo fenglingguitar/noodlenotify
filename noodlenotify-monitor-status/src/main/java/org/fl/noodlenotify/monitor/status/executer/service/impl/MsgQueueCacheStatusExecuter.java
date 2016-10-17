@@ -2,22 +2,22 @@ package org.fl.noodlenotify.monitor.status.executer.service.impl;
 
 import java.util.List;
 
+import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.MsgQueueCacheService;
 import org.fl.noodlenotify.console.vo.MsgQueueCacheVo;
 import org.fl.noodlenotify.core.connect.ConnectAgent;
 import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheStatusChecker;
-import org.fl.noodlenotify.monitor.status.executer.service.ExecuterServiceAbstract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("msgQueueCacheStatusExecuter")
-public class MsgQueueCacheStatusExecuterServiceImpl extends ExecuterServiceAbstract {
+public class MsgQueueCacheStatusExecuter extends AbstractExecuter {
 
-	private final static Logger logger = LoggerFactory.getLogger(MsgQueueCacheStatusExecuterServiceImpl.class);
+	private final static Logger logger = LoggerFactory.getLogger(MsgQueueCacheStatusExecuter.class);
 	
 	@Autowired
 	private MsgQueueCacheService msgQueueCacheService;

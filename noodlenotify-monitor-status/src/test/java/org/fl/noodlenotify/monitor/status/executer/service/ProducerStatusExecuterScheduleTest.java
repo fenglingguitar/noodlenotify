@@ -1,6 +1,8 @@
 package org.fl.noodlenotify.monitor.status.executer.service;
 
+import org.fl.noodle.common.monitor.executer.Executer;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
@@ -10,8 +12,11 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 public class ProducerStatusExecuterScheduleTest extends AbstractJUnit4SpringContextTests {
 
+	@Autowired
+	Executer executer;
+	
 	@Test
 	public void test() throws Exception {
-		Thread.sleep(Long.MAX_VALUE);
+		executer.execute();
 	}
 }

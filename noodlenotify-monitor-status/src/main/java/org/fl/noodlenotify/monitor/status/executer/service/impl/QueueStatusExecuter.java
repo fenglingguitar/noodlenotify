@@ -1,20 +1,20 @@
 package org.fl.noodlenotify.monitor.status.executer.service.impl;
 
+import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.service.QueueDistributerService;
 import org.fl.noodlenotify.console.service.QueueExchangerService;
 import org.fl.noodlenotify.console.service.QueueService;
 import org.fl.noodlenotify.monitor.performance.persistence.RedisPersistenceTemplate;
-import org.fl.noodlenotify.monitor.status.executer.service.ExecuterServiceAbstract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("queueStatusExecuterService")
-public class QueueStatusExecuterServiceImpl extends ExecuterServiceAbstract {
+public class QueueStatusExecuter extends AbstractExecuter {
 
 	@SuppressWarnings("unused")
-	private final static Logger logger = LoggerFactory.getLogger(QueueStatusExecuterServiceImpl.class);
+	private final static Logger logger = LoggerFactory.getLogger(QueueStatusExecuter.class);
 	
 	@Autowired
 	private QueueService queueService;

@@ -18,7 +18,7 @@
 	<bean id="connectAgentFactoryNetty" class="org.fl.noodlenotify.core.connect.net.netty.client.NettyNetConnectAgentFactory" />
 	<bean id="connectAgentFactoryJetty" class="org.fl.noodlenotify.core.connect.net.jetty.client.JettyNetConnectAgentFactory" />
 	
-	<bean id="distributerStatusExecuter" class="org.fl.noodlenotify.monitor.status.executer.service.impl.DistributerStatusExecuterServiceImpl" >
+	<bean id="distributerStatusExecuter" class="org.fl.noodlenotify.monitor.status.executer.service.impl.DistributerStatusExecuter" >
 		<property name="connectAgentFactoryMap">
 			<map>
 				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />

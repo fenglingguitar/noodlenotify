@@ -2,22 +2,22 @@ package org.fl.noodlenotify.monitor.status.executer.service.impl;
 
 import java.util.List;
 
+import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.QueueMsgStorageService;
 import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
 import org.fl.noodlenotify.core.connect.ConnectAgent;
 import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
 import org.fl.noodlenotify.core.connect.db.DbStatusChecker;
-import org.fl.noodlenotify.monitor.status.executer.service.ExecuterServiceAbstract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("msgStorageCapacityStatusExecuter")
-public class MsgStorageCapacityStatusExecuterServiceImpl extends ExecuterServiceAbstract {
+public class MsgStorageCapacityStatusExecuter extends AbstractExecuter {
 
-	private final static Logger logger = LoggerFactory.getLogger(MsgStorageCapacityStatusExecuterServiceImpl.class);
+	private final static Logger logger = LoggerFactory.getLogger(MsgStorageCapacityStatusExecuter.class);
 	
 	@Autowired
 	private QueueMsgStorageService queueMsgStorageService;

@@ -3,22 +3,22 @@ package org.fl.noodlenotify.monitor.status.executer.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.ExchangerService;
 import org.fl.noodlenotify.console.vo.ExchangerVo;
 import org.fl.noodlenotify.core.connect.ConnectAgent;
 import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
 import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
-import org.fl.noodlenotify.monitor.status.executer.service.ExecuterServiceAbstract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("exchangerStatusExecuter")
-public class ExchangerStatusExecuterServiceImpl extends ExecuterServiceAbstract {
+public class ExchangerStatusExecuter extends AbstractExecuter {
 
-	private final static Logger logger = LoggerFactory.getLogger(ExchangerStatusExecuterServiceImpl.class);
+	private final static Logger logger = LoggerFactory.getLogger(ExchangerStatusExecuter.class);
 	
 	@Autowired
 	private ExchangerService exchangerService;

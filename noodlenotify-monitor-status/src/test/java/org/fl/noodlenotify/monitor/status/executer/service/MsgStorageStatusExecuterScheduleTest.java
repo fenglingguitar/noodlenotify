@@ -1,5 +1,6 @@
 package org.fl.noodlenotify.monitor.status.executer.service;
 
+import org.fl.noodle.common.monitor.executer.Executer;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -12,10 +13,10 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 public class MsgStorageStatusExecuterScheduleTest extends AbstractJUnit4SpringContextTests {
 
 	@Autowired
-	ExecuterService executerService;
+	Executer executer;
 	
 	@Test
 	public void test() throws Exception {
-		executerService.execute();
+		executer.execute();
 	}
 }

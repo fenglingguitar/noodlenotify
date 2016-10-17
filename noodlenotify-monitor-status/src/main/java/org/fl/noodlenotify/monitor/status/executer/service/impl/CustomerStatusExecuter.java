@@ -3,22 +3,22 @@ package org.fl.noodlenotify.monitor.status.executer.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.CustomerService;
 import org.fl.noodlenotify.console.vo.CustomerVo;
 import org.fl.noodlenotify.core.connect.ConnectAgent;
 import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
 import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
-import org.fl.noodlenotify.monitor.status.executer.service.ExecuterServiceAbstract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("customerStatusExecuterService")
-public class CustomerStatusExecuterServiceImpl extends ExecuterServiceAbstract {
+public class CustomerStatusExecuter extends AbstractExecuter {
 
-	private final static Logger logger = LoggerFactory.getLogger(CustomerStatusExecuterServiceImpl.class);
+	private final static Logger logger = LoggerFactory.getLogger(CustomerStatusExecuter.class);
 	
 	@Autowired
 	private CustomerService customerService;

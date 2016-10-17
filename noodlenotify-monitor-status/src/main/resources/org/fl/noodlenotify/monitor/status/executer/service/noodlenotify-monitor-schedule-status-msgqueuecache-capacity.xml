@@ -25,6 +25,6 @@
 		<property name="cacheConnectAgentConfParam" ref="cacheConnectAgentConfParamBody" />
 	</bean>
 	
-	<bean id="msgQueueCacheCapacityStatusExecuter" class="org.fl.noodlenotify.monitor.status.executer.service.impl.MsgQueueCacheCapacityStatusExecuterServiceImpl" />
+	<bean id="msgQueueCacheCapacityStatusExecuter" class="org.fl.noodlenotify.monitor.status.executer.service.impl.MsgQueueCacheCapacityStatusExecuter" />
 	
 </beans>

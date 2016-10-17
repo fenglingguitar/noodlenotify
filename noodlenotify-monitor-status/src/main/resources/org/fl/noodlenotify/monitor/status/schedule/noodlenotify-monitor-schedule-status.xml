@@ -14,21 +14,32 @@
 	
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
 	
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgstorage.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgstorage-capacity.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgbodycache.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgbodycache-capacity.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgqueuecache.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgqueuecache-capacity.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-customer.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-distributer.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-exchanger.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgbodycache-capacity.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgbodycache.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgqueuecache-capacity.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgqueuecache.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgstorage-capacity.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-msgstorage.xml" />
+	<!-- <import resource="classpath:org/fl/noodlenotify/monitor/status/executer/service/noodlenotify-monitor-schedule-status-producer.xml" /> -->
 
-	<bean id="statusExecuterSchedule" class="org.fl.noodlenotify.monitor.status.schedule.StatusExecuterSchedule"
+	<bean id="statusExecuterSchedule" class="org.fl.noodle.common.monitor.schedule.ExecuterSchedule"
 		init-method="start" destroy-method="destroy" >
 		<property name="delay" value="10" />
-		<property name="mappedNameList">
+		<property name="executerList">
 			<list>
-				<value>*StatusExecuter</value>
+				<ref bean="customerStatusExecuter" />
+				<ref bean="distributerStatusExecuter" />
+				<ref bean="exchangerStatusExecuter" />
+				<ref bean="msgBodyCacheCapacityStatusExecuter" />
+				<ref bean="msgBodyCacheStatusExecuter" />
+				<ref bean="msgQueueCacheCapacityStatusExecuter" />
+				<ref bean="msgQueueCacheStatusExecuter" />
+				<ref bean="msgStorageCapacityStatusExecuter" />
+				<ref bean="msgStorageStatusExecuter" />
+				<!-- <ref bean="producerStatusExecuter" /> -->
 			</list>
 		</property>
 	</bean>
