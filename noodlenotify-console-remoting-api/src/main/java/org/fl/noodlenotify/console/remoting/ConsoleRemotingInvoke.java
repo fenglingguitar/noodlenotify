@@ -3,13 +3,6 @@ package org.fl.noodlenotify.console.remoting;
 import java.util.List;
 import java.util.Map;
 
-import org.fl.noodlenotify.console.vo.CustomerVo;
-import org.fl.noodlenotify.console.vo.DistributerVo;
-import org.fl.noodlenotify.console.vo.ExchangerVo;
-import org.fl.noodlenotify.console.vo.MsgBodyCacheVo;
-import org.fl.noodlenotify.console.vo.MsgQueueCacheVo;
-import org.fl.noodlenotify.console.vo.MsgStorageVo;
-import org.fl.noodlenotify.console.vo.ProducerVo;
 import org.fl.noodlenotify.console.vo.QueueCustomerVo;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
@@ -56,18 +49,4 @@ public interface ConsoleRemotingInvoke {
 	public Map<String, List<QueueCustomerVo>> distributerGetQueueCustomers(long distributerId) throws Exception;
 
 	public Map<String, Map<Long, List<QueueCustomerVo>>> distributerGetQueueCustomerGroups(long distributerId) throws Exception;
-
-	public List<ProducerVo> queryCheckProducers() throws Exception;
-
-	public List<CustomerVo> queryCheckCustomers() throws Exception;
-
-	public List<ExchangerVo> queryCheckExchangers() throws Exception;
-
-	public List<DistributerVo> queryCheckDistributers() throws Exception;
-
-	public List<MsgStorageVo> queryCheckMsgStorages() throws Exception;
-
-	public List<MsgBodyCacheVo> queryCheckMsgBodyCaches() throws Exception;
-
-	public List<MsgQueueCacheVo> queryCheckMsgQueueCaches() throws Exception;
 }

@@ -253,39 +253,4 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 			}
 		}
 	}
-
-	@Test
-	public void testQueryCheckProducers() throws Exception {
-		remotingInvoke.queryCheckProducers();
-	}
-
-	@Test
-	public void testQueryCheckExchangers() throws Exception {
-		remotingInvoke.queryCheckExchangers();
-	}
-
-	@Test
-	public void testQueryCheckDistributers() throws Exception {
-		remotingInvoke.queryCheckDistributers();
-	}
-
-	@Test
-	public void testQueryCheckMsgBodyCaches() throws Exception {
-		remotingInvoke.queryCheckMsgBodyCaches();
-	}
-
-	@Test
-	public void testQueryCheckMsgQueueCaches() throws Exception {
-		remotingInvoke.queryCheckMsgQueueCaches();
-	}
-
-	@Test
-	public void testQueryCheckMsgStorages() throws Exception {
-		remotingInvoke.queryCheckMsgStorages();
-	}
-
-	@Test
-	public void testQueryCheckCustomers() throws Exception {
-		remotingInvoke.queryCheckCustomers();
-	}
 }

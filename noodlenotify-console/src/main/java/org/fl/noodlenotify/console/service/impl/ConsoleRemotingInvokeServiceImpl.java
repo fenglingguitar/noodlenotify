@@ -29,9 +29,6 @@ import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.CustomerVo;
 import org.fl.noodlenotify.console.vo.DistributerVo;
 import org.fl.noodlenotify.console.vo.ExchangerVo;
-import org.fl.noodlenotify.console.vo.MsgBodyCacheVo;
-import org.fl.noodlenotify.console.vo.MsgQueueCacheVo;
-import org.fl.noodlenotify.console.vo.MsgStorageVo;
 import org.fl.noodlenotify.console.vo.ProducerVo;
 import org.fl.noodlenotify.console.vo.QueueCustomerGroupVo;
 import org.fl.noodlenotify.console.vo.QueueCustomerVo;
@@ -491,54 +488,5 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 			result.put(queueNm, customerMap);
 		}
 		return result;
-	}
-
-	@Override
-	public List<ProducerVo> queryCheckProducers() throws Exception {
-		ProducerVo producerVo = new ProducerVo();
-		producerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		return producerDao.queryProducerList(producerVo);
-	}
-
-	@Override
-	public List<CustomerVo> queryCheckCustomers() throws Exception {
-		CustomerVo customerVo = new CustomerVo();
-		customerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		return customerDao.queryCustomerList(customerVo);
-	}
-
-	@Override
-	public List<ExchangerVo> queryCheckExchangers() throws Exception {
-		ExchangerVo exchangerVo = new ExchangerVo();
-		exchangerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		return exchangerDao.queryExchangerList(exchangerVo);
-	}
-
-	@Override
-	public List<DistributerVo> queryCheckDistributers() throws Exception {
-		DistributerVo distributerVo = new DistributerVo();
-		distributerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		return distributerDao.queryDistributerList(distributerVo);
-	}
-
-	@Override
-	public List<MsgStorageVo> queryCheckMsgStorages() throws Exception {
-		MsgStorageVo msgStorageVo = new MsgStorageVo();
-		msgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
-		return msgStorageDao.queryMsgStorageListExclude(msgStorageVo);
-	}
-
-	@Override
-	public List<MsgBodyCacheVo> queryCheckMsgBodyCaches() throws Exception {
-		MsgBodyCacheVo msgBodyCacheVo = new MsgBodyCacheVo();
-		msgBodyCacheVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		return msgBodyCacheDao.queryMsgBodyCacheList(msgBodyCacheVo);
-	}
-
-	@Override
-	public List<MsgQueueCacheVo> queryCheckMsgQueueCaches() throws Exception {
-		MsgQueueCacheVo msgQueueCacheVo = new MsgQueueCacheVo();
-		msgQueueCacheVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		return msgQueueCacheDao.queryMsgQueueCacheList(msgQueueCacheVo);
 	}
 }
