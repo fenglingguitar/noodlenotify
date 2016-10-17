@@ -91,67 +91,61 @@
 		<dependency>
 			<groupId>org.fl.noodle.common.net</groupId>
 			<artifactId>noodlecommon-net</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
+			<version>2.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.util</groupId>
 			<artifactId>noodlecommon-util</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
+			<version>2.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.test</groupId>
 			<artifactId>noodlecommon-test</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
+			<version>2.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.mvc</groupId>
 			<artifactId>noodlecommon-mvc</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
+			<version>2.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.mvc.vo</groupId>
 			<artifactId>noodlecommon-mvc-vo</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
+			<version>2.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.dynamicsql</groupId>
 			<artifactId>noodlecommon-dynamicsql</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
+			<version>2.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.dbseparate</groupId>
 			<artifactId>noodlecommon-dbseparate</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
+			<version>2.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.connect</groupId>
 			<artifactId>noodlecommon-connect-api</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.fl.noodle.common.connect.expand</groupId>
-			<artifactId>noodlecommon-connect-expand-api</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
+			<version>2.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.monitor</groupId>
 			<artifactId>noodlecommon-monitor-api</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
+			<version>2.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.monitor.performance</groupId>
 			<artifactId>noodlecommon-monitor-performance</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
+			<version>2.0.1-SNAPSHOT</version>
 		</dependency>
 		
 	    <dependency>
