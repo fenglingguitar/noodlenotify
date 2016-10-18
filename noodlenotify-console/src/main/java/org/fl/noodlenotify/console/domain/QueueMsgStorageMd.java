@@ -16,8 +16,8 @@ public class QueueMsgStorageMd implements java.io.Serializable {
 
 	private QueueMd queueMd;
 	private MsgStorageMd msgStorageMd;
-	private long new_Len;
-	private long portion_Len;
+	private Long new_Len;
+	private Long portion_Len;
 
 	@Id
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -42,20 +42,20 @@ public class QueueMsgStorageMd implements java.io.Serializable {
 	}
 
 	@Column(name = "NEW_LEN")
-	public long getNew_Len() {
+	public Long getNew_Len() {
 		return new_Len;
 	}
 
-	public void setNew_Len(long new_Len) {
+	public void setNew_Len(Long new_Len) {
 		this.new_Len = new_Len;
 	}
 
 	@Column(name = "PORTION_LEN")
-	public long getPortion_Len() {
+	public Long getPortion_Len() {
 		return portion_Len;
 	}
 
-	public void setPortion_Len(long portion_Len) {
+	public void setPortion_Len(Long portion_Len) {
 		this.portion_Len = portion_Len;
 	}
 

@@ -12,8 +12,6 @@ public interface ProducerDao {
 
 	public List<ProducerVo> queryProducerList(ProducerVo vo) throws Exception;
 
-	public List<ProducerVo> queryCheckProducerList(ProducerVo vo) throws Exception;
-
 	public void insertProducer(ProducerVo vo) throws Exception;
 
 	public void insertsProducer(ProducerVo[] vos) throws Exception;

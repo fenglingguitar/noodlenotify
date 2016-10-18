@@ -5,17 +5,17 @@ public class QueueMsgStorageVo implements java.io.Serializable {
 	private static final long serialVersionUID = -1863080062770997616L;
 
 	private String queue_Nm;
-	private long msgStorage_Id;
-	private long new_Len;
-	private long portion_Len;
+	private Long msgStorage_Id;
+	private Long new_Len;
+	private Long portion_Len;
 
 	private String name;
 	private String ip;
-	private int port;
-	private byte system_Status;
-	private byte manual_Status;
-	private byte is_Repeat;
-	private long expire_Time;
+	private Integer port;
+	private Byte system_Status;
+	private Byte manual_Status;
+	private Byte is_Repeat;
+	private Long expire_Time;
 
 	public String getQueue_Nm() {
 		return queue_Nm;
@@ -25,11 +25,11 @@ public class QueueMsgStorageVo implements java.io.Serializable {
 		this.queue_Nm = queue_Nm;
 	}
 
-	public long getMsgStorage_Id() {
+	public Long getMsgStorage_Id() {
 		return msgStorage_Id;
 	}
 
-	public void setMsgStorage_Id(long msgStorage_Id) {
+	public void setMsgStorage_Id(Long msgStorage_Id) {
 		this.msgStorage_Id = msgStorage_Id;
 	}
 
@@ -49,59 +49,59 @@ public class QueueMsgStorageVo implements java.io.Serializable {
 		this.ip = ip;
 	}
 
-	public int getPort() {
+	public Integer getPort() {
 		return port;
 	}
 
-	public void setPort(int port) {
+	public void setPort(Integer port) {
 		this.port = port;
 	}
 
-	public byte getSystem_Status() {
+	public Byte getSystem_Status() {
 		return system_Status;
 	}
 
-	public void setSystem_Status(byte system_Status) {
+	public void setSystem_Status(Byte system_Status) {
 		this.system_Status = system_Status;
 	}
 
-	public byte getManual_Status() {
+	public Byte getManual_Status() {
 		return manual_Status;
 	}
 
-	public void setManual_Status(byte manual_Status) {
+	public void setManual_Status(Byte manual_Status) {
 		this.manual_Status = manual_Status;
 	}
 
-	public byte getIs_Repeat() {
+	public Byte getIs_Repeat() {
 		return is_Repeat;
 	}
 
-	public void setIs_Repeat(byte is_Repeat) {
+	public void setIs_Repeat(Byte is_Repeat) {
 		this.is_Repeat = is_Repeat;
 	}
 
-	public long getExpire_Time() {
+	public Long getExpire_Time() {
 		return expire_Time;
 	}
 
-	public void setExpire_Time(long expire_Time) {
+	public void setExpire_Time(Long expire_Time) {
 		this.expire_Time = expire_Time;
 	}
 
-	public long getNew_Len() {
+	public Long getNew_Len() {
 		return new_Len;
 	}
 
-	public void setNew_Len(long new_Len) {
+	public void setNew_Len(Long new_Len) {
 		this.new_Len = new_Len;
 	}
 
-	public long getPortion_Len() {
+	public Long getPortion_Len() {
 		return portion_Len;
 	}
 
-	public void setPortion_Len(long portion_Len) {
+	public void setPortion_Len(Long portion_Len) {
 		this.portion_Len = portion_Len;
 	}
 

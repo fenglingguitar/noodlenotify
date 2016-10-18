@@ -111,7 +111,7 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 								if (connectAgent == null) {
 									connectAgent = connectAgentFactory
 											.createConnectAgent(queueCustomerVo.getIp(),
-													queueCustomerVo.getPort(), queueCustomerVo.getUrl(), queueCustomerVo.getCustomer_Id(), (int)queueCustomerVo.getDph_Timeout());
+													queueCustomerVo.getPort(), queueCustomerVo.getUrl(), queueCustomerVo.getCustomer_Id(), (int)queueCustomerVo.getDph_Timeout().intValue());
 									try {
 										connectAgent.connect();
 										if (logger.isDebugEnabled()) {
@@ -212,7 +212,7 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 										
 										connectAgent = connectAgentFactory
 												.createConnectAgent(queueCustomerVo.getIp(),
-														queueCustomerVo.getPort(), queueCustomerVo.getUrl(), queueCustomerVo.getCustomer_Id(), (int)queueCustomerVo.getDph_Timeout());
+														queueCustomerVo.getPort(), queueCustomerVo.getUrl(), queueCustomerVo.getCustomer_Id(), (int)queueCustomerVo.getDph_Timeout().intValue());
 										try {
 											connectAgent.connect();
 											if (logger.isDebugEnabled()) {

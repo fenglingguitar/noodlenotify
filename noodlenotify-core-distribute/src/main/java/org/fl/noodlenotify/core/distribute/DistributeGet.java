@@ -559,7 +559,7 @@ public class DistributeGet {
 																		messageDm.getQueueName(), 
 																		messageDm.getUuid(), 
 																		new String(messageDm.getContent(), "UTF-8")
-																		), (int)queueDistributerVo.getDph_Timeout());
+																		), queueDistributerVo.getDph_Timeout().intValue());
 											break;
 										} catch (ConnectionUnableException e) {
 											if (logger.isErrorEnabled()) {

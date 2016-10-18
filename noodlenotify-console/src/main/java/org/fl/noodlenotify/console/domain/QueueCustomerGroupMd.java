@@ -16,7 +16,7 @@ public class QueueCustomerGroupMd implements java.io.Serializable {
 	
 	private QueueMd queueMd;
 	private CustomerGroupMd customerGroupMd;
-	private long customer_Num;
+	private Long customer_Num;
 
 	@Id
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -41,11 +41,11 @@ public class QueueCustomerGroupMd implements java.io.Serializable {
 	}
 
 	@Column(name = "CUSTOMER_NUM", nullable = false, length = 16)
-	public long getCustomer_Num() {
+	public Long getCustomer_Num() {
 		return customer_Num;
 	}
 
-	public void setCustomer_Num(long customer_Num) {
+	public void setCustomer_Num(Long customer_Num) {
 		this.customer_Num = customer_Num;
 	}
 

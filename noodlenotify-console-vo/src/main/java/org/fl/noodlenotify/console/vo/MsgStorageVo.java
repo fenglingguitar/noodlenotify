@@ -4,18 +4,18 @@ public class MsgStorageVo implements java.io.Serializable {
 
 	private static final long serialVersionUID = 446701832363322175L;
 
-	private long msgStorage_Id;
+	private Long msgStorage_Id;
 	private String name;
 	private String ip;
-	private int port;
-	private byte system_Status;
-	private byte manual_Status;
+	private Integer port;
+	private Byte system_Status;
+	private Byte manual_Status;
 
-	public long getMsgStorage_Id() {
+	public Long getMsgStorage_Id() {
 		return this.msgStorage_Id;
 	}
 
-	public void setMsgStorage_Id(long msgStorage_Id) {
+	public void setMsgStorage_Id(Long msgStorage_Id) {
 		this.msgStorage_Id = msgStorage_Id;
 	}
 
@@ -35,27 +35,27 @@ public class MsgStorageVo implements java.io.Serializable {
 		this.ip = ip;
 	}
 
-	public int getPort() {
+	public Integer getPort() {
 		return this.port;
 	}
 
-	public void setPort(int port) {
+	public void setPort(Integer port) {
 		this.port = port;
 	}
 
-	public byte getSystem_Status() {
+	public Byte getSystem_Status() {
 		return system_Status;
 	}
 
-	public void setSystem_Status(byte system_Status) {
+	public void setSystem_Status(Byte system_Status) {
 		this.system_Status = system_Status;
 	}
 
-	public byte getManual_Status() {
+	public Byte getManual_Status() {
 		return manual_Status;
 	}
 
-	public void setManual_Status(byte manual_Status) {
+	public void setManual_Status(Byte manual_Status) {
 		this.manual_Status = manual_Status;
 	}
 

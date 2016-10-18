@@ -5,14 +5,14 @@ public class QueueMsgBodyCacheVo implements java.io.Serializable {
 	private static final long serialVersionUID = 2777519492510006342L;
 
 	private String queue_Nm;
-	private long msgBodyCache_Id;
+	private Long msgBodyCache_Id;
 	private String name;
 	private String ip;
-	private int port;
-	private byte system_Status;
-	private byte manual_Status;
-	private byte is_Repeat;
-	private long expire_Time;
+	private Integer port;
+	private Byte system_Status;
+	private Byte manual_Status;
+	private Byte is_Repeat;
+	private Long expire_Time;
 
 	public String getQueue_Nm() {
 		return queue_Nm;
@@ -22,11 +22,11 @@ public class QueueMsgBodyCacheVo implements java.io.Serializable {
 		this.queue_Nm = queue_Nm;
 	}
 
-	public long getMsgBodyCache_Id() {
+	public Long getMsgBodyCache_Id() {
 		return msgBodyCache_Id;
 	}
 
-	public void setMsgBodyCache_Id(long msgBodyCache_Id) {
+	public void setMsgBodyCache_Id(Long msgBodyCache_Id) {
 		this.msgBodyCache_Id = msgBodyCache_Id;
 	}
 
@@ -46,43 +46,43 @@ public class QueueMsgBodyCacheVo implements java.io.Serializable {
 		this.ip = ip;
 	}
 
-	public int getPort() {
+	public Integer getPort() {
 		return port;
 	}
 
-	public void setPort(int port) {
+	public void setPort(Integer port) {
 		this.port = port;
 	}
 
-	public byte getSystem_Status() {
+	public Byte getSystem_Status() {
 		return system_Status;
 	}
 
-	public void setSystem_Status(byte system_Status) {
+	public void setSystem_Status(Byte system_Status) {
 		this.system_Status = system_Status;
 	}
 
-	public byte getManual_Status() {
+	public Byte getManual_Status() {
 		return manual_Status;
 	}
 
-	public void setManual_Status(byte manual_Status) {
+	public void setManual_Status(Byte manual_Status) {
 		this.manual_Status = manual_Status;
 	}
 
-	public byte getIs_Repeat() {
+	public Byte getIs_Repeat() {
 		return is_Repeat;
 	}
 
-	public void setIs_Repeat(byte is_Repeat) {
+	public void setIs_Repeat(Byte is_Repeat) {
 		this.is_Repeat = is_Repeat;
 	}
 
-	public long getExpire_Time() {
+	public Long getExpire_Time() {
 		return expire_Time;
 	}
 
-	public void setExpire_Time(long expire_Time) {
+	public void setExpire_Time(Long expire_Time) {
 		this.expire_Time = expire_Time;
 	}
 

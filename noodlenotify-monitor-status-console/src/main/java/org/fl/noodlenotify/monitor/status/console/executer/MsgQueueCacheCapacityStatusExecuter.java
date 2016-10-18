@@ -43,8 +43,8 @@ public class MsgQueueCacheCapacityStatusExecuter extends AbstractExecuter {
 					queueMsgQueueCacheService.updateQueueMsgQueueCacheSimple(queueMsgQueueCacheVo);
 				} else if (queueMsgQueueCacheVo.getIs_Active() == ConsoleConstants.IS_TRUE) {
 					queueMsgQueueCacheVo.setIs_Active(ConsoleConstants.IS_FALSE);
-					queueMsgQueueCacheVo.setNew_Len(0);
-					queueMsgQueueCacheVo.setPortion_Len(0);
+					queueMsgQueueCacheVo.setNew_Len(0L);
+					queueMsgQueueCacheVo.setPortion_Len(0L);
 					queueMsgQueueCacheService.updateQueueMsgQueueCacheSimple(queueMsgQueueCacheVo);
 				}
 			} catch (Exception e) {

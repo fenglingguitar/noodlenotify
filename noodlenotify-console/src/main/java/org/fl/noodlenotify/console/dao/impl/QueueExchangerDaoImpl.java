@@ -23,7 +23,7 @@ public class QueueExchangerDaoImpl implements QueueExchangerDao {
 	public PageVo<QueueExchangerVo> queryQueueExchangerPage(QueueExchangerVo vo, int page, int rows) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
-		paramsMap.put("exchanger_Id", vo.getExchanger_Id() > 0 ? vo.getExchanger_Id() : null);
+		paramsMap.put("exchanger_Id", vo.getExchanger_Id() != null ? vo.getExchanger_Id() : null);
 		return dynamicSqlTemplate.queryPage("queue-exchanger-query-list", paramsMap, page, rows, QueueExchangerVo.class);
 	}
 
@@ -31,7 +31,7 @@ public class QueueExchangerDaoImpl implements QueueExchangerDao {
 	public List<QueueExchangerVo> queryQueueExchangerList(QueueExchangerVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
-		paramsMap.put("exchanger_Id", vo.getExchanger_Id() > 0 ? vo.getExchanger_Id() : null);
+		paramsMap.put("exchanger_Id", vo.getExchanger_Id() != null ? vo.getExchanger_Id() : null);
 		return dynamicSqlTemplate.queryList("queue-exchanger-query-list", paramsMap, QueueExchangerVo.class);
 	}
 
@@ -41,11 +41,11 @@ public class QueueExchangerDaoImpl implements QueueExchangerDao {
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
-		paramsMap.put("port", vo.getPort() > 0 ? vo.getPort() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() > 0 ? vo.getCheck_Port() : null);
+		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
+		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-exchanger-query-includelist", paramsMap, page, rows, QueueExchangerVo.class);
 	}
 
@@ -55,27 +55,27 @@ public class QueueExchangerDaoImpl implements QueueExchangerDao {
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
-		paramsMap.put("port", vo.getPort() > 0 ? vo.getPort() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() > 0 ? vo.getCheck_Port() : null);
+		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
+		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-exchanger-query-excludelist", paramsMap, page, rows, QueueExchangerVo.class);
 	}
 
 	@Override
 	public List<QueueExchangerVo> queryQueuesByExchanger(QueueExchangerVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
-		paramsMap.put("exchanger_Id", vo.getExchanger_Id() > 0 ? vo.getExchanger_Id() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("exchanger_Id", vo.getExchanger_Id() != null ? vo.getExchanger_Id() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-exchanger-query-queue", paramsMap, QueueExchangerVo.class);
 	}
 	
 	@Override
 	public List<QueueExchangerVo> queryQueuesByExchangerTree(QueueExchangerVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
-		paramsMap.put("exchanger_Id", vo.getExchanger_Id() > 0 ? vo.getExchanger_Id() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("exchanger_Id", vo.getExchanger_Id() != null ? vo.getExchanger_Id() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? (new StringBuilder().append("%").append(vo.getQueue_Nm()).append("%")).toString() : null);
 		return dynamicSqlTemplate.queryList("queue-exchanger-query-queue-tree", paramsMap, QueueExchangerVo.class);
 	}
@@ -84,8 +84,8 @@ public class QueueExchangerDaoImpl implements QueueExchangerDao {
 	public List<QueueExchangerVo> queryExchangersByQueue(QueueExchangerVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-exchanger-query-exchanger", paramsMap, QueueExchangerVo.class);
 	}
 
@@ -94,7 +94,7 @@ public class QueueExchangerDaoImpl implements QueueExchangerDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("exchanger_Id", vo.getExchanger_Id());
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-exchanger-query-queue", paramsMap, page, rows, QueueExchangerVo.class);
 	}
 

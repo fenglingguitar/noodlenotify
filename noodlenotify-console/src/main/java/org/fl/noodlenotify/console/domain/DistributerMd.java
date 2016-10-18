@@ -13,22 +13,22 @@ public class DistributerMd implements java.io.Serializable {
 
 	private static final long serialVersionUID = 2327623245797558719L;
 
-	private long distributer_Id;
+	private Long distributer_Id;
 	private String name;
 	private String ip;
-	private int port;
-	private int check_Port;
-	private byte system_Status;
-	private byte manual_Status;
+	private Integer port;
+	private Integer check_Port;
+	private Byte system_Status;
+	private Byte manual_Status;
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "DISTRIBUTER_ID", nullable = false, length = 16)
-	public long getDistributer_Id() {
+	public Long getDistributer_Id() {
 		return this.distributer_Id;
 	}
 
-	public void setDistributer_Id(long distributer_Id) {
+	public void setDistributer_Id(Long distributer_Id) {
 		this.distributer_Id = distributer_Id;
 	}
 
@@ -51,38 +51,38 @@ public class DistributerMd implements java.io.Serializable {
 	}
 
 	@Column(name = "PORT", nullable = false, length = 8)
-	public int getPort() {
+	public Integer getPort() {
 		return this.port;
 	}
 
-	public void setPort(int port) {
+	public void setPort(Integer port) {
 		this.port = port;
 	}
 
 	@Column(name = "CHECK_PORT", nullable = false, length = 8)
-	public int getCheck_Port() {
+	public Integer getCheck_Port() {
 		return check_Port;
 	}
 
-	public void setCheck_Port(int check_Port) {
+	public void setCheck_Port(Integer check_Port) {
 		this.check_Port = check_Port;
 	}
 
 	@Column(name = "SYSTEM_STATUS", nullable = false, length = 1)
-	public byte getSystem_Status() {
+	public Byte getSystem_Status() {
 		return system_Status;
 	}
 
-	public void setSystem_Status(byte system_Status) {
+	public void setSystem_Status(Byte system_Status) {
 		this.system_Status = system_Status;
 	}
 
 	@Column(name = "MANUAL_STATUS", nullable = false, length = 1)
-	public byte getManual_Status() {
+	public Byte getManual_Status() {
 		return manual_Status;
 	}
 
-	public void setManual_Status(byte manual_Status) {
+	public void setManual_Status(Byte manual_Status) {
 		this.manual_Status = manual_Status;
 	}
 

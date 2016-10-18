@@ -33,9 +33,9 @@ public class QueueMsgQueueCacheDaoImpl implements QueueMsgQueueCacheDao {
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
-		paramsMap.put("port", vo.getPort() > 0 ? vo.getPort() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-msgqueuecache-query-includelist", paramsMap, page, rows, QueueMsgQueueCacheVo.class);
 	}
 
@@ -45,9 +45,9 @@ public class QueueMsgQueueCacheDaoImpl implements QueueMsgQueueCacheDao {
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
-		paramsMap.put("port", vo.getPort() > 0 ? vo.getPort() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-msgqueuecache-query-excludelist", paramsMap, page, rows, QueueMsgQueueCacheVo.class);
 	}
 
@@ -64,7 +64,7 @@ public class QueueMsgQueueCacheDaoImpl implements QueueMsgQueueCacheDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("msgQueueCache_Id", vo.getMsgQueueCache_Id());
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-msgqueuecache-query-queue", paramsMap, QueueMsgQueueCacheVo.class);
 	}
 	
@@ -75,7 +75,7 @@ public class QueueMsgQueueCacheDaoImpl implements QueueMsgQueueCacheDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("msgQueueCache_Id", vo.getMsgQueueCache_Id());
 		paramsMap.put("queue_Nm",  vo.getQueue_Nm() != null ? (new StringBuilder().append("%").append(vo.getQueue_Nm()).append("%")).toString() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-msgqueuecache-query-queue-tree", paramsMap, QueueMsgQueueCacheVo.class);
 	}
 	
@@ -83,8 +83,8 @@ public class QueueMsgQueueCacheDaoImpl implements QueueMsgQueueCacheDao {
 	public List<QueueMsgQueueCacheVo> queryQueueMsgQueueCacheByQueue(QueueMsgQueueCacheVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-msgqueuecache-query-msgqueuecache", paramsMap, QueueMsgQueueCacheVo.class);
 	}
 
@@ -93,7 +93,7 @@ public class QueueMsgQueueCacheDaoImpl implements QueueMsgQueueCacheDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("msgQueueCache_Id", vo.getMsgQueueCache_Id());
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-msgqueuecache-query-queue", paramsMap, page, rows, QueueMsgQueueCacheVo.class);
 	}
 

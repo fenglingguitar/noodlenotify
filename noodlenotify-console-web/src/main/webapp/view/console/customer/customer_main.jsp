@@ -71,7 +71,8 @@
 						'监测类型',
 						'系统状态',
 						'控制状态',
-						'消费组名称'
+						'消费组名称',
+						'心跳时间'
 					],
 			   	colModel: [
 					{name:'customer_Id', index:'customer_Id', width:100, align: 'center'},
@@ -85,7 +86,8 @@
 					{name:'check_Type', index:'check_Type', width:100, align:'center', formatter:'select', editoptions:{value:'NETTY:NETTY;HTTP:HTTP'}},
 			   		{name:'system_Status', index:'system_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:在线;2:离线'}},
 			   		{name:'manual_Status', index:'manual_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:有效;2:无效'}},
-			   		{name:'customerGroup_Nm', index:'customerGroup_Nm', width:400, align: 'center'}
+			   		{name:'customerGroup_Nm', index:'customerGroup_Nm', width:400, align: 'center'},
+			   		{name:'beat_Time', index:'beat_Time', width:200, align:'center', formatter:'date', formatoptions:{srcformat:'Y-m-d H:i:s', newformat:'Y-m-d H:i:s'}}
 			   	],
 			   	rowNum: 10,
 			   	rowList: [10,20,30,40,50,100],

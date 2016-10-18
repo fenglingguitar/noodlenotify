@@ -11,8 +11,6 @@ public interface ExchangerDao {
 
 	public List<ExchangerVo> queryExchangerList(ExchangerVo vo) throws Exception;
 
-	public List<ExchangerVo> queryCheckExchangerList(ExchangerVo vo) throws Exception;
-
 	public void insertExchanger(ExchangerVo vo) throws Exception;
 
 	public void insertsExchanger(ExchangerVo[] vos) throws Exception;

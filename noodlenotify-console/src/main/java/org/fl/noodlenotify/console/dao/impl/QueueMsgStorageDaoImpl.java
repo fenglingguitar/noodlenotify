@@ -41,9 +41,9 @@ public class QueueMsgStorageDaoImpl implements QueueMsgStorageDao {
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
-		paramsMap.put("port", vo.getPort() > 0 ? vo.getPort() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-msgstorage-query-includepage", paramsMap, page, rows, QueueMsgStorageVo.class);
 	}
 
@@ -53,9 +53,9 @@ public class QueueMsgStorageDaoImpl implements QueueMsgStorageDao {
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
-		paramsMap.put("port", vo.getPort() > 0 ? vo.getPort() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-msgstorage-query-excludepage", paramsMap, page, rows, QueueMsgStorageVo.class);
 	}
 	
@@ -65,9 +65,9 @@ public class QueueMsgStorageDaoImpl implements QueueMsgStorageDao {
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
 		paramsMap.put("name", vo.getName() != null ? vo.getName() : null);
 		paramsMap.put("ip", vo.getIp() != null ? vo.getIp() : null);
-		paramsMap.put("port", vo.getPort() > 0 ? vo.getPort() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-msgstorage-query-includelist", paramsMap, QueueMsgStorageVo.class);
 	}
 	
@@ -76,7 +76,7 @@ public class QueueMsgStorageDaoImpl implements QueueMsgStorageDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("msgStorage_Id", vo.getMsgStorage_Id());
 		paramsMap.put("queue_Nm",  vo.getQueue_Nm() != null ? (new StringBuilder().append("%").append(vo.getQueue_Nm()).append("%")).toString() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-msgstorage-query-queue-tree", paramsMap, QueueMsgStorageVo.class);
 	}
 	
@@ -84,8 +84,8 @@ public class QueueMsgStorageDaoImpl implements QueueMsgStorageDao {
 	public List<QueueMsgStorageVo> queryMsgStoragesByQueue(QueueMsgStorageVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-msgstorage-query-msgstorage", paramsMap, QueueMsgStorageVo.class);
 	}
 	
@@ -93,8 +93,8 @@ public class QueueMsgStorageDaoImpl implements QueueMsgStorageDao {
 	public List<QueueMsgStorageVo> queryMsgStoragesByQueueExclude(QueueMsgStorageVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-msgstorage-query-msgstorage-exclude", paramsMap, QueueMsgStorageVo.class);
 	}
 
@@ -103,7 +103,7 @@ public class QueueMsgStorageDaoImpl implements QueueMsgStorageDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("msgStorage_Id", vo.getMsgStorage_Id());
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-msgstorage-query-queue", paramsMap, page, rows, QueueMsgStorageVo.class);
 	}
 

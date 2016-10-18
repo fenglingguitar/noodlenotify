@@ -12,7 +12,7 @@ public class CustomerGroupMd implements java.io.Serializable {
 	private static final long serialVersionUID = 5248390504913904876L;
 
 	private String customerGroup_Nm;
-	private byte manual_Status;
+	private Byte manual_Status;
 
 	@Id
 	@Column(name = "CUSTOMERGROUP_NM", nullable = false, length = 32)
@@ -25,11 +25,11 @@ public class CustomerGroupMd implements java.io.Serializable {
 	}
 
 	@Column(name = "MANUAL_STATUS", nullable = false, length = 1)
-	public byte getManual_Status() {
+	public Byte getManual_Status() {
 		return manual_Status;
 	}
 
-	public void setManual_Status(byte manual_Status) {
+	public void setManual_Status(Byte manual_Status) {
 		this.manual_Status = manual_Status;
 	}
 

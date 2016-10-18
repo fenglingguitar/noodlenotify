@@ -14,7 +14,8 @@
 				check_Type,
 				system_Status,
 				manual_Status,
-				customerGroup_Nm
+				customerGroup_Nm,
+				beat_Time
 		FROM 	CSL_CUSTOMER
 		WHERE 	1=1
 		 		#if($customer_Id)
@@ -49,7 +50,10 @@
 				#end
 		 		#if($customerGroup_Nm)
 					AND customerGroup_Nm LIKE :customerGroup_Nm
-				#end		
+				#end
+				#if($beat_Time_Start && $beat_Time_End)
+					AND beat_Time BETWEEN :beat_Time_Start AND :beat_Time_End
+				#end
 		ORDER BY customer_Id desc
 	]]>
 	</query>
@@ -68,7 +72,8 @@
 				check_Type,
 				system_Status,
 				manual_Status,
-				customerGroup_Nm
+				customerGroup_Nm,
+				beat_Time
 		FROM 	CSL_CUSTOMER
 		WHERE 	1=1
 		 		#if($customer_Id)
@@ -100,7 +105,10 @@
 				#end
 		 		#if($customerGroup_Nm)
 					AND customerGroup_Nm = :customerGroup_Nm
-				#end		
+				#end
+				#if($beat_Time_Start && $beat_Time_End)
+					AND beat_Time BETWEEN :beat_Time_Start AND :beat_Time_End
+				#end
 		ORDER BY customer_Id desc
 	]]>
 	</query>

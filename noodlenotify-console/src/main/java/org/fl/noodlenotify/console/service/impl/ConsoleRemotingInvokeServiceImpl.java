@@ -1,6 +1,7 @@
 package org.fl.noodlenotify.console.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -488,5 +489,21 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 			result.put(queueNm, customerMap);
 		}
 		return result;
+	}
+
+	@Override
+	public void saveProducerBeat(Long producerId) throws Exception {
+		ProducerVo producerVo = new ProducerVo();
+		producerVo.setProducer_Id(producerId);
+		producerVo.setBeat_Time(new Date());
+		producerDao.updateProducer(producerVo);
+	}
+
+	@Override
+	public void saveCustomerBeat(Long customerId) throws Exception {
+		CustomerVo customerVo = new CustomerVo();
+		customerVo.setCustomer_Id(customerId);
+		customerVo.setBeat_Time(new Date());
+		customerDao.updateCustomer(customerVo);
 	}
 }

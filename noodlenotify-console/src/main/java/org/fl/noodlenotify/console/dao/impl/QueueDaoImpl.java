@@ -24,7 +24,7 @@ public class QueueDaoImpl implements QueueDao {
 	public PageVo<QueueVo> queryQueuePage(QueueVo vo, int page, int rows) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? (new StringBuilder().append("%").append(vo.getQueue_Nm()).append("%")).toString() : null);
-		paramsMap.put("manual_Status",	vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status",	vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		paramsMap.put("is_Repeat", vo.getIs_Repeat() >= 0 ? vo.getIs_Repeat() : null);
 		return dynamicSqlTemplate.queryPage("queue-query-list", paramsMap, page, rows, QueueVo.class);
 	}
@@ -33,7 +33,7 @@ public class QueueDaoImpl implements QueueDao {
 	public List<QueueVo> queryQueueList(QueueVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("name", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
-		paramsMap.put("manual_Status",	vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status",	vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-query-list", paramsMap, QueueVo.class);
 	}
 
@@ -79,7 +79,7 @@ public class QueueDaoImpl implements QueueDao {
 	public PageVo<QueueVo> queryQueueMonitorPage(QueueVo vo, int page, int rows) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? (new StringBuilder().append("%").append(vo.getQueue_Nm()).append("%")).toString() : null);
-		paramsMap.put("manual_Status",	vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status",	vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-query-monitor-list", paramsMap, page, rows, QueueVo.class);
 	}
 

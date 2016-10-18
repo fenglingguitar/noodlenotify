@@ -23,35 +23,27 @@ public class ProducerDaoImpl implements ProducerDao {
 	@Override
 	public PageVo<ProducerVo> queryProducerPage(ProducerVo vo, int page, int rows) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
-		paramsMap.put("producer_Id", vo.getProducer_Id() > 0 ? vo.getProducer_Id() : null);
+		paramsMap.put("producer_Id", vo.getProducer_Id() != null ? vo.getProducer_Id() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() > 0 ? vo.getCheck_Port() : null);
+		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
 		paramsMap.put("check_Type", vo.getCheck_Type() != null ? vo.getCheck_Type() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("producer-query-list", paramsMap, page, rows, ProducerVo.class);
 	}
 
 	@Override
 	public List<ProducerVo> queryProducerList(ProducerVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
-		paramsMap.put("producer_Id", vo.getProducer_Id() > 0 ? vo.getProducer_Id() : null);
+		paramsMap.put("producer_Id", vo.getProducer_Id() != null ? vo.getProducer_Id() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? vo.getIp() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() > 0 ? vo.getCheck_Port() : null);
+		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
 		paramsMap.put("check_Type", vo.getCheck_Type() != null ? vo.getCheck_Type() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("producer-query-list", paramsMap, ProducerVo.class);
-	}
-
-	@Override
-	public List<ProducerVo> queryCheckProducerList(ProducerVo vo) throws Exception {
-		Map<String, Object> paramsMap = new HashMap<String, Object>();
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
-		return dynamicSqlTemplate.queryList("query-check-producer-list", paramsMap, ProducerVo.class);
 	}
 
 	@Override
@@ -68,14 +60,14 @@ public class ProducerDaoImpl implements ProducerDao {
 
 	@Override
 	public void updateProducer(ProducerVo vo) throws Exception {
-		dynamicSqlTemplate.update(vo, ProducerMd.class);
+		dynamicSqlTemplate.updateNonull(vo, ProducerMd.class);
 
 	}
 
 	@Override
 	public void updatesProducer(ProducerVo[] vos) throws Exception {
 		for (ProducerVo vo : vos) {
-			dynamicSqlTemplate.update(vo, ProducerMd.class);
+			dynamicSqlTemplate.updateNonull(vo, ProducerMd.class);
 		}
 	}
 

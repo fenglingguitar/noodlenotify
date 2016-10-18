@@ -10,15 +10,15 @@ import javax.persistence.Table;
 public class GroupAuxiliaryMd implements java.io.Serializable {
 
 	private static final long serialVersionUID = 6044951323552034122L;
-	private long group_Num;
+	private Long group_Num;
 
 	@Id
 	@Column(name = "GROUP_NUM", nullable = false, length = 20)
-	public long getGroup_Num() {
+	public Long getGroup_Num() {
 		return group_Num;
 	}
 
-	public void setGroup_Num(long group_Num) {
+	public void setGroup_Num(Long group_Num) {
 		this.group_Num = group_Num;
 	}
 

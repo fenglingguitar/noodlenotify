@@ -10,7 +10,8 @@
 				check_Url,
 				check_Type,
 				manual_Status,
-                system_Status
+                system_Status,
+                beat_Time
 		FROM 	CSL_PRODUCER
 		WHERE 	1=1
 		 		#if($producer_Id)
@@ -34,7 +35,9 @@
 		 		#if($system_Status)
 					AND system_Status = :system_Status
 				#end
-				
+				#if($beat_Time_Start && $beat_Time_End)
+					AND beat_Time BETWEEN :beat_Time_Start AND :beat_Time_End
+				#end
 		ORDER BY producer_Id desc
 	]]>
 	</query>

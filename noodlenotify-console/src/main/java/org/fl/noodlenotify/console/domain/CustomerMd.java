@@ -2,6 +2,8 @@ package org.fl.noodlenotify.console.domain;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,28 +19,29 @@ public class CustomerMd implements java.io.Serializable {
 
 	private static final long serialVersionUID = -7856386332878028902L;
 
-	private long customer_Id;
+	private Long customer_Id;
 	private String name;
 	private String ip;
-	private int port;
+	private Integer port;
 	private String url;
 	private String type;
-	private int check_Port;
+	private Integer check_Port;
 	private String check_Url;
 	private String check_Type;
-	private byte system_Status;
-	private byte manual_Status;
+	private Byte system_Status;
+	private Byte manual_Status;
 	private CustomerGroupMd customerGroupMd;
 	
+	private Date beat_Time;
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "CUSTOMER_ID", nullable = false, length = 16)
-	public long getCustomer_Id() {
+	public Long getCustomer_Id() {
 		return this.customer_Id;
 	}
 
-	public void setCustomer_Id(long customer_Id) {
+	public void setCustomer_Id(Long customer_Id) {
 		this.customer_Id = customer_Id;
 	}
 
@@ -61,11 +64,11 @@ public class CustomerMd implements java.io.Serializable {
 	}
 
 	@Column(name = "PORT", nullable = false, length = 8)
-	public int getPort() {
+	public Integer getPort() {
 		return this.port;
 	}
 
-	public void setPort(int port) {
+	public void setPort(Integer port) {
 		this.port = port;
 	}
 	
@@ -88,11 +91,11 @@ public class CustomerMd implements java.io.Serializable {
 	}
 
 	@Column(name = "CHECK_PORT", nullable = false, length = 8)
-	public int getCheck_Port() {
+	public Integer getCheck_Port() {
 		return check_Port;
 	}
 
-	public void setCheck_Port(int check_Port) {
+	public void setCheck_Port(Integer check_Port) {
 		this.check_Port = check_Port;
 	}
 
@@ -115,20 +118,20 @@ public class CustomerMd implements java.io.Serializable {
 	}
 
 	@Column(name = "SYSTEM_STATUS", nullable = false, length = 1)
-	public byte getSystem_Status() {
+	public Byte getSystem_Status() {
 		return system_Status;
 	}
 
-	public void setSystem_Status(byte system_Status) {
+	public void setSystem_Status(Byte system_Status) {
 		this.system_Status = system_Status;
 	}
 
 	@Column(name = "MANUAL_STATUS", nullable = false, length = 1)
-	public byte getManual_Status() {
+	public Byte getManual_Status() {
 		return manual_Status;
 	}
 
-	public void setManual_Status(byte manual_Status) {
+	public void setManual_Status(Byte manual_Status) {
 		this.manual_Status = manual_Status;
 	}
 
@@ -140,5 +143,14 @@ public class CustomerMd implements java.io.Serializable {
 
 	public void setCustomerGroupMd(CustomerGroupMd customerGroupMd) {
 		this.customerGroupMd = customerGroupMd;
+	}
+
+	@Column(name = "BEAT_TIME", nullable = true)
+	public Date getBeat_Time() {
+		return beat_Time;
+	}
+
+	public void setBeat_Time(Date beat_Time) {
+		this.beat_Time = beat_Time;
 	}
 }

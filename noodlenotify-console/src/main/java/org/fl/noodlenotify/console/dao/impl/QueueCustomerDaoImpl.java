@@ -33,12 +33,12 @@ public class QueueCustomerDaoImpl implements QueueCustomerDao {
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
-		paramsMap.put("port", vo.getPort() > 0 ? vo.getPort() : null);
+		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() > 0 ? vo.getCheck_Port() : null);
+		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
 		paramsMap.put("check_Type", vo.getCheck_Type() != null ? vo.getCheck_Type() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-customer-query-includelist", paramsMap, page, rows, QueueCustomerVo.class);
 	}
 
@@ -48,12 +48,12 @@ public class QueueCustomerDaoImpl implements QueueCustomerDao {
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
-		paramsMap.put("port", vo.getPort() > 0 ? vo.getPort() : null);
+		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() > 0 ? vo.getCheck_Port() : null);
+		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
 		paramsMap.put("check_Type", vo.getCheck_Type() != null ? vo.getCheck_Type() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-customer-query-excludelist", paramsMap, page, rows, QueueCustomerVo.class);
 	}
 
@@ -70,8 +70,8 @@ public class QueueCustomerDaoImpl implements QueueCustomerDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
 		paramsMap.put("customerGroup_Nm", vo.getCustomerGroup_Nm());
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-customer-query-customer", paramsMap, QueueCustomerVo.class);
 	}
 
@@ -80,7 +80,7 @@ public class QueueCustomerDaoImpl implements QueueCustomerDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("customer_Id", vo.getCustomer_Id());
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-customer-query-queue", paramsMap, QueueCustomerVo.class);
 	}
 
@@ -89,7 +89,7 @@ public class QueueCustomerDaoImpl implements QueueCustomerDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("customer_Id", vo.getCustomer_Id());
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-customer-query-queue", paramsMap, page, rows, QueueCustomerVo.class);
 	}
 

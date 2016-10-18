@@ -22,26 +22,26 @@ public class DistributerDaoImpl implements DistributerDao {
 	@Override
 	public PageVo<DistributerVo> queryDistributerPage(DistributerVo vo, int page, int rows) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
-		paramsMap.put("distributer_Id", vo.getDistributer_Id() > 0 ? vo.getDistributer_Id() : null);
+		paramsMap.put("distributer_Id", vo.getDistributer_Id() != null ? vo.getDistributer_Id() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
-		paramsMap.put("port", vo.getPort() > 0 ? vo.getPort() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() > 0 ? vo.getCheck_Port() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
+		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("distributer-query-list", paramsMap, page, rows, DistributerVo.class);
 	}
 
 	@Override
 	public List<DistributerVo> queryDistributerList(DistributerVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
-		paramsMap.put("distributer_Id", vo.getDistributer_Id() > 0 ? vo.getDistributer_Id() : null);
+		paramsMap.put("distributer_Id", vo.getDistributer_Id() != null ? vo.getDistributer_Id() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? vo.getIp() : null);
-		paramsMap.put("port", vo.getPort() > 0 ? vo.getPort() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() > 0 ? vo.getCheck_Port() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
+		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("distributer-query-list", paramsMap, DistributerVo.class);
 	}
 

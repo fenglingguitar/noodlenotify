@@ -1,23 +1,27 @@
 package org.fl.noodlenotify.console.vo;
 
+import java.util.Date;
+
 public class ProducerVo implements java.io.Serializable {
 
 	private static final long serialVersionUID = -6267250644786791957L;
 
-	private long producer_Id;
+	private Long producer_Id;
 	private String name;
 	private String ip;
-	private int check_Port;
+	private Integer check_Port;
 	private String check_Url;
 	private String check_Type;
-	private byte system_Status;
-	private byte manual_Status;
+	private Byte system_Status;
+	private Byte manual_Status;
+	
+	private Date beat_Time;
 
-	public long getProducer_Id() {
+	public Long getProducer_Id() {
 		return this.producer_Id;
 	}
 
-	public void setProducer_Id(long producer_Id) {
+	public void setProducer_Id(Long producer_Id) {
 		this.producer_Id = producer_Id;
 	}
 
@@ -37,11 +41,11 @@ public class ProducerVo implements java.io.Serializable {
 		this.ip = ip;
 	}
 
-	public int getCheck_Port() {
+	public Integer getCheck_Port() {
 		return check_Port;
 	}
 
-	public void setCheck_Port(int check_Port) {
+	public void setCheck_Port(Integer check_Port) {
 		this.check_Port = check_Port;
 	}
 
@@ -61,20 +65,27 @@ public class ProducerVo implements java.io.Serializable {
 		this.check_Type = check_Type;
 	}
 
-	public byte getSystem_Status() {
+	public Byte getSystem_Status() {
 		return system_Status;
 	}
 
-	public void setSystem_Status(byte system_Status) {
+	public void setSystem_Status(Byte system_Status) {
 		this.system_Status = system_Status;
 	}
 
-	public byte getManual_Status() {
+	public Byte getManual_Status() {
 		return manual_Status;
 	}
 
-	public void setManual_Status(byte manual_Status) {
+	public void setManual_Status(Byte manual_Status) {
 		this.manual_Status = manual_Status;
 	}
 
+	public Date getBeat_Time() {
+		return beat_Time;
+	}
+
+	public void setBeat_Time(Date beat_Time) {
+		this.beat_Time = beat_Time;
+	}
 }

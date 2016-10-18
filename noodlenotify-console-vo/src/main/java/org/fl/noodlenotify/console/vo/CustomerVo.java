@@ -1,27 +1,31 @@
 package org.fl.noodlenotify.console.vo;
 
+import java.util.Date;
+
 public class CustomerVo implements java.io.Serializable {
 
 	private static final long serialVersionUID = -7856386332878028902L;
 
-	private long customer_Id;
+	private Long customer_Id;
 	private String name;
 	private String ip;
-	private int port;
+	private Integer port;
 	private String url;
 	private String type;
-	private int check_Port;
+	private Integer check_Port;
 	private String check_Url;
 	private String check_Type;
-	private byte system_Status;
-	private byte manual_Status;
+	private Byte system_Status;
+	private Byte manual_Status;
 	private String customerGroup_Nm;
+	
+	private Date beat_Time;
 
-	public long getCustomer_Id() {
+	public Long getCustomer_Id() {
 		return this.customer_Id;
 	}
 
-	public void setCustomer_Id(long customer_Id) {
+	public void setCustomer_Id(Long customer_Id) {
 		this.customer_Id = customer_Id;
 	}
 
@@ -41,11 +45,11 @@ public class CustomerVo implements java.io.Serializable {
 		this.ip = ip;
 	}
 
-	public int getPort() {
+	public Integer getPort() {
 		return this.port;
 	}
 
-	public void setPort(int port) {
+	public void setPort(Integer port) {
 		this.port = port;
 	}
 
@@ -65,11 +69,11 @@ public class CustomerVo implements java.io.Serializable {
 		this.type = type;
 	}
 
-	public int getCheck_Port() {
+	public Integer getCheck_Port() {
 		return check_Port;
 	}
 
-	public void setCheck_Port(int check_Port) {
+	public void setCheck_Port(Integer check_Port) {
 		this.check_Port = check_Port;
 	}
 
@@ -89,19 +93,19 @@ public class CustomerVo implements java.io.Serializable {
 		this.check_Type = check_Type;
 	}
 
-	public byte getSystem_Status() {
+	public Byte getSystem_Status() {
 		return system_Status;
 	}
 
-	public void setSystem_Status(byte system_Status) {
+	public void setSystem_Status(Byte system_Status) {
 		this.system_Status = system_Status;
 	}
 
-	public byte getManual_Status() {
+	public Byte getManual_Status() {
 		return manual_Status;
 	}
 
-	public void setManual_Status(byte manual_Status) {
+	public void setManual_Status(Byte manual_Status) {
 		this.manual_Status = manual_Status;
 	}
 
@@ -113,4 +117,11 @@ public class CustomerVo implements java.io.Serializable {
 		this.customerGroup_Nm = customerGroup_Nm;
 	}
 
+	public Date getBeat_Time() {
+		return beat_Time;
+	}
+
+	public void setBeat_Time(Date beat_Time) {
+		this.beat_Time = beat_Time;
+	}
 }

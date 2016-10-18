@@ -253,4 +253,14 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 			}
 		}
 	}
+	
+	@Test
+	public void testSaveProducerBeat() throws Exception {
+		remotingInvoke.saveProducerBeat(1L);
+	}
+	
+	@Test
+	public void testSaveCustomerBeat() throws Exception {
+		remotingInvoke.saveCustomerBeat(1L);
+	}
 }

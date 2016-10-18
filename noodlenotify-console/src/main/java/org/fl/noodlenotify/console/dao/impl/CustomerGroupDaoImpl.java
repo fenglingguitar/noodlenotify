@@ -22,7 +22,7 @@ public class CustomerGroupDaoImpl implements CustomerGroupDao {
 	public PageVo<CustomerGroupVo> queryCustomerGroupPage(CustomerGroupVo vo, int page, int rows) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("customerGroup_Nm", vo.getCustomerGroup_Nm() != null ? (new StringBuilder().append("%").append(vo.getCustomerGroup_Nm()).append("%")).toString() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("customer-group-query-list", paramsMap, page, rows, CustomerGroupVo.class);
 	}
 
@@ -30,7 +30,7 @@ public class CustomerGroupDaoImpl implements CustomerGroupDao {
 	public List<CustomerGroupVo> queryCustomerGroupList(CustomerGroupVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("customerGroup_Nm", vo.getCustomerGroup_Nm() != null ? (new StringBuilder().append("%").append(vo.getCustomerGroup_Nm()).append("%")).toString() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("customer-group-query-list", paramsMap, CustomerGroupVo.class);
 	}
 	
@@ -39,12 +39,12 @@ public class CustomerGroupDaoImpl implements CustomerGroupDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
-		paramsMap.put("port", vo.getPort() > 0 ? vo.getPort() : null);
+		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() > 0 ? vo.getCheck_Port() : null);
+		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
 		paramsMap.put("check_Type", vo.getCheck_Type() != null ? vo.getCheck_Type() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		paramsMap.put("customerGroup_Nm", vo.getCustomerGroup_Nm() != null ?  vo.getCustomerGroup_Nm(): null);
 		return dynamicSqlTemplate.queryPage("customergroup-query-includelist", paramsMap, page, rows, CustomerVo.class);
 	}
@@ -54,12 +54,12 @@ public class CustomerGroupDaoImpl implements CustomerGroupDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
-		paramsMap.put("port", vo.getPort() > 0 ? vo.getPort() : null);
+		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() > 0 ? vo.getCheck_Port() : null);
+		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
 		paramsMap.put("check_Type", vo.getCheck_Type() != null ? vo.getCheck_Type() : null);
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("customergroup-query-excludelist", paramsMap, page, rows, CustomerVo.class);
 	}
 
@@ -77,13 +77,13 @@ public class CustomerGroupDaoImpl implements CustomerGroupDao {
 
 	@Override
 	public void updateCustomerGroup(CustomerGroupVo vo) throws Exception {
-		dynamicSqlTemplate.update(vo, CustomerGroupMd.class);
+		dynamicSqlTemplate.updateNonull(vo, CustomerGroupMd.class);
 	}
 
 	@Override
 	public void updatesCustomerGroup(CustomerGroupVo[] vos) throws Exception {
 		for (CustomerGroupVo vo : vos) {
-			dynamicSqlTemplate.update(vo, CustomerGroupMd.class);
+			dynamicSqlTemplate.updateNonull(vo, CustomerGroupMd.class);
 		}
 	}
 

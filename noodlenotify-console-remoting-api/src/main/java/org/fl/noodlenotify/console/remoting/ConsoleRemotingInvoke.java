@@ -49,4 +49,7 @@ public interface ConsoleRemotingInvoke {
 	public Map<String, List<QueueCustomerVo>> distributerGetQueueCustomers(long distributerId) throws Exception;
 
 	public Map<String, Map<Long, List<QueueCustomerVo>>> distributerGetQueueCustomerGroups(long distributerId) throws Exception;
+	
+	public void saveProducerBeat(Long producerId) throws Exception;
+	public void saveCustomerBeat(Long customerId) throws Exception;
 }

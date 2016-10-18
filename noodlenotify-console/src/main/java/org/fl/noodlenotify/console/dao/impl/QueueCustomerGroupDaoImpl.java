@@ -32,9 +32,9 @@ public class QueueCustomerGroupDaoImpl implements QueueCustomerGroupDao {
 	public PageVo<QueueCustomerGroupVo> queryQueueCustomerGroupIncludePage(QueueCustomerGroupVo vo, int page, int rows) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
-		paramsMap.put("customer_Num", vo.getCustomer_Num() > 0 ? vo.getCustomer_Num() : null);
+		paramsMap.put("customer_Num", vo.getCustomer_Num() != null ? vo.getCustomer_Num() : null);
 		paramsMap.put("customerGroup_Nm", vo.getCustomerGroup_Nm());
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-customergroup-query-includelist", paramsMap, page, rows, QueueCustomerGroupVo.class);
 	}
 
@@ -43,7 +43,7 @@ public class QueueCustomerGroupDaoImpl implements QueueCustomerGroupDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
 		paramsMap.put("customerGroup_Nm", vo.getCustomerGroup_Nm() != null ? (new StringBuilder().append("%").append(vo.getCustomerGroup_Nm()).append("%")).toString() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-customergroup-query-excludelist", paramsMap, page, rows, QueueCustomerGroupVo.class);
 	}
 
@@ -51,7 +51,7 @@ public class QueueCustomerGroupDaoImpl implements QueueCustomerGroupDao {
 	public List<QueueCustomerGroupVo> queryQueueCustomerGroupList(QueueCustomerGroupVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
-		paramsMap.put("customer_Num", vo.getCustomer_Num() > 0 ? vo.getCustomer_Num() : null);
+		paramsMap.put("customer_Num", vo.getCustomer_Num() != null ? vo.getCustomer_Num() : null);
 		paramsMap.put("customerGroup_Nm", vo.getCustomerGroup_Nm() != null ? vo.getCustomerGroup_Nm() : null);
 		return dynamicSqlTemplate.queryList("queue-customergroup-query-list", paramsMap, QueueCustomerGroupVo.class);
 	}
@@ -61,7 +61,7 @@ public class QueueCustomerGroupDaoImpl implements QueueCustomerGroupDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("customerGroup_Nm", vo.getCustomerGroup_Nm());
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-customergroup-query-byqueue", paramsMap, QueueCustomerGroupVo.class);
 	}
 
@@ -70,8 +70,8 @@ public class QueueCustomerGroupDaoImpl implements QueueCustomerGroupDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
 		paramsMap.put("customerGroup_Nm", vo.getCustomerGroup_Nm());
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-customergroup-query-customer", paramsMap, QueueCustomerGroupVo.class);
 	}
 
@@ -80,7 +80,7 @@ public class QueueCustomerGroupDaoImpl implements QueueCustomerGroupDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("customerGroup_Nm", vo.getCustomerGroup_Nm());
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-customergroup-query-queue", paramsMap, page, rows, QueueCustomerGroupVo.class);
 	}
 
@@ -89,8 +89,8 @@ public class QueueCustomerGroupDaoImpl implements QueueCustomerGroupDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
 		paramsMap.put("customerGroup_Nm", vo.getCustomerGroup_Nm());
-		paramsMap.put("system_Status", vo.getSystem_Status() > 0 ? vo.getSystem_Status() : null);
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("queue-customergroup-query-customer", paramsMap, page, rows, QueueCustomerGroupVo.class);
 	}
 
@@ -105,7 +105,7 @@ public class QueueCustomerGroupDaoImpl implements QueueCustomerGroupDao {
 	public List<QueueCustomerGroupVo> queryCustomerGroupList(QueueCustomerGroupVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("manual_Status", vo.getManual_Status() > 0 ? vo.getManual_Status() : null);
+		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("queue-customergroup-query-customergroup", paramsMap, QueueCustomerGroupVo.class);
 	}
 

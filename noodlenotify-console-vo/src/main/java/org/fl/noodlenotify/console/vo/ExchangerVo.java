@@ -4,21 +4,21 @@ public class ExchangerVo implements java.io.Serializable {
 
 	private static final long serialVersionUID = 4353744880800628439L;
 
-	private long exchanger_Id;
+	private Long exchanger_Id;
 	private String name;
 	private String ip;
-	private int port;
+	private Integer port;
 	private String url;
 	private String type;
-	private int check_Port;
-	private byte system_Status;
-	private byte manual_Status;
+	private Integer check_Port;
+	private Byte system_Status;
+	private Byte manual_Status;
 
-	public long getExchanger_Id() {
+	public Long getExchanger_Id() {
 		return this.exchanger_Id;
 	}
 
-	public void setExchanger_Id(long exchanger_Id) {
+	public void setExchanger_Id(Long exchanger_Id) {
 		this.exchanger_Id = exchanger_Id;
 	}
 
@@ -38,11 +38,11 @@ public class ExchangerVo implements java.io.Serializable {
 		this.ip = ip;
 	}
 
-	public int getPort() {
+	public Integer getPort() {
 		return this.port;
 	}
 
-	public void setPort(int port) {
+	public void setPort(Integer port) {
 		this.port = port;
 	}
 	
@@ -62,27 +62,27 @@ public class ExchangerVo implements java.io.Serializable {
 		this.type = type;
 	}
 
-	public int getCheck_Port() {
+	public Integer getCheck_Port() {
 		return check_Port;
 	}
 
-	public void setCheck_Port(int check_Port) {
+	public void setCheck_Port(Integer check_Port) {
 		this.check_Port = check_Port;
 	}
 
-	public byte getSystem_Status() {
+	public Byte getSystem_Status() {
 		return system_Status;
 	}
 
-	public void setSystem_Status(byte system_Status) {
+	public void setSystem_Status(Byte system_Status) {
 		this.system_Status = system_Status;
 	}
 
-	public byte getManual_Status() {
+	public Byte getManual_Status() {
 		return manual_Status;
 	}
 
-	public void setManual_Status(byte manual_Status) {
+	public void setManual_Status(Byte manual_Status) {
 		this.manual_Status = manual_Status;
 	}
 
