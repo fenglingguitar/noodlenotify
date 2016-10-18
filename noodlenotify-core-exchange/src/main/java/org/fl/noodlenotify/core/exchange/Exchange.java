@@ -27,8 +27,6 @@ import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
-import org.fl.noodlenotify.monitor.performance.constant.MonitorPerformanceConstant;
-import org.fl.noodlenotify.monitor.performance.storage.MemoryStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,8 +71,8 @@ public class Exchange implements NetConnectReceiver {
 		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
 		moduleId = consoleRemotingInvoke.saveExchangerRegister(localIp, localPort, url, type, checkPort, exchangeName);
 		
-		MemoryStorage.moduleName = MonitorPerformanceConstant.MODULE_ID_EXCHANGE;
-		MemoryStorage.moduleId = moduleId;
+		//MemoryStorage.moduleName = MonitorPerformanceConstant.MODULE_ID_EXCHANGE;
+		//MemoryStorage.moduleId = moduleId;
 		
 		bodyCacheConnectManager.setModuleId(moduleId);
 		bodyCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);

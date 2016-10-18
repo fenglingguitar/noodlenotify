@@ -46,12 +46,6 @@
 	</dependency>
 	
 	<dependency>
-		<groupId>org.fl.noodlenotify.monitor.performance</groupId>
-		<artifactId>noodlenotify-monitor-performance</artifactId>
-		<version>${noodlenotify.monitor.performance.version}</version>
-	</dependency>
-	
-	<dependency>
 		<groupId>org.fl.noodlenotify.console.remoting.api</groupId>
 		<artifactId>noodlenotify-console-remoting-api</artifactId>
 		<version>${noodlenotify.console.remoting.api.version}</version>

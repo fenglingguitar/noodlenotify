@@ -32,12 +32,6 @@
 		<version>${noodlenotify.core.connect.cache.api.version}</version>
 	</dependency>
 	
-	<dependency>
-		<groupId>org.fl.noodlenotify.monitor.performance</groupId>
-  		<artifactId>noodlenotify-monitor-performance</artifactId>
-  		<version>${noodlenotify.monitor.performance.version}</version>
-	</dependency>
-	
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

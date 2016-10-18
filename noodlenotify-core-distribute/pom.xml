@@ -51,12 +51,6 @@
 		<version>${noodlenotify.core.connect.db.version}</version>
 	</dependency>
 	
-	<dependency>
-		<groupId>org.fl.noodlenotify.monitor.performance</groupId>
-		<artifactId>noodlenotify-monitor-performance</artifactId>
-		<version>${noodlenotify.monitor.performance.version}</version>
-	</dependency>
-  
   	<dependency>
 		<groupId>org.fl.noodlenotify.core.connect.net.jetty.server</groupId>
 		<artifactId>noodlenotify-core-connect-net-jetty-server</artifactId>

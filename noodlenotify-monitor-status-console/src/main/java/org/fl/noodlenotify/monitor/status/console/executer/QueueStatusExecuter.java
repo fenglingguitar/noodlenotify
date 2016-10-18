@@ -4,7 +4,6 @@ import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.service.QueueDistributerService;
 import org.fl.noodlenotify.console.service.QueueExchangerService;
 import org.fl.noodlenotify.console.service.QueueService;
-import org.fl.noodlenotify.monitor.performance.persistence.RedisPersistenceTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ public class QueueStatusExecuter extends AbstractExecuter {
 	private QueueDistributerService queueDistributerService;
 
 	@Autowired(required = false)
-	private RedisPersistenceTemplate redisPersistenceTemplate;
+	//private RedisPersistenceTemplate redisPersistenceTemplate;
 	
 	//private long currentTimeMillis = 0;
 	

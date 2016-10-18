@@ -51,12 +51,6 @@
 	</dependency>
 	
 	<dependency>
-		<groupId>org.fl.noodlenotify.monitor.performance</groupId>
-  		<artifactId>noodlenotify-monitor-performance</artifactId>
-  		<version>${noodlenotify.monitor.performance.version}</version>
-	</dependency>
-	
-	<dependency>
 		<groupId>org.fl.noodlenotify.core.client.producer</groupId>
 		<artifactId>noodlenotify-core-client-producer</artifactId>
 		<version>${noodlenotify.core.client.producer.version}</version>

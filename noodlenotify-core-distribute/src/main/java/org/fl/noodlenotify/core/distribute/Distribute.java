@@ -19,8 +19,6 @@ import org.fl.noodlenotify.core.connect.QueueAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.distribute.locker.DistributeSetLocker;
 import org.fl.noodlenotify.core.distribute.locker.cache.queue.QueueCacheDistributeSetLocker;
-import org.fl.noodlenotify.monitor.performance.constant.MonitorPerformanceConstant;
-import org.fl.noodlenotify.monitor.performance.storage.MemoryStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,8 +67,8 @@ public class Distribute {
 		localIp = localIp == null ? NetAddressUtil.getLocalIp(): localIp;
 		moduleId = consoleRemotingInvoke.saveDistributerRegister(localIp, checkPort, distributeName);
 		
-		MemoryStorage.moduleName = MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE;
-		MemoryStorage.moduleId = moduleId;
+		//MemoryStorage.moduleName = MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE;
+		//MemoryStorage.moduleId = moduleId;
 
 		netConnectManager.setModuleId(moduleId);
 		netConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
