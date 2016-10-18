@@ -35,7 +35,7 @@
   	<noodlenotify.console.vo.version>2.0.0-SNAPSHOT</noodlenotify.console.vo.version>
   	<noodlenotify.console.remoting.api.version>2.0.0-SNAPSHOT</noodlenotify.console.remoting.api.version>
   	<noodlenotify.console.web.version>2.0.0-SNAPSHOT</noodlenotify.console.web.version>
-  	<noodlenotify.monitor.status.version>2.0.0-SNAPSHOT</noodlenotify.monitor.status.version>
+  	<noodlenotify.monitor.status.console.version>2.0.0-SNAPSHOT</noodlenotify.monitor.status.console.version>
   	<noodlenotify.monitor.performance.version>2.0.0-SNAPSHOT</noodlenotify.monitor.performance.version>
   	<noodlenotify.core.run.version>2.0.0-SNAPSHOT</noodlenotify.core.run.version>
 	
@@ -73,7 +73,7 @@
     <module>noodlenotify-console-vo</module>
     <module>noodlenotify-console-remoting-api</module>
     <module>noodlenotify-console-web</module>
-    <module>noodlenotify-monitor-status</module>
+    <module>noodlenotify-monitor-status-console</module>
     <module>noodlenotify-monitor-performance</module>
     <module>noodlenotify-core-run</module>
     <module>noodlenotify-demo-producer</module>

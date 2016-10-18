@@ -14,13 +14,19 @@
 	
 	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
-	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/schedule/noodlenotify-monitor-schedule-status.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/bean/client/noodlenotify-pclient-console.xml" />
-	
- 	<bean name="consoleRemotingInvokeExporter" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
-    	<property name="service" ref="consoleRemotingInvokeService"/>
-    	<property name="serviceInterface" value="org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke"/>
+	<import resource="classpath:org/fl/noodlenotify/core/connect/db/mysql/noodlenotify-core-connect-db-datasource.xml" />
+
+	<bean id="dbConnectAgentConfParam" class="org.fl.noodlenotify.core.connect.db.DbConnectAgentConfParam">
+		<property name="insertThreadCount" value="0"/>
+		<property name="updateThreadCount" value="0"/>
+		<property name="deleteThreadCount" value="0"/>
 	</bean>
+	
+	<bean id="dbConnectAgentFactory" class="org.fl.noodlenotify.core.connect.db.mysql.MysqlDbConnectAgentFactory">
+		<property name="dbDataSourceFactory" ref="dbDataSourceFactory" />
+		<property name="dbConnectAgentConfParam" ref="dbConnectAgentConfParam" />
+	</bean>
+	
+	<bean id="msgStorageCapacityStatusExecuter" class="org.fl.noodlenotify.monitor.status.console.executer.MsgStorageCapacityStatusExecuter" />
 	
 </beans>

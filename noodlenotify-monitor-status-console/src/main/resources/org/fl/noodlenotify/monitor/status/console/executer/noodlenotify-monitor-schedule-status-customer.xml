@@ -14,13 +14,17 @@
 	
 	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
-	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/schedule/noodlenotify-monitor-schedule-status.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/bean/client/noodlenotify-pclient-console.xml" />
+		
+	<bean id="connectAgentFactoryNetty" class="org.fl.noodlenotify.core.connect.net.netty.client.NettyNetConnectAgentFactory" />
+	<bean id="connectAgentFactoryJetty" class="org.fl.noodlenotify.core.connect.net.jetty.client.JettyNetConnectAgentFactory" />
 	
- 	<bean name="consoleRemotingInvokeExporter" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
-    	<property name="service" ref="consoleRemotingInvokeService"/>
-    	<property name="serviceInterface" value="org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke"/>
-	</bean>
+	<bean id="customerStatusExecuter" class="org.fl.noodlenotify.monitor.status.console.executer.CustomerStatusExecuter" >
+		<property name="connectAgentFactoryMap">
+			<map>
+				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />
+				<entry key="HTTP" value-ref="connectAgentFactoryJetty" />
+			</map>
+		</property>
+    </bean>
 	
 </beans>

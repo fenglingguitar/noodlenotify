@@ -45,9 +45,9 @@
 	</dependency>
 	
 	<dependency>
-		<groupId>org.fl.noodlenotify.monitor.status</groupId>
-		<artifactId>noodlenotify-monitor-status</artifactId>
-		<version>${noodlenotify.monitor.status.version}</version>
+		<groupId>org.fl.noodlenotify.monitor.status.console</groupId>
+		<artifactId>noodlenotify-monitor-status-console</artifactId>
+		<version>${noodlenotify.monitor.status.console.version}</version>
 	</dependency>
 	
 	<dependency>
