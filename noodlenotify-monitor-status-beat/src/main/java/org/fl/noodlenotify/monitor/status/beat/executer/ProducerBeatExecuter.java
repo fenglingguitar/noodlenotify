@@ -17,6 +17,10 @@ public class ProducerBeatExecuter extends AbstractExecuter {
 	@Override
 	public void execute() throws Exception {
 		
+		if (producerModuleRegister.getModuleId() == null) {
+			return;
+		}
+		
 		try {
 			consoleRemotingInvoke.saveProducerBeat(producerModuleRegister.getModuleId());
 		} catch (Exception e) {

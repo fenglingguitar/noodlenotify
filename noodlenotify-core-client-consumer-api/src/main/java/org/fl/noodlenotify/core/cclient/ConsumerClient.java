@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.core.connect.exception.ConnectionInvokeException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionStopException;
@@ -30,6 +31,8 @@ public class ConsumerClient implements NetConnectReceiver {
 	private String checkUrl;
 	private String checkType;
 	
+	private ModuleRegister consumerModuleRegister;
+	
 	private volatile boolean stopSign = false;
 	
 	public void start() throws Exception {
@@ -43,6 +46,7 @@ public class ConsumerClient implements NetConnectReceiver {
 					checkUrl, checkType, consumerClientName, customerGroupName, 
 					new ArrayList<String>(consumerReceiverMap.keySet()));
 		
+		consumerModuleRegister.setModuleId(moduleId);
 	}
 	
 	public void destroy() throws Exception {
@@ -113,5 +117,9 @@ public class ConsumerClient implements NetConnectReceiver {
 
 	public void setModuleId(long moduleId) {
 		this.moduleId = moduleId;
+	}
+
+	public void setConsumerModuleRegister(ModuleRegister consumerModuleRegister) {
+		this.consumerModuleRegister = consumerModuleRegister;
 	}
 }

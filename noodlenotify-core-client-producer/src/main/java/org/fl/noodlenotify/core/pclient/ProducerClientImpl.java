@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.core.connect.ConnectAgent;
@@ -34,6 +35,8 @@ public class ProducerClientImpl implements ProducerClient {
 	private String checkUrl;
 	private String checkType;
 	
+	private ModuleRegister producerModuleRegister;
+
 	public ProducerClientImpl() {
 	}
 	
@@ -50,6 +53,8 @@ public class ProducerClientImpl implements ProducerClient {
 		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
 		moduleId = consoleRemotingInvoke.saveProducerRegister(localIp, checkPort, checkUrl, checkType, producerClientName);		
 
+		producerModuleRegister.setModuleId(moduleId);
+		
 		netConnectManager.setModuleId(moduleId);
 		netConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
 		netConnectManager.start();
@@ -169,5 +174,9 @@ public class ProducerClientImpl implements ProducerClient {
 	
 	public void setModuleId(long moduleId) {
 		this.moduleId = moduleId;
+	}
+	
+	public void setProducerModuleRegister(ModuleRegister producerModuleRegister) {
+		this.producerModuleRegister = producerModuleRegister;
 	}
 }

@@ -10,28 +10,32 @@ public class CustomerBeatExecuter extends AbstractExecuter {
 
 	private final static Logger logger = LoggerFactory.getLogger(CustomerBeatExecuter.class);
 	
-	private ModuleRegister customerModuleRegister;
+	private ModuleRegister consumerModuleRegister;
 	
 	private ConsoleRemotingInvoke consoleRemotingInvoke;
 	
 	@Override
 	public void execute() throws Exception {
 		
+		if (consumerModuleRegister.getModuleId() == null) {
+			return;
+		}
+		
 		try {
-			consoleRemotingInvoke.saveCustomerBeat(customerModuleRegister.getModuleId());
+			consoleRemotingInvoke.saveCustomerBeat(consumerModuleRegister.getModuleId());
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
-				logger.error("execute -> consoleRemotingInvoke.serverBeat -> {} -> Exception:{}", customerModuleRegister, e.getMessage());
+				logger.error("execute -> consoleRemotingInvoke.serverBeat -> {} -> Exception:{}", consumerModuleRegister, e.getMessage());
 			}
 		}
 		
 		if (logger.isDebugEnabled()) {			
-			logger.debug("execute -> consoleRemotingInvoke.serverBeat -> {}", customerModuleRegister);
+			logger.debug("execute -> consoleRemotingInvoke.serverBeat -> {}", consumerModuleRegister);
 		}
 	}
 
-	public void setCustomerModuleRegister(ModuleRegister customerModuleRegister) {
-		this.customerModuleRegister = customerModuleRegister;
+	public void setConsumerModuleRegister(ModuleRegister consumerModuleRegister) {
+		this.consumerModuleRegister = consumerModuleRegister;
 	}
 	
 	public void setConsoleRemotingInvoke(ConsoleRemotingInvoke consoleRemotingInvoke) {

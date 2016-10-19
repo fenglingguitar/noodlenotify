@@ -18,7 +18,7 @@ public class CustomerBeatExecuterTest extends AbstractJUnit4SpringContextTests {
 	public void testExecute() throws Exception {
 		ModuleRegister moduleRegister = new ModuleRegister();
 		moduleRegister.setModuleId(1L);
-		customerBeatExecuter.setCustomerModuleRegister(moduleRegister);
+		customerBeatExecuter.setConsumerModuleRegister(moduleRegister);
 		customerBeatExecuter.execute();
 	}
 }

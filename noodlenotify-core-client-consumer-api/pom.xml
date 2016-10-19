@@ -25,6 +25,17 @@
 		<groupId>org.fl.noodle.common.test</groupId>
 		<artifactId>noodlecommon-test</artifactId>
 	</dependency>
+	
+	<dependency>
+		<groupId>org.fl.noodle.common.monitor</groupId>
+		<artifactId>noodlecommon-monitor-api</artifactId>
+    </dependency>
+	
+	<dependency>
+		<groupId>org.fl.noodlenotify.monitor.status.beat</groupId>
+  		<artifactId>noodlenotify-monitor-status-beat</artifactId>
+		<version>${noodlenotify.monitor.status.beat.version}</version>
+	</dependency>
   
 	<dependency>
 		<groupId>org.fl.noodlenotify.core.connect.net.api</groupId>
