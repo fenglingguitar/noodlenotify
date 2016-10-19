@@ -122,5 +122,53 @@
 				#end
 	]]>
 	</query>
+	
+	<query name="customer-query-toonline-list">
+	<![CDATA[
+		SELECT 
+				customer_Id,
+				name,
+				ip,
+				port,
+				url,
+				type,
+				check_Port,
+				check_Url,
+				check_Type,
+				system_Status,
+				manual_Status,
+				customerGroup_Nm,
+				beat_Time
+		FROM 	CSL_CUSTOMER
+		WHERE 	1=1
+				AND beat_Time >= :beat_Time 
+				AND system_Status = :system_Status
+		ORDER BY customer_Id
+	]]>
+	</query>
+	
+	<query name="customer-query-tooffline-list">
+	<![CDATA[
+		SELECT 
+				customer_Id,
+				name,
+				ip,
+				port,
+				url,
+				type,
+				check_Port,
+				check_Url,
+				check_Type,
+				system_Status,
+				manual_Status,
+				customerGroup_Nm,
+				beat_Time
+		FROM 	CSL_CUSTOMER
+		WHERE 	1=1
+				AND (beat_Time < :beat_Time || beat_Time IS NULL) 
+				AND system_Status = :system_Status
+		ORDER BY customer_Id
+	]]>
+	</query>
 
 </dynamic-hibernate>

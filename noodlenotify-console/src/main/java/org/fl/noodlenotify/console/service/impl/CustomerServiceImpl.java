@@ -87,4 +87,14 @@ public class CustomerServiceImpl implements CustomerService {
 	public void deletesgroupCustomer(CustomerVo[] vos) throws Exception {
 		customerDao.deletesgroupCustomer(vos);
 	}
+
+	@Override
+	public List<CustomerVo> queryCustomerToOnlineList(CustomerVo vo) throws Exception {
+		return customerDao.queryCustomerToOnlineList(vo);
+	}
+
+	@Override
+	public List<CustomerVo> queryCustomerToOfflineList(CustomerVo vo) throws Exception {
+		return customerDao.queryCustomerToOfflineList(vo);
+	}
 }

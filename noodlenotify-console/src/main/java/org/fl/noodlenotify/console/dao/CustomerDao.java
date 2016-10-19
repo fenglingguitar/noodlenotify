@@ -35,6 +35,7 @@ public interface CustomerDao {
 	public void deletegroupCustomer(CustomerVo vo) throws Exception;
 
 	public void deletesgroupCustomer(CustomerVo[] vos) throws Exception;
-
-	public boolean ifCustomerValid(long customerId) throws Exception;
+	
+	public List<CustomerVo> queryCustomerToOnlineList(CustomerVo vo) throws Exception;
+	public List<CustomerVo> queryCustomerToOfflineList(CustomerVo vo) throws Exception;
 }

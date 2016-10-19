@@ -1,5 +1,6 @@
 package org.fl.noodlenotify.monitor.status.console.executer;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -23,35 +24,74 @@ public class CustomerStatusExecuter extends AbstractExecuter {
 
 	@Autowired
 	private Map<String, ConnectAgentFactory> connectAgentFactoryMap;
+	
+	private long maxInterval = 10 * 1000;
 
 	@Override
 	public void execute() throws Exception {
-
+		
 		CustomerVo customerVoParam = new CustomerVo();
-		customerVoParam.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		List<CustomerVo> customerVoList = customerService.queryCustomerList(customerVoParam);
-		for (CustomerVo customerVo : customerVoList) {
-			byte systemStatus = customerVo.getSystem_Status();
-			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;
-			ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get(customerVo.getCheck_Type());
-			if (connectAgentFactory != null) {
-				ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(customerVo.getIp(), customerVo.getCheck_Port(), customerVo.getCustomer_Id());
-				try {
-					connectAgent.connect();
-					((NetStatusChecker)connectAgent).checkHealth();
-					currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_ON_LINE;
-				} catch (Exception e) {
-					if (logger.isDebugEnabled()) {
-						logger.error("CheckHealth -> " + e);
+		customerVoParam.setBeat_Time(new Date(((new Date()).getTime() - maxInterval)));
+		
+		List<CustomerVo> customerVoToOnlineList = null;
+		try {
+			customerVoToOnlineList = customerService.queryCustomerToOnlineList(customerVoParam);
+		} catch (Exception e) {
+			if (logger.isErrorEnabled()) {
+				logger.error("execute -> serverService.queryServerOnlineLis -> {} -> Exception:{}", customerVoParam, e.getMessage());
+			}
+		}
+		if (customerVoToOnlineList != null) {
+			for (CustomerVo CustomerVoToOnline : customerVoToOnlineList) {
+				ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get(CustomerVoToOnline.getCheck_Type());
+				if (connectAgentFactory != null) {
+					ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(CustomerVoToOnline.getIp(), CustomerVoToOnline.getCheck_Port(), CustomerVoToOnline.getCustomer_Id());
+					try {
+						connectAgent.connect();
+						((NetStatusChecker)connectAgent).checkHealth();
+						CustomerVo currentCustomerVo = new CustomerVo();
+						currentCustomerVo.setCustomer_Id(CustomerVoToOnline.getCustomer_Id());
+						currentCustomerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
+						customerService.updateCustomerSystemStatus(currentCustomerVo);
+					} catch (Exception e) {
+						if (logger.isErrorEnabled()) {
+							logger.error("CheckHealth -> " + e);
+						}
+					} finally {
+						connectAgent.close();
 					}
-				} finally {
-					connectAgent.close();
 				}
-				if (systemStatus != currentSysTemStatus) {
-					CustomerVo currentCustomerVo = new CustomerVo();
-					currentCustomerVo.setCustomer_Id(customerVo.getCustomer_Id());
-					currentCustomerVo.setSystem_Status(currentSysTemStatus);
-					customerService.updateCustomerSystemStatus(currentCustomerVo);
+			}
+		}
+		
+		customerVoParam.setBeat_Time(new Date(((new Date()).getTime() - maxInterval)));
+		List<CustomerVo> customerVoToOfflineList = null;
+		try {
+			customerVoToOfflineList = customerService.queryCustomerToOfflineList(customerVoParam);
+		} catch (Exception e) {
+			if (logger.isErrorEnabled()) {
+				logger.error("execute -> serverService.queryServerOnlineLis -> {} -> Exception:{}", customerVoParam, e.getMessage());
+			}
+		}
+		if (customerVoToOfflineList != null) {
+			for (CustomerVo customerVoToOffline : customerVoToOfflineList) {
+				ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get(customerVoToOffline.getCheck_Type());
+				if (connectAgentFactory != null) {
+					ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(customerVoToOffline.getIp(), customerVoToOffline.getCheck_Port(), customerVoToOffline.getCustomer_Id());
+					try {
+						connectAgent.connect();
+						((NetStatusChecker)connectAgent).checkHealth();
+					} catch (Exception e) {
+						if (logger.isErrorEnabled()) {
+							logger.error("CheckHealth -> " + e);
+						}
+						CustomerVo currentCustomerVo = new CustomerVo();
+						currentCustomerVo.setCustomer_Id(customerVoToOffline.getCustomer_Id());
+						currentCustomerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
+						customerService.updateCustomerSystemStatus(currentCustomerVo);
+					} finally {
+						connectAgent.close();
+					}
 				}
 			}
 		}

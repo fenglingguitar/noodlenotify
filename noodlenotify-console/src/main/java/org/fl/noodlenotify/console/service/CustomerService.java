@@ -31,4 +31,6 @@ public interface CustomerService {
 
 	public void deletesgroupCustomer(CustomerVo[] vos) throws Exception;
 
+	public List<CustomerVo> queryCustomerToOnlineList(CustomerVo vo) throws Exception;
+	public List<CustomerVo> queryCustomerToOfflineList(CustomerVo vo) throws Exception;
 }
