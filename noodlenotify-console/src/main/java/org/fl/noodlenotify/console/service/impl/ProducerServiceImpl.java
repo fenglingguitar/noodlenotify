@@ -59,4 +59,14 @@ public class ProducerServiceImpl implements ProducerService {
 	public void deletesProducer(ProducerVo[] vos) throws Exception {
 		producerDao.deletesProducer(vos);
 	}
+
+	@Override
+	public void updateClientOnline(ProducerVo vo) throws Exception {
+		producerDao.updateClientOnline(vo);
+	}
+
+	@Override
+	public void updateClientOffline(ProducerVo vo) throws Exception {
+		producerDao.updateClientOffline(vo);
+	}
 }

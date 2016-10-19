@@ -41,5 +41,21 @@
 		ORDER BY producer_Id desc
 	]]>
 	</query>
+	
+	<query name="producer-update-online">
+	<![CDATA[
+		UPDATE 	CSL_PRODUCER
+		SET 	system_Status = :system_Status
+		WHERE 	beat_Time >= :beat_Time
+	]]>
+	</query>
+	
+	<query name="producer-update-offline">
+	<![CDATA[
+		UPDATE 	CSL_PRODUCER
+		SET 	system_Status = :system_Status
+		WHERE 	beat_Time < :beat_Time || beat_Time IS NULL
+	]]>
+	</query>
 
 </dynamic-hibernate>

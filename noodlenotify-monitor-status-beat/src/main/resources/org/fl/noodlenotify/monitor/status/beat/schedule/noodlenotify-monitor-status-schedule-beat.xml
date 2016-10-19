@@ -14,7 +14,7 @@
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/executer/noodlenotify-monitor-status-executer-beat-producer.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/executer/noodlenotify-monitor-status-executer-beat-customer.xml" />
 		
-	<bean id="statusServerBeatExecuterSchedule" class="org.fl.noodle.common.monitor.schedule.ExecuterSchedule"
+	<bean id="beatExecuterSchedule" class="org.fl.noodle.common.monitor.schedule.ExecuterSchedule"
 		init-method="start" destroy-method="destroy" >
 		<property name="delay" value="10" />
 		<property name="initialDelay" value="10" />

@@ -12,9 +12,7 @@ import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheStatusChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service("msgQueueCacheStatusExecuter")
 public class MsgQueueCacheStatusExecuter extends AbstractExecuter {
 
 	private final static Logger logger = LoggerFactory.getLogger(MsgQueueCacheStatusExecuter.class);

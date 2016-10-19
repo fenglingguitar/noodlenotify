@@ -24,4 +24,7 @@ public interface ProducerService {
 	public void deleteProducer(ProducerVo vo) throws Exception;
 
 	public void deletesProducer(ProducerVo[] vos) throws Exception;
+	
+	public void updateClientOnline(ProducerVo vo) throws Exception;
+	public void updateClientOffline(ProducerVo vo) throws Exception;
 }

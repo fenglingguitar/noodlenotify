@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.dao.ProducerDao;
 import org.fl.noodlenotify.console.domain.ProducerMd;
@@ -102,5 +101,21 @@ public class ProducerDaoImpl implements ProducerDao {
 			return false;
 		}
 		return queryProducers.get(0).getManual_Status() == ConsoleConstants.MANUAL_STATUS_VALID;
+	}
+	
+	@Override
+	public void updateClientOnline(ProducerVo vo) throws Exception {
+		Map<String, Object> paramsMap = new HashMap<String, Object>();
+		paramsMap.put("system_Status", ConsoleConstants.SYSTEM_STATUS_ON_LINE);
+		paramsMap.put("beat_Time", vo.getBeat_Time());
+		dynamicSqlTemplate.updateSql("producer-update-online", paramsMap);
+	}
+
+	@Override
+	public void updateClientOffline(ProducerVo vo) throws Exception {
+		Map<String, Object> paramsMap = new HashMap<String, Object>();
+		paramsMap.put("system_Status", ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
+		paramsMap.put("beat_Time", vo.getBeat_Time());
+		dynamicSqlTemplate.updateSql("producer-update-offline", paramsMap);
 	}
 }

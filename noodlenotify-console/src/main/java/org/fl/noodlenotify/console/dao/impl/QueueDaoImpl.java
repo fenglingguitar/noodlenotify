@@ -25,7 +25,7 @@ public class QueueDaoImpl implements QueueDao {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? (new StringBuilder().append("%").append(vo.getQueue_Nm()).append("%")).toString() : null);
 		paramsMap.put("manual_Status",	vo.getManual_Status() != null ? vo.getManual_Status() : null);
-		paramsMap.put("is_Repeat", vo.getIs_Repeat() >= 0 ? vo.getIs_Repeat() : null);
+		paramsMap.put("is_Repeat", vo.getIs_Repeat() != null ? vo.getIs_Repeat() : null);
 		return dynamicSqlTemplate.queryPage("queue-query-list", paramsMap, page, rows, QueueVo.class);
 	}
 

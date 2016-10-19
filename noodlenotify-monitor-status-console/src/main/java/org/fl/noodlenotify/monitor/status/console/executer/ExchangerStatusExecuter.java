@@ -13,9 +13,7 @@ import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service("exchangerStatusExecuter")
 public class ExchangerStatusExecuter extends AbstractExecuter {
 
 	private final static Logger logger = LoggerFactory.getLogger(ExchangerStatusExecuter.class);

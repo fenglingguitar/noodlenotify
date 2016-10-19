@@ -176,7 +176,7 @@
 			    	<th><label>队列状态</label></th>
 			    	<td>
 			    		<select id="manual_Status">
-			    			<option value="-1">--all--</option>
+			    			<option value="">--all--</option>
 			    			<option value="1">有效</option>
 			    			<option value="2">无效</option>
 			    		</select>

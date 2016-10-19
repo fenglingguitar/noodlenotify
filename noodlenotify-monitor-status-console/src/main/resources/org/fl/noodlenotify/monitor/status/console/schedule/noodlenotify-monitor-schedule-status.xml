@@ -23,11 +23,12 @@
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-schedule-status-msgqueuecache.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-schedule-status-msgstorage-capacity.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-schedule-status-msgstorage.xml" />
-	<!-- <import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-schedule-status-producer.xml" /> -->
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-schedule-status-producer.xml" />
 
 	<bean id="statusExecuterSchedule" class="org.fl.noodle.common.monitor.schedule.ExecuterSchedule"
 		init-method="start" destroy-method="destroy" >
 		<property name="delay" value="10" />
+		<property name="initialDelay" value="10" />
 		<property name="executerList">
 			<list>
 				<ref bean="customerStatusExecuter" />
@@ -39,7 +40,7 @@
 				<ref bean="msgQueueCacheStatusExecuter" />
 				<ref bean="msgStorageCapacityStatusExecuter" />
 				<ref bean="msgStorageStatusExecuter" />
-				<!-- <ref bean="producerStatusExecuter" /> -->
+				<ref bean="producerStatusExecuter" />
 			</list>
 		</property>
 	</bean>

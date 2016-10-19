@@ -29,4 +29,7 @@ public interface ProducerDao {
 	public void updateProducerSystemStatus(ProducerVo vo) throws Exception;
 
 	public boolean ifProducerValid(long producerId) throws Exception;
+	
+	public void updateClientOnline(ProducerVo vo) throws Exception;
+	public void updateClientOffline(ProducerVo vo) throws Exception;
 }
