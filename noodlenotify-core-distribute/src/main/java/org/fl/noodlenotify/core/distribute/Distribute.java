@@ -227,22 +227,22 @@ public class Distribute {
 					}
 				} else {
 					QueueDistributerVo queueDistributerVoOld = queueDistributerVoMap.get(queueDistributerVo.getQueue_Nm());
-					if (queueDistributerVoOld.getIs_Repeat() != queueDistributerVo.getIs_Repeat() 
-							|| queueDistributerVoOld.getExpire_Time() != queueDistributerVo.getExpire_Time()
-								|| queueDistributerVoOld.getInterval_Time() != queueDistributerVo.getInterval_Time()
-									|| queueDistributerVoOld.getDph_Delay_Time() != queueDistributerVo.getDph_Delay_Time()
-										|| queueDistributerVoOld.getDph_Timeout() != queueDistributerVo.getDph_Timeout()
-												|| queueDistributerVoOld.getNew_Pop_ThreadNum() != queueDistributerVo.getNew_Pop_ThreadNum()
-													|| queueDistributerVoOld.getNew_Exe_ThreadNum() != queueDistributerVo.getNew_Exe_ThreadNum()
-														|| queueDistributerVoOld.getPortion_Pop_ThreadNum() != queueDistributerVo.getPortion_Pop_ThreadNum()
-															|| queueDistributerVoOld.getPortion_Exe_ThreadNum() != queueDistributerVo.getPortion_Exe_ThreadNum()
+					if (!queueDistributerVoOld.getIs_Repeat().equals(queueDistributerVo.getIs_Repeat())
+							|| !queueDistributerVoOld.getExpire_Time().equals(queueDistributerVo.getExpire_Time())
+								|| !queueDistributerVoOld.getInterval_Time().equals(queueDistributerVo.getInterval_Time())
+									|| !queueDistributerVoOld.getDph_Delay_Time().equals(queueDistributerVo.getDph_Delay_Time())
+										|| !queueDistributerVoOld.getDph_Timeout().equals(queueDistributerVo.getDph_Timeout())
+											|| !queueDistributerVoOld.getNew_Pop_ThreadNum().equals(queueDistributerVo.getNew_Pop_ThreadNum())
+												|| !queueDistributerVoOld.getNew_Exe_ThreadNum().equals(queueDistributerVo.getNew_Exe_ThreadNum())
+													|| !queueDistributerVoOld.getPortion_Pop_ThreadNum().equals(queueDistributerVo.getPortion_Pop_ThreadNum())
+														|| !queueDistributerVoOld.getPortion_Exe_ThreadNum().equals(queueDistributerVo.getPortion_Exe_ThreadNum())
 					) {
 						queueDistributerVoMap.put(queueDistributerVo.getQueue_Nm(), queueDistributerVo);
 						
-						if (queueDistributerVoOld.getNew_Pop_ThreadNum() != queueDistributerVo.getNew_Pop_ThreadNum()
-								|| queueDistributerVoOld.getNew_Exe_ThreadNum() != queueDistributerVo.getNew_Exe_ThreadNum()
-										|| queueDistributerVoOld.getPortion_Pop_ThreadNum() != queueDistributerVo.getPortion_Pop_ThreadNum()
-												|| queueDistributerVoOld.getPortion_Exe_ThreadNum() != queueDistributerVo.getPortion_Exe_ThreadNum()
+						if (!queueDistributerVoOld.getNew_Pop_ThreadNum().equals(queueDistributerVo.getNew_Pop_ThreadNum())
+								|| !queueDistributerVoOld.getNew_Exe_ThreadNum().equals(queueDistributerVo.getNew_Exe_ThreadNum())
+										|| !queueDistributerVoOld.getPortion_Pop_ThreadNum().equals(queueDistributerVo.getPortion_Pop_ThreadNum())
+												|| !queueDistributerVoOld.getPortion_Exe_ThreadNum().equals(queueDistributerVo.getPortion_Exe_ThreadNum())
 						) {
 							
 							DistributeGet distributeGet = distributeGetMap.get(queueDistributerVo.getQueue_Nm());
@@ -289,9 +289,9 @@ public class Distribute {
 										);
 							}
 						} else {
-							if (queueDistributerVoOld.getIs_Repeat() != queueDistributerVo.getIs_Repeat() 
-									|| queueDistributerVoOld.getExpire_Time() != queueDistributerVo.getExpire_Time()
-											|| queueDistributerVoOld.getInterval_Time() != queueDistributerVo.getInterval_Time()
+							if (!queueDistributerVoOld.getIs_Repeat().equals(queueDistributerVo.getIs_Repeat())
+									|| !queueDistributerVoOld.getExpire_Time().equals(queueDistributerVo.getExpire_Time())
+											|| !queueDistributerVoOld.getInterval_Time().equals(queueDistributerVo.getInterval_Time())
 							) {
 								DistributeGet distributeGet = distributeGetMap.get(queueDistributerVo.getQueue_Nm());
 								distributeGet.setQueueDistributerVo(queueDistributerVo);
@@ -325,8 +325,8 @@ public class Distribute {
 								}
 							}
 								
-							if (queueDistributerVoOld.getInterval_Time() != queueDistributerVo.getInterval_Time()
-									|| queueDistributerVoOld.getDph_Delay_Time() != queueDistributerVo.getDph_Delay_Time()
+							if (!queueDistributerVoOld.getInterval_Time().equals(queueDistributerVo.getInterval_Time())
+									|| !queueDistributerVoOld.getDph_Delay_Time().equals(queueDistributerVo.getDph_Delay_Time())
 							) {
 								ConcurrentMap<Long, DistributeSet> distributeSetDbMap = distributeSetQueueMap.get(queueDistributerVo.getQueue_Nm());
 								for (Long dbId : distributeSetDbMap.keySet()) {
