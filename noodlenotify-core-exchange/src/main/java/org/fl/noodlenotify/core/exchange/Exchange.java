@@ -46,7 +46,7 @@ public class Exchange implements NetConnectReceiver {
 	
 	private ConsoleRemotingInvoke consoleRemotingInvoke;
 	
-	private ConcurrentMap<String, Long> queueCustomerGroupNumMap = new ConcurrentHashMap<String, Long>();
+	private ConcurrentMap<String, Long> queueConsumerGroupNumMap = new ConcurrentHashMap<String, Long>();
 	private ConcurrentMap<String, QueueExchangerVo> queueExchangerVoMap = new ConcurrentHashMap<String, QueueExchangerVo>();
 	
 	private String exchangeName;
@@ -136,12 +136,12 @@ public class Exchange implements NetConnectReceiver {
 		Map<String, Long> consoleInfoMapGroupNum = null;
 		
 		try {
-			consoleInfoMapGroupNum = consoleRemotingInvoke.exchangerGetQueueCustomerGroupNum(moduleId);
+			consoleInfoMapGroupNum = consoleRemotingInvoke.exchangerGetQueueConsumerGroupNum(moduleId);
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("UpdateConnectAgent -> "
 							+ "ModuleId: " + moduleId
-							+ ", Exchanger Get QueueCustomerGroupNum -> " + e);
+							+ ", Exchanger Get QueueConsumerGroupNum -> " + e);
 			}
 		}
 		
@@ -150,54 +150,54 @@ public class Exchange implements NetConnectReceiver {
 			if (logger.isDebugEnabled()) {
 				Set<String> set = consoleInfoMapGroupNum.keySet();
 				for (String queueName : set) {
-					logger.debug("UpdateConnectAgent -> ExchangerGetQueueCustomerGroupNum -> " 
+					logger.debug("UpdateConnectAgent -> ExchangerGetQueueConsumerGroupNum -> " 
 							+ "QueueName: " + queueName 
-							+ ", QueueCustomerGroupNum: " + consoleInfoMapGroupNum.get(queueName)
+							+ ", QueueConsumerGroupNum: " + consoleInfoMapGroupNum.get(queueName)
 							);
 				}
 			}
 			
 			for (String queueName : consoleInfoMapGroupNum.keySet()) {
-				if (!queueCustomerGroupNumMap.containsKey(queueName)) {
-					queueCustomerGroupNumMap.putIfAbsent(queueName, consoleInfoMapGroupNum.get(queueName));
+				if (!queueConsumerGroupNumMap.containsKey(queueName)) {
+					queueConsumerGroupNumMap.putIfAbsent(queueName, consoleInfoMapGroupNum.get(queueName));
 					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Add QueueCustomerGroupNum -> " 
+						logger.debug("UpdateConnectAgent -> Add QueueConsumerGroupNum -> " 
 								+ "QueueName: " + queueName 
-								+ ", QueueCustomerGroupNum: " + consoleInfoMapGroupNum.get(queueName)
+								+ ", QueueConsumerGroupNum: " + consoleInfoMapGroupNum.get(queueName)
 								);
 					}
 				} else {
-					Long queueCustomerGroupNumOld = queueCustomerGroupNumMap.get(queueName);
-					Long queueCustomerGroupNumNew = consoleInfoMapGroupNum.get(queueName);
-					if (!queueCustomerGroupNumOld.equals(queueCustomerGroupNumNew)) {
-						queueCustomerGroupNumMap.remove(queueName);
+					Long queueConsumerGroupNumOld = queueConsumerGroupNumMap.get(queueName);
+					Long queueConsumerGroupNumNew = consoleInfoMapGroupNum.get(queueName);
+					if (!queueConsumerGroupNumOld.equals(queueConsumerGroupNumNew)) {
+						queueConsumerGroupNumMap.remove(queueName);
 						if (logger.isDebugEnabled()) {
-							logger.debug("UpdateConnectAgent -> Remove QueueCustomerGroupNum -> " 
+							logger.debug("UpdateConnectAgent -> Remove QueueConsumerGroupNum -> " 
 									+ "QueueName: " + queueName 
-									+ ", QueueCustomerGroupNum: " + queueCustomerGroupNumOld
-									+ ", QueueCustomerGroupNum Change"
+									+ ", QueueConsumerGroupNum: " + queueConsumerGroupNumOld
+									+ ", QueueConsumerGroupNum Change"
 									);
 						}
-						queueCustomerGroupNumMap.put(queueName, queueCustomerGroupNumNew);
+						queueConsumerGroupNumMap.put(queueName, queueConsumerGroupNumNew);
 						if (logger.isDebugEnabled()) {
-							logger.debug("UpdateConnectAgent -> Add QueueCustomerGroupNum -> " 
+							logger.debug("UpdateConnectAgent -> Add QueueConsumerGroupNum -> " 
 									+ "QueueName: " + queueName 
-									+ ", QueueCustomerGroupNum: " + queueCustomerGroupNumNew
-									+ ", QueueCustomerGroupNum Change"
+									+ ", QueueConsumerGroupNum: " + queueConsumerGroupNumNew
+									+ ", QueueConsumerGroupNum Change"
 									);
 						}
 					}
 				}
 			}
 			
-			for (String queueName : queueCustomerGroupNumMap.keySet()) {
-				Long queueCustomerGroupNumOld = queueCustomerGroupNumMap.get(queueName);
+			for (String queueName : queueConsumerGroupNumMap.keySet()) {
+				Long queueConsumerGroupNumOld = queueConsumerGroupNumMap.get(queueName);
 				if (!consoleInfoMapGroupNum.containsKey(queueName)) {
-					queueCustomerGroupNumMap.remove(queueName);
+					queueConsumerGroupNumMap.remove(queueName);
 					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Remove QueueCustomerGroupNum -> " 
+						logger.debug("UpdateConnectAgent -> Remove QueueConsumerGroupNum -> " 
 								+ "QueueName: " + queueName 
-								+ ", QueueCustomerGroupNum: " + queueCustomerGroupNumOld
+								+ ", QueueConsumerGroupNum: " + queueConsumerGroupNumOld
 								);
 					}
 				}
@@ -255,7 +255,7 @@ public class Exchange implements NetConnectReceiver {
 	}
 	
 	private void destroyConnectAgent() {
-		queueCustomerGroupNumMap.clear();
+		queueConsumerGroupNumMap.clear();
 	}
 	
 	@Override
@@ -282,19 +282,19 @@ public class Exchange implements NetConnectReceiver {
 			throw new ConnectionInvokeException("Message body bigger then max limit: " + sizeLimit);
 		}
 		
-		Long queueCustomerGroupNum = queueCustomerGroupNumMap.get(messageDm.getQueueName());
-		if (queueCustomerGroupNum != null) {
-			messageDm.setExecuteQueue(queueCustomerGroupNum);
+		Long queueConsumerGroupNum = queueConsumerGroupNumMap.get(messageDm.getQueueName());
+		if (queueConsumerGroupNum != null) {
+			messageDm.setExecuteQueue(queueConsumerGroupNum);
 			messageDm.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
 		} else {
 			if (logger.isErrorEnabled()) {
 				logger.error("Receive -> "
 						+ "Queue: " + messageDm.getQueueName()
 						+ ", UUID: " + messageDm.getUuid()
-						+ ", Get Queue Customer Group Num -> Null");
+						+ ", Get Queue Consumer Group Num -> Null");
 			}
 			startUpdateConnectAgent();
-			throw new ConnectionInvokeException("Set execute queue error, can not get queue customer group num");
+			throw new ConnectionInvokeException("Set execute queue error, can not get queue consumer group num");
 		}
 		
 		if (bodyCacheConnectManager != null) {

@@ -60,14 +60,14 @@ public class DistributeGet {
 							ConnectManager dbConnectManager,
 							ConnectManager queueCacheConnectManager,
 							ConnectManager bodyCacheConnectManager,
-							ConnectManager customerNetConnectManager,
+							ConnectManager consumerNetConnectManager,
 							DistributeConfParam distributeConfParam,
 							QueueDistributerVo queueDistributerVo) {
 		this.queueName = queueName;
 		this.dbConnectManager = dbConnectManager;
 		this.queueCacheConnectManager = queueCacheConnectManager;
 		this.bodyCacheConnectManager = bodyCacheConnectManager;
-		this.netConnectManager = customerNetConnectManager;
+		this.netConnectManager = consumerNetConnectManager;
 		this.distributeConfParam = distributeConfParam;
 		this.queueDistributerVo = queueDistributerVo;
 	}

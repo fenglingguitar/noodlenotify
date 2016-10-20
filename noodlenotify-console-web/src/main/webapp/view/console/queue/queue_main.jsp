@@ -63,11 +63,11 @@
 			$('#msgbodycache').button().click(function() {
 				setMsgbodycache();
 			});
-			$('#customergroup').button().click(function() {
-				setCustomerGroup();
+			$('#consumergroup').button().click(function() {
+				setConsumerGroup();
 			});
-			$('#customer').button().click(function() {
-				setCustomer();
+			$('#consumer').button().click(function() {
+				setConsumer();
 			});
 			$('#send').button().click(function() {
 				send();
@@ -313,7 +313,7 @@
 			top.openDialog('设置消息体缓存', '<%=request.getContextPath()%>/view/console/queue/queue-msgbodycache/queue_msgbodycache_main.jsp', ret, 610, 1200, null);					
 		}
 		
-		function setCustomerGroup() {
+		function setConsumerGroup() {
 			
 			var index = jQuery('#list').jqGrid('getGridParam', 'selarrrow');
 			if (index.toString() == '') {
@@ -326,10 +326,10 @@
 				return;
 			}
 			var ret = jQuery('#list').jqGrid('getRowData', index);
-			top.openDialog('设置消费者组', '<%=request.getContextPath()%>/view/console/queue/queue-customergroup/queue_customergroup_main.jsp', ret, 580, 1200, null);					
+			top.openDialog('设置消费者组', '<%=request.getContextPath()%>/view/console/queue/queue-consumergroup/queue_consumergroup_main.jsp', ret, 580, 1200, null);					
 		}
 		
-		function setCustomer() {
+		function setConsumer() {
 			var index = jQuery('#list').jqGrid('getGridParam', 'selarrrow');
 			if (index.toString() == '') {
 				alert('请选择');
@@ -341,7 +341,7 @@
 				return;
 			}
 			var ret = jQuery('#list').jqGrid('getRowData', index);
-			top.openDialog('设置消费者', '<%=request.getContextPath()%>/view/console/queue/queue-customer/queue_customer_main.jsp', ret, 670, 1200, null);					
+			top.openDialog('设置消费者', '<%=request.getContextPath()%>/view/console/queue/queue-consumer/queue_consumer_main.jsp', ret, 670, 1200, null);					
 		}
 		
 		function send() {
@@ -373,8 +373,8 @@
 		<button id="msgstorage">设置数据库</button>
 		<button id="msgqueuecache">设置队列缓存</button>
 		<button id="msgbodycache">设置消息体缓存</button>
-		<button id="customergroup">设置消费者组</button>
-		<button id="customer">设置消费者</button>
+		<button id="consumergroup">设置消费者组</button>
+		<button id="consumer">设置消费者</button>
 		<button id="send">发送消息</button>
 	</div>
 	<div id="expander" class="s_expander">

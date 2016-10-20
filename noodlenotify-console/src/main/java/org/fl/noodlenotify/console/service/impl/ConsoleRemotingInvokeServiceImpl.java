@@ -7,32 +7,32 @@ import java.util.List;
 import java.util.Map;
 
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
-import org.fl.noodlenotify.console.dao.CustomerDao;
+import org.fl.noodlenotify.console.dao.ConsumerDao;
 import org.fl.noodlenotify.console.dao.DistributerDao;
 import org.fl.noodlenotify.console.dao.ExchangerDao;
 import org.fl.noodlenotify.console.dao.MsgBodyCacheDao;
 import org.fl.noodlenotify.console.dao.MsgQueueCacheDao;
 import org.fl.noodlenotify.console.dao.MsgStorageDao;
 import org.fl.noodlenotify.console.dao.ProducerDao;
-import org.fl.noodlenotify.console.dao.QueueCustomerDao;
-import org.fl.noodlenotify.console.dao.QueueCustomerGroupDao;
+import org.fl.noodlenotify.console.dao.QueueConsumerDao;
+import org.fl.noodlenotify.console.dao.QueueConsumerGroupDao;
 import org.fl.noodlenotify.console.dao.QueueDao;
 import org.fl.noodlenotify.console.dao.QueueDistributerDao;
 import org.fl.noodlenotify.console.dao.QueueExchangerDao;
 import org.fl.noodlenotify.console.dao.QueueMsgBodyCacheDao;
 import org.fl.noodlenotify.console.dao.QueueMsgQueueCacheDao;
 import org.fl.noodlenotify.console.dao.QueueMsgStorageDao;
-import org.fl.noodlenotify.console.domain.CustomerMd;
+import org.fl.noodlenotify.console.domain.ConsumerMd;
 import org.fl.noodlenotify.console.domain.DistributerMd;
 import org.fl.noodlenotify.console.domain.ExchangerMd;
 import org.fl.noodlenotify.console.domain.ProducerMd;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
-import org.fl.noodlenotify.console.vo.CustomerVo;
+import org.fl.noodlenotify.console.vo.ConsumerVo;
 import org.fl.noodlenotify.console.vo.DistributerVo;
 import org.fl.noodlenotify.console.vo.ExchangerVo;
 import org.fl.noodlenotify.console.vo.ProducerVo;
-import org.fl.noodlenotify.console.vo.QueueCustomerGroupVo;
-import org.fl.noodlenotify.console.vo.QueueCustomerVo;
+import org.fl.noodlenotify.console.vo.QueueConsumerGroupVo;
+import org.fl.noodlenotify.console.vo.QueueConsumerVo;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
@@ -55,10 +55,10 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	private DistributerDao distributerDao;
 	
 	@Autowired
-	private CustomerDao customerDao;
+	private ConsumerDao consumerDao;
 	
 	@Autowired
-	private QueueCustomerDao queueCustomerDao;
+	private QueueConsumerDao queueConsumerDao;
 	
 	@Autowired
 	private QueueDao queueDao;
@@ -73,7 +73,7 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	private QueueMsgBodyCacheDao queueMsgBodyCacheDao;
 	
 	@Autowired
-	private QueueCustomerGroupDao queueCustomerGroupDao;
+	private QueueConsumerGroupDao queueConsumerGroupDao;
 	
 	@Autowired
 	private QueueDistributerDao queueDistributerDao;
@@ -175,44 +175,44 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	}
 
 	@Override
-	public long saveCustomerRegister(String ip, int port, String url, String type, int checkPort, String checkUrl, String checkType, String name, String customerGroupName, List<String> queueNameList) throws Exception {
-		CustomerVo customerVo = new CustomerVo();
-		customerVo.setIp(ip);
-		customerVo.setCheck_Port(checkPort);
-		List<CustomerVo> exchangerList = customerDao.queryCustomerList(customerVo);
+	public long saveConsumerRegister(String ip, int port, String url, String type, int checkPort, String checkUrl, String checkType, String name, String consumerGroupName, List<String> queueNameList) throws Exception {
+		ConsumerVo consumerVo = new ConsumerVo();
+		consumerVo.setIp(ip);
+		consumerVo.setCheck_Port(checkPort);
+		List<ConsumerVo> exchangerList = consumerDao.queryConsumerList(consumerVo);
 		if (exchangerList == null || exchangerList.size() == 0) {
-			customerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
-			customerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+			consumerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
+			consumerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
 		} else {
-			customerVo = exchangerList.get(0);
+			consumerVo = exchangerList.get(0);
 		}
-		customerVo.setName(name);
-		customerVo.setPort(port);
-		customerVo.setUrl(url);
-		customerVo.setType(type);
-		customerVo.setCheck_Url(checkUrl);
-		customerVo.setCheck_Type(checkType);
-		customerVo.setCustomerGroup_Nm(customerGroupName);
-		CustomerMd customerMd = customerDao.insertOrUpdate(customerVo);
-		QueueCustomerVo queueCustomerDeleteVo = new QueueCustomerVo();
-		queueCustomerDeleteVo.setCustomer_Id(customerMd.getCustomer_Id());
-		queueCustomerDao.deleteQueueCustomerByCustomerId(queueCustomerDeleteVo);
+		consumerVo.setName(name);
+		consumerVo.setPort(port);
+		consumerVo.setUrl(url);
+		consumerVo.setType(type);
+		consumerVo.setCheck_Url(checkUrl);
+		consumerVo.setCheck_Type(checkType);
+		consumerVo.setConsumerGroup_Nm(consumerGroupName);
+		ConsumerMd consumerMd = consumerDao.insertOrUpdate(consumerVo);
+		QueueConsumerVo queueConsumerDeleteVo = new QueueConsumerVo();
+		queueConsumerDeleteVo.setConsumer_Id(consumerMd.getConsumer_Id());
+		queueConsumerDao.deleteQueueConsumerByConsumerId(queueConsumerDeleteVo);
 
 		for (String queueName : queueNameList) {
-			QueueCustomerVo queueCustomerInsertVo = new QueueCustomerVo();
-			queueCustomerInsertVo.setQueue_Nm(queueName);
-			queueCustomerInsertVo.setCustomer_Id(customerMd.getCustomer_Id());
-			queueCustomerDao.insertQueueCustomer(queueCustomerInsertVo);
+			QueueConsumerVo queueConsumerInsertVo = new QueueConsumerVo();
+			queueConsumerInsertVo.setQueue_Nm(queueName);
+			queueConsumerInsertVo.setConsumer_Id(consumerMd.getConsumer_Id());
+			queueConsumerDao.insertQueueConsumer(queueConsumerInsertVo);
 		}
-		return customerMd.getCustomer_Id();
+		return consumerMd.getConsumer_Id();
 	}
 
 	@Override
-	public void saveCustomerCancel(long customerId) throws Exception {
-		CustomerVo customerVo = new CustomerVo();
-		customerVo.setCustomer_Id(customerId);
-		customerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
-		customerDao.updateCustomerSystemStatus(customerVo);
+	public void saveConsumerCancel(long consumerId) throws Exception {
+		ConsumerVo consumerVo = new ConsumerVo();
+		consumerVo.setConsumer_Id(consumerId);
+		consumerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
+		consumerDao.updateConsumerSystemStatus(consumerVo);
 	}
 
 	@Override
@@ -303,7 +303,7 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	}
 
 	@Override
-	public Map<String, Long> exchangerGetQueueCustomerGroupNum(long exchangerId) throws Exception {
+	public Map<String, Long> exchangerGetQueueConsumerGroupNum(long exchangerId) throws Exception {
 		if (!exchangerDao.ifExchangerValid(exchangerId)) {
 			return new HashMap<String, Long>();
 		}
@@ -316,17 +316,17 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 		if (queues == null) {
 			return result;
 		}
-		QueueCustomerGroupVo queueCustomerGroupVo = new QueueCustomerGroupVo();
-		queueCustomerGroupVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		QueueConsumerGroupVo queueConsumerGroupVo = new QueueConsumerGroupVo();
+		queueConsumerGroupVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
 		for (QueueExchangerVo qe : queues) {
 			String queueNm = qe.getQueue_Nm();
-			queueCustomerGroupVo.setQueue_Nm(queueNm);
-			List<QueueCustomerGroupVo> customerGroups = queueCustomerGroupDao.queryCustomerGroupList(queueCustomerGroupVo);
-			long customerNumResult = 0;
-			for (QueueCustomerGroupVo queueCustomerGroup : customerGroups) {
-				customerNumResult |= queueCustomerGroup.getCustomer_Num();
+			queueConsumerGroupVo.setQueue_Nm(queueNm);
+			List<QueueConsumerGroupVo> consumerGroups = queueConsumerGroupDao.queryConsumerGroupList(queueConsumerGroupVo);
+			long consumerNumResult = 0;
+			for (QueueConsumerGroupVo queueConsumerGroup : consumerGroups) {
+				consumerNumResult |= queueConsumerGroup.getConsumer_Num();
 			}
-			result.put(queueNm, customerNumResult);
+			result.put(queueNm, consumerNumResult);
 		}
 		return result;
 	}
@@ -421,12 +421,12 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	}
 
 	@Override
-	public Map<String, List<QueueCustomerVo>> distributerGetQueueCustomers(long distributerId) throws Exception {
+	public Map<String, List<QueueConsumerVo>> distributerGetQueueConsumers(long distributerId) throws Exception {
 		if (!distributerDao.ifDistributerValid(distributerId)) {
-			return new HashMap<String, List<QueueCustomerVo>>();
+			return new HashMap<String, List<QueueConsumerVo>>();
 		}
 
-		Map<String, List<QueueCustomerVo>> result = new HashMap<String, List<QueueCustomerVo>>();
+		Map<String, List<QueueConsumerVo>> result = new HashMap<String, List<QueueConsumerVo>>();
 		QueueDistributerVo queueDistributerVo = new QueueDistributerVo();
 		queueDistributerVo.setDistributer_Id(distributerId);
 		queueDistributerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
@@ -434,25 +434,25 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 		if (queues == null) {
 			return result;
 		}
-		QueueCustomerVo queueCustomerVo = new QueueCustomerVo();
-		queueCustomerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
-		queueCustomerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		QueueConsumerVo queueConsumerVo = new QueueConsumerVo();
+		queueConsumerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
+		queueConsumerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
 		for (QueueDistributerVo qd : queues) {
 			String queueNm = qd.getQueue_Nm();
-			queueCustomerVo.setQueue_Nm(queueNm);
-			List<QueueCustomerVo> customers = queueCustomerDao.queryCustomersByQueue(queueCustomerVo);
-			result.put(queueNm, customers);
+			queueConsumerVo.setQueue_Nm(queueNm);
+			List<QueueConsumerVo> consumers = queueConsumerDao.queryConsumersByQueue(queueConsumerVo);
+			result.put(queueNm, consumers);
 		}
 		return result;
 	}
 
 	@Override
-	public Map<String, Map<Long, List<QueueCustomerVo>>> distributerGetQueueCustomerGroups(long distributerId) throws Exception {
+	public Map<String, Map<Long, List<QueueConsumerVo>>> distributerGetQueueConsumerGroups(long distributerId) throws Exception {
 		if (!distributerDao.ifDistributerValid(distributerId)) {
-			return new HashMap<String, Map<Long, List<QueueCustomerVo>>>();
+			return new HashMap<String, Map<Long, List<QueueConsumerVo>>>();
 		}
 
-		Map<String, Map<Long, List<QueueCustomerVo>>> result = new HashMap<String, Map<Long, List<QueueCustomerVo>>>();
+		Map<String, Map<Long, List<QueueConsumerVo>>> result = new HashMap<String, Map<Long, List<QueueConsumerVo>>>();
 		QueueDistributerVo queueDistributerVo = new QueueDistributerVo();
 		queueDistributerVo.setDistributer_Id(distributerId);
 		queueDistributerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
@@ -461,32 +461,32 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 			return result;
 		}
 
-		QueueCustomerGroupVo queueCustomerGroupVo = new QueueCustomerGroupVo();
-		queueCustomerGroupVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		QueueConsumerGroupVo queueConsumerGroupVo = new QueueConsumerGroupVo();
+		queueConsumerGroupVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
 		for (QueueDistributerVo qd : queues) {
-			Map<Long, List<QueueCustomerVo>> customerMap = new HashMap<Long, List<QueueCustomerVo>>();
+			Map<Long, List<QueueConsumerVo>> consumerMap = new HashMap<Long, List<QueueConsumerVo>>();
 			String queueNm = qd.getQueue_Nm();
-			queueCustomerGroupVo.setQueue_Nm(queueNm);
-			List<QueueCustomerGroupVo> customerGroups = queueCustomerGroupDao.queryCustomerGroupList(queueCustomerGroupVo);
-			if (customerGroups == null) {
+			queueConsumerGroupVo.setQueue_Nm(queueNm);
+			List<QueueConsumerGroupVo> consumerGroups = queueConsumerGroupDao.queryConsumerGroupList(queueConsumerGroupVo);
+			if (consumerGroups == null) {
 				continue;
 			}
-			QueueCustomerVo queueCustomerVo = new QueueCustomerVo();
-			queueCustomerVo.setQueue_Nm(queueNm);
-			queueCustomerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-			queueCustomerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
-			for (QueueCustomerGroupVo vo : customerGroups) {
-				queueCustomerVo.setCustomerGroup_Nm(vo.getCustomerGroup_Nm());
-				List<QueueCustomerVo> customers = queueCustomerDao.queryCustomersByQueue(queueCustomerVo);
-				if (customers == null) {
-					customers = new ArrayList<QueueCustomerVo>();
+			QueueConsumerVo queueConsumerVo = new QueueConsumerVo();
+			queueConsumerVo.setQueue_Nm(queueNm);
+			queueConsumerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+			queueConsumerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
+			for (QueueConsumerGroupVo vo : consumerGroups) {
+				queueConsumerVo.setConsumerGroup_Nm(vo.getConsumerGroup_Nm());
+				List<QueueConsumerVo> consumers = queueConsumerDao.queryConsumersByQueue(queueConsumerVo);
+				if (consumers == null) {
+					consumers = new ArrayList<QueueConsumerVo>();
 				}
-				for (QueueCustomerVo qcVo : customers) {
+				for (QueueConsumerVo qcVo : consumers) {
 					qcVo.setDph_Timeout(qd.getDph_Timeout());
 				}
-				customerMap.put(vo.getCustomer_Num(), customers);
+				consumerMap.put(vo.getConsumer_Num(), consumers);
 			}
-			result.put(queueNm, customerMap);
+			result.put(queueNm, consumerMap);
 		}
 		return result;
 	}
@@ -500,10 +500,10 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	}
 
 	@Override
-	public void saveCustomerBeat(Long customerId) throws Exception {
-		CustomerVo customerVo = new CustomerVo();
-		customerVo.setCustomer_Id(customerId);
-		customerVo.setBeat_Time(new Date());
-		customerDao.updateCustomer(customerVo);
+	public void saveConsumerBeat(Long consumerId) throws Exception {
+		ConsumerVo consumerVo = new ConsumerVo();
+		consumerVo.setConsumer_Id(consumerId);
+		consumerVo.setBeat_Time(new Date());
+		consumerDao.updateConsumer(consumerVo);
 	}
 }

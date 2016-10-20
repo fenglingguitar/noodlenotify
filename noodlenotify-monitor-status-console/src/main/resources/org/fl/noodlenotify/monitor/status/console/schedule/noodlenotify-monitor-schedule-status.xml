@@ -14,7 +14,7 @@
 	
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
 	
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-schedule-status-customer.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-schedule-status-consumer.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-schedule-status-distributer.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-schedule-status-exchanger.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-schedule-status-msgbodycache-capacity.xml" />
@@ -31,7 +31,7 @@
 		<property name="initialDelay" value="10" />
 		<property name="executerList">
 			<list>
-				<ref bean="customerStatusExecuter" />
+				<ref bean="consumerStatusExecuter" />
 				<ref bean="distributerStatusExecuter" />
 				<ref bean="exchangerStatusExecuter" />
 				<ref bean="msgBodyCacheCapacityStatusExecuter" />

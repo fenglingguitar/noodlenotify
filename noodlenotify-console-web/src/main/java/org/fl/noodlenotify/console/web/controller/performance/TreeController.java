@@ -16,7 +16,7 @@ import org.fl.noodlenotify.console.service.ExchangerService;
 import org.fl.noodlenotify.console.service.MsgBodyCacheService;
 import org.fl.noodlenotify.console.service.MsgQueueCacheService;
 import org.fl.noodlenotify.console.service.MsgStorageService;
-import org.fl.noodlenotify.console.service.QueueCustomerGroupService;
+import org.fl.noodlenotify.console.service.QueueConsumerGroupService;
 import org.fl.noodlenotify.console.service.QueueDistributerService;
 import org.fl.noodlenotify.console.service.QueueExchangerService;
 import org.fl.noodlenotify.console.service.QueueMsgBodyCacheService;
@@ -27,7 +27,7 @@ import org.fl.noodlenotify.console.vo.ExchangerVo;
 import org.fl.noodlenotify.console.vo.MsgBodyCacheVo;
 import org.fl.noodlenotify.console.vo.MsgQueueCacheVo;
 import org.fl.noodlenotify.console.vo.MsgStorageVo;
-import org.fl.noodlenotify.console.vo.QueueCustomerGroupVo;
+import org.fl.noodlenotify.console.vo.QueueConsumerGroupVo;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
@@ -71,7 +71,7 @@ public class TreeController {
 	private QueueMsgBodyCacheService queueMsgBodyCacheService;
 	
 	@Autowired
-	private QueueCustomerGroupService queueCustomerGroupService;
+	private QueueConsumerGroupService queueConsumerGroupService;
 	
 	@RequestMapping(value = "/queryfirst")
 	@NoodleResponseBody
@@ -117,18 +117,18 @@ public class TreeController {
 		treeVoList.add(treeVo);
 		
 		treeVo = new TreeVo();
-		treeVo.setId(MonitorPerformanceConstant.MODULE_ID_CUSTOMER);
-		treeVo.setLabel(MonitorPerformanceConstant.MODULE_NAME_CUSTOMER);
+		treeVo.setId(MonitorPerformanceConstant.MODULE_ID_CONSUMER);
+		treeVo.setLabel(MonitorPerformanceConstant.MODULE_NAME_CONSUMER);
 		treeVo.setPid("ROOT");
-		treeVo.setUrl("monitor/tree/querycustomerbycustomer");
+		treeVo.setUrl("monitor/tree/queryconsumerbyconsumer");
 		treeVoList.add(treeVo);
 		
 		return treeVoList;
 	}
 	
-	@RequestMapping(value = "/querycustomerbycustomer")
+	@RequestMapping(value = "/queryconsumerbyconsumer")
 	@NoodleResponseBody
-	public List<TreeVo> queryCustomerByCustomer(String pid) throws Exception {
+	public List<TreeVo> queryConsumerByConsumer(String pid) throws Exception {
 		
 		List<TreeVo> treeVoList = new ArrayList<TreeVo>();
 		
@@ -138,7 +138,7 @@ public class TreeController {
 		treeVo.setId(MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE);
 		treeVo.setLabel(MonitorPerformanceConstant.MODULE_NAME_DISTRIBUTE);
 		treeVo.setPid(pid);
-		treeVo.setUrl("monitor/tree/querydistributebycustomer");
+		treeVo.setUrl("monitor/tree/querydistributebyconsumer");
 		treeVoList.add(treeVo);
 		
 		return treeVoList;
@@ -190,9 +190,9 @@ public class TreeController {
 		return treeVoList;
 	}
 	
-	@RequestMapping(value = "/querydistributebycustomer")
+	@RequestMapping(value = "/querydistributebyconsumer")
 	@NoodleResponseBody
-	public List<TreeVo> queryDistributeByCustomer(String pid) throws Exception {
+	public List<TreeVo> queryDistributeByConsumer(String pid) throws Exception {
 		
 		List<TreeVo> treeVoList = new ArrayList<TreeVo>();
 		
@@ -206,7 +206,7 @@ public class TreeController {
 			treeVo.setId(String.valueOf(distributerVo.getDistributer_Id()));
 			treeVo.setLabel(distributerVo.getName());
 			treeVo.setPid(pid);
-			treeVo.setUrl("monitor/tree/queryqueuebycustomer");
+			treeVo.setUrl("monitor/tree/queryqueuebyconsumer");
 			treeVoList.add(treeVo);
 		}
 		
@@ -263,9 +263,9 @@ public class TreeController {
 		return treeVoList;
 	}
 	
-	@RequestMapping(value = "/queryqueuebycustomer")
+	@RequestMapping(value = "/queryqueuebyconsumer")
 	@NoodleResponseBody
-	public List<TreeVo> queryQueueByCustomer(String pid,String queue_Nm) throws Exception {
+	public List<TreeVo> queryQueueByConsumer(String pid,String queue_Nm) throws Exception {
 		
 		List<TreeVo> treeVoList = new ArrayList<TreeVo>();
 		
@@ -281,55 +281,55 @@ public class TreeController {
 			treeVo.setId(queueDistributerVoResult.getQueue_Nm());
 			treeVo.setLabel(queueDistributerVoResult.getQueue_Nm());
 			treeVo.setPid(pid);
-			treeVo.setUrl("monitor/tree/querygroupbycustomer");
+			treeVo.setUrl("monitor/tree/querygroupbyconsumer");
 			treeVoList.add(treeVo);
 		}
 		
 		return treeVoList;
 	}
 	
-	@RequestMapping(value = "/querygroupbycustomer")
+	@RequestMapping(value = "/querygroupbyconsumer")
 	@NoodleResponseBody
-	public List<TreeVo> queryGroupByCustomer(String pid) throws Exception {
+	public List<TreeVo> queryGroupByConsumer(String pid) throws Exception {
 		
 		List<TreeVo> treeVoList = new ArrayList<TreeVo>();
 		
 		TreeVo treeVo = null;
-		QueueCustomerGroupVo queueCustomerGroupVo = new QueueCustomerGroupVo();
-		queueCustomerGroupVo.setQueue_Nm(pid);
-		queueCustomerGroupVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		List<QueueCustomerGroupVo> queueCustomerGroupVoList = queueCustomerGroupService.queryQueueByCustomerGroupList(queueCustomerGroupVo);
-		for (QueueCustomerGroupVo queueCustomerGroupVoResult : queueCustomerGroupVoList) {
+		QueueConsumerGroupVo queueConsumerGroupVo = new QueueConsumerGroupVo();
+		queueConsumerGroupVo.setQueue_Nm(pid);
+		queueConsumerGroupVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		List<QueueConsumerGroupVo> queueConsumerGroupVoList = queueConsumerGroupService.queryQueueByConsumerGroupList(queueConsumerGroupVo);
+		for (QueueConsumerGroupVo queueConsumerGroupVoResult : queueConsumerGroupVoList) {
 			treeVo = new TreeVo();
-			treeVo.setId(queueCustomerGroupVoResult.getCustomerGroup_Nm());
-			treeVo.setLabel(queueCustomerGroupVoResult.getCustomerGroup_Nm());
+			treeVo.setId(queueConsumerGroupVoResult.getConsumerGroup_Nm());
+			treeVo.setLabel(queueConsumerGroupVoResult.getConsumerGroup_Nm());
 			treeVo.setPid(pid);
-			treeVo.setUrl("monitor/tree/querycustomerbycustomergroup");
+			treeVo.setUrl("monitor/tree/queryconsumerbyconsumergroup");
 			treeVoList.add(treeVo);
 		}
 		
 		return treeVoList;
 	}
 	
-	@RequestMapping(value = "/querycustomerbycustomergroup")
+	@RequestMapping(value = "/queryconsumerbyconsumergroup")
 	@NoodleResponseBody
-	public List<TreeVo> queryCustomerByCustomergroup(String pid, String ppid) throws Exception {
+	public List<TreeVo> queryConsumerByConsumergroup(String pid, String ppid) throws Exception {
 		
 		List<TreeVo> treeVoList = new ArrayList<TreeVo>();
 		
 		TreeVo treeVo = null;
 		
-		QueueCustomerGroupVo queueCustomerGroupVo = new QueueCustomerGroupVo();
-		queueCustomerGroupVo.setQueue_Nm(ppid);
-		queueCustomerGroupVo.setCustomerGroup_Nm(pid);
-		queueCustomerGroupVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		List<QueueCustomerGroupVo> queueCustomerGroupVoList = queueCustomerGroupService.queryCustomerGroupsByQueue(queueCustomerGroupVo);
-		for (QueueCustomerGroupVo queueCustomerGroupVoResult : queueCustomerGroupVoList) {
+		QueueConsumerGroupVo queueConsumerGroupVo = new QueueConsumerGroupVo();
+		queueConsumerGroupVo.setQueue_Nm(ppid);
+		queueConsumerGroupVo.setConsumerGroup_Nm(pid);
+		queueConsumerGroupVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		List<QueueConsumerGroupVo> queueConsumerGroupVoList = queueConsumerGroupService.queryConsumerGroupsByQueue(queueConsumerGroupVo);
+		for (QueueConsumerGroupVo queueConsumerGroupVoResult : queueConsumerGroupVoList) {
 			treeVo = new TreeVo();
-			treeVo.setId(String.valueOf(queueCustomerGroupVoResult.getCustomer_Id()));
-			treeVo.setLabel(queueCustomerGroupVoResult.getName());
+			treeVo.setId(String.valueOf(queueConsumerGroupVoResult.getConsumer_Id()));
+			treeVo.setLabel(queueConsumerGroupVoResult.getName());
 			treeVo.setPid(pid);
-			treeVo.setUrl("monitor/tree/querymonitorbycustomer");
+			treeVo.setUrl("monitor/tree/querymonitorbyconsumer");
 			treeVoList.add(treeVo);
 		}
 		
@@ -388,22 +388,22 @@ public class TreeController {
 		return treeVoList;
 	}
 	
-	@RequestMapping(value = "/querymonitorbycustomer")
+	@RequestMapping(value = "/querymonitorbyconsumer")
 	@NoodleResponseBody
-	public List<TreeVo> queryMonitorByCustomer(String pid) throws Exception {
+	public List<TreeVo> queryMonitorByConsumer(String pid) throws Exception {
 		
 		List<TreeVo> treeVoList = new ArrayList<TreeVo>();
 		
 		TreeVo treeVo = null;
 		
 		treeVo = new TreeVo();
-		treeVo.setId(MonitorPerformanceConstant.MONITOR_ID_CUSTOMER_SEND);
-		treeVo.setLabel(MonitorPerformanceConstant.MONITOR_NAME_CUSTOMER_SEND);
+		treeVo.setId(MonitorPerformanceConstant.MONITOR_ID_CONSUMER_SEND);
+		treeVo.setLabel(MonitorPerformanceConstant.MONITOR_NAME_CONSUMER_SEND);
 		treeVo.setPid(pid);
 		treeVo.setUrl("monitor/tree/querynull");
 		treeVo.setEnableHighlight("true");
 		treeVo.setLoad("true");
-		treeVo.setOther(MonitorPerformanceConstant.MODULE_ID_CUSTOMER);
+		treeVo.setOther(MonitorPerformanceConstant.MODULE_ID_CONSUMER);
 		treeVoList.add(treeVo);
 		
 		return treeVoList;

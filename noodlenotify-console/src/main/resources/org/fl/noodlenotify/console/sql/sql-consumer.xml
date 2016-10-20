@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="consumer-query-list">
+	<![CDATA[
+		SELECT 
+				consumer_Id,
+				name,
+				ip,
+				port,
+				url,
+				type,
+				check_Port,
+				check_Url,
+				check_Type,
+				system_Status,
+				manual_Status,
+				consumerGroup_Nm,
+				beat_Time
+		FROM 	CSL_CONSUMER
+		WHERE 	1=1
+		 		#if($consumer_Id)
+					AND consumer_Id = :consumer_Id
+				#end
+		 		#if($name)
+					AND name LIKE :name
+				#end
+		 		#if($ip)
+					AND ip LIKE :ip
+				#end
+		 		#if($port)
+					AND port = :port
+				#end
+				#if($type)
+					AND type = :type
+				#end
+				#if($url)
+					AND url = :url
+				#end
+		 		#if($check_Port)
+					AND check_Port = :check_Port
+				#end
+				#if($check_Type)
+					AND check_Type = :check_Type
+				#end
+		 		#if($system_Status)
+					AND system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND manual_Status = :manual_Status
+				#end
+		 		#if($consumerGroup_Nm)
+					AND consumerGroup_Nm LIKE :consumerGroup_Nm
+				#end
+				#if($beat_Time_Start && $beat_Time_End)
+					AND beat_Time BETWEEN :beat_Time_Start AND :beat_Time_End
+				#end
+		ORDER BY consumer_Id desc
+	]]>
+	</query>
+
+	<query name="consumer-query-list-equal">
+	<![CDATA[
+		SELECT 
+				consumer_Id,
+				name,
+				ip,
+				port,
+				url,
+				type,
+				check_Port,
+				check_Url,
+				check_Type,
+				system_Status,
+				manual_Status,
+				consumerGroup_Nm,
+				beat_Time
+		FROM 	CSL_CONSUMER
+		WHERE 	1=1
+		 		#if($consumer_Id)
+					AND consumer_Id = :consumer_Id
+				#end
+		 		#if($name)
+					AND name = :name
+				#end
+		 		#if($ip)
+					AND ip = :ip
+				#end
+		 		#if($port)
+					AND port = :port
+				#end
+				#if($type)
+					AND type = :type
+				#end
+		 		#if($check_Port)
+					AND check_Port = :check_Port
+				#end
+				#if($check_Type)
+					AND check_Type = :check_Type
+				#end
+		 		#if($system_Status)
+					AND system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND manual_Status = :manual_Status
+				#end
+		 		#if($consumerGroup_Nm)
+					AND consumerGroup_Nm = :consumerGroup_Nm
+				#end
+				#if($beat_Time_Start && $beat_Time_End)
+					AND beat_Time BETWEEN :beat_Time_Start AND :beat_Time_End
+				#end
+		ORDER BY consumer_Id desc
+	]]>
+	</query>
+
+	<query name="consumer-update-consumernm">
+	<![CDATA[
+		UPDATE  CSL_CONSUMER SET CONSUMERGROUP_NM = null 
+		WHERE 	1=1
+		 		#if($consumerGroup_Nm)
+					AND consumerGroup_Nm = :consumerGroup_Nm
+				#end
+	]]>
+	</query>
+	
+	<query name="consumer-query-toonline-list">
+	<![CDATA[
+		SELECT 
+				consumer_Id,
+				name,
+				ip,
+				port,
+				url,
+				type,
+				check_Port,
+				check_Url,
+				check_Type,
+				system_Status,
+				manual_Status,
+				consumerGroup_Nm,
+				beat_Time
+		FROM 	CSL_CONSUMER
+		WHERE 	1=1
+				AND beat_Time >= :beat_Time 
+				AND system_Status = :system_Status
+		ORDER BY consumer_Id
+	]]>
+	</query>
+	
+	<query name="consumer-query-tooffline-list">
+	<![CDATA[
+		SELECT 
+				consumer_Id,
+				name,
+				ip,
+				port,
+				url,
+				type,
+				check_Port,
+				check_Url,
+				check_Type,
+				system_Status,
+				manual_Status,
+				consumerGroup_Nm,
+				beat_Time
+		FROM 	CSL_CONSUMER
+		WHERE 	1=1
+				AND (beat_Time < :beat_Time || beat_Time IS NULL) 
+				AND system_Status = :system_Status
+		ORDER BY consumer_Id
+	]]>
+	</query>
+
+</dynamic-hibernate>

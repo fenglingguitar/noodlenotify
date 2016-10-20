@@ -3,8 +3,8 @@ package org.fl.noodlenotify.console.service.impl;
 import java.util.List;
 
 import org.fl.noodle.common.mvc.vo.PageVo;
-import org.fl.noodlenotify.console.dao.QueueCustomerDao;
-import org.fl.noodlenotify.console.dao.QueueCustomerGroupDao;
+import org.fl.noodlenotify.console.dao.QueueConsumerDao;
+import org.fl.noodlenotify.console.dao.QueueConsumerGroupDao;
 import org.fl.noodlenotify.console.dao.QueueDao;
 import org.fl.noodlenotify.console.dao.QueueDistributerDao;
 import org.fl.noodlenotify.console.dao.QueueExchangerDao;
@@ -12,8 +12,8 @@ import org.fl.noodlenotify.console.dao.QueueMsgBodyCacheDao;
 import org.fl.noodlenotify.console.dao.QueueMsgQueueCacheDao;
 import org.fl.noodlenotify.console.dao.QueueMsgStorageDao;
 import org.fl.noodlenotify.console.service.QueueService;
-import org.fl.noodlenotify.console.vo.QueueCustomerGroupVo;
-import org.fl.noodlenotify.console.vo.QueueCustomerVo;
+import org.fl.noodlenotify.console.vo.QueueConsumerGroupVo;
+import org.fl.noodlenotify.console.vo.QueueConsumerVo;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
@@ -30,10 +30,10 @@ public class QueueServiceImpl implements QueueService {
 	private QueueDao queueDao;
 
 	@Autowired
-	private QueueCustomerDao queueCustomerDao;
+	private QueueConsumerDao queueConsumerDao;
 
 	@Autowired
-	private QueueCustomerGroupDao queueCustomerGroupDao;
+	private QueueConsumerGroupDao queueConsumerGroupDao;
 
 	@Autowired
 	private QueueExchangerDao queueExchangerDao;
@@ -82,12 +82,12 @@ public class QueueServiceImpl implements QueueService {
 
 	@Override
 	public void deleteQueue(QueueVo vo) throws Exception {
-		QueueCustomerVo queueCustomerVo = new QueueCustomerVo();
-		queueCustomerVo.setQueue_Nm(vo.getQueue_Nm());
-		queueCustomerDao.deleteQueueCustomerByQueueNm(queueCustomerVo);
-		QueueCustomerGroupVo queueCustomerGroupVo = new QueueCustomerGroupVo();
-		queueCustomerGroupVo.setQueue_Nm(vo.getQueue_Nm());
-		queueCustomerGroupDao.deleteQueueCustomerGroupByQueueNm(queueCustomerGroupVo);
+		QueueConsumerVo queueConsumerVo = new QueueConsumerVo();
+		queueConsumerVo.setQueue_Nm(vo.getQueue_Nm());
+		queueConsumerDao.deleteQueueConsumerByQueueNm(queueConsumerVo);
+		QueueConsumerGroupVo queueConsumerGroupVo = new QueueConsumerGroupVo();
+		queueConsumerGroupVo.setQueue_Nm(vo.getQueue_Nm());
+		queueConsumerGroupDao.deleteQueueConsumerGroupByQueueNm(queueConsumerGroupVo);
 		QueueExchangerVo queueExchangerVo = new QueueExchangerVo();
 		queueExchangerVo.setQueue_Nm(vo.getQueue_Nm());
 		queueExchangerDao.deleteQueueExchangerByQueueNm(queueExchangerVo);
@@ -109,12 +109,12 @@ public class QueueServiceImpl implements QueueService {
 	@Override
 	public void deletesQueue(QueueVo[] vos) throws Exception {
 		for (QueueVo vo : vos) {
-			QueueCustomerVo queueCustomerVo = new QueueCustomerVo();
-			queueCustomerVo.setQueue_Nm(vo.getQueue_Nm());
-			queueCustomerDao.deleteQueueCustomerByQueueNm(queueCustomerVo);
-			QueueCustomerGroupVo queueCustomerGroupVo = new QueueCustomerGroupVo();
-			queueCustomerGroupVo.setQueue_Nm(vo.getQueue_Nm());
-			queueCustomerGroupDao.deleteQueueCustomerGroupByQueueNm(queueCustomerGroupVo);
+			QueueConsumerVo queueConsumerVo = new QueueConsumerVo();
+			queueConsumerVo.setQueue_Nm(vo.getQueue_Nm());
+			queueConsumerDao.deleteQueueConsumerByQueueNm(queueConsumerVo);
+			QueueConsumerGroupVo queueConsumerGroupVo = new QueueConsumerGroupVo();
+			queueConsumerGroupVo.setQueue_Nm(vo.getQueue_Nm());
+			queueConsumerGroupDao.deleteQueueConsumerGroupByQueueNm(queueConsumerGroupVo);
 			QueueExchangerVo queueExchangerVo = new QueueExchangerVo();
 			queueExchangerVo.setQueue_Nm(vo.getQueue_Nm());
 			queueExchangerDao.deleteQueueExchangerByQueueNm(queueExchangerVo);

@@ -3,7 +3,7 @@ package org.fl.noodlenotify.console.remoting;
 import java.util.List;
 import java.util.Map;
 
-import org.fl.noodlenotify.console.vo.QueueCustomerVo;
+import org.fl.noodlenotify.console.vo.QueueConsumerVo;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
@@ -24,9 +24,9 @@ public interface ConsoleRemotingInvoke {
 
 	public void saveDistributerCancel(long distributerId) throws Exception;
 
-	public long saveCustomerRegister(String ip, int port, String url, String type, int checkPort, String check_Url, String check_Type, String name, String customerGroupName, List<String> queueNameList) throws Exception;
+	public long saveConsumerRegister(String ip, int port, String url, String type, int checkPort, String check_Url, String check_Type, String name, String consumerGroupName, List<String> queueNameList) throws Exception;
 
-	public void saveCustomerCancel(long customerId) throws Exception;
+	public void saveConsumerCancel(long consumerId) throws Exception;
 
 	public Map<String, List<QueueExchangerVo>> producerGetExchangers(long producerId) throws Exception;
 
@@ -36,7 +36,7 @@ public interface ConsoleRemotingInvoke {
 
 	public Map<String, List<QueueMsgBodyCacheVo>> exchangerGetMsgBodyCaches(long exchangerId) throws Exception;
 
-	public Map<String, Long> exchangerGetQueueCustomerGroupNum(long exchangerId) throws Exception;
+	public Map<String, Long> exchangerGetQueueConsumerGroupNum(long exchangerId) throws Exception;
 
 	public List<QueueDistributerVo> distributerGetQueues(long distributerId) throws Exception;
 
@@ -46,10 +46,10 @@ public interface ConsoleRemotingInvoke {
 
 	public Map<String, List<QueueMsgQueueCacheVo>> distributerGetMsgQueueCaches(long distributerId) throws Exception;
 
-	public Map<String, List<QueueCustomerVo>> distributerGetQueueCustomers(long distributerId) throws Exception;
+	public Map<String, List<QueueConsumerVo>> distributerGetQueueConsumers(long distributerId) throws Exception;
 
-	public Map<String, Map<Long, List<QueueCustomerVo>>> distributerGetQueueCustomerGroups(long distributerId) throws Exception;
+	public Map<String, Map<Long, List<QueueConsumerVo>>> distributerGetQueueConsumerGroups(long distributerId) throws Exception;
 	
 	public void saveProducerBeat(Long producerId) throws Exception;
-	public void saveCustomerBeat(Long customerId) throws Exception;
+	public void saveConsumerBeat(Long consumerId) throws Exception;
 }

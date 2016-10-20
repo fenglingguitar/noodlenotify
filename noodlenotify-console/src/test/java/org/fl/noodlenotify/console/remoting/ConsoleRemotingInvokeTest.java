@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.fl.noodlenotify.console.vo.QueueCustomerVo;
+import org.fl.noodlenotify.console.vo.QueueConsumerVo;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
@@ -88,7 +88,7 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 	}
 
 	@Test
-	public void testSaveCustomerRegist() throws Exception {
+	public void testSaveConsumerRegist() throws Exception {
 		String ip = "127.0.0.1";
 		int port = 12345;
 		String url = "test/test";
@@ -97,14 +97,14 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 		String checkUrl = "test/test";
 		String checkType = "NETTY";
 		String name = "消费者-注册-test";
-		String customerGroupName = "TestCustomerGroup1";
+		String consumerGroupName = "TestConsumerGroup1";
 		List<String> queueNameList = new ArrayList<String>();
 		queueNameList.add("TestQueue1");
-		remotingInvoke.saveCustomerRegister(ip, port, url, type, checkPort, checkUrl, checkType, name, customerGroupName, queueNameList);
+		remotingInvoke.saveConsumerRegister(ip, port, url, type, checkPort, checkUrl, checkType, name, consumerGroupName, queueNameList);
 	}
 
 	@Test
-	public void testSaveCustomerCancel() throws Exception {
+	public void testSaveConsumerCancel() throws Exception {
 		String ip = "127.0.0.1";
 		int port = 12345;
 		String url = "test/test";
@@ -113,10 +113,10 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 		String checkUrl = "test/test";
 		String checkType = "NETTY";
 		String name = "消费者-注册-test";
-		String customerGroupName = "TestCustomerGroup1";
+		String consumerGroupName = "TestConsumerGroup1";
 		List<String> queueNameList = new ArrayList<String>();
 		queueNameList.add("TestQueue1");
-		remotingInvoke.saveCustomerCancel(remotingInvoke.saveCustomerRegister(ip, port, url, type, checkPort, checkUrl, checkType, name, customerGroupName, queueNameList));
+		remotingInvoke.saveConsumerCancel(remotingInvoke.saveConsumerRegister(ip, port, url, type, checkPort, checkUrl, checkType, name, consumerGroupName, queueNameList));
 	}
 
 	@Test
@@ -168,11 +168,11 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 	}
 
 	@Test
-	public void testExchangerGetQueueCustomerGroupNum() throws Exception {
+	public void testExchangerGetQueueConsumerGroupNum() throws Exception {
 		long exchangerId = 1;
-		Map<String, Long> map = remotingInvoke.exchangerGetQueueCustomerGroupNum(exchangerId);
-		for (Map.Entry<String, Long> queueCustomerGroupNum : map.entrySet()) {
-			logger.info("QueueName: " + queueCustomerGroupNum.getKey() + ", QueueCustomerGroupNum: " + queueCustomerGroupNum.getValue());
+		Map<String, Long> map = remotingInvoke.exchangerGetQueueConsumerGroupNum(exchangerId);
+		for (Map.Entry<String, Long> queueConsumerGroupNum : map.entrySet()) {
+			logger.info("QueueName: " + queueConsumerGroupNum.getKey() + ", QueueConsumerGroupNum: " + queueConsumerGroupNum.getValue());
 		}
 	}
 
@@ -225,30 +225,30 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 	}
 
 	@Test
-	public void testDistributerGetQueueCustomers() throws Exception {
+	public void testDistributerGetQueueConsumers() throws Exception {
 		long distributerId = 4;
-		Map<String, List<QueueCustomerVo>> map = remotingInvoke.distributerGetQueueCustomers(distributerId);
+		Map<String, List<QueueConsumerVo>> map = remotingInvoke.distributerGetQueueConsumers(distributerId);
 		Set<String> set = map.keySet();
 		for (String queueName : set) {
-			List<QueueCustomerVo> list = map.get(queueName);
-			for (QueueCustomerVo queueCustomerVo : list) {
-				logger.info("QueueName: " + queueName + ", CustomerId: " + queueCustomerVo.getCustomer_Id());
+			List<QueueConsumerVo> list = map.get(queueName);
+			for (QueueConsumerVo queueConsumerVo : list) {
+				logger.info("QueueName: " + queueName + ", ConsumerId: " + queueConsumerVo.getConsumer_Id());
 			}
 		}
 	}
 
 	@Test
-	public void testDistributerGetQueueCustomerGroups() throws Exception {
+	public void testDistributerGetQueueConsumerGroups() throws Exception {
 		long distributerId = 4;
-		Map<String, Map<Long, List<QueueCustomerVo>>> map = remotingInvoke.distributerGetQueueCustomerGroups(distributerId);
+		Map<String, Map<Long, List<QueueConsumerVo>>> map = remotingInvoke.distributerGetQueueConsumerGroups(distributerId);
 		Set<String> set = map.keySet();
 		for (String queueName : set) {
-			Map<Long, List<QueueCustomerVo>> map1 = map.get(queueName);
+			Map<Long, List<QueueConsumerVo>> map1 = map.get(queueName);
 			Set<Long> set1 = map1.keySet();
 			for (Long l : set1) {
-				List<QueueCustomerVo> list = map1.get(l);
-				for (QueueCustomerVo queueCustomerVo : list) {
-					logger.info("QueueName: " + queueName + ", CustomerNum: " + l + ", CustomerId: " + queueCustomerVo.getCustomer_Id());
+				List<QueueConsumerVo> list = map1.get(l);
+				for (QueueConsumerVo queueConsumerVo : list) {
+					logger.info("QueueName: " + queueName + ", ConsumerNum: " + l + ", ConsumerId: " + queueConsumerVo.getConsumer_Id());
 				}
 			}
 		}
@@ -260,7 +260,7 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 	}
 	
 	@Test
-	public void testSaveCustomerBeat() throws Exception {
-		remotingInvoke.saveCustomerBeat(1L);
+	public void testSaveConsumerBeat() throws Exception {
+		remotingInvoke.saveConsumerBeat(1L);
 	}
 }

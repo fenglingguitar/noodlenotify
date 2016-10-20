@@ -43,8 +43,8 @@
 				               <li><a href="#" onclick="javascript:top.addTab('mainframe_1_5', '数据库', '<%=request.getContextPath()%>/view/console/msgstorage/msgstorage_main.jsp');">数据库</a></li>
 				               <li><a href="#" onclick="javascript:top.addTab('mainframe_1_6', '队列缓存', '<%=request.getContextPath()%>/view/console/msgqueuecache/msgqueuecache_main.jsp');">队列缓存</a></li>
 				               <li><a href="#" onclick="javascript:top.addTab('mainframe_1_7', '消息体缓存', '<%=request.getContextPath()%>/view/console/msgbodycache/msgbodycache_main.jsp');">消息体缓存</a></li>
-				               <li><a href="#" onclick="javascript:top.addTab('mainframe_1_8', '消费者组', '<%=request.getContextPath()%>/view/console/customergroup/customergroup_main.jsp');">消费者组</a></li>
-				               <li><a href="#" onclick="javascript:top.addTab('mainframe_1_9', '消费者', '<%=request.getContextPath()%>/view/console/customer/customer_main.jsp');">消费者</a></li>
+				               <li><a href="#" onclick="javascript:top.addTab('mainframe_1_8', '消费者组', '<%=request.getContextPath()%>/view/console/consumergroup/consumergroup_main.jsp');">消费者组</a></li>
+				               <li><a href="#" onclick="javascript:top.addTab('mainframe_1_9', '消费者', '<%=request.getContextPath()%>/view/console/consumer/consumer_main.jsp');">消费者</a></li>
 							</ul>
 						</li>
 				    </ul>

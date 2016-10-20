@@ -398,7 +398,7 @@
 					}
 				}
 				
-			} else if (data.other == 'CUSTOMER') {
+			} else if (data.other == 'CONSUMER') {
 				
 				data.pppppppid = node.parent.parent.parent.parent.parent.parent.parent.data.id;
 				var pppppppid = data.pppppppid.replace(/\W/g, '');

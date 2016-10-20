@@ -29,7 +29,7 @@
 			init-method="start" destroy-method="destroy"
 			parent="consumerClientParam" 
 			depends-on="netConnectReceiveServer">
-		<property name="customerGroupName" value="TestCustomerGroup1" />
+		<property name="consumerGroupName" value="TestConsumerGroup1" />
 		<property name="consumerClientName" value="TestConsumerClient1" />
 		<property name="localIp" value="127.0.0.1" />
 		<!-- <property name="localPort" value="20501" />

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="queue-consumergroup-query-list">
+	<![CDATA[
+		SELECT 
+				queue_Nm,
+				consumerGroup_Nm,
+				consumer_Num
+		FROM CSL_QUEUE_CONSUMER_GROUP
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND queue_Nm = :queue_Nm
+				#end
+		 		#if($consumerGroup_Nm)
+					AND consumerGroup_Nm = :consumerGroup_Nm
+				#end
+		 		#if($consumer_Num)
+					AND consumer_Num = :consumer_Num
+				#end
+	]]>
+	</query>
+	
+	<query name="queue-consumergroup-query-consumer">
+	<![CDATA[
+		SELECT 
+				c.consumer_Id,
+				c.name,
+				c.ip,
+				c.port,
+				c.url,
+				c.type,
+				c.check_Port,
+				c.check_Url,
+				c.check_Type,
+				c.system_Status,
+				c.manual_Status,
+				qcg.queue_Nm,
+				qcg.consumerGroup_Nm,
+				qcg.consumer_Num
+		FROM    CSL_CONSUMER c, CSL_QUEUE_CONSUMER_GROUP qcg, CSL_QUEUE_CONSUMER qc 
+		WHERE 	c.consumerGroup_Nm = qcg.consumerGroup_Nm
+				AND qcg.queue_Nm = qc.queue_Nm
+				AND c.consumer_Id = qc.consumer_Id
+		 		#if($queue_Nm)
+					AND qcg.queue_Nm = :queue_Nm
+				#end
+		 		#if($consumerGroup_Nm)
+					AND c.consumerGroup_Nm = :consumerGroup_Nm
+				#end
+		 		#if($system_Status)
+					AND c.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND c.manual_Status = :manual_Status
+				#end
+		
+	]]>
+	</query>
+	
+	<query name="queue-consumergroup-query-includelist">
+	<![CDATA[
+		SELECT 
+				qcg.queue_Nm,
+				qcg.consumer_Num,
+				cg.consumerGroup_Nm,
+				cg.manual_Status
+		FROM    CSL_CONSUMER_GROUP cg, CSL_QUEUE_CONSUMER_GROUP qcg
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND qcg.queue_Nm = :queue_Nm
+				#end
+		 		#if($consumerGroup_Nm)
+					AND cg.consumerGroup_Nm = :consumerGroup_Nm
+				#end
+		 		#if($consumer_Num)
+					AND qcg.consumer_Num = :consumer_Num
+				#end
+		 		#if($manual_Status)
+					AND cg.manual_Status = :manual_Status
+				#end
+				AND cg.consumerGroup_Nm = qcg.consumerGroup_Nm
+		ORDER BY  qcg.consumer_Num 
+	]]>
+	</query>
+	<query name="queue-consumergroup-query-excludelist">
+	<![CDATA[
+		SELECT 
+				cg.consumerGroup_Nm,
+				cg.manual_Status
+		FROM    CSL_CONSUMER_GROUP cg
+		WHERE 	1=1
+		 		#if($consumerGroup_Nm)
+					AND cg.consumerGroup_Nm LIKE :consumerGroup_Nm
+				#end
+		 		#if($manual_Status)
+					AND cg.manual_Status = :manual_Status
+				#end
+				AND cg.consumerGroup_Nm NOT IN (SELECT consumerGroup_Nm FROM CSL_QUEUE_CONSUMER_GROUP  WHERE queue_Nm = :queue_Nm)
+	]]>
+	</query>
+	
+	<query name="queue-consumergroupnum-query-unuselist">
+	<![CDATA[
+		SELECT 
+				agn.group_Num as consumer_Num
+		FROM    CSL_AXL_GROUP_NUM agn
+		WHERE 	
+		 		agn.group_Num NOT IN (SELECT consumer_Num FROM CSL_QUEUE_CONSUMER_GROUP  WHERE queue_Nm = :queue_Nm)
+		ORDER BY agn.group_Num	 		
+	]]>
+	</query>
+	
+	<query name="queue-consumergroup-query-queue">
+	<![CDATA[
+		SELECT 	
+				q.queue_Nm,
+				q.is_Repeat,
+				q.expire_Time,
+				q.manual_Status,
+				qcg.consumerGroup_Nm
+		FROM 	CSL_QUEUE q, CSL_QUEUE_CONSUMER_GROUP qcg
+		WHERE 	1=1
+		 		#if($consumerGroup_Nm)
+					AND qcg.consumerGroup_Nm = :consumerGroup_Nm
+				#end
+				#if($queue_Nm)
+					AND q.queue_Nm = :queue_Nm
+				#end
+		 		#if($manual_Status)
+					AND q.manual_Status = :manual_Status
+				#end
+				AND q.queue_Nm = qcg.queue_Nm
+	]]>
+	</query>
+	
+	<query name="queue-consumergroup-query-byqueue">
+	<![CDATA[
+		SELECT 	
+				q.queue_Nm,
+				q.is_Repeat,
+				q.expire_Time,
+				q.manual_Status,
+				qcg.consumerGroup_Nm
+		FROM 	CSL_QUEUE q, CSL_QUEUE_CONSUMER_GROUP qcg, CSL_CONSUMER_GROUP cg
+		WHERE 	1=1
+		 		#if($consumerGroup_Nm)
+					AND qcg.consumerGroup_Nm = :consumerGroup_Nm
+				#end
+				#if($queue_Nm)
+					AND q.queue_Nm = :queue_Nm
+				#end
+				#if($manual_Status)
+					AND cg.manual_Status = :manual_Status
+				#end
+				AND q.queue_Nm = qcg.queue_Nm
+				AND cg.consumerGroup_Nm = qcg.consumerGroup_Nm
+	]]>
+	</query>
+	
+	<query name="queue-consumergroup-query-consumergroup">
+	<![CDATA[
+		SELECT 	
+				qcg.queue_Nm,
+				qcg.consumer_Num,
+				qcg.consumerGroup_Nm,
+				cg.manual_Status
+		FROM 	CSL_CONSUMER_GROUP cg, CSL_QUEUE_CONSUMER_GROUP qcg
+		WHERE 	1=1
+		 		#if($queue_Nm)
+					AND qcg.queue_Nm = :queue_Nm
+				#end
+		 		#if($consumerGroup_Nm)
+					AND qcg.consumerGroup_Nm = :consumerGroup_Nm
+				#end
+		 		#if($consumer_Num)
+					AND qcg.consumer_Num = :consumer_Num
+				#end
+		 		#if($manual_Status)
+					AND cg.manual_Status = :manual_Status
+				#end
+				AND cg.consumerGroup_Nm = qcg.consumerGroup_Nm
+	]]>
+	</query>
+	
+	
+</dynamic-hibernate>

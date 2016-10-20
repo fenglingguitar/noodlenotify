@@ -14,7 +14,7 @@ import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 
 public class ConsumerClient implements NetConnectReceiver {
 	
-	private String customerGroupName;
+	private String consumerGroupName;
 	
 	private Map<String, ConsumerReceiver> consumerReceiverMap
 						= new HashMap<String, ConsumerReceiver>();
@@ -42,15 +42,15 @@ public class ConsumerClient implements NetConnectReceiver {
 			consumerClientName = NetAddressUtil.getLocalHostName();
 		}		
 		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
-		moduleId = consoleRemotingInvoke.saveCustomerRegister(localIp, localPort, url, type, checkPort,
-					checkUrl, checkType, consumerClientName, customerGroupName, 
+		moduleId = consoleRemotingInvoke.saveConsumerRegister(localIp, localPort, url, type, checkPort,
+					checkUrl, checkType, consumerClientName, consumerGroupName, 
 					new ArrayList<String>(consumerReceiverMap.keySet()));
 		
 		consumerModuleRegister.setModuleId(moduleId);
 	}
 	
 	public void destroy() throws Exception {
-		consoleRemotingInvoke.saveCustomerCancel(moduleId);
+		consoleRemotingInvoke.saveConsumerCancel(moduleId);
 		stopSign = true;
 	}
 	
@@ -75,8 +75,8 @@ public class ConsumerClient implements NetConnectReceiver {
 		this.consumerReceiverMap = consumerReceiverMap;
 	}
 	
-	public void setCustomerGroupName(String customerGroupName) {
-		this.customerGroupName = customerGroupName;
+	public void setConsumerGroupName(String consumerGroupName) {
+		this.consumerGroupName = consumerGroupName;
 	}
 
 	public void setConsoleRemotingInvoke(ConsoleRemotingInvoke consoleRemotingInvoke) {

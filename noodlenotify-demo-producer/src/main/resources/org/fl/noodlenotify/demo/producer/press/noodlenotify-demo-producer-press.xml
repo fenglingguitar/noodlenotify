@@ -31,7 +31,7 @@
 	<bean id="producerClientProxy" class="org.fl.noodle.common.test.press.PressToolClientSpringProxyFactory">
 		<property name="interfaceName" value="org.fl.noodlenotify.core.pclient.ProducerClient"/>
 		<property name="serviceOriginal" ref="producerClient"/>
-		<property name="planExecuteNum" value="30000"/>
+		<property name="planExecuteNum" value="10000"/>
 		<property name="threadNum" value="50"/>
 		<property name="executeInterval" value="1"/>
 		<property name="monitorInterval" value="1000"/>

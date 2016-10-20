@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dynamic-hibernate>
+	<query name="consumer-group-query-list">
+	<![CDATA[
+		SELECT 
+				consumerGroup_Nm,
+				manual_Status
+		FROM 	CSL_CONSUMER_GROUP
+		WHERE 	1=1
+		 		#if($consumerGroup_Nm)
+					AND consumerGroup_Nm LIKE :consumerGroup_Nm
+				#end
+		 		#if($manual_Status)
+					AND manual_Status = :manual_Status
+				#end
+		ORDER BY consumerGroup_Nm
+	]]>
+	</query>
+	<query name="consumergroup-query-includelist">
+	<![CDATA[
+		SELECT 
+				c.consumer_Id,
+				c.name,
+				c.ip,
+				c.port,
+				c.url,
+				c.type,
+				c.check_Port,
+				c.check_Url,
+				c.check_Type,
+				c.system_Status,
+				c.manual_Status,
+				c.consumerGroup_Nm
+		FROM 	CSL_CONSUMER c
+		WHERE 	1=1
+				#if($name)
+					AND c.name LIKE :name
+				#end
+		 		#if($ip)
+					AND c.ip LIKE :ip
+				#end
+		 		#if($port)
+					AND c.port = :port
+				#end
+				#if($type)
+					AND c.type = :type
+				#end
+		 		#if($check_Port)
+					AND c.check_Port = :check_Port
+				#end
+				#if($check_Type)
+					AND c.check_Type = :check_Type
+				#end
+		 		#if($system_Status)
+					AND c.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND c.manual_Status = :manual_Status
+				#end
+		 		#if($consumerGroup_Nm)
+					AND c.consumerGroup_Nm = :consumerGroup_Nm
+				#end
+		ORDER BY consumer_Id desc
+	]]>
+	</query>
+	
+	<query name="consumergroup-query-excludelist">
+	<![CDATA[
+		SELECT 
+				c.consumer_Id,
+				c.name,
+				c.ip,
+				c.port,
+				c.url,
+				c.type,
+				c.check_Port,
+				c.check_Url,
+				c.check_Type,
+				c.system_Status,
+				c.manual_Status,
+				c.consumerGroup_Nm
+		FROM 	CSL_CONSUMER c
+		WHERE 	1=1
+				#if($name)
+					AND c.name LIKE :name
+				#end
+		 		#if($ip)
+					AND c.ip LIKE :ip
+				#end
+		 		#if($port)
+					AND c.port = :port
+				#end
+				#if($type)
+					AND c.type = :type
+				#end
+		 		#if($check_Port)
+					AND c.check_Port = :check_Port
+				#end
+				#if($check_Type)
+					AND c.check_Type = :check_Type
+				#end
+		 		#if($system_Status)
+					AND c.system_Status = :system_Status
+				#end
+		 		#if($manual_Status)
+					AND c.manual_Status = :manual_Status
+				#end
+		 		AND c.consumerGroup_Nm is null
+		 ORDER BY consumer_Id DESC
+	]]>
+	</query>
+
+</dynamic-hibernate>

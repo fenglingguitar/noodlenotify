@@ -11,7 +11,7 @@
 			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/executer/noodlenotify-monitor-status-executer-beat-customer.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/executer/noodlenotify-monitor-status-executer-beat-consumer.xml" />
 		
 	<bean id="beatExecuterSchedule" class="org.fl.noodle.common.monitor.schedule.ExecuterSchedule"
 		init-method="start" destroy-method="destroy" >
@@ -19,7 +19,7 @@
 		<property name="initialDelay" value="10" />
 		<property name="executerList">
 			<list>
-				<ref bean="customerBeatExecuter" />
+				<ref bean="consumerBeatExecuter" />
 			</list>
 		</property>
 	</bean>
