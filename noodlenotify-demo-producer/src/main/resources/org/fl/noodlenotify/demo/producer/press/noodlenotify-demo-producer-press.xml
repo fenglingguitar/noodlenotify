@@ -13,7 +13,7 @@
 	default-autowire="byName">
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/manager/noodlenotify-core-connect-net-manager-producer.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/schedule/noodlenotify-monitor-status-schedule-beat-producer.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/schedule/noodlenotify-monitor-status-beat-schedule-producer.xml" />
 	
 	<bean id="producerModuleRegister" class="org.fl.noodle.common.connect.register.ModuleRegister" />
 	

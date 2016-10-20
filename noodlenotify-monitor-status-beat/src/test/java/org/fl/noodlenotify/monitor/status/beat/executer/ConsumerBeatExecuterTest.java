@@ -7,7 +7,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 @ContextConfiguration(locations = {
-		"classpath:org/fl/noodlenotify/monitor/status/beat/executer/noodlenotify-monitor-status-executer-beat-consumer.xml"
+		"classpath:org/fl/noodlenotify/monitor/status/beat/executer/noodlenotify-monitor-status-beat-executer-consumer.xml"
 })
 public class ConsumerBeatExecuterTest extends AbstractJUnit4SpringContextTests {
 

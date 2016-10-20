@@ -8,7 +8,7 @@ import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodlenotify.monitor.status.beat.executer.ProducerBeatExecuter;
 
 @ContextConfiguration(locations = {
-		"classpath:org/fl/noodlenotify/monitor/status/beat/executer/noodlenotify-monitor-status-executer-beat-producer.xml"
+		"classpath:org/fl/noodlenotify/monitor/status/beat/executer/noodlenotify-monitor-status-beat-executer-producer.xml"
 })
 public class ProducerBeatExecuterTest extends AbstractJUnit4SpringContextTests {
 

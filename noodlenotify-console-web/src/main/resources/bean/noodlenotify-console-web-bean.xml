@@ -15,7 +15,7 @@
 	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/schedule/noodlenotify-monitor-schedule-status.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/schedule/noodlenotify-monitor-status-console-schedule-status.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/bean/client/noodlenotify-pclient-console.xml" />
 	
  	<bean name="consoleRemotingInvokeExporter" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">

@@ -7,7 +7,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 @ContextConfiguration(locations = { 
-		"classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-schedule-status-msgqueuecache-capacity.xml" 
+		"classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-status-console-executer-msgqueuecache-capacity.xml" 
 })
 
 public class MsgQueueCacheCapacityStatusExecuterScheduleTest extends AbstractJUnit4SpringContextTests {

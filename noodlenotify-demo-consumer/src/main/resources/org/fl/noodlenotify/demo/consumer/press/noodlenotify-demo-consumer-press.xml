@@ -13,7 +13,7 @@
 	default-autowire="byName">
 	
 	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/schedule/noodlenotify-monitor-status-schedule-beat-consumer.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/schedule/noodlenotify-monitor-status-beat-schedule-consumer.xml" />
 	
 	<bean id="consumerModuleRegister" class="org.fl.noodle.common.connect.register.ModuleRegister" />
 	
