@@ -6,31 +6,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
+import org.fl.noodle.common.connect.manager.AbstractConnectManager;
+import org.fl.noodle.common.connect.node.ConnectNode;
+import org.fl.noodle.common.connect.node.ConnectNodeImpl;
+import org.fl.noodle.common.connect.register.ModuleRegister;
+import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
+import org.fl.noodlenotify.console.vo.QueueExchangerVo;
+import org.fl.noodlenotify.core.connect.net.constent.NetConnectManagerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
-import org.fl.noodlenotify.console.vo.QueueExchangerVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
-import org.fl.noodlenotify.core.connect.ConnectManagerAbstract;
-import org.fl.noodlenotify.core.connect.QueueAgent;
-import org.fl.noodlenotify.core.connect.net.NetQueueAgent;
-
-public class ProducerNetConnectManager extends ConnectManagerAbstract {
+public class ProducerNetConnectManager extends AbstractConnectManager implements ApplicationListener<ContextRefreshedEvent> {
 	
 	private final static Logger logger = LoggerFactory.getLogger(ProducerNetConnectManager.class);
 	
-	Map<String, ConnectAgentFactory> connectAgentFactoryMap;
+	private ModuleRegister producerModuleRegister;
 	
-	public ProducerNetConnectManager() {
-	}
-	
-	public ProducerNetConnectManager(ConnectAgentFactory connectAgentFactory) {
-		super(connectAgentFactory);
-	}
+	private ConsoleRemotingInvoke consoleRemotingInvoke;
 
 	@Override
 	protected void updateConnectAgent() {
+		
+		long moduleId = producerModuleRegister.getModuleId();
 		
 		Map<String, List<QueueExchangerVo>> consoleInfoMap = null;
 		
@@ -69,10 +70,10 @@ public class ProducerNetConnectManager extends ConnectManagerAbstract {
 			List<ConnectAgent> connectAgentList = new ArrayList<ConnectAgent>();
 			Set<String> queueNameSet = consoleInfoMap.keySet();
 			for (String queueName : queueNameSet) {
-				QueueAgent queueAgent = queueAgentMap.get(queueName);
-				if (queueAgent == null) {
-					queueAgent = new NetQueueAgent(queueName);
-					queueAgentMap.put(queueName, queueAgent);
+				ConnectNode connectNode = connectNodeMap.get(queueName);
+				if (connectNode == null) {
+					connectNode = new ConnectNodeImpl(queueName);
+					connectNodeMap.put(queueName, connectNode);
 					if (logger.isDebugEnabled()) {
 						logger.debug("UpdateConnectAgent -> Add Queue -> " 
 								+ "ModuleId: " + moduleId
@@ -88,8 +89,8 @@ public class ProducerNetConnectManager extends ConnectManagerAbstract {
 						ConnectAgent connectAgent = connectAgentMap.get(queueExchangerVo.getExchanger_Id());
 						if (connectAgent == null) {
 							connectAgent = connectAgentFactory
-									.createConnectAgent(queueExchangerVo.getIp(),
-											queueExchangerVo.getPort(), queueExchangerVo.getUrl(), queueExchangerVo.getExchanger_Id());
+									.createConnectAgent(queueExchangerVo.getExchanger_Id(), queueExchangerVo.getIp(),
+											queueExchangerVo.getPort(), queueExchangerVo.getUrl());
 							try {
 								connectAgent.connect();
 								if (logger.isDebugEnabled()) {
@@ -118,11 +119,8 @@ public class ProducerNetConnectManager extends ConnectManagerAbstract {
 								}
 							}
 						} else {
-							if (connectAgent.getIp().equals(queueExchangerVo.getIp()) 
-									&& connectAgent.getPort() == queueExchangerVo.getPort()
-										&& (connectAgent.getUrl() != null && queueExchangerVo.getUrl() != null && connectAgent.getUrl().equals(queueExchangerVo.getUrl()) || (connectAgent.getUrl() == null && queueExchangerVo.getUrl() == null))
-											&& connectAgent.getType().equals(queueExchangerVo.getType())) {
-								if (connectAgent.getConnectStatus() == false) {
+							if (connectAgent.isSameConnect(queueExchangerVo.getIp(), queueExchangerVo.getPort(), queueExchangerVo.getUrl(), queueExchangerVo.getType())) {
+								if (!connectAgent.isHealthyConnect()) {
 									try {
 										connectAgent.reconnect();
 										if (logger.isDebugEnabled()) {
@@ -160,15 +158,15 @@ public class ProducerNetConnectManager extends ConnectManagerAbstract {
 											+ "ModuleId: " + moduleId
 											+ ", QueueName: " + queueName
 											+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
-											+ ", Ip: " + connectAgent.getIp()
-											+ ", Port: " + connectAgent.getPort()
+											//+ ", Ip: " + connectAgent.getIp()
+											//+ ", Port: " + connectAgent.getPort()
 											+ ", Ip Or Port Change"
 											);
 								}
 								
 								connectAgent = connectAgentFactory
-										.createConnectAgent(queueExchangerVo.getIp(),
-												queueExchangerVo.getPort(), queueExchangerVo.getUrl(), queueExchangerVo.getExchanger_Id());
+										.createConnectAgent(queueExchangerVo.getExchanger_Id(), queueExchangerVo.getIp(),
+												queueExchangerVo.getPort(), queueExchangerVo.getUrl());
 								try {
 									connectAgent.connect();
 									if (logger.isDebugEnabled()) {
@@ -201,14 +199,14 @@ public class ProducerNetConnectManager extends ConnectManagerAbstract {
 						}
 					}
 				}
-				queueAgent.updateConnectAgents(connectAgentList);
+				connectNode.updateConnectAgentList(connectAgentList);
 				connectAgentList.clear();
 			}
 			
-			Set<String> queueAgentMapSet = queueAgentMap.keySet();
+			Set<String> queueAgentMapSet = connectNodeMap.keySet();
 			for (String queueName : queueAgentMapSet) {
 				if (!queueNameSet.contains(queueName)) {
-					queueAgentMap.remove(queueName);
+					connectNodeMap.remove(queueName);
 					if (logger.isDebugEnabled()) {
 						logger.debug("UpdateConnectAgent -> Remove Queue -> " 
 								+ "ModuleId: " + moduleId
@@ -228,8 +226,8 @@ public class ProducerNetConnectManager extends ConnectManagerAbstract {
 						logger.debug("UpdateConnectAgent -> Remove Connect -> " 
 								+ "ModuleId: " + moduleId
 								+ ", ConnectId: " + connectAgent.getConnectId()
-								+ ", Ip: " + connectAgent.getIp()
-								+ ", Port: " + connectAgent.getPort()
+								//+ ", Ip: " + connectAgent.getIp()
+								//+ ", Port: " + connectAgent.getPort()
 								);
 					}
 				}
@@ -240,7 +238,9 @@ public class ProducerNetConnectManager extends ConnectManagerAbstract {
 	@Override
 	protected void destroyConnectAgent() {
 
-		queueAgentMap.clear();
+		connectNodeMap.clear();
+		
+		long moduleId = producerModuleRegister.getModuleId();
 		
 		Set<Long> connectAgentKeySet = connectAgentMap.keySet();
 		for (long key : connectAgentKeySet) {
@@ -250,16 +250,27 @@ public class ProducerNetConnectManager extends ConnectManagerAbstract {
 				logger.debug("DestroyConnectAgent -> Close -> " 
 						+ "ModuleId: " + moduleId
 						+ ", ConnectId: " + connectAgent.getConnectId()
-						+ ", Ip: " + connectAgent.getIp()
-						+ ", Port: " + connectAgent.getPort()
+						//+ ", Ip: " + connectAgent.getIp()
+						//+ ", Port: " + connectAgent.getPort()
 						);
 			}
 		}
 		connectAgentMap.clear();
 	}
 	
-	public void setConnectAgentFactoryMap(
-			Map<String, ConnectAgentFactory> connectAgentFactoryMap) {
-		this.connectAgentFactoryMap = connectAgentFactoryMap;
+	public void setConsoleRemotingInvoke(ConsoleRemotingInvoke consoleRemotingInvoke) {
+		this.consoleRemotingInvoke = consoleRemotingInvoke;
+	}
+
+	@Override
+	protected String getManagerName() {
+		return NetConnectManagerType.NET.getCode();
+	}
+
+	@Override
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+		if (event.getApplicationContext().getParent() == null) {
+			updateConnectAgent();
+		}
 	}
 }

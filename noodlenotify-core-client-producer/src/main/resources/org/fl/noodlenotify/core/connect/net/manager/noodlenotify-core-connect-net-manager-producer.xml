@@ -12,12 +12,15 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
+	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/netty/client/noodlenotify-core-connect-net-client-netty-factory.xml" />
-	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/jetty/client/noodlenotify-core-connect-net-client-jetty-factory.xml" />
+
+	<import resource="classpath:org/fl/noodlenotify/core/connect/net/cluster/noodlenotify-core-connect-net-cluster-factory.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/net/serialize/noodlenotify-core-connect-net-serialize-factory.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/net/route/noodlenotify-core-connect-net-route-factory.xml" />
 
     <bean id="producerNetConnectManager" class="org.fl.noodlenotify.core.connect.net.manager.ProducerNetConnectManager" 
 			parent="commonParam">
@@ -25,6 +28,25 @@
 			<map>
 				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />
 				<entry key="HTTP" value-ref="connectAgentFactoryJetty" />
+			</map>
+		</property>
+		<property name="connectClusterFactoryMap">
+			<map>
+				<entry key="FAILOVER" value-ref="netFailoverConnectClusterFactory" />
+				<entry key="ONCE" value-ref="netOnceConnectClusterFactory" />
+				<entry key="ALL" value-ref="netAllConnectClusterFactory" />
+			</map>
+		</property>
+		<property name="connectSerializeFactoryMap">
+			<map>
+				<entry key="JSON" value-ref="jsonNetConnectSerializeFactory" />
+			</map>
+		</property>
+		<property name="connectRouteFactoryMap">
+			<map>
+				<entry key="RANDOM" value-ref="randomConnectRouteFactory" />
+				<entry key="WEIGHT" value-ref="weightConnectRouteFactory" />
+				<entry key="RESPONSE" value-ref="responseConnectRouteFactory" />
 			</map>
 		</property>
     </bean>

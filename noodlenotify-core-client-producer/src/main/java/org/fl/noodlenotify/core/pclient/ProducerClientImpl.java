@@ -2,23 +2,16 @@ package org.fl.noodlenotify.core.pclient;
 
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.fl.noodle.common.connect.cluster.ConnectCluster;
+import org.fl.noodle.common.connect.exception.ConnectInvokeException;
+import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
-import org.fl.noodlenotify.core.connect.ConnectManager;
-import org.fl.noodlenotify.core.connect.QueueAgent;
-import org.fl.noodlenotify.core.connect.exception.ConnectionNothingQueueException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionTimeoutException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
-import org.fl.noodlenotify.core.connect.net.manager.ProducerNetConnectManager;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProducerClientImpl implements ProducerClient {
 	
@@ -35,13 +28,9 @@ public class ProducerClientImpl implements ProducerClient {
 	private String checkUrl;
 	private String checkType;
 	
-	private ModuleRegister producerModuleRegister;
+	protected ModuleRegister producerModuleRegister;
 
 	public ProducerClientImpl() {
-	}
-	
-	public ProducerClientImpl(ConnectAgentFactory connectAgentFactory) {
-		netConnectManager = new ProducerNetConnectManager(connectAgentFactory);
 	}
 	
 	public void start() throws Exception {
@@ -55,15 +44,15 @@ public class ProducerClientImpl implements ProducerClient {
 
 		producerModuleRegister.setModuleId(moduleId);
 		
-		netConnectManager.setModuleId(moduleId);
-		netConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		netConnectManager.start();
+		//netConnectManager.setModuleId(0);
+		//netConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
+		//netConnectManager.start();
 	}
 
 	public void destroy() throws Exception {
 		
 		consoleRemotingInvoke.saveProducerCancel(moduleId);
-		netConnectManager.destroy();
+		//netConnectManager.destroy();
 	}
 	
 	@Override
@@ -75,8 +64,20 @@ public class ProducerClientImpl implements ProducerClient {
 		message.setUuid(uuid);
 		message.setContent(content);
 		
-		QueueAgent queueAgent = netConnectManager.getQueueAgent(queueName);
-		if (queueAgent == null) {
+		ConnectCluster connectCluster = netConnectManager.getConnectCluster(queueName);
+		if (connectCluster == null) {
+			if (logger.isErrorEnabled()) {
+				logger.error("invoke -> connectManager.getConnectCluster return null -> invokerKey: {}", queueName);
+			}
+			throw new ConnectInvokeException("no have this connect cluster");
+		}
+		
+		NetConnectAgent netConnectAgent = (NetConnectAgent) connectCluster.getProxy();
+		
+		return netConnectAgent.send(message);
+		
+		/*ConnectNode connectNode = netConnectManager.getConnectNode(queueName);
+		if (connectNode == null) {
 			logger.error("Send -> "
 					+ "Queue: " + message.getQueueName()
 					+ ", UUID: " + message.getUuid()
@@ -86,7 +87,7 @@ public class ProducerClientImpl implements ProducerClient {
 		
 		NetConnectAgent netConnectAgent = null;		
 		do {
-			netConnectAgent = (NetConnectAgent) queueAgent.getConnectAgent();
+			netConnectAgent = (NetConnectAgent) connectNode.getConnectAgent();
 			if (netConnectAgent != null) {
 				try {
 					netConnectAgent.send(message);
@@ -96,7 +97,7 @@ public class ProducerClientImpl implements ProducerClient {
 						logger.error("Send -> "
 								+ "Queue: " + message.getQueueName()
 								+ ", UUID: " + message.getUuid()
-								+ ", Connect: " + ((ConnectAgent)netConnectAgent).getConnectId()
+								//+ ", Connect: " + ((ConnectAgent)netConnectAgent).getConnectId()
 								+ ", Send Message -> " + e);
 					}
 					continue;
@@ -105,7 +106,7 @@ public class ProducerClientImpl implements ProducerClient {
 						logger.error("Send -> "
 								+ "Queue: " + message.getQueueName()
 								+ ", UUID: " + message.getUuid()
-								+ ", Connect: " + ((ConnectAgent)netConnectAgent).getConnectId()
+								//+ ", Connect: " + ((ConnectAgent)netConnectAgent).getConnectId()
 								+ ", Send Message -> " + e);
 					}
 					continue;
@@ -114,7 +115,7 @@ public class ProducerClientImpl implements ProducerClient {
 						logger.error("Send -> "
 								+ "Queue: " + message.getQueueName()
 								+ ", UUID: " + message.getUuid()
-								+ ", Connect: " + ((ConnectAgent)netConnectAgent).getConnectId()
+								//+ ", Connect: " + ((ConnectAgent)netConnectAgent).getConnectId()
 								+ ", Send Message -> " + e);
 					}
 					continue;
@@ -123,13 +124,13 @@ public class ProducerClientImpl implements ProducerClient {
 						logger.error("Send -> "
 								+ "Queue: " + message.getQueueName()
 								+ ", UUID: " + message.getUuid()
-								+ ", Connect: " + ((ConnectAgent)netConnectAgent).getConnectId()
+								//+ ", Connect: " + ((ConnectAgent)netConnectAgent).getConnectId()
 								+ ", Send Message -> " + e);
 					}
 					throw e;
 				}
 			} else {
-				netConnectManager.startUpdateConnectAgent();
+				netConnectManager.runUpdateNow();
 				if (logger.isErrorEnabled()) {
 					logger.error("NoodleNotify have lose Message -> "
 								+ "Queue: " + message.getQueueName()
@@ -139,9 +140,7 @@ public class ProducerClientImpl implements ProducerClient {
 				}
 				throw new ConnectionRefusedException("Producer Client Send -> Connection refused by all the net connect agent");
 			}
-		} while (netConnectAgent != null);
-		
-		return uuid;
+		} while (netConnectAgent != null);*/
 	}
 
 	public void setNetConnectManager(ConnectManager netConnectManager) {
