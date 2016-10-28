@@ -3,12 +3,12 @@ package org.fl.noodlenotify.monitor.status.console.executer;
 import java.util.List;
 import java.util.Map;
 
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.DistributerService;
 import org.fl.noodlenotify.console.vo.DistributerVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
 import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class DistributerStatusExecuter extends AbstractExecuter {
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;
 			ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get("HTTP");
 			if (connectAgentFactory != null) {
-				ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(distributerVo.getIp(), distributerVo.getCheck_Port(), distributerVo.getDistributer_Id());
+				ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(distributerVo.getDistributer_Id(), distributerVo.getIp(), distributerVo.getCheck_Port(), "/noodlenotify");
 				try {
 					connectAgent.connect();
 					((NetStatusChecker)connectAgent).checkHealth();

@@ -8,19 +8,20 @@ import java.util.Set;
 
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
+import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.manager.AbstractConnectManager;
 import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodle.common.connect.node.ConnectNodeImpl;
 import org.fl.noodle.common.connect.register.ModuleRegister;
+import org.fl.noodle.common.connect.route.ConnectRoute;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
+import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.constent.NetConnectManagerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 
-public class ProducerNetConnectManager extends AbstractConnectManager implements ApplicationListener<ContextRefreshedEvent> {
+public class ProducerNetConnectManager extends AbstractConnectManager {
 	
 	private final static Logger logger = LoggerFactory.getLogger(ProducerNetConnectManager.class);
 	
@@ -32,6 +33,14 @@ public class ProducerNetConnectManager extends AbstractConnectManager implements
 	protected void updateConnectAgent() {
 		
 		long moduleId = producerModuleRegister.getModuleId();
+		
+		if (connectClusterMap.isEmpty()) {
+			connectClusterMap.put("Defalt", connectClusterFactoryMap.get("FAILOVER").createConnectCluster(NetConnectAgent.class));
+		}
+		
+		if (connectRouteMap.isEmpty()) {
+			connectRouteMap.put("Defalt", connectRouteFactoryMap.get("RANDOM").createConnectRoute());
+		}
 		
 		Map<String, List<QueueExchangerVo>> consoleInfoMap = null;
 		
@@ -46,55 +55,118 @@ public class ProducerNetConnectManager extends AbstractConnectManager implements
 			}
 		}
 		
-		if (consoleInfoMap != null) {
+		if (consoleInfoMap == null) { return; }
+		
+		if (logger.isDebugEnabled()) {
+			Set<String> set = consoleInfoMap.keySet();
+			for (String queueName : set) {
+				List<QueueExchangerVo> list = consoleInfoMap.get(queueName);
+				for (QueueExchangerVo queueExchangerVo : list) {
+					logger.debug("UpdateConnectAgent -> ProducerGetExchangers -> " 
+								+ "ModuleId: " + moduleId
+								+ ", QueueName: " + queueName 
+								+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
+								+ ", Name: " + queueExchangerVo.getName()
+								+ ", Ip: " + queueExchangerVo.getIp()
+								+ ", Port: " + queueExchangerVo.getPort()
+								);
+				}
+			}
+		}
+		
+		Set<Long> connectIdSet = new HashSet<Long>();
+
+		List<ConnectAgent> connectAgentList = new ArrayList<ConnectAgent>();
+		for (String queueName : consoleInfoMap.keySet()) {
 			
-			if (logger.isDebugEnabled()) {
-				Set<String> set = consoleInfoMap.keySet();
-				for (String queueName : set) {
-					List<QueueExchangerVo> list = consoleInfoMap.get(queueName);
-					for (QueueExchangerVo queueExchangerVo : list) {
-						logger.debug("UpdateConnectAgent -> ProducerGetExchangers -> " 
+			ConnectNode connectNode = connectNodeMap.get(queueName);
+			if (connectNode == null) {
+				connectNode = new ConnectNodeImpl(queueName);
+				connectNodeMap.put(queueName, connectNode);
+				if (logger.isDebugEnabled()) {
+					logger.debug("UpdateConnectAgent -> Add Queue -> " 
+							+ "ModuleId: " + moduleId
+							+ ", QueueName: " + queueName
+							);
+				}
+			}
+			
+			for (QueueExchangerVo queueExchangerVo : consoleInfoMap.get(queueName)) {
+				
+				connectIdSet.add(queueExchangerVo.getExchanger_Id());
+				
+				if (connectAgentFactoryMap == null) {
+					if (logger.isErrorEnabled()) {
+						logger.error("UpdateConnectAgent -> "
 									+ "ModuleId: " + moduleId
-									+ ", QueueName: " + queueName 
+									+ ", QueueName: " + queueName
+									+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
+									+ ", Name: " + queueExchangerVo.getName()
+									+ ", Ip: " + queueExchangerVo.getIp()
+									+ ", Port: " + queueExchangerVo.getPort()
+									+ ", ConnectAgent Reconnect -> connectAgentFactoryMap is null "
+									);
+					}
+					continue; 
+				}
+				
+				ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get(queueExchangerVo.getType());
+				
+				if (connectAgentFactory == null) {
+					if (logger.isErrorEnabled()) {
+						logger.error("UpdateConnectAgent -> "
+									+ "ModuleId: " + moduleId
+									+ ", QueueName: " + queueName
+									+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
+									+ ", Name: " + queueExchangerVo.getName()
+									+ ", Ip: " + queueExchangerVo.getIp()
+									+ ", Port: " + queueExchangerVo.getPort()
+									+ ", Type: " + queueExchangerVo.getType()
+									+ ", ConnectAgent Reconnect -> connectAgentFactory is null "
+									);
+					}
+					continue; 
+				}
+				
+				ConnectAgent connectAgent = connectAgentMap.get(queueExchangerVo.getExchanger_Id());
+				if (connectAgent == null) {
+					connectAgent = connectAgentFactory
+							.createConnectAgent(queueExchangerVo.getExchanger_Id(), queueExchangerVo.getIp(),
+									queueExchangerVo.getPort(), queueExchangerVo.getUrl());
+					try {
+						connectAgent.connect();
+						if (logger.isDebugEnabled()) {
+							logger.debug("UpdateConnectAgent -> Connect -> " 
+									+ "ModuleId: " + moduleId
+									+ ", QueueName: " + queueName
 									+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
 									+ ", Name: " + queueExchangerVo.getName()
 									+ ", Ip: " + queueExchangerVo.getIp()
 									+ ", Port: " + queueExchangerVo.getPort()
 									);
+						}
+						connectAgentMap.put(queueExchangerVo.getExchanger_Id(), connectAgent);
+						connectAgentList.add(connectAgent);
+					} catch (Exception e) {
+						if (logger.isErrorEnabled()) {
+							logger.error("UpdateConnectAgent -> "
+										+ "ModuleId: " + moduleId
+										+ ", QueueName: " + queueName
+										+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
+										+ ", Name: " + queueExchangerVo.getName()
+										+ ", Ip: " + queueExchangerVo.getIp()
+										+ ", Port: " + queueExchangerVo.getPort()
+										+ ", ConnectAgent Connect -> " + e
+										);
+						}
 					}
-				}
-			}
-			
-			Set<Long> connectIdSet = new HashSet<Long>();
-
-			List<ConnectAgent> connectAgentList = new ArrayList<ConnectAgent>();
-			Set<String> queueNameSet = consoleInfoMap.keySet();
-			for (String queueName : queueNameSet) {
-				ConnectNode connectNode = connectNodeMap.get(queueName);
-				if (connectNode == null) {
-					connectNode = new ConnectNodeImpl(queueName);
-					connectNodeMap.put(queueName, connectNode);
-					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Add Queue -> " 
-								+ "ModuleId: " + moduleId
-								+ ", QueueName: " + queueName
-								);
-					}
-				}
-				List<QueueExchangerVo> queueExchangerVoList = consoleInfoMap.get(queueName);
-				for (QueueExchangerVo queueExchangerVo : queueExchangerVoList) {
-					connectIdSet.add(queueExchangerVo.getExchanger_Id());
-					if (connectAgentFactoryMap != null) {
-						ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get(queueExchangerVo.getType());
-						ConnectAgent connectAgent = connectAgentMap.get(queueExchangerVo.getExchanger_Id());
-						if (connectAgent == null) {
-							connectAgent = connectAgentFactory
-									.createConnectAgent(queueExchangerVo.getExchanger_Id(), queueExchangerVo.getIp(),
-											queueExchangerVo.getPort(), queueExchangerVo.getUrl());
+				} else {
+					if (connectAgent.isSameConnect(queueExchangerVo.getIp(), queueExchangerVo.getPort(), queueExchangerVo.getUrl(), queueExchangerVo.getType())) {
+						if (!connectAgent.isHealthyConnect()) {
 							try {
-								connectAgent.connect();
+								connectAgent.reconnect();
 								if (logger.isDebugEnabled()) {
-									logger.debug("UpdateConnectAgent -> Connect -> " 
+									logger.debug("UpdateConnectAgent -> Reconnect -> " 
 											+ "ModuleId: " + moduleId
 											+ ", QueueName: " + queueName
 											+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
@@ -103,7 +175,6 @@ public class ProducerNetConnectManager extends AbstractConnectManager implements
 											+ ", Port: " + queueExchangerVo.getPort()
 											);
 								}
-								connectAgentMap.put(queueExchangerVo.getExchanger_Id(), connectAgent);
 								connectAgentList.add(connectAgent);
 							} catch (Exception e) {
 								if (logger.isErrorEnabled()) {
@@ -114,122 +185,90 @@ public class ProducerNetConnectManager extends AbstractConnectManager implements
 												+ ", Name: " + queueExchangerVo.getName()
 												+ ", Ip: " + queueExchangerVo.getIp()
 												+ ", Port: " + queueExchangerVo.getPort()
-												+ ", ConnectAgent Connect -> " + e
+												+ ", ConnectAgent Reconnect -> " + e
 												);
 								}
 							}
 						} else {
-							if (connectAgent.isSameConnect(queueExchangerVo.getIp(), queueExchangerVo.getPort(), queueExchangerVo.getUrl(), queueExchangerVo.getType())) {
-								if (!connectAgent.isHealthyConnect()) {
-									try {
-										connectAgent.reconnect();
-										if (logger.isDebugEnabled()) {
-											logger.debug("UpdateConnectAgent -> Reconnect -> " 
-													+ "ModuleId: " + moduleId
-													+ ", QueueName: " + queueName
-													+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
-													+ ", Name: " + queueExchangerVo.getName()
-													+ ", Ip: " + queueExchangerVo.getIp()
-													+ ", Port: " + queueExchangerVo.getPort()
-													);
-										}
-										connectAgentList.add(connectAgent);
-									} catch (Exception e) {
-										if (logger.isErrorEnabled()) {
-											logger.error("UpdateConnectAgent -> "
-														+ "ModuleId: " + moduleId
-														+ ", QueueName: " + queueName
-														+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
-														+ ", Name: " + queueExchangerVo.getName()
-														+ ", Ip: " + queueExchangerVo.getIp()
-														+ ", Port: " + queueExchangerVo.getPort()
-														+ ", ConnectAgent Reconnect -> " + e
-														);
-										}
-									}
-								} else {
-									connectAgentList.add(connectAgent);
-								}
-							} else {
-								connectAgent.close();
-								connectAgentMap.remove(connectAgent.getConnectId());
-								if (logger.isDebugEnabled()) {
-									logger.debug("UpdateConnectAgent -> Remove Connect -> " 
+							connectAgentList.add(connectAgent);
+						}
+					} else {
+						connectAgent.close();
+						connectAgentMap.remove(connectAgent.getConnectId());
+						if (logger.isDebugEnabled()) {
+							logger.debug("UpdateConnectAgent -> Remove Connect -> " 
+									+ "ModuleId: " + moduleId
+									+ ", QueueName: " + queueName
+									+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
+									//+ ", Ip: " + connectAgent.getIp()
+									//+ ", Port: " + connectAgent.getPort()
+									+ ", Ip Or Port Change"
+									);
+						}
+						
+						connectAgent = connectAgentFactory
+								.createConnectAgent(queueExchangerVo.getExchanger_Id(), queueExchangerVo.getIp(),
+										queueExchangerVo.getPort(), queueExchangerVo.getUrl());
+						try {
+							connectAgent.connect();
+							if (logger.isDebugEnabled()) {
+								logger.debug("UpdateConnectAgent -> Change -> " 
+										+ "ModuleId: " + moduleId
+										+ ", QueueName: " + queueName
+										+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
+										+ ", Name: " + queueExchangerVo.getName()
+										+ ", Ip: " + queueExchangerVo.getIp()
+										+ ", Port: " + queueExchangerVo.getPort()
+										+ ", Ip Or Port Change"
+										);
+							}
+							connectAgentMap.put(queueExchangerVo.getExchanger_Id(), connectAgent);
+							connectAgentList.add(connectAgent);
+						} catch (Exception e) {
+							if (logger.isErrorEnabled()) {
+								logger.error("UpdateConnectAgent -> "
 											+ "ModuleId: " + moduleId
 											+ ", QueueName: " + queueName
 											+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
-											//+ ", Ip: " + connectAgent.getIp()
-											//+ ", Port: " + connectAgent.getPort()
-											+ ", Ip Or Port Change"
+											+ ", Name: " + queueExchangerVo.getName()
+											+ ", Ip: " + queueExchangerVo.getIp()
+											+ ", Port: " + queueExchangerVo.getPort()
+											+ ", Ip Or Port Change, ConnectAgent Connect -> " + e
 											);
-								}
-								
-								connectAgent = connectAgentFactory
-										.createConnectAgent(queueExchangerVo.getExchanger_Id(), queueExchangerVo.getIp(),
-												queueExchangerVo.getPort(), queueExchangerVo.getUrl());
-								try {
-									connectAgent.connect();
-									if (logger.isDebugEnabled()) {
-										logger.debug("UpdateConnectAgent -> Change -> " 
-												+ "ModuleId: " + moduleId
-												+ ", QueueName: " + queueName
-												+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
-												+ ", Name: " + queueExchangerVo.getName()
-												+ ", Ip: " + queueExchangerVo.getIp()
-												+ ", Port: " + queueExchangerVo.getPort()
-												+ ", Ip Or Port Change"
-												);
-									}
-									connectAgentMap.put(queueExchangerVo.getExchanger_Id(), connectAgent);
-									connectAgentList.add(connectAgent);
-								} catch (Exception e) {
-									if (logger.isErrorEnabled()) {
-										logger.error("UpdateConnectAgent -> "
-													+ "ModuleId: " + moduleId
-													+ ", QueueName: " + queueName
-													+ ", ConnectId: " + queueExchangerVo.getExchanger_Id()
-													+ ", Name: " + queueExchangerVo.getName()
-													+ ", Ip: " + queueExchangerVo.getIp()
-													+ ", Port: " + queueExchangerVo.getPort()
-													+ ", Ip Or Port Change, ConnectAgent Connect -> " + e
-													);
-									}
-								}
 							}
 						}
 					}
 				}
-				connectNode.updateConnectAgentList(connectAgentList);
-				connectAgentList.clear();
 			}
-			
-			Set<String> queueAgentMapSet = connectNodeMap.keySet();
-			for (String queueName : queueAgentMapSet) {
-				if (!queueNameSet.contains(queueName)) {
-					connectNodeMap.remove(queueName);
-					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Remove Queue -> " 
-								+ "ModuleId: " + moduleId
-								+ ", QueueName: " + queueName
-								);
-					}
+			connectNode.updateConnectAgentList(connectAgentList);
+			connectAgentList.clear();
+		}
+		
+		for (String queueName : connectNodeMap.keySet()) {
+			if (!consoleInfoMap.containsKey(queueName)) {
+				connectNodeMap.remove(queueName);
+				if (logger.isDebugEnabled()) {
+					logger.debug("UpdateConnectAgent -> Remove Queue -> " 
+							+ "ModuleId: " + moduleId
+							+ ", QueueName: " + queueName
+							);
 				}
 			}
-			
-			Set<Long> connectAgentMapSet = connectAgentMap.keySet();
-			for (long connectId : connectAgentMapSet) {
-				if (!connectIdSet.contains(connectId)) {
-					ConnectAgent connectAgent = connectAgentMap.get(connectId);
-					connectAgent.close();
-					connectAgentMap.remove(connectId);
-					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Remove Connect -> " 
-								+ "ModuleId: " + moduleId
-								+ ", ConnectId: " + connectAgent.getConnectId()
-								//+ ", Ip: " + connectAgent.getIp()
-								//+ ", Port: " + connectAgent.getPort()
-								);
-					}
+		}
+		
+		Set<Long> connectAgentMapSet = connectAgentMap.keySet();
+		for (long connectId : connectAgentMapSet) {
+			if (!connectIdSet.contains(connectId)) {
+				ConnectAgent connectAgent = connectAgentMap.get(connectId);
+				connectAgent.close();
+				connectAgentMap.remove(connectId);
+				if (logger.isDebugEnabled()) {
+					logger.debug("UpdateConnectAgent -> Remove Connect -> " 
+							+ "ModuleId: " + moduleId
+							+ ", ConnectId: " + connectAgent.getConnectId()
+							//+ ", Ip: " + connectAgent.getIp()
+							//+ ", Port: " + connectAgent.getPort()
+							);
 				}
 			}
 		}
@@ -262,15 +301,22 @@ public class ProducerNetConnectManager extends AbstractConnectManager implements
 		this.consoleRemotingInvoke = consoleRemotingInvoke;
 	}
 
+	public void setProducerModuleRegister(ModuleRegister producerModuleRegister) {
+		this.producerModuleRegister = producerModuleRegister;
+	}
+
 	@Override
 	protected String getManagerName() {
 		return NetConnectManagerType.NET.getCode();
 	}
-
+	
 	@Override
-	public void onApplicationEvent(ContextRefreshedEvent event) {
-		if (event.getApplicationContext().getParent() == null) {
-			updateConnectAgent();
-		}
+	public ConnectCluster getConnectCluster(String clusterName) {
+		return connectClusterMap.get("Defalt");
+	}
+	
+	@Override
+	public ConnectRoute getConnectRoute(String routeName) {
+		return connectRouteMap.get("RANDOM");
 	}
 }

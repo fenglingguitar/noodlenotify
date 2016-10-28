@@ -3,12 +3,12 @@ package org.fl.noodlenotify.monitor.status.console.executer;
 import java.util.List;
 import java.util.Map;
 
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.ExchangerService;
 import org.fl.noodlenotify.console.vo.ExchangerVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
 import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class ExchangerStatusExecuter extends AbstractExecuter {
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;
 			ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get("HTTP");
 			if (connectAgentFactory != null) {
-				ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(exchangerVo.getIp(), exchangerVo.getCheck_Port(), exchangerVo.getExchanger_Id());
+				ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(exchangerVo.getExchanger_Id(), exchangerVo.getIp(), exchangerVo.getCheck_Port(), "/noodlenotify");
 				try {
 					connectAgent.connect();
 					((NetStatusChecker)connectAgent).checkHealth();

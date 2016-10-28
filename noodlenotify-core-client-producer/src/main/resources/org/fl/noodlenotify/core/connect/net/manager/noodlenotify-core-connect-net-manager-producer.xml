@@ -22,11 +22,13 @@
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/serialize/noodlenotify-core-connect-net-serialize-factory.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/route/noodlenotify-core-connect-net-route-factory.xml" />
 
+	<bean id="producerModuleRegister" class="org.fl.noodle.common.connect.register.ModuleRegister" />
+
     <bean id="producerNetConnectManager" class="org.fl.noodlenotify.core.connect.net.manager.ProducerNetConnectManager" 
-			parent="commonParam">
+    	init-method="start" destroy-method="destroy">
 		<property name="connectAgentFactoryMap">
 			<map>
-				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />
+				<!-- <entry key="NETTY" value-ref="connectAgentFactoryNetty" /> -->
 				<entry key="HTTP" value-ref="connectAgentFactoryJetty" />
 			</map>
 		</property>

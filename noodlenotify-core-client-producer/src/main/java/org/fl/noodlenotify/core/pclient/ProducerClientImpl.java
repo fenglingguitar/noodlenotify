@@ -47,6 +47,8 @@ public class ProducerClientImpl implements ProducerClient {
 		//netConnectManager.setModuleId(0);
 		//netConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
 		//netConnectManager.start();
+		
+		netConnectManager.runUpdateNow();
 	}
 
 	public void destroy() throws Exception {

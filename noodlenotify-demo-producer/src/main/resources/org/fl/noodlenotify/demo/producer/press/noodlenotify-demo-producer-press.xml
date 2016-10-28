@@ -15,8 +15,6 @@
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/manager/noodlenotify-core-connect-net-manager-producer.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/schedule/noodlenotify-monitor-status-beat-schedule-producer.xml" />
 	
-	<bean id="producerModuleRegister" class="org.fl.noodle.common.connect.register.ModuleRegister" />
-	
 	<bean id="producerClient" class="org.fl.noodlenotify.core.pclient.ProducerClientImpl"
 			init-method="start" destroy-method="destroy" >
 		<property name="localIp" value="127.0.0.1" />

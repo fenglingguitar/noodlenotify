@@ -4,12 +4,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.ConsumerService;
 import org.fl.noodlenotify.console.vo.ConsumerVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
 import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public class ConsumerStatusExecuter extends AbstractExecuter {
 			for (ConsumerVo ConsumerVoToOnline : consumerVoToOnlineList) {
 				ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get(ConsumerVoToOnline.getCheck_Type());
 				if (connectAgentFactory != null) {
-					ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(ConsumerVoToOnline.getIp(), ConsumerVoToOnline.getCheck_Port(), ConsumerVoToOnline.getConsumer_Id());
+					ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(ConsumerVoToOnline.getConsumer_Id(), ConsumerVoToOnline.getIp(), ConsumerVoToOnline.getCheck_Port(), ConsumerVoToOnline.getUrl());
 					try {
 						connectAgent.connect();
 						((NetStatusChecker)connectAgent).checkHealth();
@@ -77,7 +77,7 @@ public class ConsumerStatusExecuter extends AbstractExecuter {
 			for (ConsumerVo consumerVoToOffline : consumerVoToOfflineList) {
 				ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get(consumerVoToOffline.getCheck_Type());
 				if (connectAgentFactory != null) {
-					ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(consumerVoToOffline.getIp(), consumerVoToOffline.getCheck_Port(), consumerVoToOffline.getConsumer_Id());
+					ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(consumerVoToOffline.getConsumer_Id(), consumerVoToOffline.getIp(), consumerVoToOffline.getCheck_Port(), consumerVoToOffline.getCheck_Url());
 					try {
 						connectAgent.connect();
 						((NetStatusChecker)connectAgent).checkHealth();
