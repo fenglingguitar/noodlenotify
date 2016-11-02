@@ -28,7 +28,7 @@
     	init-method="start" destroy-method="destroy">
 		<property name="connectAgentFactoryMap">
 			<map>
-				<!-- <entry key="NETTY" value-ref="connectAgentFactoryNetty" /> -->
+				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />
 				<entry key="HTTP" value-ref="connectAgentFactoryJetty" />
 			</map>
 		</property>

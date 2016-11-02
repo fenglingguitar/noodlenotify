@@ -1,21 +1,23 @@
 package org.fl.noodlenotify.core.connect.net.netty.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
 
-import org.fl.noodlenotify.core.connect.ConnectAgentAbstract;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.fl.noodle.common.connect.agent.AbstractConnectAgent;
+import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionStopException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionTimeoutException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
-import org.fl.noodlenotify.core.connect.net.NetConnectConstant;
 import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
+import org.fl.noodlenotify.core.connect.net.constent.NetConnectAgentType;
 import org.fl.noodlenotify.core.connect.net.netty.client.exception.NettyConnectionException;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetConnectAgent, NetStatusChecker  {
+public class NettyNetConnectAgent extends AbstractConnectAgent implements NetConnectAgent, NetStatusChecker  {
 
 	private final static Logger logger = LoggerFactory.getLogger(NettyNetConnectAgent.class);
 
@@ -23,9 +25,17 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 	
 	private NettyNetConnectPoolConfParam nettyNetConnectPoolConfParam;
 	
-	public NettyNetConnectAgent(String ip, int port, long connectId,
+	public NettyNetConnectAgent(
+			long connectId, String ip, int port, String url, 
+			int connectTimeout, int readTimeout, String encoding,
+			int invalidLimitNum, ConnectDistinguish connectDistinguish,
+			List<MethodInterceptor> methodInterceptorList, 
 			NettyNetConnectPoolConfParam nettyNetConnectPoolConfParam) {
-		super(ip, port, connectId, NetConnectConstant.NETCONNECT_TYPE_NETTY);
+		super(
+			connectId, ip, port, url, NetConnectAgentType.NETTY.getCode(),
+			connectTimeout, readTimeout, encoding, 
+			invalidLimitNum, connectDistinguish, 
+			methodInterceptorList);
 		this.nettyNetConnectPoolConfParam = nettyNetConnectPoolConfParam;
 	}
 
@@ -81,10 +91,6 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 	@Override
 	public String send(Message message, int readTimeout) throws Exception {
 
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the net netty connect agent");
-		}
-
 		NettyNetConnect nettyNetConnect = getConnect();
 		
 		String uuid = null;
@@ -92,7 +98,6 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 		try {
 			uuid = nettyNetConnect.send(message, readTimeout);
 		} catch (NettyConnectionException e) { 
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
 						+ "ConnectId: " + connectId
@@ -104,7 +109,6 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectionResetException("Connection reset for send by net netty connect agent");
 		} catch (java.net.SocketException e) { 
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
 						+ "ConnectId: " + connectId
@@ -116,7 +120,6 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectionResetException("Connection reset for send by net netty connect agent");
 		} catch (java.net.SocketTimeoutException e) { 
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
 						+ "ConnectId: " + connectId
@@ -128,7 +131,6 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectionTimeoutException("Connection timeout for send by net netty connect agent");
 		} catch (ConnectionStopException e) { 
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
 						+ "ConnectId: " + connectId
@@ -160,16 +162,11 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 	@Override
 	public void checkHealth() throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the net netty connect agent");
-		}
-		
 		NettyNetConnect nettyNetConnect = getConnect();
 
 		try {
 			nettyNetConnect.send("CheckHealth", nettyNetConnectPoolConfParam.getTimeout());
 		} catch (NettyConnectionException e) { 
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
 						+ "ConnectId: " + connectId
@@ -181,7 +178,6 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectionResetException("Connection reset for send by net netty connect agent");
 		} catch (java.net.SocketException e) { 
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
 						+ "ConnectId: " + connectId
@@ -193,7 +189,6 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectionResetException("Connection reset for send by net netty connect agent");
 		} catch (java.net.SocketTimeoutException e) { 
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
 						+ "ConnectId: " + connectId
@@ -205,7 +200,6 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectionTimeoutException("Connection timeout for send by net netty connect agent");
 		} catch (ConnectionStopException e) { 
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
 						+ "ConnectId: " + connectId
@@ -237,7 +231,6 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 			NettyNetConnect nettyNetConnect = nettyNetConnectPool.getResource();
 			return nettyNetConnect;
 		} catch (NettyConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("GetConnect -> " 
 						+ "ConnectId: " + connectId
@@ -252,5 +245,10 @@ public class NettyNetConnectAgent extends ConnectAgentAbstract implements NetCon
 	public void setNettyNetConnectPoolConfParam(
 			NettyNetConnectPoolConfParam nettyNetConnectPoolConfParam) {
 		this.nettyNetConnectPoolConfParam = nettyNetConnectPoolConfParam;
+	}
+
+	@Override
+	protected Class<?> getServiceInterfaces() {
+		return NetConnectAgent.class;
 	}
 }

@@ -1,20 +1,24 @@
 package org.fl.noodlenotify.core.connect.net.netty.client;
 
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectAgentFactoryAbstract;
+import org.fl.noodle.common.connect.agent.AbstractConnectAgentFactory;
+import org.fl.noodle.common.connect.agent.ConnectAgent;
 
-public class NettyNetConnectAgentFactory extends ConnectAgentFactoryAbstract {
+public class NettyNetConnectAgentFactory extends AbstractConnectAgentFactory {
 
-	private NettyNetConnectPoolConfParam nettyNetConnectPoolConfParam 
-				= new NettyNetConnectPoolConfParam();
+	private NettyNetConnectPoolConfParam nettyNetConnectPoolConfParam = new NettyNetConnectPoolConfParam();
 	
 	@Override
-	public ConnectAgent createConnectAgent(String ip, int port, long connectId) {
-		return new NettyNetConnectAgent(ip, port, connectId, nettyNetConnectPoolConfParam);
-	}
+	public ConnectAgent createConnectAgent(
+			long connectId, String ip, int port, String url, 
+			int connectTimeout, int readTimeout) {
+		return new NettyNetConnectAgent(
+				connectId, ip, port, url,
+				connectTimeout, readTimeout, encoding, invalidLimitNum,
+				connectDistinguish, methodInterceptorList, 
+				nettyNetConnectPoolConfParam);
+	}	
 
-	public void setNettyNetConnectPoolConfParam(
-			NettyNetConnectPoolConfParam nettyNetConnectPoolConfParam) {
+	public void setNettyNetConnectPoolConfParam(NettyNetConnectPoolConfParam nettyNetConnectPoolConfParam) {
 		this.nettyNetConnectPoolConfParam = nettyNetConnectPoolConfParam;
 	}
 }

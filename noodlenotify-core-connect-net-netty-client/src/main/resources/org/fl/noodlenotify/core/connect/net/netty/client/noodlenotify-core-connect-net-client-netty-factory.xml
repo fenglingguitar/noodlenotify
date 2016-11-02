@@ -12,6 +12,8 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
+	<import resource="classpath:org/fl/noodlenotify/core/connect/net/distinguish/noodlenotify-core-connect-net-distinguish.xml" />
+	
     <bean id="nettyNetConnectPoolConfParam" class="org.fl.noodlenotify.core.connect.net.netty.client.NettyNetConnectPoolConfParam">
 		<property name="maxActive" value="3000"/>
 		<property name="minIdle" value="8"/>
@@ -22,6 +24,7 @@
 		<property name="timeout" value="10000"/>
 	</bean>
 	<bean id="connectAgentFactoryNetty" class="org.fl.noodlenotify.core.connect.net.netty.client.NettyNetConnectAgentFactory">
+		<property name="connectDistinguish" ref="netConnectDistinguish" />
 		<property name="nettyNetConnectPoolConfParam" ref="nettyNetConnectPoolConfParam"/>
 	</bean>
     
