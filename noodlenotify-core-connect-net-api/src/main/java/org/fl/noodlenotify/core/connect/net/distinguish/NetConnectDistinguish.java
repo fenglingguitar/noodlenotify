@@ -6,6 +6,7 @@ import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.manager.ConnectManagerPool;
 import org.fl.noodlenotify.core.connect.net.constent.NetConnectManagerType;
+import org.fl.noodlenotify.core.connect.net.pojo.Message;
 
 public class NetConnectDistinguish implements ConnectDistinguish {
 
@@ -16,7 +17,7 @@ public class NetConnectDistinguish implements ConnectDistinguish {
 
 	@Override
 	public String getNodeName(Object[] args) {		
-		return (String) args[0];
+		return ((Message) args[0]).getQueueName();
 	}
 
 	@Override
@@ -26,7 +27,7 @@ public class NetConnectDistinguish implements ConnectDistinguish {
 
 	@Override
 	public String getMethodKay(Method method, Object[] args) {
-		return (String) args[0];
+		return ((Message) args[0]).getQueueName();
 	}
 
 	@Override

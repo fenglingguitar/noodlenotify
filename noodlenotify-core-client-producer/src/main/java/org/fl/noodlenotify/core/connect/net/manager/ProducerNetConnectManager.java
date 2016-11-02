@@ -35,11 +35,11 @@ public class ProducerNetConnectManager extends AbstractConnectManager {
 		long moduleId = producerModuleRegister.getModuleId();
 		
 		if (connectClusterMap.isEmpty()) {
-			connectClusterMap.put("Defalt", connectClusterFactoryMap.get("FAILOVER").createConnectCluster(NetConnectAgent.class));
+			connectClusterMap.put("DEFALT", connectClusterFactoryMap.get("FAILOVER").createConnectCluster(NetConnectAgent.class));
 		}
 		
 		if (connectRouteMap.isEmpty()) {
-			connectRouteMap.put("Defalt", connectRouteFactoryMap.get("RANDOM").createConnectRoute());
+			connectRouteMap.put("DEFALT", connectRouteFactoryMap.get("RANDOM").createConnectRoute());
 		}
 		
 		Map<String, List<QueueExchangerVo>> consoleInfoMap = null;
@@ -312,11 +312,11 @@ public class ProducerNetConnectManager extends AbstractConnectManager {
 	
 	@Override
 	public ConnectCluster getConnectCluster(String clusterName) {
-		return connectClusterMap.get("Defalt");
+		return connectClusterMap.get("DEFALT");
 	}
 	
 	@Override
 	public ConnectRoute getConnectRoute(String routeName) {
-		return connectRouteMap.get("RANDOM");
+		return connectRouteMap.get("DEFALT");
 	}
 }

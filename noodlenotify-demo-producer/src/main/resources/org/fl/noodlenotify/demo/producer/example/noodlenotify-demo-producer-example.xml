@@ -12,10 +12,18 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/core/connect/net/distinguish/noodlenotify-core-connect-net-distinguish.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/net/manager/noodlenotify-core-connect-net-manager-producer.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/schedule/noodlenotify-monitor-status-beat-schedule-producer.xml" />
 	
-	<bean id="connectAgentFactoryJetty" class="org.fl.noodlenotify.core.connect.net.jetty.client.JettyNetConnectAgentFactory">
-		<property name="connectDistinguish" ref="netConnectDistinguish" />
-	</bean>
-    
+	<bean id="producerClient" class="org.fl.noodlenotify.core.pclient.ProducerClientImpl"
+			init-method="start" destroy-method="destroy" >
+		<property name="localIp" value="127.0.0.1" />
+		<property name="checkPort" value="20611" />
+		<property name="checkUrl" value="/noodlenotify"/>
+		<property name="checkType" value="HTTP"/>
+		<property name="producerClientName" value="TestProducerClient1" />
+		<property name="netConnectManager" ref="producerNetConnectManager" />
+		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
+    </bean>
+
 </beans>
