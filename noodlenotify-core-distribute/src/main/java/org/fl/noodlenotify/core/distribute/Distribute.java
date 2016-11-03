@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
@@ -33,7 +34,7 @@ public class Distribute {
 	private ConnectManager dbConnectManager;
 	private ConnectManager queueCacheConnectManager;
 	private ConnectManager bodyCacheConnectManager;
-	private ConnectManager netConnectManager;
+	private org.fl.noodle.common.connect.manager.ConnectManager netConnectManager;
 		
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();	
 	
@@ -58,6 +59,8 @@ public class Distribute {
 	private String localIp;
 	private int checkPort;
 	
+	private ModuleRegister distributeModuleRegister;
+	
 	public void start() throws Exception {
 		
 		if (distributeName == null || 
@@ -69,10 +72,13 @@ public class Distribute {
 		
 		//MemoryStorage.moduleName = MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE;
 		//MemoryStorage.moduleId = moduleId;
+		
+		distributeModuleRegister.setModuleId(moduleId);
 
-		netConnectManager.setModuleId(moduleId);
-		netConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		netConnectManager.start();
+		//netConnectManager.setModuleId(moduleId);
+		//netConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
+		//netConnectManager.start();
+		netConnectManager.runUpdateNow();
 		
 		bodyCacheConnectManager.setModuleId(moduleId);
 		bodyCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
@@ -132,7 +138,7 @@ public class Distribute {
 		dbConnectManager.destroy();
 		queueCacheConnectManager.destroy();
 		bodyCacheConnectManager.destroy();
-		netConnectManager.destroy();		
+		//netConnectManager.destroy();		
 	}
 	
 	private synchronized void suspendUpdateConnectAgent() {
@@ -665,7 +671,7 @@ public class Distribute {
 		this.bodyCacheConnectManager = bodyCacheConnectManager;
 	}
 
-	public void setNetConnectManager(ConnectManager netConnectManager) {
+	public void setNetConnectManager(org.fl.noodle.common.connect.manager.ConnectManager netConnectManager) {
 		this.netConnectManager = netConnectManager;
 	}
 	
@@ -695,5 +701,9 @@ public class Distribute {
 	
 	public void setModuleId(long moduleId) {
 		this.moduleId = moduleId;
+	}
+
+	public void setDistributeModuleRegister(ModuleRegister distributeModuleRegister) {
+		this.distributeModuleRegister = distributeModuleRegister;
 	}
 }

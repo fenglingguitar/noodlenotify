@@ -1,5 +1,6 @@
 package org.fl.noodlenotify.core.distribute;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +12,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
+import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.ConnectAgent;
 import org.fl.noodlenotify.core.connect.ConnectManager;
@@ -18,10 +21,9 @@ import org.fl.noodlenotify.core.connect.QueueAgent;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
-import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
+import org.fl.noodlenotify.core.connect.net.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
@@ -37,7 +39,7 @@ public class DistributeGet {
 	private ConnectManager dbConnectManager;
 	private ConnectManager queueCacheConnectManager;
 	private ConnectManager bodyCacheConnectManager;
-	private ConnectManager netConnectManager;
+	private org.fl.noodle.common.connect.manager.ConnectManager netConnectManager;
 		
 	private DistributeConfParam distributeConfParam;
 	
@@ -60,14 +62,14 @@ public class DistributeGet {
 							ConnectManager dbConnectManager,
 							ConnectManager queueCacheConnectManager,
 							ConnectManager bodyCacheConnectManager,
-							ConnectManager consumerNetConnectManager,
+							org.fl.noodle.common.connect.manager.ConnectManager netConnectManager,
 							DistributeConfParam distributeConfParam,
 							QueueDistributerVo queueDistributerVo) {
 		this.queueName = queueName;
 		this.dbConnectManager = dbConnectManager;
 		this.queueCacheConnectManager = queueCacheConnectManager;
 		this.bodyCacheConnectManager = bodyCacheConnectManager;
-		this.netConnectManager = consumerNetConnectManager;
+		this.netConnectManager = netConnectManager;
 		this.distributeConfParam = distributeConfParam;
 		this.queueDistributerVo = queueDistributerVo;
 	}
@@ -526,13 +528,14 @@ public class DistributeGet {
 					continue;
 				}
 				
-				QueueAgent netQueueAgent = netConnectManager.getQueueAgent(queueName);
-				if (netQueueAgent == null) {
+				ConnectCluster connectCluster = netConnectManager.getConnectCluster(queueName);
+				if (connectCluster == null) {
 					if (logger.isErrorEnabled()) {
 						logger.error(queueCacheName + " -> "
-								+ "Queue: " + queueName 
+								+ "Queue: " + queueName
 								+ ", UUID: " + messageDm.getUuid()
-								+ ", Get Net QueueAgent -> Null");
+								+ ", DB: " + messageDm.getDb()
+								+ ", Get ConnectCluster -> Null");
 					}
 					removeQueue(queueCacheName, messageDm);
 					executeBlockingQueueBatchCount.poll();
@@ -540,81 +543,21 @@ public class DistributeGet {
 					continue;
 				}
 				
-				long executeQueue = messageDm.getExecuteQueue();
-				long resultQueue = messageDm.getResultQueue();
-				long executeQueueNum = 1;
-				long testNum = 1;
-				while (executeQueue > 0) {
-					if ((executeQueue & testNum) > 0 && (resultQueue & testNum) == 0) {
-						QueueAgent netGroupQueueAgent = netQueueAgent.getChildQueueAgent(executeQueueNum);
-						if (netGroupQueueAgent != null) {
-							try {
-								ConnectAgent connectAgent = null;
-								do {
-									connectAgent = netGroupQueueAgent.getConnectAgent();
-									if (connectAgent != null) {
-										NetConnectAgent netConnectAgent = (NetConnectAgent) connectAgent;
-										try {
-											netConnectAgent.send(new Message(
-																		messageDm.getQueueName(), 
-																		messageDm.getUuid(), 
-																		new String(messageDm.getContent(), "UTF-8")
-																		), queueDistributerVo.getDph_Timeout().intValue());
-											break;
-										} catch (ConnectionUnableException e) {
-											if (logger.isErrorEnabled()) {
-												logger.error(queueCacheName + " -> "
-														+ "UUID: "+ messageDm.getUuid()
-														+ ", Group: " + executeQueueNum
-														+ ", Connect: " + connectAgent.getConnectId()
-														+ ", Execute -> " + e);
-											}
-											continue;
-										} catch (ConnectionResetException e) {
-											if (logger.isErrorEnabled()) {
-												logger.error(queueCacheName + " -> "
-														+ "UUID: "+ messageDm.getUuid()
-														+ ", Group: " + executeQueueNum
-														+ ", Connec: " + connectAgent.getConnectId()
-														+ ", Execute -> " + e);
-											}
-											continue;
-										} catch (Exception e) {
-											throw e;
-										}
-									} else {
-										netConnectManager.startUpdateConnectAgent();
-										throw new ConnectionRefusedException("Distribute Send -> Connection refused by all the net connect agent");
-									}
-								} while (connectAgent != null);
-							} catch (Exception e) {
-								if (logger.isErrorEnabled()) {
-									logger.error(queueCacheName + " -> "
-											+ "UUID: "+ messageDm.getUuid()
-											+ ", Group: " + executeQueueNum
-											+ ", Execute -> " + e);
-								}
-								executeQueue >>= 1;
-								resultQueue >>= 1;
-								executeQueueNum <<= 1;
-								continue;
-							}
-							long resultQueueNew = messageDm.getResultQueue();
-							resultQueueNew |= executeQueueNum;
-							messageDm.setResultQueue(resultQueueNew);
-						} else {
-							if (logger.isErrorEnabled()) {
-								logger.error(queueCacheName + " -> "
-										+ "Queue: " + queueName 
-										+ ", UUID: " + messageDm.getUuid()
-										+ ", Group: " + executeQueueNum
-										+ ", Get Net Group QueueAgent -> Null");
-							}
-						}
-					}
-					executeQueue >>= 1;
-					resultQueue >>= 1;
-					executeQueueNum <<= 1;
+				NetConnectAgent netConnectAgent = (NetConnectAgent) connectCluster.getProxy();
+				
+				ConnectThreadLocalStorage.put(LocalStorageType.MESSAGEDM.getCode(), messageDm);
+				try {
+					netConnectAgent.send(new Message(
+							messageDm.getQueueName(), 
+							messageDm.getUuid(), 
+							new String(messageDm.getContent(), "UTF-8")
+							));
+				} catch (UnsupportedEncodingException e1) {
+					e1.printStackTrace();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				} finally {
+					ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGEDM.getCode());
 				}
 				
 				if (messageDm.getResultQueue() == messageDm.getExecuteQueue()) {
@@ -634,7 +577,7 @@ public class DistributeGet {
 				}
 				messageDm.setFinishTime(System.currentTimeMillis());
 				
-				messageDm.setObjectOne(executeBlockingQueueBatch);
+				messageDm.setObjectFour(executeBlockingQueueBatch);
 				messageDm.setObjectTwo(executeBatchOverflowList);
 				messageDm.setObjectThree(executeBlockingQueueBatchCount);
 				messageDm.setResult(false);
@@ -913,7 +856,7 @@ public class DistributeGet {
 		this.bodyCacheConnectManager = bodyCacheConnectManager;
 	}
 
-	public void setNetConnectManager(ConnectManager netConnectManager) {
+	public void setNetConnectManager(org.fl.noodle.common.connect.manager.ConnectManager netConnectManager) {
 		this.netConnectManager = netConnectManager;
 	}
 	

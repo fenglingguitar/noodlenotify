@@ -26,6 +26,7 @@ public class MessageDm implements Serializable {
 	private Object objectOne;
 	private Object objectTwo;
 	private Object objectThree;
+	private Object objectFour;
 	private boolean bool;
 	
 	public MessageDm() {
@@ -199,6 +200,14 @@ public class MessageDm implements Serializable {
 
 	public void setObjectThree(Object objectThree) {
 		this.objectThree = objectThree;
+	}
+
+	public Object getObjectFour() {
+		return objectFour;
+	}
+
+	public void setObjectFour(Object objectFour) {
+		this.objectFour = objectFour;
 	}
 
 	public boolean getBool() {

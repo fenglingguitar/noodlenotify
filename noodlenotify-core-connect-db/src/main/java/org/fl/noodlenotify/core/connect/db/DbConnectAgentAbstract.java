@@ -352,7 +352,7 @@ public abstract class DbConnectAgentAbstract extends ConnectAgentAbstract implem
 	
 	private void offerExecuteBatch(MessageDm messageDm) {
 		@SuppressWarnings("unchecked")
-		BlockingQueue<MessageDm> executeBlockingQueueBatch = (BlockingQueue<MessageDm>) messageDm.getObjectOne();
+		BlockingQueue<MessageDm> executeBlockingQueueBatch = (BlockingQueue<MessageDm>) messageDm.getObjectFour();
 		try {
 			while (!executeBlockingQueueBatch.offer(messageDm, 1000, TimeUnit.MILLISECONDS)) {
 				Thread.sleep(executeBlockingQueueBatch.size() > 0 ? executeBlockingQueueBatch.size() : 1000);

@@ -9,29 +9,41 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
+import org.fl.noodle.common.connect.cluster.ConnectCluster;
+import org.fl.noodle.common.connect.manager.AbstractConnectManager;
+import org.fl.noodle.common.connect.node.ConnectNode;
+import org.fl.noodle.common.connect.node.ConnectNodeImpl;
+import org.fl.noodle.common.connect.register.ModuleRegister;
+import org.fl.noodle.common.connect.route.ConnectRoute;
+import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueConsumerVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
-import org.fl.noodlenotify.core.connect.ConnectManagerAbstract;
-import org.fl.noodlenotify.core.connect.QueueAgent;
-import org.fl.noodlenotify.core.connect.net.NetQueueAgent;
+import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
+import org.fl.noodlenotify.core.connect.net.cluster.LayerConnectCluster;
+import org.fl.noodlenotify.core.connect.net.constent.NetConnectManagerType;
 
-public class DistributeNetConnectManager extends ConnectManagerAbstract {
+public class DistributeNetConnectManager extends AbstractConnectManager {
 	
 	private final static Logger logger = LoggerFactory.getLogger(DistributeNetConnectManager.class);
 	
-	Map<String, ConnectAgentFactory> connectAgentFactoryMap;
+	private ModuleRegister distributeModuleRegister;
 	
-	public DistributeNetConnectManager() {
-	}
-	
-	public DistributeNetConnectManager(ConnectAgentFactory connectAgentFactory) {
-		super(connectAgentFactory);
-	}
+	private ConsoleRemotingInvoke consoleRemotingInvoke;
 
 	@Override
 	protected void updateConnectAgent() {
+		
+		long moduleId = distributeModuleRegister.getModuleId();
+		
+		if (connectClusterMap.isEmpty()) {
+			connectClusterMap.put("DEFALT", connectClusterFactoryMap.get("LAYER").createConnectCluster(NetConnectAgent.class));
+			((LayerConnectCluster)connectClusterMap.get("DEFALT")).setConnectCluster(connectClusterFactoryMap.get("LAYERFAILOVER").createConnectCluster(NetConnectAgent.class));
+		}
+		
+		if (connectRouteMap.isEmpty()) {
+			connectRouteMap.put("DEFALT", connectRouteFactoryMap.get("RANDOM").createConnectRoute());
+		}
 		
 		Map<String, Map<Long, List<QueueConsumerVo>>> consoleInfoMap = null;
 		
@@ -76,10 +88,10 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 			List<ConnectAgent> connectAgentList = new ArrayList<ConnectAgent>();
 			Set<String> queueNameSet = consoleInfoMap.keySet();
 			for (String queueName : queueNameSet) {
-				QueueAgent queueAgent = queueAgentMap.get(queueName);
-				if (queueAgent == null) {
-					queueAgent = new NetQueueAgent(queueName);
-					queueAgentMap.put(queueName, queueAgent);
+				ConnectNode connectNode = connectNodeMap.get(queueName);
+				if (connectNode == null) {
+					connectNode = new ConnectNodeImpl(queueName);
+					connectNodeMap.put(queueName, connectNode);
 					if (logger.isDebugEnabled()) {
 						logger.debug("UpdateConnectAgent -> Add Queue -> " 
 								+ "ModuleId: " + moduleId
@@ -90,10 +102,10 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 				Map<Long, List<QueueConsumerVo>> consumerGroupNmMap = consoleInfoMap.get(queueName);
 				for (long consumerGroupNm : consumerGroupNmMap.keySet()) {
 					consumerGroupNmSet.add(consumerGroupNm);
-					QueueAgent consumerGroupNmQueueAgent = queueAgent.getChildQueueAgent(consumerGroupNm);
-					if (consumerGroupNmQueueAgent == null) {
-						consumerGroupNmQueueAgent = new NetQueueAgent(queueName);
-						queueAgent.addChildQueueAgent(consumerGroupNm, consumerGroupNmQueueAgent);
+					ConnectNode consumerGroupNmConnectNode = connectNode.getChildConnectNode(consumerGroupNm);
+					if (consumerGroupNmConnectNode == null) {
+						consumerGroupNmConnectNode = new ConnectNodeImpl(queueName);
+						connectNode.addChildConnectNode(consumerGroupNm, consumerGroupNmConnectNode);
 						if (logger.isDebugEnabled()) {
 							logger.debug("UpdateConnectAgent -> Add Group -> " 
 									+ "ModuleId: " + moduleId
@@ -110,8 +122,8 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 								ConnectAgent connectAgent = connectAgentMap.get(queueConsumerVo.getConsumer_Id());
 								if (connectAgent == null) {
 									connectAgent = connectAgentFactory
-											.createConnectAgent(queueConsumerVo.getIp(),
-													queueConsumerVo.getPort(), queueConsumerVo.getUrl(), queueConsumerVo.getConsumer_Id(), (int)queueConsumerVo.getDph_Timeout().intValue());
+											.createConnectAgent(queueConsumerVo.getConsumer_Id(), queueConsumerVo.getIp(),
+													queueConsumerVo.getPort(), queueConsumerVo.getUrl(), (int)queueConsumerVo.getDph_Timeout().intValue(), (int)queueConsumerVo.getDph_Timeout().intValue());
 									try {
 										connectAgent.connect();
 										if (logger.isDebugEnabled()) {
@@ -148,13 +160,8 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 										}
 									}
 								} else {
-									if (connectAgent.getIp().equals(queueConsumerVo.getIp()) 
-											&& connectAgent.getPort() == queueConsumerVo.getPort()
-												&& (connectAgent.getUrl() != null && queueConsumerVo.getUrl() != null && connectAgent.getUrl().equals(queueConsumerVo.getUrl()) || (connectAgent.getUrl() == null && queueConsumerVo.getUrl() == null))
-													&& connectAgent.getType().equals(queueConsumerVo.getType())
-														/*&& (connectAgent.getTimeout() == 0 || queueConsumerVo.getDph_Timeout() == 0 || connectAgent.getTimeout() == queueConsumerVo.getDph_Timeout())*/
-									) {
-										if (connectAgent.getConnectStatus() == false) {
+									if (connectAgent.isSameConnect(queueConsumerVo.getIp(), queueConsumerVo.getPort(), queueConsumerVo.getUrl(), queueConsumerVo.getType())) {
+										if (!connectAgent.isHealthyConnect()) {
 											try {
 												connectAgent.reconnect();
 												if (logger.isDebugEnabled()) {
@@ -201,8 +208,8 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 													+ ", QueueName: " + queueName
 													+ ", GroupNm: " + Long.toBinaryString(consumerGroupNm)
 													+ ", ConnectId: " + queueConsumerVo.getConsumer_Id()
-													+ ", Ip: " + connectAgent.getIp()
-													+ ", Port: " + connectAgent.getPort()
+													//+ ", Ip: " + connectAgent.getIp()
+													//+ ", Port: " + connectAgent.getPort()
 													+ ", Url: " + queueConsumerVo.getUrl()
 													+ ", Type: " + queueConsumerVo.getType()
 													+ ", Timeout: " + queueConsumerVo.getDph_Timeout()
@@ -211,8 +218,8 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 										}
 										
 										connectAgent = connectAgentFactory
-												.createConnectAgent(queueConsumerVo.getIp(),
-														queueConsumerVo.getPort(), queueConsumerVo.getUrl(), queueConsumerVo.getConsumer_Id(), (int)queueConsumerVo.getDph_Timeout().intValue());
+												.createConnectAgent(queueConsumerVo.getConsumer_Id(), queueConsumerVo.getIp(),
+														queueConsumerVo.getPort(), queueConsumerVo.getUrl(), (int)queueConsumerVo.getDph_Timeout().intValue(), (int)queueConsumerVo.getDph_Timeout().intValue());
 										try {
 											connectAgent.connect();
 											if (logger.isDebugEnabled()) {
@@ -254,18 +261,18 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 							}
 						}
 					}
-					consumerGroupNmQueueAgent.updateConnectAgents(connectAgentList);
+					consumerGroupNmConnectNode.updateConnectAgentList(connectAgentList);
 					connectAgentList.clear();
 				}
 			}
 			
-			Set<String> queueAgentMapSet = queueAgentMap.keySet();
-			for (String queueName : queueAgentMapSet) {
+			Set<String> connectNodeMapSet = connectNodeMap.keySet();
+			for (String queueName : connectNodeMapSet) {
 				if (!queueNameSet.contains(queueName)) {
-					QueueAgent consumerGroupNmQueueAgent = queueAgentMap.get(queueName);
-					ConcurrentMap<Long, QueueAgent> consumerGroupNmMap = consumerGroupNmQueueAgent.getChildQueueAgentMap();
+					ConnectNode consumerGroupNmConnectNode = connectNodeMap.get(queueName);
+					ConcurrentMap<Long, ConnectNode> consumerGroupNmMap = consumerGroupNmConnectNode.getChildConnectNodeMap();
 					consumerGroupNmMap.clear();
-					queueAgentMap.remove(queueName);
+					consumerGroupNmMap.remove(queueName);
 					if (logger.isDebugEnabled()) {
 						logger.debug("UpdateConnectAgent -> Remove Queue -> " 
 								+ "ModuleId: " + moduleId
@@ -273,8 +280,8 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 								);
 					}
 				} else {
-					QueueAgent consumerGroupNmQueueAgent = queueAgentMap.get(queueName);
-					ConcurrentMap<Long, QueueAgent> consumerGroupNmMap = consumerGroupNmQueueAgent.getChildQueueAgentMap();
+					ConnectNode consumerGroupNmConnectNode = connectNodeMap.get(queueName);
+					ConcurrentMap<Long, ConnectNode> consumerGroupNmMap = consumerGroupNmConnectNode.getChildConnectNodeMap();
 					for (long consumerGroupNm : consumerGroupNmMap.keySet()) {
 						if (!consumerGroupNmSet.contains(consumerGroupNm)) {
 							consumerGroupNmMap.remove(consumerGroupNm);
@@ -299,11 +306,11 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 						logger.debug("UpdateConnectAgent -> Remove Connect -> " 
 								+ "ModuleId: " + moduleId
 								+ ", ConnectId: " + connectAgent.getConnectId()
-								+ ", Ip: " + connectAgent.getIp()
-								+ ", Port: " + connectAgent.getPort()
-								+ ", Url: " + connectAgent.getUrl()
-								+ ", Type: " + connectAgent.getType()
-								+ ", Timeout: " + connectAgent.getTimeout()
+								//+ ", Ip: " + connectAgent.getIp()
+								//+ ", Port: " + connectAgent.getPort()
+								//+ ", Url: " + connectAgent.getUrl()
+								//+ ", Type: " + connectAgent.getType()
+								//+ ", Timeout: " + connectAgent.getTimeout()
 								);
 					}
 				}
@@ -314,14 +321,14 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 	@Override
 	protected void destroyConnectAgent() {
 		
-		Set<String> queueAgentMapSet = queueAgentMap.keySet();
-		for (String queueName : queueAgentMapSet) {
-			QueueAgent consumerGroupNmQueueAgent = queueAgentMap.get(queueName);
-			ConcurrentMap<Long, QueueAgent> consumerGroupNmMap = consumerGroupNmQueueAgent.getChildQueueAgentMap();
+		Set<String> connectNodeMapSet = connectNodeMap.keySet();
+		for (String queueName : connectNodeMapSet) {
+			ConnectNode consumerGroupNmConnectNode = connectNodeMap.get(queueName);
+			ConcurrentMap<Long, ConnectNode> consumerGroupNmMap = consumerGroupNmConnectNode.getChildConnectNodeMap();
 			consumerGroupNmMap.clear();
 		}
 		
-		queueAgentMap.clear();
+		connectNodeMap.clear();
 		
 		Set<Long> connectAgentKeySet = connectAgentMap.keySet();
 		for (long key : connectAgentKeySet) {
@@ -329,12 +336,12 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 			connectAgent.close();
 			if (logger.isDebugEnabled()) {
 				logger.debug("DestroyConnectAgent -> Close -> " 
-						+ "ModuleId: " + moduleId
+						+ "ModuleId: " + distributeModuleRegister.getModuleId()
 						+ ", ConnectId: " + connectAgent.getConnectId()
-						+ ", Ip: " + connectAgent.getIp()
-						+ ", Port: " + connectAgent.getPort()
-						+ ", Url: " + connectAgent.getUrl()
-						+ ", Type: " + connectAgent.getType()
+						//+ ", Ip: " + connectAgent.getIp()
+						//+ ", Port: " + connectAgent.getPort()
+						//+ ", Url: " + connectAgent.getUrl()
+						//+ ", Type: " + connectAgent.getType()
 						);
 			}
 		}
@@ -344,5 +351,28 @@ public class DistributeNetConnectManager extends ConnectManagerAbstract {
 	public void setConnectAgentFactoryMap(
 			Map<String, ConnectAgentFactory> connectAgentFactoryMap) {
 		this.connectAgentFactoryMap = connectAgentFactoryMap;
+	}
+
+	public void setDistributeModuleRegister(ModuleRegister distributeModuleRegister) {
+		this.distributeModuleRegister = distributeModuleRegister;
+	}
+
+	public void setConsoleRemotingInvoke(ConsoleRemotingInvoke consoleRemotingInvoke) {
+		this.consoleRemotingInvoke = consoleRemotingInvoke;
+	}
+
+	@Override
+	protected String getManagerName() {
+		return NetConnectManagerType.NET.getCode();
+	}
+	
+	@Override
+	public ConnectCluster getConnectCluster(String clusterName) {
+		return connectClusterMap.get("DEFALT");
+	}
+	
+	@Override
+	public ConnectRoute getConnectRoute(String routeName) {
+		return connectRouteMap.get("DEFALT");
 	}
 }

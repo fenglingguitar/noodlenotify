@@ -21,7 +21,7 @@
 	<bean id="consumerStatusExecuter" class="org.fl.noodlenotify.monitor.status.console.executer.ConsumerStatusExecuter" >
 		<property name="connectAgentFactoryMap">
 			<map>
-				<!-- <entry key="NETTY" value-ref="connectAgentFactoryNetty" /> -->
+				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />
 				<entry key="HTTP" value-ref="connectAgentFactoryJetty" />
 			</map>
 		</property>
