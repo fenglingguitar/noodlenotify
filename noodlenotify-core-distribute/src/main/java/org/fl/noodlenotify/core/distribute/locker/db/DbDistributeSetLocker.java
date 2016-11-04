@@ -2,9 +2,8 @@ package org.fl.noodlenotify.core.distribute.locker.db;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectManager;
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.distribute.locker.DistributeSetLockerAbstract;
 

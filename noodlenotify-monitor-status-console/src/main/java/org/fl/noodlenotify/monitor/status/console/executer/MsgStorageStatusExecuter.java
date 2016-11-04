@@ -2,12 +2,12 @@ package org.fl.noodlenotify.monitor.status.console.executer;
 
 import java.util.List;
 
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.MsgStorageService;
 import org.fl.noodlenotify.console.vo.MsgStorageVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
 import org.fl.noodlenotify.core.connect.db.DbStatusChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class MsgStorageStatusExecuter extends AbstractExecuter {
 		List<MsgStorageVo> msgStorageVoList = msgStorageService.queryMsgStorageList(msgStorageVoParam);
 		for (MsgStorageVo msgStorageVo : msgStorageVoList) {
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;
-			ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(msgStorageVo.getIp(), msgStorageVo.getPort(), msgStorageVo.getMsgStorage_Id());
+			ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(msgStorageVo.getMsgStorage_Id(), msgStorageVo.getIp(), msgStorageVo.getPort(), null);
 			try {
 				connectAgent.connect();
 				((DbStatusChecker) connectAgent).checkHealth();

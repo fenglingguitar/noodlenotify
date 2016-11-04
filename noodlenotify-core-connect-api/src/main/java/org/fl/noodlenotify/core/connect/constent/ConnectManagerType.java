@@ -1,12 +1,13 @@
-package org.fl.noodlenotify.core.connect.net.constent;
+package org.fl.noodlenotify.core.connect.constent;
 
-public enum NetConnectManagerType {
+public enum ConnectManagerType {
 	
-	NET("NET");
+	NET("NET"),
+	DB("DB");
 	
 	private String code;
 
-	private NetConnectManagerType(String code) {
+	private ConnectManagerType(String code) {
 		this.code = code;
 	}
 	

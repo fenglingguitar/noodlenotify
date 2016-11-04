@@ -19,8 +19,8 @@
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/jetty/client/noodlenotify-core-connect-net-client-jetty-factory.xml" />
 
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/cluster/noodlenotify-core-connect-net-cluster-factory.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/connect/net/serialize/noodlenotify-core-connect-net-serialize-factory.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/connect/net/route/noodlenotify-core-connect-net-route-factory.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/serialize/noodlenotify-core-connect-serialize-factory.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/route/noodlenotify-core-connect-route-factory.xml" />
 
 	<bean id="producerModuleRegister" class="org.fl.noodle.common.connect.register.ModuleRegister" />
 

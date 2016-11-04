@@ -5,14 +5,14 @@ import java.lang.reflect.Method;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.manager.ConnectManagerPool;
-import org.fl.noodlenotify.core.connect.net.constent.NetConnectManagerType;
+import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 
 public class NetConnectDistinguish implements ConnectDistinguish {
 
 	@Override
 	public ConnectManager getConnectManager() {
-		return ConnectManagerPool.getConnectManager(NetConnectManagerType.NET.getCode());
+		return ConnectManagerPool.getConnectManager(ConnectManagerType.NET.getCode());
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class NetConnectDistinguish implements ConnectDistinguish {
 
 	@Override
 	public String getRouteName(Object[] args) {
-		return NetConnectManagerType.NET.getCode();
+		return ConnectManagerType.NET.getCode();
 	}
 
 	@Override
@@ -32,6 +32,6 @@ public class NetConnectDistinguish implements ConnectDistinguish {
 
 	@Override
 	public String getModuleName(Object[] args) {
-		return NetConnectManagerType.NET.getCode();
+		return ConnectManagerType.NET.getCode();
 	}
 }

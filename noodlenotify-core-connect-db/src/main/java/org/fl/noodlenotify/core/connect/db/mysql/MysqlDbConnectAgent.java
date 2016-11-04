@@ -11,13 +11,15 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
+import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgentAbstract;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.db.datasource.DbDataSource;
 import org.fl.noodlenotify.core.connect.db.datasource.DbDataSourceFactory;
 import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.fl.noodlenotify.core.domain.message.MessageVo;
@@ -64,16 +66,17 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	private ConcurrentMap<String, String> releaseAliveSqlMap = new ConcurrentHashMap<String, String>();
 	private ConcurrentMap<String, String> checkLenSqlMap = new ConcurrentHashMap<String, String>();
 
-	public MysqlDbConnectAgent(String ip, int port, long connectId,
-			DbDataSourceFactory dbDataSourceFactory) {
-		super(ip, port, connectId);
-		this.dbDataSourceFactory = dbDataSourceFactory;
-	}
-	
-	public MysqlDbConnectAgent(String ip, int port, long connectId,
+	public MysqlDbConnectAgent(
+			long connectId, String ip, int port, String url, 
+			int connectTimeout, int readTimeout, String encoding,
+			int invalidLimitNum, ConnectDistinguish connectDistinguish,
+			List<MethodInterceptor> methodInterceptorList,
 			DbConnectAgentConfParam dbConnectAgentConfParam,
 			DbDataSourceFactory dbDataSourceFactory) {
-		super(ip, port, connectId, dbConnectAgentConfParam);
+		super(
+			connectId, ip, port, url, connectTimeout, readTimeout, encoding, 
+			invalidLimitNum, connectDistinguish, 
+			methodInterceptorList, dbConnectAgentConfParam);
 		this.dbDataSourceFactory = dbDataSourceFactory;
 	}
 
@@ -128,10 +131,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 
 	@Override
 	public void createTable(String queueName) throws Exception {
-		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
 		
 		StringBuilder sqlContentTableStringBuilder = new StringBuilder();
 		sqlContentTableStringBuilder.append("CREATE TABLE IF NOT EXISTS `MSG_");
@@ -202,7 +201,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 			jdbcTemplate.update(sqLockTableStringBuilder.toString());
 			jdbcTemplate.update(sqLocklInsertTableStringBuilder.toString());
 		} catch (RecoverableDataAccessException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("CreateTable -> " 
 						+ "DB: " + connectId
@@ -316,7 +314,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 				}
 			});
 		} catch (CannotCreateTransactionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("InsertActual -> " 
 						+ "DB: " + connectId
@@ -372,7 +369,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 				}
 			});
 		} catch (CannotCreateTransactionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("UpdateActual -> " 
 						+ "DB: " + connectId
@@ -443,7 +439,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 				}
 			});
 		} catch (CannotCreateTransactionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("DeleteActual -> " 
 						+ "DB: " + connectId
@@ -456,10 +451,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	
 	@Override
 	public List<MessageDm> select(String queueName, long start, long end, byte status) throws Exception {
-		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
 		
 		String sql = selectSqlMap.get(queueName);
 		if (sql == null) {
@@ -496,7 +487,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 				}
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("Select -> " 
 						+ "DB: " + connectId
@@ -521,10 +511,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public long selectCount(String queueName, long start, long end, byte status) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = selectCountSqlMap.get(queueName);
 		if (sql == null) {
 			sql = "SELECT COUNT(*) FROM MSG_" + queueName.toUpperCase().replace(".", "_") 
@@ -541,7 +527,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 					status
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("Select -> " 
 						+ "DB: " + connectId
@@ -565,10 +550,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	
 	@Override
 	public List<MessageDm> selectTimeout(String queueName, long start, long end, byte status, long timeout) throws Exception {
-		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
 		
 		String sql = selectFinishTimeoutSqlMap.get(queueName);
 		if (sql == null) {
@@ -606,7 +587,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 				}
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("SelectFinishTimeout -> " 
 						+ "DB: " + connectId
@@ -631,10 +611,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public MessageDm selectById(String queueName, long id) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = selectByIdSqlMap.get(queueName);
 		if (sql == null) {
 			sql = "SELECT CONTENT FROM MSG_" + queueName.toUpperCase().replace(".", "_") + "_CT WHERE ID = ?";
@@ -655,7 +631,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 				}
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("SelectById -> " 
 						+ "DB: " + connectId
@@ -683,10 +658,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public long maxId(String queueName) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = maxIdSqlMap.get(queueName);
 		if (sql == null) {
 			sql = "SELECT MAX(ID) FROM MSG_" + queueName.toUpperCase().replace(".", "_") + "_IF";
@@ -697,7 +668,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 		try {
 			maxId = jdbcTemplate.queryForLong(sqlFinal);
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("MaxId -> " 
 						+ "DB: " + connectId
@@ -722,10 +692,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public long maxIdDelay(String queueName, long delay) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = maxIdDelaySqlMap.get(queueName);
 		if (sql == null) {
 			sql = "SELECT MAX(ID) FROM MSG_" + queueName.toUpperCase().replace(".", "_") + "_IF WHERE BEGIN_TIME < ?";
@@ -736,7 +702,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 		try {
 			maxId = jdbcTemplate.queryForLong(sqlFinal, delay);
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("MaxIdDelay -> " 
 						+ "DB: " + connectId
@@ -761,10 +726,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public long minId(String queueName) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = minIdSqlMap.get(queueName);
 		if (sql == null) {
 			sql = "SELECT MIN(ID) FROM MSG_" + queueName.toUpperCase().replace(".", "_") + "_IF";
@@ -775,7 +736,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 		try {
 			minId = jdbcTemplate.queryForLong(sqlFinal);
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("MinId -> " 
 						+ "DB: " + connectId
@@ -800,10 +760,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public long minUnFinishId(String queueName) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = minUnFinishIdSqlMap.get(queueName);
 		if (sql == null) {
 			sql = "SELECT MIN(ID) FROM MSG_" + queueName.toUpperCase().replace(".", "_") + "_IF WHERE STATUS <> ?";
@@ -816,7 +772,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 					MessageConstant.MESSAGE_STATUS_FINISH
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("MinUnFinishId -> " 
 						+ "DB: " + connectId
@@ -841,10 +796,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public long minIdByStatus(String queueName, byte status) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = minIdByStatusSqlMap.get(queueName);
 		if (sql == null) {
 			sql = "SELECT MIN(ID) FROM MSG_" + queueName.toUpperCase().replace(".", "_") + "_IF WHERE STATUS = ?";
@@ -857,7 +808,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 					status
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("MinIdByStatus -> " 
 						+ "DB: " + connectId
@@ -884,10 +834,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public long getDiffTime() throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		final String sqlFinal = "SELECT CURRENT_TIMESTAMP FROM DUAL";
 		List<Long> diffTimeList = null;
 		long diffTime = 0;
@@ -900,7 +846,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 				}
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("GetDiffTime -> " 
 						+ "DB: " + connectId
@@ -929,10 +874,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public boolean getAlive(String queueName, long id, long diffTime, long intervalTime) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = getAliveSqlMap.get(queueName);
 		if (sql == null) {
 			sql = "UPDATE MSG_" + queueName.toUpperCase().replace(".", "_") + "_LK SET SET_ID = ?, OVERTIME = ? WHERE OVERTIME < ? AND ID = 1";
@@ -949,7 +890,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 				return true;
 			}
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("GetAlive -> " 
 						+ "DB: " + connectId
@@ -974,10 +914,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public boolean keepAlive(String queueName, long id, long diffTime, long intervalTime) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = keepAliveSqlMap.get(queueName);
 		if (sql == null) {
 			sql = "UPDATE MSG_" + queueName.toUpperCase().replace(".", "_") + "_LK SET SET_ID = ?, OVERTIME = ? WHERE SET_ID = ? AND ID = 1";
@@ -994,7 +930,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 				return true;
 			}
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("KeepAlive -> " 
 						+ "DB: " + connectId
@@ -1019,10 +954,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public void releaseAlive(String queueName, long id) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = releaseAliveSqlMap.get(queueName);
 		if (sql == null) {
 			sql = "UPDATE MSG_" + queueName.toUpperCase().replace(".", "_") + "_LK SET SET_ID = ?, OVERTIME = ? WHERE SET_ID = ? AND ID = 1";
@@ -1036,7 +967,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 					id
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("ReleaseAlive -> " 
 						+ "DB: " + connectId
@@ -1060,10 +990,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public void checkHealth() throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		final String sqlFinal = "SELECT CURRENT_TIMESTAMP FROM DUAL";
 		try {
 			jdbcTemplate.query(sqlFinal, new RowMapper<Long>() {
@@ -1074,7 +1000,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 				}
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("CheckHealth -> " 
 						+ "DB: " + connectId
@@ -1098,10 +1023,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public long checkNewLen(String queueName) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = checkLenSqlMap.get(queueName);
 		if (sql == null) {
 			sql = "SELECT COUNT(*) FROM MSG_" + queueName.toUpperCase().replace(".", "_") + "_IF WHERE STATUS = ?";
@@ -1114,7 +1035,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 					MessageConstant.MESSAGE_STATUS_NEW
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("CheckNewLen -> " 
 						+ "DB: " + connectId
@@ -1142,10 +1062,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public long checkPortionLen(String queueName) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = checkLenSqlMap.get(queueName);
 		if (sql == null) {
 			sql = "SELECT COUNT(*) FROM MSG_" + queueName.toUpperCase().replace(".", "_") + "_IF WHERE STATUS = ?";
@@ -1158,7 +1074,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 					MessageConstant.MESSAGE_STATUS_PORTION
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("checkPortionLen -> " 
 						+ "DB: " + connectId
@@ -1186,10 +1101,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 
 	@Override
 	public List<MessageVo> queryPortionMessage(String queueName, String uuid, Long region, String content, Integer page, Integer rows) throws Exception {
-		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
 		
 		List<Object> objectList = new ArrayList<Object>();
 		objectList.add(MessageConstant.MESSAGE_STATUS_PORTION);		
@@ -1239,7 +1150,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 				}
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("queryPortionMessage -> " 
 						+ "DB: " + connectId
@@ -1264,10 +1174,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public void savePortionMessage(String queueName, Long contentId, String content) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = "UPDATE MSG_" + queueName.toUpperCase().replace(".", "_") + "_CT SET CONTENT = ? WHERE ID = ?";
 				
 		final String sqlFinal = sql;
@@ -1278,7 +1184,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 					contentId,
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("savePortionMessage -> " 
 						+ "DB: " + connectId
@@ -1302,10 +1207,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	public void deletePortionMessage(String queueName, Long id) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		String sql = "UPDATE MSG_" + queueName.toUpperCase().replace(".", "_") + "_IF SET STATUS = ? WHERE ID = ?";
 				
 		final String sqlFinal = sql;
@@ -1316,7 +1217,6 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 					id
 			});
 		} catch (RecoverableDataAccessException e) {	
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("deletePortionMessage -> " 
 						+ "DB: " + connectId
@@ -1339,5 +1239,10 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	
 	public void setDbDataSourceFactory(DbDataSourceFactory dbDataSourceFactory) {
 		this.dbDataSourceFactory = dbDataSourceFactory;
+	}
+
+	@Override
+	protected Class<?> getServiceInterfaces() {
+		return DbConnectAgent.class;
 	}
 }

@@ -10,6 +10,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.fl.noodle.common.connect.cluster.ConnectCluster;
+import org.fl.noodle.common.connect.exception.ConnectInvokeException;
+import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
@@ -19,10 +22,7 @@ import org.fl.noodlenotify.core.connect.QueueAgent;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.exception.ConnectionInvokeException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionStopException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
@@ -36,7 +36,7 @@ public class Exchange implements NetConnectReceiver {
 	
 	private long suspendTime = 300000;
 	
-	private ConnectManager dbConnectManager;
+	private org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager;
 	private ConnectManager bodyCacheConnectManager;
 	
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();	
@@ -58,7 +58,9 @@ public class Exchange implements NetConnectReceiver {
 	private int checkPort;
 	
 	private long sizeLimit = 8192;
-		
+	
+	private ModuleRegister exchangeModuleRegister;
+	
 	public Exchange() {
 	}
 	
@@ -74,13 +76,16 @@ public class Exchange implements NetConnectReceiver {
 		//MemoryStorage.moduleName = MonitorPerformanceConstant.MODULE_ID_EXCHANGE;
 		//MemoryStorage.moduleId = moduleId;
 		
+		exchangeModuleRegister.setModuleId(moduleId);
+		
 		bodyCacheConnectManager.setModuleId(moduleId);
 		bodyCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
 		bodyCacheConnectManager.start();
 		
-		dbConnectManager.setModuleId(moduleId);
-		dbConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		dbConnectManager.start();
+		//dbConnectManager.setModuleId(moduleId);
+		//dbConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
+		//dbConnectManager.start();
+		dbConnectManager.runUpdateNow();
 		
 		updateConnectAgent();
 		
@@ -111,7 +116,7 @@ public class Exchange implements NetConnectReceiver {
 		stopCountDownLatch.await();
 		executorService.shutdown();
 		
-		dbConnectManager.destroy();		
+		//dbConnectManager.destroy();		
 		bodyCacheConnectManager.destroy();
 	}
 	
@@ -371,7 +376,20 @@ public class Exchange implements NetConnectReceiver {
 			}
 		}
 		
-		QueueAgent queueAgentDb = dbConnectManager.getQueueAgent(messageDm.getQueueName());
+		ConnectCluster connectCluster = dbConnectManager.getConnectCluster(messageDm.getQueueName());
+		if (connectCluster == null) {
+			if (logger.isErrorEnabled()) {
+				logger.error("invoke -> connectManager.getConnectCluster return null -> invokerKey: {}", messageDm.getQueueName());
+			}
+			throw new ConnectInvokeException("no have this connect cluster");
+		}
+		
+		DbConnectAgent dbConnectAgent = (DbConnectAgent) connectCluster.getProxy();
+		
+		messageDm.setBeginTime(System.currentTimeMillis());
+		dbConnectAgent.insert(messageDm);
+		
+		/*QueueAgent queueAgentDb = dbConnectManager.getQueueAgent(messageDm.getQueueName());
 		if (queueAgentDb != null) {
 			DbConnectAgent dbConnectAgent = null;
 			do {
@@ -437,10 +455,10 @@ public class Exchange implements NetConnectReceiver {
 			}
 			dbConnectManager.startUpdateConnectAgent();
 			throw new ConnectionInvokeException("Db connect agent insert message error, can not get db queue agent");
-		}
+		}*/
 	}	
 	
-	public void setDbConnectManager(ConnectManager dbConnectManager) {
+	public void setDbConnectManager(org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager) {
 		this.dbConnectManager = dbConnectManager;
 	}
 
@@ -486,5 +504,9 @@ public class Exchange implements NetConnectReceiver {
 
 	public void setSizeLimit(long sizeLimit) {
 		this.sizeLimit = sizeLimit;
+	}
+
+	public void setExchangeModuleRegister(ModuleRegister exchangeModuleRegister) {
+		this.exchangeModuleRegister = exchangeModuleRegister;
 	}
 }

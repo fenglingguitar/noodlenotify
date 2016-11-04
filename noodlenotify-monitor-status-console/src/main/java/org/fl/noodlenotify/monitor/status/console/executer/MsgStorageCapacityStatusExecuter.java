@@ -2,12 +2,12 @@ package org.fl.noodlenotify.monitor.status.console.executer;
 
 import java.util.List;
 
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.QueueMsgStorageService;
 import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
 import org.fl.noodlenotify.core.connect.db.DbStatusChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class MsgStorageCapacityStatusExecuter extends AbstractExecuter {
 		queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
 		List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryQueueMsgStorageIncludeList(queueMsgStorageVo);
 		for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
-			ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getIp(), queueMsgStorage.getPort(), queueMsgStorage.getMsgStorage_Id());
+			ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
 			try {
 				connectAgent.connect();
 				long newLen = ((DbStatusChecker) connectAgent).checkNewLen(queueMsgStorage.getQueue_Nm());

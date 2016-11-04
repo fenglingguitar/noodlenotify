@@ -31,7 +31,7 @@ public class DistributeSet {
 	
 	private long moduleId;
 	
-	private ConnectManager dbConnectManager;
+	private org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager;
 	private ConnectManager queueCacheConnectManager;
 	private long dbId;
 	
@@ -52,7 +52,7 @@ public class DistributeSet {
 
 	public DistributeSet(String queueName,
 							long moduleId,
-							ConnectManager dbConnectManager,
+							org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager,
 							ConnectManager queueCacheConnectManager,
 							DistributeConfParam distributeConfParam,
 							QueueDistributerVo queueDistributerVo,
@@ -68,7 +68,7 @@ public class DistributeSet {
 	
 	public void start() {
 		
-		ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
+		org.fl.noodle.common.connect.agent.ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
 		if(connectAgent != null) {
 			
 			DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent;
@@ -192,7 +192,7 @@ public class DistributeSet {
 					break;
 				}
 				
-				ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
+				org.fl.noodle.common.connect.agent.ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
 				if(connectAgent == null) {
 					if (logger.isErrorEnabled()) {
 						logger.error("DistributeSetFreshRunnable -> " 
@@ -433,7 +433,7 @@ public class DistributeSet {
 					break;
 				}
 				
-				ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
+				org.fl.noodle.common.connect.agent.ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
 				if(connectAgent == null) {
 					if (logger.isErrorEnabled()) {
 						logger.error("DistributeSetNewRunnable -> " 
@@ -660,7 +660,7 @@ public class DistributeSet {
 					break;
 				}
 				
-				ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
+				org.fl.noodle.common.connect.agent.ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
 				if(connectAgent == null) {
 					if (logger.isErrorEnabled()) {
 						logger.error("DistributeSetNewRunnable -> " 
@@ -891,7 +891,7 @@ public class DistributeSet {
 					break;
 				}
 				
-				ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
+				org.fl.noodle.common.connect.agent.ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
 				if(connectAgent == null) {
 					if (logger.isErrorEnabled()) {
 						logger.error("DistributeSetDeleteTimeoutRunnable -> Get DB ConnectAgent -> " 
@@ -1211,7 +1211,7 @@ public class DistributeSet {
 		this.queueName = queueName;
 	}
 	
-	public void setDbConnectManager(ConnectManager dbConnectManager) {
+	public void setDbConnectManager(org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager) {
 		this.dbConnectManager = dbConnectManager;
 	}
 	

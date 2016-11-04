@@ -6,13 +6,13 @@ import java.util.List;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.agent.AbstractConnectAgent;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
+import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionStopException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionTimeoutException;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
-import org.fl.noodlenotify.core.connect.net.constent.NetConnectAgentType;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public class JettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 			int invalidLimitNum, ConnectDistinguish connectDistinguish,
 			List<MethodInterceptor> methodInterceptorList) {
 		super(
-			connectId, ip, port, url, NetConnectAgentType.HTTP.getCode(),
+			connectId, ip, port, url, ConnectAgentType.NET_HTTP.getCode(),
 			connectTimeout, readTimeout, encoding, 
 			invalidLimitNum, connectDistinguish, 
 			methodInterceptorList);

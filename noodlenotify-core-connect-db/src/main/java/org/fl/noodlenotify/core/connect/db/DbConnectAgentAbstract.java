@@ -10,15 +10,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.fl.noodle.common.connect.agent.AbstractConnectAgent;
+import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
+import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
+import org.fl.noodlenotify.core.connect.exception.ConnectionTimeoutException;
+import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.fl.noodlenotify.core.connect.ConnectAgentAbstract;
-import org.fl.noodlenotify.core.connect.exception.ConnectionTimeoutException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
-
-public abstract class DbConnectAgentAbstract extends ConnectAgentAbstract implements DbConnectAgent, DbStatusChecker {
+public abstract class DbConnectAgentAbstract extends AbstractConnectAgent implements DbConnectAgent, DbStatusChecker {
 	
 	private final static Logger logger = LoggerFactory.getLogger(DbConnectAgentAbstract.class);
 	
@@ -35,14 +36,17 @@ public abstract class DbConnectAgentAbstract extends ConnectAgentAbstract implem
 	private CountDownLatch stopCountDownLatch;
 	private AtomicInteger  stopCountDownLatchCount;
 		
-	public DbConnectAgentAbstract(String ip, int port, long connectId) {
-		super(ip, port, connectId);
-		dbConnectAgentConfParam = new DbConnectAgentConfParam();
-	}
-	
-	public DbConnectAgentAbstract(String ip, int port, long connectId,
+	public DbConnectAgentAbstract(
+			long connectId, String ip, int port, String url, 
+			int connectTimeout, int readTimeout, String encoding,
+			int invalidLimitNum, ConnectDistinguish connectDistinguish,
+			List<MethodInterceptor> methodInterceptorList, 
 			DbConnectAgentConfParam dbConnectAgentConfParam) {
-		super(ip, port, connectId);
+		super(
+			connectId, ip, port, url, ConnectAgentType.DB.getCode(),
+			connectTimeout, readTimeout, encoding, 
+			invalidLimitNum, connectDistinguish, 
+			methodInterceptorList);
 		this.dbConnectAgentConfParam = dbConnectAgentConfParam;
 	}
 	
@@ -277,10 +281,6 @@ public abstract class DbConnectAgentAbstract extends ConnectAgentAbstract implem
 	@Override
 	public void insert(MessageDm messageDm) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
-		
 		synchronized(messageDm) {
 			messageDm.setResult(false);
 			if (insertBlockingQueue.offer(messageDm, dbConnectAgentConfParam.getInsertTimeout(), TimeUnit.MILLISECONDS)) {
@@ -307,10 +307,10 @@ public abstract class DbConnectAgentAbstract extends ConnectAgentAbstract implem
 	@Override
 	public void update(MessageDm messageDm) throws Exception {
 		
-		if (connectStatus.get() == false) {
+		/*if (connectStatus.get() == false) {
 			offerExecuteBatch(messageDm);
 			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
+		}*/
 		
 		if (!updateBlockingQueue.offer(messageDm, dbConnectAgentConfParam.getUpdateTimeout(), TimeUnit.MILLISECONDS)) {				
 			offerExecuteBatch(messageDm);
@@ -321,10 +321,10 @@ public abstract class DbConnectAgentAbstract extends ConnectAgentAbstract implem
 	@Override
 	public void delete(MessageDm messageDm) throws Exception {
 		
-		if (connectStatus.get() == false) {
+		/*if (connectStatus.get() == false) {
 			cancelCountDownLatch(messageDm);
 			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}
+		}*/
 		
 		if (!deleteBlockingQueue.offer(messageDm, dbConnectAgentConfParam.getDeleteTimeout(), TimeUnit.MILLISECONDS)) {
 			cancelCountDownLatch(messageDm);

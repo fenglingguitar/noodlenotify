@@ -3,14 +3,14 @@ package org.fl.noodlenotify.console.web.controller.console;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.mvc.annotation.NoodleRequestParam;
 import org.fl.noodle.common.mvc.annotation.NoodleResponseBody;
 import org.fl.noodle.common.mvc.vo.VoidVo;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.QueueMsgStorageService;
 import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
 import org.fl.noodlenotify.core.connect.db.DbStatusChecker;
 import org.fl.noodlenotify.core.domain.message.MessageVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class MsgController {
 		queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
 		List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
 		for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
-			ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getIp(), queueMsgStorage.getPort(), queueMsgStorage.getMsgStorage_Id());
+			ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
 			try {
 				connectAgent.connect();	
 				result.addAll(((DbStatusChecker) connectAgent).queryPortionMessage(queueMsgStorage.getQueue_Nm(), vo.getUuid(), vo.getRegion(), vo.getContent(), pageInt * rowsInt, rowsInt));
@@ -66,7 +66,7 @@ public class MsgController {
 		List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
 		for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
 			if (queueMsgStorage.getMsgStorage_Id() == vo.getDb()) {
-				ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getIp(), queueMsgStorage.getPort(), queueMsgStorage.getMsgStorage_Id());
+				ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
 				try {
 					connectAgent.connect();	
 					((DbStatusChecker) connectAgent).savePortionMessage(queueMsgStorage.getQueue_Nm(), vo.getContentId(), vo.getContent());
@@ -90,7 +90,7 @@ public class MsgController {
 			List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
 			for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
 				if (queueMsgStorage.getMsgStorage_Id() == vo.getDb()) {
-					ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getIp(), queueMsgStorage.getPort(), queueMsgStorage.getMsgStorage_Id());
+					ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
 					try {
 						connectAgent.connect();	
 						((DbStatusChecker) connectAgent).deletePortionMessage(queueMsgStorage.getQueue_Nm(), vo.getId());

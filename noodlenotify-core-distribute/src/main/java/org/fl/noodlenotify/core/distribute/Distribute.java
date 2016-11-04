@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
@@ -31,7 +32,7 @@ public class Distribute {
 	
 	private DistributeConfParam distributeConfParam = new DistributeConfParam();
 	
-	private ConnectManager dbConnectManager;
+	private org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager;
 	private ConnectManager queueCacheConnectManager;
 	private ConnectManager bodyCacheConnectManager;
 	private org.fl.noodle.common.connect.manager.ConnectManager netConnectManager;
@@ -88,9 +89,10 @@ public class Distribute {
 		queueCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
 		queueCacheConnectManager.start();
 
-		dbConnectManager.setModuleId(moduleId);
-		dbConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		dbConnectManager.start();
+		//dbConnectManager.setModuleId(moduleId);
+		//dbConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
+		//dbConnectManager.start();
+		dbConnectManager.runUpdateNow();
 		
 		updateConnectAgent();
 		
@@ -135,7 +137,7 @@ public class Distribute {
 		stopCountDownLatch.await();
 		executorService.shutdown();
 		
-		dbConnectManager.destroy();
+		//dbConnectManager.destroy();
 		queueCacheConnectManager.destroy();
 		bodyCacheConnectManager.destroy();
 		//netConnectManager.destroy();		
@@ -380,10 +382,10 @@ public class Distribute {
 					distributeSetQueueMap.put(queueDistributerVo.getQueue_Nm(), distributeSetDbMap);
 				}
 				Set<Long> dbIdSet = new HashSet<Long>();
-				QueueAgent queueAgent = dbConnectManager.getQueueAgent(queueDistributerVo.getQueue_Nm());
-				if (queueAgent != null) {
-					List<ConnectAgent> connectAgentList = queueAgent.getConnectAgentAll();
-					for (ConnectAgent connectAgent : connectAgentList) {
+				ConnectNode connectNode = dbConnectManager.getConnectNode(queueDistributerVo.getQueue_Nm());
+				if (connectNode != null) {
+					List<org.fl.noodle.common.connect.agent.ConnectAgent> connectAgentList = connectNode.getConnectAgentList();
+					for (org.fl.noodle.common.connect.agent.ConnectAgent connectAgent : connectAgentList) {
 						dbIdSet.add(connectAgent.getConnectId());
 						if (!distributeSetDbMap.containsKey(connectAgent.getConnectId())) {
 							DistributeSet distributeSet = 
@@ -659,7 +661,7 @@ public class Distribute {
 		}
 	}
 	
-	public void setDbConnectManager(ConnectManager dbConnectManager) {
+	public void setDbConnectManager(org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager) {
 		this.dbConnectManager = dbConnectManager;
 	}
 	

@@ -21,6 +21,7 @@ public class DistributeNetConnectManagerTest extends AbstractJUnit4SpringContext
 	@Test
 	public final void testServer() throws Exception {
 		
+		distributeNetConnectManager.start();
 		distributeModuleRegister.setModuleId(1L);
 		distributeNetConnectManager.runUpdateNow();
 		Thread.sleep(Long.MAX_VALUE);
@@ -29,6 +30,7 @@ public class DistributeNetConnectManagerTest extends AbstractJUnit4SpringContext
 	@Test
 	public final void testClose() throws Exception {
 		
+		distributeNetConnectManager.start();
 		distributeModuleRegister.setModuleId(1L);
 		distributeNetConnectManager.runUpdateNow();
 		Thread.sleep(1000);

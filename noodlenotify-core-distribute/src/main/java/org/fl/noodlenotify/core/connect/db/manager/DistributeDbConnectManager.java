@@ -6,27 +6,42 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
+import org.fl.noodle.common.connect.cluster.ConnectCluster;
+import org.fl.noodle.common.connect.manager.AbstractConnectManager;
+import org.fl.noodle.common.connect.node.ConnectNode;
+import org.fl.noodle.common.connect.node.ConnectNodeImpl;
+import org.fl.noodle.common.connect.register.ModuleRegister;
+import org.fl.noodle.common.connect.route.ConnectRoute;
+import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
+import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
+import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
+import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
+import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
-import org.fl.noodlenotify.core.connect.ConnectManagerAbstract;
-import org.fl.noodlenotify.core.connect.QueueAgent;
-import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
-import org.fl.noodlenotify.core.connect.db.DbQueueAgent;
-
-public class DistributeDbConnectManager extends ConnectManagerAbstract {
+public class DistributeDbConnectManager extends AbstractConnectManager {
 	
 	private final static Logger logger = LoggerFactory.getLogger(DistributeDbConnectManager.class);
-	
-	public DistributeDbConnectManager(ConnectAgentFactory connectAgentFactory) {
-		super(connectAgentFactory);
-	}
 
+	private ModuleRegister distributeModuleRegister;
+	
+	private ConsoleRemotingInvoke consoleRemotingInvoke;
+	
 	@Override
 	protected void updateConnectAgent() {
+		
+		long moduleId = distributeModuleRegister.getModuleId();
+		
+		if (connectClusterMap.isEmpty()) {
+			connectClusterMap.put("DEFALT", connectClusterFactoryMap.get("FAILOVER").createConnectCluster(DbConnectAgent.class));
+		}
+		
+		if (connectRouteMap.isEmpty()) {
+			connectRouteMap.put("DEFALT", connectRouteFactoryMap.get("RANDOM").createConnectRoute());
+		}
 		
 		Map<String, List<QueueMsgStorageVo>> consoleInfoMap = null;
 		
@@ -66,10 +81,10 @@ public class DistributeDbConnectManager extends ConnectManagerAbstract {
 			Set<String> queueNameSet = consoleInfoMap.keySet();
 			for (String queueName : queueNameSet) {
 				boolean isNewQueue = false;
-				QueueAgent queueAgent = queueAgentMap.get(queueName);
-				if (queueAgent == null) {
-					queueAgent = new DbQueueAgent(queueName);
-					queueAgentMap.put(queueName, queueAgent);
+				ConnectNode connectNode = connectNodeMap.get(queueName);
+				if (connectNode == null) {
+					connectNode = new ConnectNodeImpl(queueName);
+					connectNodeMap.put(queueName, connectNode);
 					if (logger.isDebugEnabled()) {
 						logger.debug("UpdateConnectAgent -> Add Queue -> " 
 								+ "ModuleId: " + moduleId
@@ -80,13 +95,14 @@ public class DistributeDbConnectManager extends ConnectManagerAbstract {
 				}
 				List<QueueMsgStorageVo> queueMsgStorageVoList = consoleInfoMap.get(queueName);
 				for (QueueMsgStorageVo queueMsgStorageVo : queueMsgStorageVoList) {
+					ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get("MYSQL");
 					if (connectAgentFactory != null) {
 						connectIdSet.add(queueMsgStorageVo.getMsgStorage_Id());
 						ConnectAgent connectAgent = connectAgentMap.get(queueMsgStorageVo.getMsgStorage_Id());
 						if (connectAgent == null) {
 							connectAgent = connectAgentFactory
-									.createConnectAgent(queueMsgStorageVo.getIp(),
-											queueMsgStorageVo.getPort(), queueMsgStorageVo.getMsgStorage_Id());
+									.createConnectAgent(queueMsgStorageVo.getMsgStorage_Id(), queueMsgStorageVo.getIp(),
+											queueMsgStorageVo.getPort(), null);
 							try {
 								connectAgent.connect();
 								if (logger.isDebugEnabled()) {
@@ -100,7 +116,7 @@ public class DistributeDbConnectManager extends ConnectManagerAbstract {
 											);
 								}
 								try {
-									((DbConnectAgent)connectAgent).createTable(queueName);
+									((DbConnectAgent)connectAgent.getProxy()).createTable(queueName);
 									if (logger.isDebugEnabled()) {
 										logger.debug("UpdateConnectAgent -> Connect -> CreateTable -> " 
 												+ "ModuleId: " + moduleId
@@ -140,9 +156,8 @@ public class DistributeDbConnectManager extends ConnectManagerAbstract {
 								}
 							}
 						} else {
-							if (connectAgent.getIp().equals(queueMsgStorageVo.getIp()) 
-									&& connectAgent.getPort() == queueMsgStorageVo.getPort()) {
-								if (connectAgent.getConnectStatus() == false) {
+							if (connectAgent.isSameConnect(queueMsgStorageVo.getIp(), queueMsgStorageVo.getPort(), null, ConnectAgentType.DB.getCode())) {
+								if (!connectAgent.isHealthyConnect()) {
 									try {
 										connectAgent.reconnect();
 										if (logger.isDebugEnabled()) {
@@ -232,15 +247,15 @@ public class DistributeDbConnectManager extends ConnectManagerAbstract {
 											+ "ModuleId: " + moduleId
 											+ ", QueueName: " + queueName
 											+ ", ConnectId: " + queueMsgStorageVo.getMsgStorage_Id()
-											+ ", Ip: " + connectAgent.getIp()
-											+ ", Port: " + connectAgent.getPort()
+											//+ ", Ip: " + connectAgent.getIp()
+											//+ ", Port: " + connectAgent.getPort()
 											+ ", Ip Or Port Change"
 											);
 								}
 								
 								connectAgent = connectAgentFactory
-										.createConnectAgent(queueMsgStorageVo.getIp(),
-												queueMsgStorageVo.getPort(), queueMsgStorageVo.getMsgStorage_Id());
+										.createConnectAgent(queueMsgStorageVo.getMsgStorage_Id(), queueMsgStorageVo.getIp(),
+												queueMsgStorageVo.getPort(), null);
 								try {
 									connectAgent.connect();
 									if (logger.isDebugEnabled()) {
@@ -299,14 +314,14 @@ public class DistributeDbConnectManager extends ConnectManagerAbstract {
 						}
 					}
 				}
-				queueAgent.updateConnectAgents(connectAgentList);
+				connectNode.updateConnectAgentList(connectAgentList);
 				connectAgentList.clear();
 			}
 			
-			Set<String> queueAgentMapSet = queueAgentMap.keySet();
+			Set<String> queueAgentMapSet = connectNodeMap.keySet();
 			for (String queueName : queueAgentMapSet) {
 				if (!queueNameSet.contains(queueName)) {
-					queueAgentMap.remove(queueName);
+					connectNodeMap.remove(queueName);
 					if (logger.isDebugEnabled()) {
 						logger.debug("UpdateConnectAgent -> Remove Queue -> " 
 								+ "ModuleId: " + moduleId
@@ -326,8 +341,8 @@ public class DistributeDbConnectManager extends ConnectManagerAbstract {
 						logger.debug("UpdateConnectAgent -> Remove Connect -> " 
 								+ "ModuleId: " + moduleId
 								+ ", ConnectId: " + connectAgent.getConnectId()
-								+ ", Ip: " + connectAgent.getIp()
-								+ ", Port: " + connectAgent.getPort()
+								//+ ", Ip: " + connectAgent.getIp()
+								//+ ", Port: " + connectAgent.getPort()
 								);
 					}
 				}
@@ -338,7 +353,7 @@ public class DistributeDbConnectManager extends ConnectManagerAbstract {
 	@Override
 	protected void destroyConnectAgent() {
 		
-		queueAgentMap.clear();
+		connectNodeMap.clear();
 		
 		Set<Long> connectAgentKeySet = connectAgentMap.keySet();
 		for (long key : connectAgentKeySet) {
@@ -346,13 +361,36 @@ public class DistributeDbConnectManager extends ConnectManagerAbstract {
 			connectAgent.close();
 			if (logger.isDebugEnabled()) {
 				logger.debug("DestroyConnectAgent -> Close -> " 
-						+ "ModuleId: " + moduleId
+						//+ "ModuleId: " + moduleId
 						+ ", ConnectId: " + connectAgent.getConnectId()
-						+ ", Ip: " + connectAgent.getIp()
-						+ ", Port: " + connectAgent.getPort()
+						//+ ", Ip: " + connectAgent.getIp()
+						//+ ", Port: " + connectAgent.getPort()
 						);
 			}
 		}
 		connectAgentMap.clear();
+	}
+
+	public void setDistributeModuleRegister(ModuleRegister distributeModuleRegister) {
+		this.distributeModuleRegister = distributeModuleRegister;
+	}
+
+	public void setConsoleRemotingInvoke(ConsoleRemotingInvoke consoleRemotingInvoke) {
+		this.consoleRemotingInvoke = consoleRemotingInvoke;
+	}
+	
+	@Override
+	protected String getManagerName() {
+		return ConnectManagerType.DB.getCode();
+	}
+	
+	@Override
+	public ConnectCluster getConnectCluster(String clusterName) {
+		return connectClusterMap.get("DEFALT");
+	}
+	
+	@Override
+	public ConnectRoute getConnectRoute(String routeName) {
+		return connectRouteMap.get("DEFALT");
 	}
 }

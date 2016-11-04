@@ -11,16 +11,16 @@
 			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/core/connect/net/distinguish/noodlenotify-core-connect-net-distinguish.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/db/distinguish/noodlenotify-core-connect-db-distinguish.xml" />
 
-    <bean id="netFailoverConnectClusterFactory" class="org.fl.noodle.common.connect.cluster.FailoverConnectClusterFactory">
-    	<property name="connectDistinguish" ref="netConnectDistinguish" />
+    <bean id="dbFailoverConnectClusterFactory" class="org.fl.noodle.common.connect.cluster.FailoverConnectClusterFactory">
+    	<property name="connectDistinguish" ref="dbConnectDistinguish" />
     </bean>
-    <bean id="netOnceConnectClusterFactory" class="org.fl.noodle.common.connect.cluster.OnceConnectClusterFactory">
-    	<property name="connectDistinguish" ref="netConnectDistinguish" />
+    <bean id="dbOnceConnectClusterFactory" class="org.fl.noodle.common.connect.cluster.OnceConnectClusterFactory">
+    	<property name="connectDistinguish" ref="dbConnectDistinguish" />
 	</bean>
-    <bean id="netAllConnectClusterFactory" class="org.fl.noodle.common.connect.cluster.AllConnectClusterFactory">
-    	<property name="connectDistinguish" ref="netConnectDistinguish" />
+    <bean id="dbAllConnectClusterFactory" class="org.fl.noodle.common.connect.cluster.AllConnectClusterFactory">
+    	<property name="connectDistinguish" ref="dbConnectDistinguish" />
 	</bean>
 	
 </beans>

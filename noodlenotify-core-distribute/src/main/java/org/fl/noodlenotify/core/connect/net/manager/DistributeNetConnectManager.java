@@ -19,9 +19,9 @@ import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.connect.route.ConnectRoute;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueConsumerVo;
+import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.cluster.LayerConnectCluster;
-import org.fl.noodlenotify.core.connect.net.constent.NetConnectManagerType;
 
 public class DistributeNetConnectManager extends AbstractConnectManager {
 	
@@ -363,7 +363,7 @@ public class DistributeNetConnectManager extends AbstractConnectManager {
 
 	@Override
 	protected String getManagerName() {
-		return NetConnectManagerType.NET.getCode();
+		return ConnectManagerType.NET.getCode();
 	}
 	
 	@Override

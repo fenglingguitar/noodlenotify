@@ -36,7 +36,7 @@ public class DistributeGet {
 
 	private String queueName;
 	
-	private ConnectManager dbConnectManager;
+	private org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager;
 	private ConnectManager queueCacheConnectManager;
 	private ConnectManager bodyCacheConnectManager;
 	private org.fl.noodle.common.connect.manager.ConnectManager netConnectManager;
@@ -59,7 +59,7 @@ public class DistributeGet {
 	private QueueDistributerVo queueDistributerVo;
 	
 	public DistributeGet(String queueName,
-							ConnectManager dbConnectManager,
+							org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager,
 							ConnectManager queueCacheConnectManager,
 							ConnectManager bodyCacheConnectManager,
 							org.fl.noodle.common.connect.manager.ConnectManager netConnectManager,
@@ -844,7 +844,7 @@ public class DistributeGet {
 		this.queueName = queueName;
 	}
 	
-	public void setDbConnectManager(ConnectManager dbConnectManager) {
+	public void setDbConnectManager(org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager) {
 		this.dbConnectManager = dbConnectManager;
 	}
 	

@@ -16,8 +16,8 @@ import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.connect.route.ConnectRoute;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
+import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
-import org.fl.noodlenotify.core.connect.net.constent.NetConnectManagerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -307,7 +307,7 @@ public class ProducerNetConnectManager extends AbstractConnectManager {
 
 	@Override
 	protected String getManagerName() {
-		return NetConnectManagerType.NET.getCode();
+		return ConnectManagerType.NET.getCode();
 	}
 	
 	@Override

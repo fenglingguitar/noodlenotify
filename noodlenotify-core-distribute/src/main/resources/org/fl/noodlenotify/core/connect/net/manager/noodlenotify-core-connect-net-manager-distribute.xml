@@ -19,26 +19,16 @@
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/jetty/client/noodlenotify-core-connect-net-client-jetty-factory.xml" />
 
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/cluster/noodlenotify-core-connect-net-cluster-factory.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/connect/net/serialize/noodlenotify-core-connect-net-serialize-factory.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/connect/net/route/noodlenotify-core-connect-net-route-factory.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/serialize/noodlenotify-core-connect-serialize-factory.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/route/noodlenotify-core-connect-route-factory.xml" />
 	
-	<bean id="distributeModuleRegister" class="org.fl.noodle.common.connect.register.ModuleRegister" />
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/register/noodlenotify-core-distribute-register.xml" />
 	
 	<bean id="netLayerConnectClusterFactory" class="org.fl.noodlenotify.core.connect.net.cluster.LayerConnectClusterFactory">
     	<property name="connectDistinguish" ref="netConnectDistinguish" />
-    	<!-- <property name="methodInterceptorList">
-			<list>
-				<ref bean="clusterPerformanceMethodInterceptor" />
-			</list>
-		</property> -->
     </bean>
     <bean id="netLayerFailoverConnectClusterFactory" class="org.fl.noodlenotify.core.connect.net.cluster.LayerFailoverConnectClusterFactory">
     	<property name="connectDistinguish" ref="netConnectDistinguish" />
-    	<!-- <property name="methodInterceptorList">
-			<list>
-				<ref bean="clusterPerformanceMethodInterceptor" />
-			</list>
-		</property> -->
 	</bean>
  
     <bean id="distributeNetConnectManager" class="org.fl.noodlenotify.core.connect.net.manager.DistributeNetConnectManager" 

@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
-
+import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodlenotify.core.connect.db.manager.DistributeDbConnectManager;
 import org.fl.noodlenotify.core.distribute.locker.DistributeSetLocker;
 import org.fl.noodlenotify.core.distribute.locker.db.DbDistributeSetLocker;
@@ -31,12 +31,14 @@ public class DbDistributeSetLockerTest extends AbstractJUnit4SpringContextTests 
 	
 	private static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
+	@Autowired
+	ModuleRegister distributeModuleRegister;
 	
 	@Test
 	public final void testGetStatus() throws Exception {
 		
-		distributeDbConnectManager.setModuleId(4);
-		distributeDbConnectManager.start();
+		distributeModuleRegister.setModuleId(1L);
+		distributeDbConnectManager.runUpdateNow();
 		
 		distributeSetLocker1 = new DbDistributeSetLocker("TestQueue1", 1, 5000, 1000, distributeDbConnectManager, 1);
 		distributeSetLocker1.start();
