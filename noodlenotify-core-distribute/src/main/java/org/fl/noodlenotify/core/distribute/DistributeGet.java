@@ -472,23 +472,7 @@ public class DistributeGet {
 		@Override
 		public void run() {
 			
-			BlockingQueue<Integer> executeBlockingQueueBatchCount = 
-					new LinkedBlockingQueue<Integer>(distributeConfParam.getExecuteBatchNum());
-			
 			while (true) {
-				
-				try {
-					while (!executeBlockingQueueBatchCount.offer(1, 1000, TimeUnit.MILLISECONDS)) {
-						startSleep(executeBlockingQueueBatchCount.size() > 0 ? executeBlockingQueueBatchCount.size() : 1000);
-						if (stopSign) {
-							break;
-						}
-					}
-				} catch (InterruptedException e) {
-					if (logger.isErrorEnabled()) {
-						logger.error(queueCacheName+ " -> Offer To ExecuteBlockingQueueBatchCount -> " + e);
-					}
-				}
 				
 				if (stopSign) {
 					break;
@@ -503,30 +487,17 @@ public class DistributeGet {
 								+ "Queue: " + queueName
 								+ ", Poll From ExecuteBlockingQueue -> " + e);
 					}
-					executeBlockingQueueBatchCount.poll();
 					continue;
 				}
 				if (messageDm == null) {
-					executeBlockingQueueBatchCount.poll();
 					continue;
-				}
+				}			
 				
-				updatingCount.incrementAndGet();			
-				
-				DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectManager.getConnectAgent(messageDm.getDb());
-				if (dbConnectAgent == null) {
-					if (logger.isErrorEnabled()) {
-						logger.error(queueCacheName + " -> "
-								+ "Queue: " + queueName
-								+ ", UUID: " + messageDm.getUuid()
-								+ ", DB: " + messageDm.getDb()
-								+ ", Get Db ConnectAgent -> Null");
-					}
-					removeQueue(queueCacheName, messageDm);
-					executeBlockingQueueBatchCount.poll();
-					updatingCount.decrementAndGet();
-					continue;
-				}
+				messageDm.setObjectFive(updatingCount);
+				messageDm.setObjectFour(executeBlockingQueueBatch);
+				messageDm.setObjectTwo(executeBatchOverflowList);
+				messageDm.setResult(false);
+				messageDm.setBool(queueType);
 				
 				ConnectCluster connectCluster = netConnectManager.getConnectCluster(queueName);
 				if (connectCluster == null) {
@@ -538,14 +509,13 @@ public class DistributeGet {
 								+ ", Get ConnectCluster -> Null");
 					}
 					removeQueue(queueCacheName, messageDm);
-					executeBlockingQueueBatchCount.poll();
-					updatingCount.decrementAndGet();
 					continue;
 				}
 				
 				NetConnectAgent netConnectAgent = (NetConnectAgent) connectCluster.getProxy();
 				
-				ConnectThreadLocalStorage.put(LocalStorageType.MESSAGEDM.getCode(), messageDm);
+				ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
+				ConnectThreadLocalStorage.put(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode(), queueDistributerVo);
 				try {
 					netConnectAgent.send(new Message(
 							messageDm.getQueueName(), 
@@ -554,47 +524,13 @@ public class DistributeGet {
 							));
 				} catch (UnsupportedEncodingException e1) {
 					e1.printStackTrace();
+					removeQueue(queueCacheName, messageDm);
 				} catch (Exception e1) {
 					e1.printStackTrace();
-				} finally {
-					ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGEDM.getCode());
-				}
-				
-				if (messageDm.getResultQueue() == messageDm.getExecuteQueue()) {
-					messageDm.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
-				} else {
-					if (queueDistributerVo.getIs_Repeat() == MessageConstant.MESSAGE_IS_REPEAT_No) {
-						messageDm.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
-					} else {
-						if (queueDistributerVo.getExpire_Time() > 0 
-								&& System.currentTimeMillis() - messageDm.getBeginTime() > queueDistributerVo.getExpire_Time()) {
-							messageDm.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
-						} else {
-							messageDm.setStatus(MessageConstant.MESSAGE_STATUS_PORTION);
-							messageDm.setDelayTime(queueDistributerVo.getInterval_Time());
-						}
-					}
-				}
-				messageDm.setFinishTime(System.currentTimeMillis());
-				
-				messageDm.setObjectFour(executeBlockingQueueBatch);
-				messageDm.setObjectTwo(executeBatchOverflowList);
-				messageDm.setObjectThree(executeBlockingQueueBatchCount);
-				messageDm.setResult(false);
-				messageDm.setBool(queueType);
-				try {
-					dbConnectAgent.update(messageDm);
-				} catch (Exception e) {
-					if (logger.isErrorEnabled()) {
-						logger.error(queueCacheName + " -> "
-								+ "UUID: " + messageDm.getUuid()
-								+ ", DB: " + messageDm.getDb()
-								+ ", Execute Update -> " + e);
-					}
 					removeQueue(queueCacheName, messageDm);
-					executeBlockingQueueBatchCount.poll();
-					updatingCount.decrementAndGet();
-					continue;
+				} finally {
+					ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
+					ConnectThreadLocalStorage.remove(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode());
 				}
 			}
 			
@@ -656,9 +592,6 @@ public class DistributeGet {
 		for (MessageDm messageDm : messageDmList) {
 			messageDm.setObjectOne(null);
 			messageDm.setObjectTwo(null);
-			@SuppressWarnings("unchecked")
-			BlockingQueue<Integer> executeBlockingQueueBatchCount = (BlockingQueue<Integer>) messageDm.getObjectThree();
-			executeBlockingQueueBatchCount.poll();
 			updatingCount.decrementAndGet();
 			messageDm.setObjectThree(null);
 			if (messageDm.getResult() == false) {

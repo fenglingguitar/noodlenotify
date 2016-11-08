@@ -24,8 +24,17 @@
 	
 	<import resource="classpath:org/fl/noodlenotify/core/distribute/register/noodlenotify-core-distribute-register.xml" />
 	
+	<bean id="pushLayerResultMethodInterceptor" class="org.fl.noodlenotify.core.distribute.aop.PushLayerResultMethodInterceptor">
+		<property name="connectDistinguish" ref="dbConnectDistinguish" />
+	</bean>
+	
 	<bean id="netLayerConnectClusterFactory" class="org.fl.noodlenotify.core.connect.net.cluster.LayerConnectClusterFactory">
     	<property name="connectDistinguish" ref="netConnectDistinguish" />
+    	<property name="methodInterceptorList">
+			<list>
+				<ref bean="pushLayerResultMethodInterceptor" />
+			</list>
+		</property>
     </bean>
     <bean id="netLayerFailoverConnectClusterFactory" class="org.fl.noodlenotify.core.connect.net.cluster.LayerFailoverConnectClusterFactory">
     	<property name="connectDistinguish" ref="netConnectDistinguish" />

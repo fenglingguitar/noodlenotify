@@ -1,16 +1,19 @@
 package org.fl.noodlenotify.core.distribute.aop;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.exception.ConnectInvokeException;
-import org.fl.noodle.common.connect.exception.ConnectRefusedException;
-import org.fl.noodle.common.connect.exception.ConnectResetException;
-import org.fl.noodle.common.connect.exception.ConnectTimeoutException;
-import org.fl.noodle.common.connect.exception.ConnectUnableException;
 import org.fl.noodle.common.connect.manager.ConnectManager;
+import org.fl.noodlenotify.console.vo.QueueDistributerVo;
+import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
+import org.fl.noodlenotify.core.connect.net.aop.LocalStorageType;
+import org.fl.noodlenotify.core.constant.message.MessageConstant;
+import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,29 +32,54 @@ public class PushLayerResultMethodInterceptor implements MethodInterceptor {
 			throw new ConnectInvokeException("no this connect manager");
 		}
 		
-		ConnectAgent connectAgent = (ConnectAgent)ConnectThreadLocalStorage.get(ConnectThreadLocalStorage.StorageType.AGENT.getCode());
-		if (connectAgent == null) {
-			logger.error("invoke -> ConnectThreadLocalStorage.get agent return null");
-			throw new ConnectInvokeException("no this connect agent");
-		}
+		MessageDm messageDm = (MessageDm) ConnectThreadLocalStorage.get(LocalStorageType.MESSAGE_DM.getCode());
+		QueueDistributerVo queueDistributerVo = (QueueDistributerVo) ConnectThreadLocalStorage.get(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode());
 		
-		if (connectAgent.getConnectStatus().get() == false) {
-			logger.error("invoke -> connect status is false -> {}", this);
-			throw new ConnectUnableException("connect disable for the net http connect agent");
+		DbConnectAgent dbConnectAgent = (DbConnectAgent)((ConnectAgent)connectManager.getConnectAgent(messageDm.getDb())).getProxy();
+		if (dbConnectAgent == null) {
+			if (logger.isErrorEnabled()) {
+				logger.error("invoke -> "
+						+ "Queue: " + messageDm.getQueueName()
+						+ ", UUID: " + messageDm.getUuid()
+						+ ", DB: " + messageDm.getDb()
+						+ ", Get Db ConnectAgent -> Null");
+			}
+			throw new ConnectInvokeException("get db connect agent return null");
 		}
 		
 		try {
 			return invocation.proceed();
 		} catch (Throwable e) {
-			if (e instanceof ConnectRefusedException
-					|| e instanceof ConnectResetException
-						|| e instanceof ConnectTimeoutException) {
-				if (connectAgent.getInvalidCount().incrementAndGet() >= connectAgent.getInvalidLimitNum()) {					
-					connectAgent.getConnectStatus().set(false);
-					logger.debug("invoke -> set connect status to false -> {}, invalidLimitNum:{}, invalidCount:{}", this, connectAgent.getInvalidLimitNum(), connectAgent.getInvalidCount().get());
-				}
-			} 
 			throw e;
+		} finally {
+			if (messageDm.getResultQueue() == messageDm.getExecuteQueue()) {
+				messageDm.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
+			} else {
+				if (queueDistributerVo.getIs_Repeat() == MessageConstant.MESSAGE_IS_REPEAT_No) {
+					messageDm.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
+				} else {
+					if (queueDistributerVo.getExpire_Time() > 0 
+							&& System.currentTimeMillis() - messageDm.getBeginTime() > queueDistributerVo.getExpire_Time()) {
+						messageDm.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
+					} else {
+						messageDm.setStatus(MessageConstant.MESSAGE_STATUS_PORTION);
+						messageDm.setDelayTime(queueDistributerVo.getInterval_Time());
+					}
+				}
+			}
+			messageDm.setFinishTime(System.currentTimeMillis());
+			((AtomicInteger) messageDm.getObjectFive()).incrementAndGet();
+			try {
+				dbConnectAgent.update(messageDm);
+			} catch (Exception e) {
+				if (logger.isErrorEnabled()) {
+					logger.error("invoke ->"
+							+ "UUID: " + messageDm.getUuid()
+							+ ", DB: " + messageDm.getDb()
+							+ ", Execute Update -> " + e);
+				}
+				((AtomicInteger) messageDm.getObjectFive()).decrementAndGet();
+			}
 		}
 	}
 	

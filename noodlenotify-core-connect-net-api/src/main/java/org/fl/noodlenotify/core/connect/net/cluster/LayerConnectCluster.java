@@ -28,7 +28,7 @@ public class LayerConnectCluster extends AbstractConnectCluster {
 		
 		ConnectNode connectNode = getConnectNode(args);
 		
-		MessageDm messageDm = (MessageDm) ConnectThreadLocalStorage.get(LocalStorageType.MESSAGEDM.getCode());
+		MessageDm messageDm = (MessageDm) ConnectThreadLocalStorage.get(LocalStorageType.MESSAGE_DM.getCode());
 		
 		long executeQueue = messageDm.getExecuteQueue();
 		long resultQueue = messageDm.getResultQueue();

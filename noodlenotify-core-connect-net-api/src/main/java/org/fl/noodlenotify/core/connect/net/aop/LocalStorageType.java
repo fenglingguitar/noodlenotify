@@ -3,7 +3,8 @@ package org.fl.noodlenotify.core.connect.net.aop;
 public enum LocalStorageType {
 	
 	LAYER_CONNECT_CLUSTER("LocalStorageType.LayerConnectCluster"),
-	MESSAGEDM("LocalStorageType.messageDm");
+	MESSAGE_DM("LocalStorageType.messageDm"),
+	QUEUE_DISTRIBUTER_VO("LocalStorageType.queueDistributerVo");
 	
 	private String code;
 
