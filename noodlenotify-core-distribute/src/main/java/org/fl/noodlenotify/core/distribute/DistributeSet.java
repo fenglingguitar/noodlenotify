@@ -71,7 +71,7 @@ public class DistributeSet {
 		org.fl.noodle.common.connect.agent.ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
 		if(connectAgent != null) {
 			
-			DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent;
+			DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent.getProxy();
 			
 			try {
 				middleIdFresh.set(dbConnectAgent.maxIdDelay(queueName, System.currentTimeMillis() - queueDistributerVo.getDph_Delay_Time()));
@@ -213,7 +213,7 @@ public class DistributeSet {
 					continue;
 				}
 				
-				DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent;
+				DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent.getProxy();
 				
 				long min = 0;
 				long max = 0;
@@ -454,7 +454,7 @@ public class DistributeSet {
 					continue;
 				}
 				
-				DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent;
+				DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent.getProxy();
 				
 				long min = 0;
 				long max = 0;
@@ -681,7 +681,7 @@ public class DistributeSet {
 					continue;
 				}
 				
-				DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent;
+				DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent.getProxy();
 				
 				long min = 0;
 				long max = 0;
@@ -912,7 +912,7 @@ public class DistributeSet {
 					continue;
 				}
 				
-				DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent;
+				DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent.getProxy();
 				
 				long min = 0;
 				long max = 0;

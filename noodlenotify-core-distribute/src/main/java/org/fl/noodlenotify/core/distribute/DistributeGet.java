@@ -352,7 +352,7 @@ public class DistributeGet {
 				}
 				
 				if (messageDm.getContent() == null) {
-					DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectManager.getConnectAgent(messageDm.getDb());
+					DbConnectAgent dbConnectAgent = (DbConnectAgent)((org.fl.noodle.common.connect.agent.ConnectAgent)dbConnectManager.getConnectAgent(messageDm.getDb())).getProxy();
 					if (dbConnectAgent == null) {
 						if (logger.isErrorEnabled()) {
 							logger.error(queueCacheName + " -> "
