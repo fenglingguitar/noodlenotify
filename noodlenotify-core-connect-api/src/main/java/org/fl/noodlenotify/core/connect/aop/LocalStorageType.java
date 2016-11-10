@@ -1,4 +1,4 @@
-package org.fl.noodlenotify.core.connect.net.aop;
+package org.fl.noodlenotify.core.connect.aop;
 
 public enum LocalStorageType {
 	

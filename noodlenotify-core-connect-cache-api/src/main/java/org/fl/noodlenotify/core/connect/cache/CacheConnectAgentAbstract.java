@@ -10,14 +10,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.fl.noodle.common.connect.agent.AbstractConnectAgent;
+import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
+import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.fl.noodlenotify.core.connect.ConnectAgentAbstract;
-import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
-
-public abstract class CacheConnectAgentAbstract extends ConnectAgentAbstract {
+public abstract class CacheConnectAgentAbstract extends AbstractConnectAgent {
 	
 	private final static Logger logger = LoggerFactory.getLogger(CacheConnectAgentAbstract.class);
 	
@@ -33,14 +33,17 @@ public abstract class CacheConnectAgentAbstract extends ConnectAgentAbstract {
 	private CountDownLatch stopCountDownLatch;
 	private AtomicInteger  stopCountDownLatchCount;
 
-	public CacheConnectAgentAbstract(String ip, int port, long connectId) {
-		super(ip, port, connectId);
-		cacheConnectAgentConfParam = new CacheConnectAgentConfParam();
-	}
-	
-	public CacheConnectAgentAbstract(String ip, int port, long connectId,
-				CacheConnectAgentConfParam cacheConnectAgentConfParam) {
-		super(ip, port, connectId);
+	public CacheConnectAgentAbstract(
+			long connectId, String ip, int port, String url, String type, 
+			int connectTimeout, int readTimeout, String encoding,
+			int invalidLimitNum, ConnectDistinguish connectDistinguish,
+			List<MethodInterceptor> methodInterceptorList, 
+			CacheConnectAgentConfParam cacheConnectAgentConfParam) {
+		super(
+			connectId, ip, port, url, type,
+			connectTimeout, readTimeout, encoding, 
+			invalidLimitNum, connectDistinguish, 
+			methodInterceptorList);
 		this.cacheConnectAgentConfParam = cacheConnectAgentConfParam;
 	}
 	

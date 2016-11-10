@@ -9,7 +9,7 @@ import org.fl.noodle.common.connect.cluster.AbstractConnectCluster;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.node.ConnectNode;
-import org.fl.noodlenotify.core.connect.net.aop.LocalStorageType;
+import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.springframework.aop.support.AopUtils;
 

@@ -3,7 +3,9 @@ package org.fl.noodlenotify.core.connect.constent;
 public enum ConnectManagerType {
 	
 	NET("NET"),
-	DB("DB");
+	DB("DB"),
+	BODY_CACHE("BODY_CACHE"),
+	QUEUE_CACHE("QUEUE_CACHE");
 	
 	private String code;
 

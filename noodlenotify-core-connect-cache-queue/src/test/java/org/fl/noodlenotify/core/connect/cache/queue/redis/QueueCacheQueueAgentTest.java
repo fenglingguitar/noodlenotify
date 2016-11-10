@@ -3,20 +3,16 @@ package org.fl.noodlenotify.core.connect.cache.queue.redis;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.junit.Test;
-
-import org.fl.noodlenotify.core.connect.ConnectAgent;
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
+import org.fl.noodle.common.util.json.JsonTranslator;
 import org.fl.noodlenotify.core.connect.QueueAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheQueueAgent;
-import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
-import org.fl.noodlenotify.core.connect.cache.queue.redis.RedisQueueCacheConnectAgent;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
-import org.fl.noodle.common.util.json.JsonTranslator;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueueCacheQueueAgentTest {
 
@@ -30,9 +26,10 @@ public class QueueCacheQueueAgentTest {
 	public final void testGetConnectAgent() throws Exception {
 		
 		final List<ConnectAgent> addConnectAgentList = new ArrayList<ConnectAgent>();
-		ConnectAgent ConnectAgent1 = new RedisQueueCacheConnectAgent("10.8.210.169", 6379, 1L);
-		ConnectAgent ConnectAgent2 = new RedisQueueCacheConnectAgent("10.8.210.169", 6380, 2L);
-		ConnectAgent ConnectAgent3 = new RedisQueueCacheConnectAgent("10.8.210.169", 6381, 3L);
+		ConnectAgentFactory redisQueueCacheConnectAgentFactory = new RedisQueueCacheConnectAgentFactory();
+		ConnectAgent ConnectAgent1 = redisQueueCacheConnectAgentFactory.createConnectAgent(1L, "10.8.210.169", 6379, null);
+		ConnectAgent ConnectAgent2 = redisQueueCacheConnectAgentFactory.createConnectAgent(2L, "10.8.210.169", 6380, null);
+		ConnectAgent ConnectAgent3 = redisQueueCacheConnectAgentFactory.createConnectAgent(3L, "10.8.210.169", 6381, null);
 		
 		ConnectAgent1.connect();
 		ConnectAgent2.connect();
@@ -41,9 +38,9 @@ public class QueueCacheQueueAgentTest {
 		addConnectAgentList.add(ConnectAgent1);
 		addConnectAgentList.add(ConnectAgent2);
 		addConnectAgentList.add(ConnectAgent3);
-		queueAgent.updateConnectAgents(addConnectAgentList);
+		//queueAgent.updateConnectAgents(addConnectAgentList);
 		
-		connectAgent = queueAgent.getConnectAgent();
+		//connectAgent = queueAgent.getConnectAgent();
 		
 		logger.info("GetConnectAgent -> " + (connectAgent != null ? connectAgent.getConnectId() : "Null"));
 	}
@@ -51,8 +48,8 @@ public class QueueCacheQueueAgentTest {
 	@Test
 	public final void testGetConnectAgentOther() {
 		
-		ConnectAgent connectAgentOther = queueAgent.getConnectAgentOther(connectAgent);
-		logger.info("GetConnectAgentOther -> " + connectAgentOther.getConnectId());
+		//ConnectAgent connectAgentOther = queueAgent.getConnectAgentOther(connectAgent);
+		//logger.info("GetConnectAgentOther -> " + connectAgentOther.getConnectId());
 	}
 	
 	@Test
@@ -61,14 +58,15 @@ public class QueueCacheQueueAgentTest {
 		Thread.sleep(3000);
 		
 		final List<ConnectAgent> addConnectAgentList = new ArrayList<ConnectAgent>();
-		ConnectAgent ConnectAgent1 = new RedisQueueCacheConnectAgent("10.8.210.169", 6379, 1L);
-		ConnectAgent ConnectAgent2 = new RedisQueueCacheConnectAgent("10.8.210.169", 6380, 2L);
-		ConnectAgent ConnectAgent3 = new RedisQueueCacheConnectAgent("10.8.210.169", 6381, 3L);
-
+		ConnectAgentFactory redisQueueCacheConnectAgentFactory = new RedisQueueCacheConnectAgentFactory();
+		ConnectAgent ConnectAgent1 = redisQueueCacheConnectAgentFactory.createConnectAgent(1L, "10.8.210.169", 6379, null);
+		ConnectAgent ConnectAgent2 = redisQueueCacheConnectAgentFactory.createConnectAgent(2L, "10.8.210.169", 6380, null);
+		ConnectAgent ConnectAgent3 = redisQueueCacheConnectAgentFactory.createConnectAgent(3L, "10.8.210.169", 6381, null);
+		
 		final List<ConnectAgent> addConnectAgentList1 = new ArrayList<ConnectAgent>();
-		ConnectAgent ConnectAgent4 = new RedisQueueCacheConnectAgent("10.8.210.169", 6379, 1L);
-		ConnectAgent ConnectAgent5 = new RedisQueueCacheConnectAgent("10.8.210.169", 6380, 2L);
-		ConnectAgent ConnectAgent6 = new RedisQueueCacheConnectAgent("10.8.210.169", 6381, 3L);
+		ConnectAgent ConnectAgent4 = redisQueueCacheConnectAgentFactory.createConnectAgent(4L, "10.8.210.169", 6379, null);
+		ConnectAgent ConnectAgent5 = redisQueueCacheConnectAgentFactory.createConnectAgent(5L, "10.8.210.169", 6380, null);
+		ConnectAgent ConnectAgent6 = redisQueueCacheConnectAgentFactory.createConnectAgent(6L, "10.8.210.169", 6381, null);
 		
 		ConnectAgent1.connect();
 		ConnectAgent2.connect();
@@ -81,12 +79,12 @@ public class QueueCacheQueueAgentTest {
 		addConnectAgentList.add(ConnectAgent1);
 		addConnectAgentList.add(ConnectAgent2);
 		addConnectAgentList.add(ConnectAgent3);
-		queueAgent.updateConnectAgents(addConnectAgentList);
+		//queueAgent.updateConnectAgents(addConnectAgentList);
 		
 		addConnectAgentList1.add(ConnectAgent4);
 		addConnectAgentList1.add(ConnectAgent5);
 		addConnectAgentList1.add(ConnectAgent6);
-		queueAgent1.updateConnectAgents(addConnectAgentList1);
+		//queueAgent1.updateConnectAgents(addConnectAgentList1);
 		
 		final MessageDm messageDm = new MessageDm();
 		messageDm.setQueueName("TestQueue1");
@@ -95,7 +93,7 @@ public class QueueCacheQueueAgentTest {
 		messageDm.setContent(JsonTranslator.toByteArray("Hello"));
 		messageDm.setBool(true);
 		
-        ExecutorService execService = Executors.newCachedThreadPool();
+        /*ExecutorService execService = Executors.newCachedThreadPool();
         
         execService.execute(new Runnable() {
 
@@ -175,6 +173,6 @@ public class QueueCacheQueueAgentTest {
         	});
         }
     	
-    	Thread.sleep(Long.MAX_VALUE);
+    	Thread.sleep(Long.MAX_VALUE);*/
 	}
 }

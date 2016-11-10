@@ -10,15 +10,15 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.exception.ConnectInvokeException;
+import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectManager;
-import org.fl.noodlenotify.core.connect.QueueAgent;
+import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.exception.ConnectionInvokeException;
@@ -36,7 +36,7 @@ public class Exchange implements NetConnectReceiver {
 	
 	private long suspendTime = 300000;
 	
-	private org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager;
+	private ConnectManager dbConnectManager;
 	private ConnectManager bodyCacheConnectManager;
 	
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();	
@@ -78,9 +78,10 @@ public class Exchange implements NetConnectReceiver {
 		
 		exchangeModuleRegister.setModuleId(moduleId);
 		
-		bodyCacheConnectManager.setModuleId(moduleId);
-		bodyCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		bodyCacheConnectManager.start();
+		//bodyCacheConnectManager.setModuleId(moduleId);
+		//bodyCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
+		//bodyCacheConnectManager.start();
+		bodyCacheConnectManager.runUpdateNow();
 		
 		//dbConnectManager.setModuleId(moduleId);
 		//dbConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
@@ -117,7 +118,7 @@ public class Exchange implements NetConnectReceiver {
 		executorService.shutdown();
 		
 		//dbConnectManager.destroy();		
-		bodyCacheConnectManager.destroy();
+		//bodyCacheConnectManager.destroy();
 	}
 	
 	private synchronized void suspendUpdateConnectAgent() {
@@ -302,7 +303,23 @@ public class Exchange implements NetConnectReceiver {
 			throw new ConnectionInvokeException("Set execute queue error, can not get queue consumer group num");
 		}
 		
-		if (bodyCacheConnectManager != null) {
+		ConnectCluster bodyCacheConnectCluster = bodyCacheConnectManager.getConnectCluster(messageDm.getQueueName());
+		if (bodyCacheConnectCluster == null) {
+			if (logger.isErrorEnabled()) {
+				logger.error("invoke -> connectManager.getConnectCluster return null -> invokerKey: {}", messageDm.getQueueName());
+			}
+			throw new ConnectInvokeException("no have this connect cluster");
+		}
+		
+		BodyCacheConnectAgent bodyCacheConnectAgent = (BodyCacheConnectAgent) bodyCacheConnectCluster.getProxy();
+		ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
+		try {
+			bodyCacheConnectAgent.set(messageDm);
+		} finally {
+			ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
+		}
+		
+		/*if (bodyCacheConnectManager != null) {
 			QueueAgent queueAgentBody = bodyCacheConnectManager.getQueueAgent(messageDm.getQueueName());
 			if (queueAgentBody != null) {
 				BodyCacheConnectAgent bodyCacheConnectAgent = null;			
@@ -374,7 +391,7 @@ public class Exchange implements NetConnectReceiver {
 				}
 				bodyCacheConnectManager.startUpdateConnectAgent();
 			}
-		}
+		}*/
 		
 		ConnectCluster connectCluster = dbConnectManager.getConnectCluster(messageDm.getQueueName());
 		if (connectCluster == null) {
@@ -388,74 +405,6 @@ public class Exchange implements NetConnectReceiver {
 		
 		messageDm.setBeginTime(System.currentTimeMillis());
 		dbConnectAgent.insert(messageDm);
-		
-		/*QueueAgent queueAgentDb = dbConnectManager.getQueueAgent(messageDm.getQueueName());
-		if (queueAgentDb != null) {
-			DbConnectAgent dbConnectAgent = null;
-			do {
-				dbConnectAgent = (DbConnectAgent) queueAgentDb.getConnectAgent();
-				if (dbConnectAgent != null) {
-					try {
-						messageDm.setBeginTime(System.currentTimeMillis());
-						dbConnectAgent.insert(messageDm);
-						break;
-					} catch (ConnectionUnableException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("Receive -> "
-									+ "Queue: " + messageDm.getQueueName()
-									+ ", UUID: " + messageDm.getUuid()
-									+ ", DB: " + ((ConnectAgent)dbConnectAgent).getConnectId()
-									+ ", Insert DB -> " + e);
-						}
-						continue;
-					} catch (ConnectionRefusedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("Receive -> "
-									+ "Queue: " + messageDm.getQueueName()
-									+ ", UUID: " + messageDm.getUuid()
-									+ ", DB: " + ((ConnectAgent)dbConnectAgent).getConnectId()
-									+ ", Insert DB -> " + e);
-						}
-						continue;
-					} catch (ConnectionResetException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("Receive -> "
-									+ "Queue: " + messageDm.getQueueName()
-									+ ", UUID: " + messageDm.getUuid()
-									+ ", DB: " + ((ConnectAgent)dbConnectAgent).getConnectId()
-									+ ", Insert DB -> " + e);
-						}
-						continue;
-					} catch (Exception e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("Receive -> "
-									+ "Queue: " + messageDm.getQueueName()
-									+ ", UUID: " + messageDm.getUuid()
-									+ ", DB: " + ((ConnectAgent)dbConnectAgent).getConnectId()
-									+ ", Insert DB -> " + e);
-						}
-					}
-				} else {
-					if (logger.isErrorEnabled()) {
-						logger.error("Receive -> "
-								+ "Queue: " + messageDm.getQueueName()
-								+ ", UUID: " + messageDm.getUuid()
-								+ ", Get DB Agent -> Null");
-					}
-					dbConnectManager.startUpdateConnectAgent();
-					throw new ConnectionInvokeException("Db connect agent insert message error, can not get db connect agent");
-				}
-			} while (dbConnectAgent != null);
-		} else {
-			if (logger.isErrorEnabled()) {
-				logger.error("Receive -> "
-						+ "Queue: " + messageDm.getQueueName()
-						+ ", UUID: " + messageDm.getUuid()
-						+ ", Get DB Queue Agent -> Null");
-			}
-			dbConnectManager.startUpdateConnectAgent();
-			throw new ConnectionInvokeException("Db connect agent insert message error, can not get db queue agent");
-		}*/
 	}	
 	
 	public void setDbConnectManager(org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager) {

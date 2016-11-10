@@ -8,7 +8,7 @@ import org.fl.noodle.common.connect.cluster.FailoverConnectCluster;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.exception.ConnectInvokeException;
 import org.fl.noodle.common.connect.node.ConnectNode;
-import org.fl.noodlenotify.core.connect.net.aop.LocalStorageType;
+import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 
 public class LayerFailoverConnectCluster extends FailoverConnectCluster {
 	

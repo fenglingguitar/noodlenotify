@@ -7,16 +7,17 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.util.json.JsonTranslator;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentAbstract;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheStatusChecker;
+import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
-//import org.fl.noodlenotify.core.distribute.locker.DistributeSetLocker;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.fl.noodlenotify.core.domain.message.MessageQueueDm;
 import org.slf4j.Logger;
@@ -57,15 +58,18 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	private ConcurrentMap<String, String> activeFullMap = new ConcurrentHashMap<String, String>();
 	private ConcurrentMap<String, String> lockerFullMap = new ConcurrentHashMap<String, String>();
 
-	public RedisQueueCacheConnectAgent(String ip, int port, long connectId) {
-		super(ip, port, connectId);
-		this.queueCacheConnectAgentConfParam = new QueueCacheConnectAgentConfParam();
-	}
-	
-	public RedisQueueCacheConnectAgent(String ip, int port, long connectId,
+	public RedisQueueCacheConnectAgent(
+			long connectId, String ip, int port, String url, 
+			int connectTimeout, int readTimeout, String encoding,
+			int invalidLimitNum, ConnectDistinguish connectDistinguish,
+			List<MethodInterceptor> methodInterceptorList,
 			CacheConnectAgentConfParam cacheConnectAgentConfParam,
 			QueueCacheConnectAgentConfParam queueCacheConnectAgentConfParam) {
-		super(ip, port, connectId, cacheConnectAgentConfParam);
+		super(
+			connectId, ip, port, url, ConnectAgentType.QUEUE_CACHE.getCode(), 
+			connectTimeout, readTimeout, encoding,
+			invalidLimitNum, connectDistinguish, 
+			methodInterceptorList, cacheConnectAgentConfParam);
 		this.queueCacheConnectAgentConfParam = queueCacheConnectAgentConfParam;
 	}
 	
@@ -213,7 +217,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 				}
 				
 			} catch (JedisConnectionException e) {
-				connectStatus.set(false);
 				if (logger.isErrorEnabled()) {
 					logger.error("SetActual -> " 
 							+ "ConnectId: " + connectId
@@ -270,7 +273,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 					jedis.del(messageDm.getUuid());
 				}
 			} catch (JedisConnectionException e) {
-				connectStatus.set(false);
 				if (logger.isErrorEnabled()) {
 					logger.error("RemoveActual -> " 
 							+ "ConnectId: " + connectId
@@ -299,10 +301,10 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	@Override
 	public void push(MessageDm messageDm) throws Exception {
 		
-		if (connectStatus.get() == false) {
+		/*if (connectStatus.get() == false) {
 			cancelCountDownLatch(messageDm);
 			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}
+		}*/
 		
 		if (!setBlockingQueue.offer(messageDm, cacheConnectAgentConfParam.getSetTimeout(), TimeUnit.MILLISECONDS)) {
 			cancelCountDownLatch(messageDm);
@@ -311,10 +313,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 
 	@Override
 	public MessageDm pop(String queueName, boolean queueType) throws Exception {
-		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}
 		
 		Jedis jedis = getConnect();
 		
@@ -379,7 +377,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 			}
 			
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("Pop -> " 
 						+ "ConnectId: " + connectId
@@ -409,10 +406,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	@Override
 	public boolean havePop(MessageDm messageDm) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}
-		
 		Jedis jedis = getConnect();
 		
 		boolean bool = false;
@@ -420,7 +413,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 		try {
 			bool = jedis.exists(messageDm.getUuid());
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("HavePop -> " 
 						+ "ConnectId: " + connectId
@@ -450,10 +442,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	@Override
 	public void setPop(MessageDm messageDm) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}
-		
 		Jedis jedis = getConnect();
 		
 		try {
@@ -463,7 +451,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 			transaction.expire(messageDm.getUuid(), queueCacheConnectAgentConfParam.getExpire());
 			transaction.exec();
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("SetPop -> " 
 						+ "ConnectId: " + connectId
@@ -491,10 +478,10 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	@Override
 	public void removePop(MessageDm messageDm) throws Exception {
 		
-		if (connectStatus.get() == false) {
+		/*if (connectStatus.get() == false) {
 			cancelCountDownLatch(messageDm);
 			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}
+		}*/
 		
 		if (!removeBlockingQueue.offer(messageDm)) {
 			cancelCountDownLatch(messageDm);
@@ -503,10 +490,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 
 	@Override
 	public void setActive(String queueName, boolean bool) throws Exception {
-		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}
 		
 		Jedis jedis = getConnect();
 		
@@ -550,7 +533,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 				queueIsActiveMap.put(queueName, false);
 			}
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("SetActive -> " 
 						+ "ConnectId: " + connectId
@@ -578,10 +560,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	@Override
 	public boolean isActive(String queueName) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}
-		
 		Boolean isActive = queueIsActiveMap.get(queueName);
 		if (isActive != null && isActive.equals(true)) {
 			return true;
@@ -600,7 +578,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 		try {
 			bool = jedis.exists(activeFullName);
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("IsActive -> " 
 						+ "ConnectId: " + connectId
@@ -632,10 +609,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 
 	@Override
 	public long len(String queueName, boolean queueType) throws Exception {
-		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}
 		
 		Jedis jedis = getConnect();
 		
@@ -670,7 +643,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 			}
 			len = jedis.llen(queueFullName);
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("Len -> " 
 						+ "ConnectId: " + connectId
@@ -700,10 +672,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	@Override
 	public long getDiffTime() throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}
-		
 		Jedis jedis = getConnect();
 		
 		long diffTime = 0;
@@ -713,7 +681,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 			jedis.expireAt(diffTimeFullName, Integer.MAX_VALUE);
 			diffTime = System.currentTimeMillis() - (Integer.MAX_VALUE - jedis.ttl(diffTimeFullName)) * 1000;
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("GetDiffTime -> " 
 						+ "ConnectId: " + connectId
@@ -741,12 +708,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	}
 
 	@Override
-	public boolean getAlive(String queueName, long id, long diffTime,
-			long intervalTime) throws Exception {
-		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}
+	public boolean getAlive(String queueName, long id, long diffTime, long intervalTime) throws Exception {
 		
 		Jedis jedis = getConnect();
 		
@@ -769,7 +731,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 				}
 			}
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("GetAlive -> " 
 						+ "ConnectId: " + connectId
@@ -797,12 +758,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	}
 
 	@Override
-	public boolean keepAlive(String queueName, long id, long diffTime,
-			long intervalTime) throws Exception {
-		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}
+	public boolean keepAlive(String queueName, long id, long diffTime, long intervalTime) throws Exception {
 		
 		Jedis jedis = getConnect();
 		
@@ -829,7 +785,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 				}
 			}
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("KeepAlive -> " 
 						+ "ConnectId: " + connectId
@@ -859,10 +814,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	@Override
 	public void releaseAlive(String queueName, long id) throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}
-		
 		Jedis jedis = getConnect();
 		
 		String lockerFullName = lockerFullMap.get(queueName);
@@ -886,7 +837,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 				}
 			}
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("ReleaseAlive -> " 
 						+ "ConnectId: " + connectId
@@ -914,16 +864,11 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	@Override
 	public void checkHealth() throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}
-		
 		Jedis jedis = getConnect();
 		
 		try {
 			jedis.exists("CheckHealth");
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("CheckHealth -> " 
 						+ "ConnectId: " + connectId
@@ -956,7 +901,6 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 			jedis = jedisPool.getResource();
 			return jedis;
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("GetConnect -> " 
 						+ "ConnectId: " + connectId
@@ -998,5 +942,10 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 	@Override
 	public long checkPortionLen(String queueName) throws Exception {
 		return len(queueName, false);
+	}
+
+	@Override
+	protected Class<?> getServiceInterfaces() {
+		return QueueCacheConnectAgent.class;
 	}
 }

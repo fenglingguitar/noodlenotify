@@ -2,12 +2,12 @@ package org.fl.noodlenotify.monitor.status.console.executer;
 
 import java.util.List;
 
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.QueueMsgQueueCacheService;
 import org.fl.noodlenotify.console.vo.QueueMsgQueueCacheVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectAgentFactory;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheStatusChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class MsgQueueCacheCapacityStatusExecuter extends AbstractExecuter {
 		queueMsgQueueCacheVoParam.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
 		List<QueueMsgQueueCacheVo> queueMsgQueueCacheList = queueMsgQueueCacheService.queryQueueMsgQueueCacheByQueue(queueMsgQueueCacheVoParam);
 		for (QueueMsgQueueCacheVo queueMsgQueueCacheVo : queueMsgQueueCacheList) {
-			ConnectAgent connectAgent = redisQueueCacheConnectAgentFactory.createConnectAgent(queueMsgQueueCacheVo.getIp(), queueMsgQueueCacheVo.getPort(), queueMsgQueueCacheVo.getMsgQueueCache_Id());
+			ConnectAgent connectAgent = redisQueueCacheConnectAgentFactory.createConnectAgent(queueMsgQueueCacheVo.getMsgQueueCache_Id(), queueMsgQueueCacheVo.getIp(), queueMsgQueueCacheVo.getPort(), null);
 			try {
 				connectAgent.connect();
 				boolean isActive = ((QueueCacheStatusChecker)connectAgent).checkIsActive(queueMsgQueueCacheVo.getQueue_Nm());

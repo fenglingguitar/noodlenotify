@@ -4,7 +4,9 @@ public enum ConnectAgentType {
 	
 	NET_HTTP("NET_HTTP"), 
 	NET_NETTY("NET_NETTY"),
-	DB("DB");
+	DB("DB"),
+	QUEUE_CACHE("QUEUE_CACHE"),
+	BODY_CACHE("BODY_CACHE");
 	
 	private String code;
 

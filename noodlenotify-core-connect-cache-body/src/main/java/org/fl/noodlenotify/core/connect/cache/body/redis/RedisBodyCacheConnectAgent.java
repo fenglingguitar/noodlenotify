@@ -2,14 +2,16 @@ package org.fl.noodlenotify.core.connect.cache.body.redis;
 
 import java.util.List;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentAbstract;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheStatusChecker;
+import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,15 +30,18 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 	
 	private BodyCacheConnectAgentConfParam bodyCacheConnectAgentConfParam;
 	
-	public RedisBodyCacheConnectAgent(String ip, int port, long connectId) {
-		super(ip, port, connectId);
-		this.bodyCacheConnectAgentConfParam = new BodyCacheConnectAgentConfParam();
-	}
-
-	public RedisBodyCacheConnectAgent(String ip, int port, long connectId,
-			CacheConnectAgentConfParam redisConnectAgentConfParam,
+	public RedisBodyCacheConnectAgent(
+			long connectId, String ip, int port, String url, 
+			int connectTimeout, int readTimeout, String encoding,
+			int invalidLimitNum, ConnectDistinguish connectDistinguish,
+			List<MethodInterceptor> methodInterceptorList,
+			CacheConnectAgentConfParam cacheConnectAgentConfParam,
 			BodyCacheConnectAgentConfParam bodyCacheConnectAgentConfParam) {
-		super(ip, port, connectId, redisConnectAgentConfParam);
+		super(
+			connectId, ip, port, url, ConnectAgentType.BODY_CACHE.getCode(), 
+			connectTimeout, readTimeout, encoding,
+			invalidLimitNum, connectDistinguish, 
+			methodInterceptorList, cacheConnectAgentConfParam);
 		this.bodyCacheConnectAgentConfParam = bodyCacheConnectAgentConfParam;
 	}
 
@@ -125,7 +130,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 					}
 				}
 			} catch (JedisConnectionException e) {
-				connectStatus.set(false);
 				if (logger.isErrorEnabled()) {
 					logger.error("SetActual -> " 
 							+ "ConnectId: " + connectId
@@ -173,7 +177,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 			try {
 				jedis.del(messageDm.getUuid());
 			} catch (JedisConnectionException e) {
-				connectStatus.set(false);
 				if (logger.isErrorEnabled()) {
 					logger.error("SetActual -> " 
 							+ "ConnectId: " + connectId
@@ -201,20 +204,11 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 	
 	@Override
 	public void set(MessageDm messageDm) throws Exception {
-		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the body redis connect agent");
-		}
-		
 		setBlockingQueue.offer(messageDm);
 	}
 	
 	@Override
 	public MessageDm get(MessageDm messageDm) throws Exception {
-		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the body redis connect agent");
-		}
 		
 		Jedis jedis = getConnect();
 		
@@ -226,7 +220,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 				messageDm.setContent(messageDmContentStr.getBytes());
 			}
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("SetActual -> " 
 						+ "ConnectId: " + connectId
@@ -255,27 +248,17 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 
 	@Override
 	public void remove(MessageDm messageDm) throws Exception {
-		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the body redis connect agent");
-		}
-		
 		removeBlockingQueue.offer(messageDm);
 	}
 	
 	@Override
 	public void checkHealth() throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the body redis connect agent");
-		}
-		
 		Jedis jedis = getConnect();
 		
 		try {
 			jedis.exists("CheckHealth");
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("SetActual -> " 
 						+ "ConnectId: " + connectId
@@ -303,10 +286,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 	@Override
 	public long checkSize() throws Exception {
 		
-		if (connectStatus.get() == false) {
-			throw new ConnectionUnableException("Connection disable for the body redis connect agent");
-		}
-		
 		Jedis jedis = getConnect();
 		
 		long size = 0;
@@ -314,7 +293,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 		try {
 			size = jedis.dbSize();
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("SetActual -> " 
 						+ "ConnectId: " + connectId
@@ -349,7 +327,6 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 			jedis = jedisPool.getResource();
 			return jedis;
 		} catch (JedisConnectionException e) {
-			connectStatus.set(false);
 			if (logger.isErrorEnabled()) {
 				logger.error("GetConnect -> " 
 						+ "ConnectId: " + connectId
@@ -364,5 +341,10 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 	public void setBodyCacheConnectAgentConfParam(
 			BodyCacheConnectAgentConfParam bodyCacheConnectAgentConfParam) {
 		this.bodyCacheConnectAgentConfParam = bodyCacheConnectAgentConfParam;
+	}
+
+	@Override
+	protected Class<?> getServiceInterfaces() {
+		return BodyCacheConnectAgent.class;
 	}
 }
