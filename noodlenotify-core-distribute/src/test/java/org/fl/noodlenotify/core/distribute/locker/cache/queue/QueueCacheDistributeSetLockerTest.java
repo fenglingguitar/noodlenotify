@@ -10,8 +10,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
-
-import org.fl.noodlenotify.core.connect.ConnectManager;
+import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodlenotify.core.distribute.locker.DistributeSetLocker;
 import org.fl.noodlenotify.core.distribute.locker.cache.queue.QueueCacheDistributeSetLocker;
 
@@ -35,8 +34,8 @@ public class QueueCacheDistributeSetLockerTest extends AbstractJUnit4SpringConte
 	@Test
 	public final void testGetStatus() throws Exception {
 		
-		distributeQueueCacheConnectManager.setModuleId(4);
-		distributeQueueCacheConnectManager.start();
+		//distributeQueueCacheConnectManager.setModuleId(4);
+		//distributeQueueCacheConnectManager.start();
 		Thread.sleep(2000);
 		logger.info("QueueCacheConnectManager Start...");
 		

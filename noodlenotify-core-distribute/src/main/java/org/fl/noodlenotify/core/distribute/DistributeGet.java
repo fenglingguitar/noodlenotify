@@ -12,12 +12,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
+import org.fl.noodle.common.connect.manager.ConnectManager;
+import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectManager;
-import org.fl.noodlenotify.core.connect.QueueAgent;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
@@ -36,10 +36,10 @@ public class DistributeGet {
 
 	private String queueName;
 	
-	private org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager;
+	private ConnectManager dbConnectManager;
 	private ConnectManager queueCacheConnectManager;
 	private ConnectManager bodyCacheConnectManager;
-	private org.fl.noodle.common.connect.manager.ConnectManager netConnectManager;
+	private ConnectManager netConnectManager;
 		
 	private DistributeConfParam distributeConfParam;
 	
@@ -59,10 +59,10 @@ public class DistributeGet {
 	private QueueDistributerVo queueDistributerVo;
 	
 	public DistributeGet(String queueName,
-							org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager,
+							ConnectManager dbConnectManager,
 							ConnectManager queueCacheConnectManager,
 							ConnectManager bodyCacheConnectManager,
-							org.fl.noodle.common.connect.manager.ConnectManager netConnectManager,
+							ConnectManager netConnectManager,
 							DistributeConfParam distributeConfParam,
 							QueueDistributerVo queueDistributerVo) {
 		this.queueName = queueName;
@@ -228,7 +228,7 @@ public class DistributeGet {
 					break;
 				}
 				
-				QueueAgent queueCacheQueueAgent = queueCacheConnectManager.getQueueAgent(queueName);
+				/*QueueAgent queueCacheQueueAgent = queueCacheConnectManager.getQueueAgent(queueName);
 				if (queueCacheQueueAgent == null) {
 					if (logger.isErrorEnabled()) {
 						logger.error(queueCacheName + " -> "
@@ -281,12 +281,30 @@ public class DistributeGet {
 								+ ", Pop Massage -> " + e);
 					}
 					continue;
+				}*/
+				
+				MessageDm messageDm = null;
+				ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster(queueName);
+				QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+				try {
+					messageDm = queueCacheConnectAgent.pop(queueName, queueType);
+				} catch (Exception e) {
+					if (logger.isErrorEnabled()) {
+						logger.error(queueCacheName + " -> " 
+								+ "Queue: " + queueName
+								//+ ", QueueCache: " + ((ConnectAgent)queueCacheConnectAgent).getConnectId()
+								//+ ", Ip: " + ((ConnectAgent)queueCacheConnectAgent).getIp()
+								//+ ", Port: " + ((ConnectAgent)queueCacheConnectAgent).getPort()
+								+ ", Pop Massage -> " + e);
+					}
+					continue;
 				}
+				
 				if (messageDm == null) {
 					continue;
 				}
 				
-				List<ConnectAgent> queueCacheConnectAgentList = queueCacheQueueAgent.getConnectAgentAll();
+				List<ConnectAgent> queueCacheConnectAgentList = queueCacheConnectManager.getConnectNode(queueName).getConnectAgentList();
 				for (ConnectAgent connectAgent : queueCacheConnectAgentList) {
 					QueueCacheConnectAgent queueCacheConnectAgentAll = (QueueCacheConnectAgent) connectAgent;
 					if (queueCacheConnectAgentAll == queueCacheConnectAgent) {
@@ -300,8 +318,8 @@ public class DistributeGet {
 									+ "Queue: " + queueName
 									+ ", UUID: " + messageDm.getUuid()
 									+ ", QueueCache: " + connectAgent.getConnectId()
-									+ ", Ip: " + connectAgent.getIp()
-									+ ", Port: " + connectAgent.getPort()
+									//+ ", Ip: " + connectAgent.getIp()
+									//+ ", Port: " + connectAgent.getPort()
 									+ ", SetPop -> " + e);
 						}
 					}
@@ -320,8 +338,8 @@ public class DistributeGet {
 											+ "Queue: " + queueName
 											+ ", UUID: " + messageDm.getUuid()
 											+ ", BodyCacheOne: " + messageDm.getRedisOne()
-											+ ", Ip: " + ((ConnectAgent)bodyCacheConnectAgentOne).getIp()
-											+ ", Port: " + ((ConnectAgent)bodyCacheConnectAgentOne).getPort()
+											//+ ", Ip: " + ((ConnectAgent)bodyCacheConnectAgentOne).getIp()
+											//+ ", Port: " + ((ConnectAgent)bodyCacheConnectAgentOne).getPort()
 											+ ", Get Body One -> " + e);
 								}
 							}
@@ -342,8 +360,8 @@ public class DistributeGet {
 											+ "Queue: " + queueName
 											+ ", UUID: " + messageDm.getUuid()
 											+ ", BodyCacheTwo: " + messageDm.getRedisTwo()
-											+ ", Ip: " + ((ConnectAgent)bodyCacheConnectAgentTwo).getIp()
-											+ ", Port: " + ((ConnectAgent)bodyCacheConnectAgentTwo).getPort()
+											//+ ", Ip: " + ((ConnectAgent)bodyCacheConnectAgentTwo).getIp()
+											//+ ", Port: " + ((ConnectAgent)bodyCacheConnectAgentTwo).getPort()
 											+ ", Get Body Two -> " + e);
 								}
 							}
@@ -375,8 +393,8 @@ public class DistributeGet {
 										+ ", UUID: " + messageDm.getUuid()
 										+ ", ID: " + messageDm.getId()
 										+ ", DB: " + messageDm.getDb()
-										+ ", Ip: " + ((ConnectAgent)dbConnectAgent).getIp()
-										+ ", Port: " + ((ConnectAgent)dbConnectAgent).getPort()
+										//+ ", Ip: " + ((ConnectAgent)dbConnectAgent).getIp()
+										//+ ", Port: " + ((ConnectAgent)dbConnectAgent).getPort()
 										+ ", Get Body From DB -> Null");
 							}
 							removeQueue(queueCacheName, messageDm);
@@ -389,8 +407,8 @@ public class DistributeGet {
 									+ ", UUID: " + messageDm.getUuid()
 									+ ", ID: " + messageDm.getId()
 									+ ", DB: " + messageDm.getDb()
-									+ ", Ip: " + ((ConnectAgent)dbConnectAgent).getIp()
-									+ ", Port: " + ((ConnectAgent)dbConnectAgent).getPort()
+									//+ ", Ip: " + ((ConnectAgent)dbConnectAgent).getIp()
+									//+ ", Port: " + ((ConnectAgent)dbConnectAgent).getPort()
 									+ ", Get Body From DB -> " + e);
 						}
 						removeQueue(queueCacheName, messageDm);
@@ -615,15 +633,15 @@ public class DistributeGet {
 	
 	private void removeQueue(String queueCacheName, MessageDm messageDm) {
 
-		QueueAgent queueAgent = queueCacheConnectManager.getQueueAgent(queueName);
-		if (queueAgent != null) {
-			List<ConnectAgent> queueCacheConnectAgentList = queueAgent.getConnectAgentAll();
+		ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
+		if (connectNode != null) {
+			List<ConnectAgent> queueCacheConnectAgentList = connectNode.getConnectAgentList();
 			for (ConnectAgent connectAgent : queueCacheConnectAgentList) {
 				QueueCacheConnectAgent queueCacheConnectAgentAll = (QueueCacheConnectAgent) connectAgent;
 				try {
 					queueCacheConnectAgentAll.removePop(messageDm);
 				} catch (ConnectionUnableException e) {
-					queueCacheConnectManager.startUpdateConnectAgent();
+					queueCacheConnectManager.runUpdate();
 				} catch (Exception e) {
 					if (logger.isErrorEnabled()) {
 						logger.error(queueCacheName + " -> RemoveQueue -> "
@@ -645,8 +663,17 @@ public class DistributeGet {
 	}
 	
 	private void removeQueueSelf(String queueCacheName, MessageDm messageDm) {
-
-		QueueAgent queueAgent = queueCacheConnectManager.getQueueAgent(queueName);
+		
+		ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster(queueName);
+		QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+		try {
+			queueCacheConnectAgent.removePop(messageDm);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		//cancelCountDownLatch(messageDm);
+		
+		/*QueueAgent queueAgent = queueCacheConnectManager.getQueueAgent(queueName);
 		if (queueAgent != null) {
 			ConnectAgent connectAgent = queueAgent.getConnectAgent();
 			if (connectAgent != null) {
@@ -679,12 +706,20 @@ public class DistributeGet {
 						+ ", Remove Pop -> Get Queue Agent -> Null");
 			}
 			cancelCountDownLatch(messageDm);
-		}
+		}*/
 	}
 	
 	private void pushQueue(String queueCacheName, MessageDm messageDm) {
 
-		QueueAgent queueAgent = queueCacheConnectManager.getQueueAgent(queueName);
+		ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster(queueName);
+		QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+		try {
+			queueCacheConnectAgent.push(messageDm);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		/*QueueAgent queueAgent = queueCacheConnectManager.getQueueAgent(queueName);
 		if (queueAgent != null) {
 			ConnectAgent connectAgent = queueAgent.getConnectAgent();
 			if (connectAgent != null) {
@@ -717,7 +752,7 @@ public class DistributeGet {
 						+ ", Push Pop -> Get Queue Agent -> Null");
 			}
 			cancelCountDownLatch(messageDm);
-		}
+		}*/
 	}
 	
 	private void removeBody(String queueCacheName, MessageDm messageDm) {
@@ -752,12 +787,12 @@ public class DistributeGet {
 		}
 	}
 	
-	private void cancelCountDownLatch(MessageDm messageDm) {
+	/*private void cancelCountDownLatch(MessageDm messageDm) {
 		if (messageDm.getObjectOne() != null) {					
 			CountDownLatch countDownLatch = (CountDownLatch) messageDm.getObjectOne();
 			countDownLatch.countDown();
 		}
-	}
+	}*/
 	
 	private synchronized void startSleep(long suspendTime) throws InterruptedException {
 		if (!stopSign && suspendTime > 0) {
@@ -777,7 +812,7 @@ public class DistributeGet {
 		this.queueName = queueName;
 	}
 	
-	public void setDbConnectManager(org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager) {
+	public void setDbConnectManager(ConnectManager dbConnectManager) {
 		this.dbConnectManager = dbConnectManager;
 	}
 	
@@ -789,7 +824,7 @@ public class DistributeGet {
 		this.bodyCacheConnectManager = bodyCacheConnectManager;
 	}
 
-	public void setNetConnectManager(org.fl.noodle.common.connect.manager.ConnectManager netConnectManager) {
+	public void setNetConnectManager(ConnectManager netConnectManager) {
 		this.netConnectManager = netConnectManager;
 	}
 	

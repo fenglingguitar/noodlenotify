@@ -3,14 +3,13 @@ package org.fl.noodlenotify.core.distribute.locker.cache.queue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectManager;
-import org.fl.noodlenotify.core.connect.QueueAgent;
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.manager.ConnectManager;
+import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.distribute.locker.DistributeSetLockerAbstract;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueueCacheDistributeSetLocker extends DistributeSetLockerAbstract {
 	
@@ -37,9 +36,9 @@ public class QueueCacheDistributeSetLocker extends DistributeSetLockerAbstract {
 	protected boolean getAlive() {
 		long intervalTime = sleepTime + delayTime;
 		boolean isAlive = false;
-		QueueAgent queueAgent = queueCacheConnectManager.getQueueAgent(queueName);
-		if (queueAgent != null) {
-			List<ConnectAgent> queueCacheConnectAgentList = (List<ConnectAgent>) queueAgent.getConnectAgentAll();
+		ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
+		if (connectNode != null) {
+			List<ConnectAgent> queueCacheConnectAgentList = (List<ConnectAgent>) connectNode.getConnectAgentList();
 			List<QueueCacheConnectAgent> queueCacheConnectAgentBackList = new ArrayList<QueueCacheConnectAgent>(queueCacheConnectAgentList.size());
 			for (ConnectAgent ConnectAgent : queueCacheConnectAgentList) {
 				QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) ConnectAgent;
@@ -112,9 +111,9 @@ public class QueueCacheDistributeSetLocker extends DistributeSetLockerAbstract {
 	protected boolean keepAlive() {
 		long intervalTime = sleepTime + delayTime;
 		boolean isAlive = false;
-		QueueAgent queueAgent = queueCacheConnectManager.getQueueAgent(queueName);
-		if (queueAgent != null) {
-			List<ConnectAgent> queueCacheConnectAgentList = (List<ConnectAgent>) queueAgent.getConnectAgentAll();
+		ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
+		if (connectNode != null) {
+			List<ConnectAgent> queueCacheConnectAgentList = (List<ConnectAgent>) connectNode.getConnectAgentList();
 			List<QueueCacheConnectAgent> queueCacheConnectAgentBackList = new ArrayList<QueueCacheConnectAgent>(queueCacheConnectAgentList.size());
 			for (ConnectAgent ConnectAgent : queueCacheConnectAgentList) {
 				QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) ConnectAgent;
@@ -177,9 +176,9 @@ public class QueueCacheDistributeSetLocker extends DistributeSetLockerAbstract {
 
 	@Override
 	protected void releaseAlive() {
-		QueueAgent queueAgent = queueCacheConnectManager.getQueueAgent(queueName);
-		if (queueAgent != null) {
-			List<ConnectAgent> queueCacheConnectAgentList = (List<ConnectAgent>) queueAgent.getConnectAgentAll();
+		ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
+		if (connectNode != null) {
+			List<ConnectAgent> queueCacheConnectAgentList = (List<ConnectAgent>) connectNode.getConnectAgentList();
 			for (ConnectAgent ConnectAgent : queueCacheConnectAgentList) {
 				QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) ConnectAgent;
 				try {

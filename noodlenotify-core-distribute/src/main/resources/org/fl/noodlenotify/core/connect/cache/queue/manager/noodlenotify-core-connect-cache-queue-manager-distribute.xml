@@ -12,35 +12,46 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
+	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
 	
-	<bean id="cacheConnectAgentConfParamQueue" class="org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam">
-		<property name="setThreadCount" value="50"/>
-		<property name="setBatchSize" value="1000"/>
-		<property name="setTimeout" value="5000"/>
-		<property name="setWaitTime" value="10"/>
-		<property name="setCapacity" value="300000"/>
-		<property name="setThreadPriority" value="8"/>
-		<property name="removeThreadCount" value="30"/>
-		<property name="removeBatchSize" value="1000"/>
-		<property name="removeTimeout" value="0"/>
-		<property name="removeWaitTime" value="10"/>
-		<property name="removeCapacity" value="100000"/>
-		<property name="removeThreadPriority" value="5"/>
-	</bean>
-	<bean id="queueCacheConnectAgentConfParam" class="org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgentConfParam">
-		<property name="popTimeout" value="5"/>
-		<property name="hashExpire" value="7200000"/>
-		<property name="expire" value="1800"/>
-	</bean>
-	<bean id="redisQueueCacheConnectAgentFactory" class="org.fl.noodlenotify.core.connect.cache.queue.redis.RedisQueueCacheConnectAgentFactory">
-		<property name="cacheConnectAgentConfParam" ref="cacheConnectAgentConfParamQueue" />
-		<property name="queueCacheConnectAgentConfParam" ref="queueCacheConnectAgentConfParam" />
-	</bean>
+	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
+	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/queue/redis/noodlenotify-core-connect-cache-queue-factory.xml" />
+
+	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/queue/cluster/noodlenotify-core-connect-cache-queue-cluster-factory.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/serialize/noodlenotify-core-connect-serialize-factory.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/route/noodlenotify-core-connect-route-factory.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/register/noodlenotify-core-distribute-register.xml" />
+	
 	<bean id="distributeQueueCacheConnectManager" class="org.fl.noodlenotify.core.connect.cache.queue.manager.DistributeQueueCacheConnectManager"
-			parent="commonParam">
-		<constructor-arg ref="redisQueueCacheConnectAgentFactory" />
+		init-method="start" destroy-method="destroy">
+		<property name="connectAgentFactoryMap">
+			<map>
+				<entry key="CACHE_QUEUE" value-ref="redisQueueCacheConnectAgentFactory" />
+			</map>
+		</property>
+		<property name="connectClusterFactoryMap">
+			<map>
+				<entry key="FAILOVER" value-ref="cacheQueueFailoverConnectClusterFactory" />
+				<entry key="ONCE" value-ref="cacheQueueOnceConnectClusterFactory" />
+				<entry key="ALL" value-ref="cacheQueueAllConnectClusterFactory" />
+				<entry key="MASTER" value-ref="cacheMasterConnectClusterFactory" />
+			</map>
+		</property>
+		<property name="connectSerializeFactoryMap">
+			<map>
+				<entry key="JSON" value-ref="jsonNetConnectSerializeFactory" />
+			</map>
+		</property>
+		<property name="connectRouteFactoryMap">
+			<map>
+				<entry key="RANDOM" value-ref="randomConnectRouteFactory" />
+				<entry key="WEIGHT" value-ref="weightConnectRouteFactory" />
+				<entry key="RESPONSE" value-ref="responseConnectRouteFactory" />
+			</map>
+		</property>
 	</bean>
 	
 </beans>

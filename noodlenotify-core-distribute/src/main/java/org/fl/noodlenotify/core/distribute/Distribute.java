@@ -10,14 +10,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectManager;
-import org.fl.noodlenotify.core.connect.QueueAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.distribute.locker.DistributeSetLocker;
 import org.fl.noodlenotify.core.distribute.locker.cache.queue.QueueCacheDistributeSetLocker;
@@ -32,10 +30,10 @@ public class Distribute {
 	
 	private DistributeConfParam distributeConfParam = new DistributeConfParam();
 	
-	private org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager;
+	private ConnectManager dbConnectManager;
 	private ConnectManager queueCacheConnectManager;
 	private ConnectManager bodyCacheConnectManager;
-	private org.fl.noodle.common.connect.manager.ConnectManager netConnectManager;
+	private ConnectManager netConnectManager;
 		
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();	
 	
@@ -81,13 +79,15 @@ public class Distribute {
 		//netConnectManager.start();
 		netConnectManager.runUpdateNow();
 		
-		bodyCacheConnectManager.setModuleId(moduleId);
-		bodyCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		bodyCacheConnectManager.start();
+		//bodyCacheConnectManager.setModuleId(moduleId);
+		//bodyCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
+		//bodyCacheConnectManager.start();
+		bodyCacheConnectManager.runUpdateNow();
 
-		queueCacheConnectManager.setModuleId(moduleId);
-		queueCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		queueCacheConnectManager.start();
+		//queueCacheConnectManager.setModuleId(moduleId);
+		//queueCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
+		//queueCacheConnectManager.start();
+		queueCacheConnectManager.runUpdateNow();
 
 		//dbConnectManager.setModuleId(moduleId);
 		//dbConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
@@ -138,8 +138,8 @@ public class Distribute {
 		executorService.shutdown();
 		
 		//dbConnectManager.destroy();
-		queueCacheConnectManager.destroy();
-		bodyCacheConnectManager.destroy();
+		//queueCacheConnectManager.destroy();
+		//bodyCacheConnectManager.destroy();
 		//netConnectManager.destroy();		
 	}
 	
@@ -604,37 +604,32 @@ public class Distribute {
 	
 	private void setActive(String queueName, ConnectManager queueCacheConnectManager) {
 		
-		QueueAgent queueAgent = queueCacheConnectManager.getQueueAgent(queueName);
-		if (queueAgent != null) {
-			QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) queueAgent.getConnectAgent();
-			if (queueCacheConnectAgent == null) {
-				QueueCacheConnectAgent queueCacheConnectAgentOther = (QueueCacheConnectAgent) queueAgent.getConnectAgentOther(null);
-				if (queueCacheConnectAgentOther != null) {
+		ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
+		if (connectNode != null && connectNode.getConnectAgentList().size() > 0) {
+			QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectNode.getConnectAgentList().get(0);
+			try {
+				if (queueCacheConnectAgent != null && !queueCacheConnectAgent.isActive(queueName)) {
 					try {
-						queueCacheConnectAgentOther.setActive(queueName, true);
+						queueCacheConnectAgent.setActive(queueName, true);
 						if (logger.isInfoEnabled()) {
 							logger.info("CheckActiveRunnable -> SetActive -> "
 									+ "QUEUE: " + queueName
-									+ ", ConnectId: " + ((ConnectAgent) queueCacheConnectAgentOther).getConnectId()
+									//+ ", ConnectId: " + ((ConnectAgent) queueCacheConnectAgentOther).getConnectId()
 									+ ", Set Cache Queue Active");
 						}
 					} catch (Exception e) {
 						if (logger.isErrorEnabled()) {
 							logger.error("CheckActiveRunnable -> SetActive -> "
 									+ "QUEUE: " + queueName
-									+ ", ConnectId: " + ((ConnectAgent) queueCacheConnectAgentOther).getConnectId()
+									//+ ", ConnectId: " + ((ConnectAgent) queueCacheConnectAgentOther).getConnectId()
 									+ ", Set Active -> Set Cache Queue Active -> " + e);
 						}
 					}
-				} else {
-					if (logger.isErrorEnabled()) {
-						logger.error("CheckActiveRunnable -> SetActive -> "
-								+ "QUEUE: " + queueName
-								+ ", Set Active -> Get Other Cache Connect Agent -> Null");
-					}
-					queueCacheConnectManager.startUpdateConnectAgent();
 				}
-			} else {
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} /*else {
 				List<ConnectAgent> connectAgentList = queueAgent.getConnectAgentAll();
 				for (ConnectAgent connectAgent : connectAgentList) {
 					QueueCacheConnectAgent queueCacheConnectAgentOther = (QueueCacheConnectAgent) connectAgent;
@@ -651,17 +646,17 @@ public class Distribute {
 						}
 					}
 				}
-			}
-		} else {
+			}*/
+		} /*else {
 			if (logger.isErrorEnabled()) {
 				logger.error("CheckActiveRunnable -> SetActive -> "
 						+ "QUEUE: " + queueName 
 						+ ", Set Active -> Get Queue Agent -> Null");
 			}
-		}
+		}*/
 	}
 	
-	public void setDbConnectManager(org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager) {
+	public void setDbConnectManager(ConnectManager dbConnectManager) {
 		this.dbConnectManager = dbConnectManager;
 	}
 	
@@ -673,7 +668,7 @@ public class Distribute {
 		this.bodyCacheConnectManager = bodyCacheConnectManager;
 	}
 
-	public void setNetConnectManager(org.fl.noodle.common.connect.manager.ConnectManager netConnectManager) {
+	public void setNetConnectManager(ConnectManager netConnectManager) {
 		this.netConnectManager = netConnectManager;
 	}
 	

@@ -7,13 +7,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.cluster.ConnectCluster;
+import org.fl.noodle.common.connect.manager.ConnectManager;
+import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
-import org.fl.noodlenotify.core.connect.ConnectManager;
-import org.fl.noodlenotify.core.connect.QueueAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
@@ -21,6 +19,8 @@ import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.distribute.locker.DistributeSetLocker;
 import org.fl.noodlenotify.core.distribute.locker.db.DbDistributeSetLocker;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class DistributeSet {
@@ -31,7 +31,7 @@ public class DistributeSet {
 	
 	private long moduleId;
 	
-	private org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager;
+	private ConnectManager dbConnectManager;
 	private ConnectManager queueCacheConnectManager;
 	private long dbId;
 	
@@ -997,9 +997,9 @@ public class DistributeSet {
 					logCount += messageDmList.size();
 					
 					if (messageDmList != null && messageDmList.size() > 0) {
-						QueueAgent queueCacheQueueAgent = queueCacheConnectManager.getQueueAgent(queueName);
-						if (queueCacheQueueAgent != null) {
-							List<ConnectAgent> queueCacheConnectAgentList = queueCacheQueueAgent.getConnectAgentAll();
+						ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
+						if (connectNode != null) {
+							List<ConnectAgent> queueCacheConnectAgentList = connectNode.getConnectAgentList();
 							if (queueCacheConnectAgentList.size() > 0) {
 								for (MessageDm messageDm : messageDmList) {
 									for (ConnectAgent queueCacheConnectAgentIt : queueCacheConnectAgentList) {
@@ -1007,7 +1007,7 @@ public class DistributeSet {
 										try {
 											queueCacheConnectAgent.removePop(messageDm);
 										} catch (ConnectionUnableException e) {
-											queueCacheConnectManager.startUpdateConnectAgent();
+											queueCacheConnectManager.runUpdate();
 											if (logger.isErrorEnabled()) {
 												logger.error("DistributeSetDeleteTimeoutRunnable -> Queue Cache Remove Pop -> "
 														+ "Queue: " + queueName
@@ -1114,9 +1114,20 @@ public class DistributeSet {
 			ConnectManager queueCacheConnectManager,
 			List<MessageDm> messageDmList) {
 		
-		QueueAgent queueAgent = queueCacheConnectManager.getQueueAgent(queueName);
-		if (queueAgent != null) {
-			QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) queueAgent.getConnectAgent();
+		ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster(queueName);
+		QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+		for (MessageDm messageDm : messageDmList) {
+			try {
+				queueCacheConnectAgent.push(messageDm);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		//cancelCountDownLatchList(messageDmList);
+		
+		/*ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
+		if (connectNode != null) {
+			QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectNode.getConnectAgent();
 			if (queueCacheConnectAgent != null) {
 				for (MessageDm messageDm : messageDmList) {
 					try {
@@ -1145,7 +1156,7 @@ public class DistributeSet {
 						+ ", Push Massage -> Get Queue Agent -> Null");
 			}
 			cancelCountDownLatchList(messageDmList);
-		}
+		}*/
 	}
 	
 	private long queueCacheLen(String queueCacheName, 
@@ -1153,7 +1164,14 @@ public class DistributeSet {
 			boolean queueType) {
 		
 		long len = -1;
-		QueueAgent queueAgent = queueCacheConnectManager.getQueueAgent(queueName);
+		ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster(queueName);
+		QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+		try {
+			len = queueCacheConnectAgent.len(queueName, queueType);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		/*QueueAgent queueAgent = queueCacheConnectManager.getQueueAgent(queueName);
 		if (queueAgent != null) {
 			QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) queueAgent.getConnectAgent();
 			if (queueCacheConnectAgent != null) {
@@ -1180,22 +1198,22 @@ public class DistributeSet {
 						+ "QUEUE: " + queueName 
 						+ ", Get Len -> Get Queue Agent -> Null");
 			}
-		}
+		}*/
 		return len;
 	}
 	
-	private void cancelCountDownLatchList(List<MessageDm> messageDmList) {
+	/*private void cancelCountDownLatchList(List<MessageDm> messageDmList) {
 		for (MessageDm messageDm : messageDmList) {
 			cancelCountDownLatch(messageDm);
 		}
-	}
+	}*/
 	
-	private void cancelCountDownLatch(MessageDm messageDm) {
+	/*private void cancelCountDownLatch(MessageDm messageDm) {
 		if (messageDm.getObjectOne() != null) {					
 			CountDownLatch countDownLatch = (CountDownLatch) messageDm.getObjectOne();
 			countDownLatch.countDown();
 		}
-	}
+	}*/
 	
 	private synchronized void startSleep(long suspendTime) throws InterruptedException {
 		if (!stopSign && suspendTime > 0) {
