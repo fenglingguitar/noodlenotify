@@ -37,6 +37,8 @@
 				<entry key="FAILOVER" value-ref="cacheBodyFailoverConnectClusterFactory" />
 				<entry key="ONCE" value-ref="cacheBodyOnceConnectClusterFactory" />
 				<entry key="ALL" value-ref="cacheBodyAllConnectClusterFactory" />
+				<entry key="EITHER" value-ref="cacheBodyEitherConnectClusterFactory" />
+				<entry key="PARTALL" value-ref="cacheBodyPartAllConnectClusterFactory" />
 			</map>
 		</property>
 		<property name="connectSerializeFactoryMap">

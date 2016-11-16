@@ -27,4 +27,12 @@
     	<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
 	</bean>
 	
+	<bean id="cacheBodyEitherConnectClusterFactory" class="org.fl.noodlenotify.core.connect.cache.body.cluster.EitherConnectClusterFactory">
+    	<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
+	</bean>
+	
+	<bean id="cacheBodyPartAllConnectClusterFactory" class="org.fl.noodlenotify.core.connect.cache.body.cluster.PartAllConnectClusterFactory">
+    	<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
+	</bean>
+	
 </beans>

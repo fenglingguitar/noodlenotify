@@ -37,6 +37,8 @@ public class DistributeBodyCacheConnectManager extends AbstractConnectManager {
 		
 		if (connectClusterMap.isEmpty()) {
 			connectClusterMap.put("DEFALT", connectClusterFactoryMap.get("FAILOVER").createConnectCluster(BodyCacheConnectAgent.class));
+			connectClusterMap.put("EITHER", connectClusterFactoryMap.get("EITHER").createConnectCluster(BodyCacheConnectAgent.class));
+			connectClusterMap.put("PARTALL", connectClusterFactoryMap.get("PARTALL").createConnectCluster(BodyCacheConnectAgent.class));
 		}
 		
 		if (connectRouteMap.isEmpty()) {
