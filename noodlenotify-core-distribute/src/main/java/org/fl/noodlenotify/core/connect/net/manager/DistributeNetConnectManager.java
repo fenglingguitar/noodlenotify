@@ -7,11 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
-import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.manager.AbstractConnectManager;
 import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodle.common.connect.node.ConnectNodeImpl;
@@ -22,6 +19,8 @@ import org.fl.noodlenotify.console.vo.QueueConsumerVo;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.cluster.LayerConnectCluster;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DistributeNetConnectManager extends AbstractConnectManager {
 	
@@ -364,11 +363,6 @@ public class DistributeNetConnectManager extends AbstractConnectManager {
 	@Override
 	protected String getManagerName() {
 		return ConnectManagerType.NET.getCode();
-	}
-	
-	@Override
-	public ConnectCluster getConnectCluster(String clusterName) {
-		return connectClusterMap.get("DEFALT");
 	}
 	
 	@Override

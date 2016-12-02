@@ -188,19 +188,12 @@ public class DistributeGet {
 				}
 				
 				MessageDm messageDm = null;
-				ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster(queueName);
+				ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
 				QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
 				try {
 					messageDm = queueCacheConnectAgent.pop(queueName, queueType);
 				} catch (Exception e) {
-					if (logger.isErrorEnabled()) {
-						logger.error(queueCacheName + " -> " 
-								+ "Queue: " + queueName
-								//+ ", QueueCache: " + ((ConnectAgent)queueCacheConnectAgent).getConnectId()
-								//+ ", Ip: " + ((ConnectAgent)queueCacheConnectAgent).getIp()
-								//+ ", Port: " + ((ConnectAgent)queueCacheConnectAgent).getPort()
-								+ ", Pop Massage -> " + e);
-					}
+					e.printStackTrace();
 					continue;
 				}
 				
@@ -208,33 +201,24 @@ public class DistributeGet {
 					continue;
 				}
 				
-				List<ConnectAgent> queueCacheConnectAgentList = queueCacheConnectManager.getConnectNode(queueName).getConnectAgentList();
-				for (ConnectAgent connectAgent : queueCacheConnectAgentList) {
-					QueueCacheConnectAgent queueCacheConnectAgentAll = (QueueCacheConnectAgent) connectAgent.getProxy();
-					if (queueCacheConnectAgentAll == queueCacheConnectAgent) {
-						continue;
-					}
-					try {
-						queueCacheConnectAgentAll.setPop(messageDm);
-					} catch (Exception e) {
-						if (logger.isErrorEnabled()) {
-							logger.error(queueCacheName + " -> "
-									+ "Queue: " + queueName
-									+ ", UUID: " + messageDm.getUuid()
-									+ ", QueueCache: " + connectAgent.getConnectId()
-									//+ ", Ip: " + connectAgent.getIp()
-									//+ ", Port: " + connectAgent.getPort()
-									+ ", SetPop -> " + e);
-						}
-					}
+				ConnectCluster otherConnectCluster = queueCacheConnectManager.getConnectCluster("OTHER");
+				QueueCacheConnectAgent otherQueueCacheConnectAgent = (QueueCacheConnectAgent) otherConnectCluster.getProxy();
+				try {
+					otherQueueCacheConnectAgent.setPop(messageDm);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 				
 				ConnectCluster bodyConnectCluster = bodyCacheConnectManager.getConnectCluster("EITHER");
 				BodyCacheConnectAgent bodyCacheConnectAgentOne = (BodyCacheConnectAgent) bodyConnectCluster.getProxy();
+				
+				ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
 				try {
 					bodyCacheConnectAgentOne.get(messageDm);
-				} catch (Exception e1) {
-					e1.printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
 				}
 				
 				if (messageDm.getContent() == null) {
@@ -361,21 +345,8 @@ public class DistributeGet {
 				messageDm.setResult(false);
 				messageDm.setBool(queueType);
 				
-				ConnectCluster connectCluster = netConnectManager.getConnectCluster(queueName);
-				if (connectCluster == null) {
-					if (logger.isErrorEnabled()) {
-						logger.error(queueCacheName + " -> "
-								+ "Queue: " + queueName
-								+ ", UUID: " + messageDm.getUuid()
-								+ ", DB: " + messageDm.getDb()
-								+ ", Get ConnectCluster -> Null");
-					}
-					removeQueue(queueCacheName, messageDm);
-					continue;
-				}
-				
+				ConnectCluster connectCluster = netConnectManager.getConnectCluster("DEFALT");
 				NetConnectAgent netConnectAgent = (NetConnectAgent) connectCluster.getProxy();
-				
 				ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
 				ConnectThreadLocalStorage.put(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode(), queueDistributerVo);
 				try {
@@ -510,10 +481,13 @@ public class DistributeGet {
 
 		ConnectCluster bodyConnectCluster = bodyCacheConnectManager.getConnectCluster("PARTALL");
 		BodyCacheConnectAgent bodyCacheConnectAgentOne = (BodyCacheConnectAgent) bodyConnectCluster.getProxy();
+		ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
 		try {
 			bodyCacheConnectAgentOne.remove(messageDm);
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
 		}
 	}
 	

@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
-import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.manager.AbstractConnectManager;
 import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodle.common.connect.node.ConnectNodeImpl;
@@ -277,11 +276,6 @@ public class ExchangeBodyCacheConnectManager extends AbstractConnectManager {
 	@Override
 	protected String getManagerName() {
 		return ConnectManagerType.BODY_CACHE.getCode();
-	}
-	
-	@Override
-	public ConnectCluster getConnectCluster(String clusterName) {
-		return connectClusterMap.get("DEFALT");
 	}
 	
 	@Override

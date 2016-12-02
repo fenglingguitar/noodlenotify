@@ -38,6 +38,7 @@
 				<entry key="ONCE" value-ref="cacheQueueOnceConnectClusterFactory" />
 				<entry key="ALL" value-ref="cacheQueueAllConnectClusterFactory" />
 				<entry key="MASTER" value-ref="cacheMasterConnectClusterFactory" />
+				<entry key="OTHER" value-ref="cacheOtherConnectClusterFactory" />
 			</map>
 		</property>
 		<property name="connectSerializeFactoryMap">

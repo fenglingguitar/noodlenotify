@@ -12,7 +12,6 @@ import java.util.concurrent.Executors;
 
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
-import org.fl.noodle.common.connect.exception.ConnectInvokeException;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
@@ -278,13 +277,6 @@ public class Exchange implements NetConnectReceiver {
 				);
 		
 		if (messageDm.getContent().length > sizeLimit) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Receive -> "
-						+ "Queue: " + messageDm.getQueueName()
-						+ ", UUID: " + messageDm.getUuid()
-						+ ", Limit: " + sizeLimit
-						+ ", Message Body Bigger Then Max Limit");
-			}
 			throw new ConnectionInvokeException("Message body bigger then max limit: " + sizeLimit);
 		}
 		
@@ -293,24 +285,11 @@ public class Exchange implements NetConnectReceiver {
 			messageDm.setExecuteQueue(queueConsumerGroupNum);
 			messageDm.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
 		} else {
-			if (logger.isErrorEnabled()) {
-				logger.error("Receive -> "
-						+ "Queue: " + messageDm.getQueueName()
-						+ ", UUID: " + messageDm.getUuid()
-						+ ", Get Queue Consumer Group Num -> Null");
-			}
 			startUpdateConnectAgent();
 			throw new ConnectionInvokeException("Set execute queue error, can not get queue consumer group num");
 		}
 		
-		ConnectCluster bodyCacheConnectCluster = bodyCacheConnectManager.getConnectCluster(messageDm.getQueueName());
-		if (bodyCacheConnectCluster == null) {
-			if (logger.isErrorEnabled()) {
-				logger.error("invoke -> connectManager.getConnectCluster return null -> invokerKey: {}", messageDm.getQueueName());
-			}
-			throw new ConnectInvokeException("no have this connect cluster");
-		}
-		
+		ConnectCluster bodyCacheConnectCluster = bodyCacheConnectManager.getConnectCluster("DEFALT");		
 		BodyCacheConnectAgent bodyCacheConnectAgent = (BodyCacheConnectAgent) bodyCacheConnectCluster.getProxy();
 		ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
 		try {
@@ -319,88 +298,7 @@ public class Exchange implements NetConnectReceiver {
 			ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
 		}
 		
-		/*if (bodyCacheConnectManager != null) {
-			QueueAgent queueAgentBody = bodyCacheConnectManager.getQueueAgent(messageDm.getQueueName());
-			if (queueAgentBody != null) {
-				BodyCacheConnectAgent bodyCacheConnectAgent = null;			
-				do {
-					bodyCacheConnectAgent = (BodyCacheConnectAgent) queueAgentBody.getConnectAgent();
-					if (bodyCacheConnectAgent != null) {
-						try {
-							bodyCacheConnectAgent.set(messageDm);
-							messageDm.setRedisOne(((ConnectAgent)bodyCacheConnectAgent).getConnectId());
-							break;
-						} catch (Exception e) {
-							if (logger.isErrorEnabled()) {
-								logger.error("Receive -> "
-										+ "Queue: " + messageDm.getQueueName()
-										+ ", UUID: " + messageDm.getUuid()
-										+ ", BodyCacheOne: " + ((ConnectAgent)bodyCacheConnectAgent).getConnectId()
-										+ ", Set Body Cache One -> " + e);
-							}
-							continue;
-						}
-					} else {
-						bodyCacheConnectManager.startUpdateConnectAgent();
-						if (logger.isErrorEnabled()) {
-							logger.error("Receive -> "
-									+ "Queue: " + messageDm.getQueueName()
-									+ ", UUID: " + messageDm.getUuid()
-									+ ", Get Body Cache Agent -> Null");
-						}
-					}
-				} while (bodyCacheConnectAgent != null);
-				
-				if (bodyCacheConnectAgent != null) {
-					BodyCacheConnectAgent bodyCacheConnectAgentOther = null;
-					do {
-						bodyCacheConnectAgentOther = (BodyCacheConnectAgent) queueAgentBody.getConnectAgentOther((ConnectAgent) bodyCacheConnectAgent);
-						if (bodyCacheConnectAgentOther != null) {
-							try {
-								bodyCacheConnectAgentOther.set(messageDm);
-								messageDm.setRedisTwo(((ConnectAgent)bodyCacheConnectAgentOther).getConnectId());
-								break;
-							} catch (Exception e) {
-								if (logger.isErrorEnabled()) {
-									logger.error("Receive -> "
-											+ "Queue: " + messageDm.getQueueName()
-											+ ", UUID: " + messageDm.getUuid()
-											+ ", BodyCacheTwo: " + ((ConnectAgent)bodyCacheConnectAgent).getConnectId()
-											+ ", Set Body Cache Two -> " + e);
-
-								}
-								continue;
-							}
-						} else {
-							bodyCacheConnectManager.startUpdateConnectAgent();
-							if (logger.isErrorEnabled()) {
-								logger.error("Receive -> "
-										+ "Queue: " + messageDm.getQueueName()
-										+ ", UUID: " + messageDm.getUuid()
-										+ ", Get Body Cache Agent -> Null");
-							}
-						}
-					} while (bodyCacheConnectAgentOther != null);
-				}
-			} else {
-				if (logger.isErrorEnabled()) {
-					logger.error("Receive -> "
-							+ "Queue: " + messageDm.getQueueName()
-							+ ", UUID: " + messageDm.getUuid()
-							+ ", Get Body Cache Queue Agent -> Null");
-				}
-				bodyCacheConnectManager.startUpdateConnectAgent();
-			}
-		}*/
-		
-		ConnectCluster connectCluster = dbConnectManager.getConnectCluster(messageDm.getQueueName());
-		if (connectCluster == null) {
-			if (logger.isErrorEnabled()) {
-				logger.error("invoke -> connectManager.getConnectCluster return null -> invokerKey: {}", messageDm.getQueueName());
-			}
-			throw new ConnectInvokeException("no have this connect cluster");
-		}
-		
+		ConnectCluster connectCluster = dbConnectManager.getConnectCluster("DEFALT");
 		DbConnectAgent dbConnectAgent = (DbConnectAgent) connectCluster.getProxy();
 		
 		messageDm.setBeginTime(System.currentTimeMillis());

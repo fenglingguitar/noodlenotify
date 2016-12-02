@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
-import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.manager.AbstractConnectManager;
 import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodle.common.connect.node.ConnectNodeImpl;
@@ -37,6 +36,7 @@ public class DistributeQueueCacheConnectManager extends AbstractConnectManager {
 		
 		if (connectClusterMap.isEmpty()) {
 			connectClusterMap.put("DEFALT", connectClusterFactoryMap.get("MASTER").createConnectCluster(QueueCacheConnectAgent.class));
+			connectClusterMap.put("OTHER", connectClusterFactoryMap.get("OTHER").createConnectCluster(QueueCacheConnectAgent.class));
 		}
 		
 		if (connectRouteMap.isEmpty()) {
@@ -276,11 +276,6 @@ public class DistributeQueueCacheConnectManager extends AbstractConnectManager {
 	@Override
 	protected String getManagerName() {
 		return ConnectManagerType.QUEUE_CACHE.getCode();
-	}
-	
-	@Override
-	public ConnectCluster getConnectCluster(String clusterName) {
-		return connectClusterMap.get("DEFALT");
 	}
 	
 	@Override

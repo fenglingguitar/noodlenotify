@@ -1114,7 +1114,7 @@ public class DistributeSet {
 			ConnectManager queueCacheConnectManager,
 			List<MessageDm> messageDmList) {
 		
-		ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster(queueName);
+		ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
 		QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
 		for (MessageDm messageDm : messageDmList) {
 			try {
@@ -1164,7 +1164,7 @@ public class DistributeSet {
 			boolean queueType) {
 		
 		long len = -1;
-		ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster(queueName);
+		ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
 		QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
 		try {
 			len = queueCacheConnectAgent.len(queueName, queueType);

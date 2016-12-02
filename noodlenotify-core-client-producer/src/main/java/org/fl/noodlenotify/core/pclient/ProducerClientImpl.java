@@ -3,19 +3,14 @@ package org.fl.noodlenotify.core.pclient;
 import java.util.UUID;
 
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
-import org.fl.noodle.common.connect.exception.ConnectInvokeException;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ProducerClientImpl implements ProducerClient {
-	
-	private final static Logger logger = LoggerFactory.getLogger(ProducerClientImpl.class);
 
 	protected ConnectManager netConnectManager;
 	
@@ -66,83 +61,10 @@ public class ProducerClientImpl implements ProducerClient {
 		message.setUuid(uuid);
 		message.setContent(content);
 		
-		ConnectCluster connectCluster = netConnectManager.getConnectCluster(queueName);
-		if (connectCluster == null) {
-			if (logger.isErrorEnabled()) {
-				logger.error("invoke -> connectManager.getConnectCluster return null -> invokerKey: {}", queueName);
-			}
-			throw new ConnectInvokeException("no have this connect cluster");
-		}
-		
+		ConnectCluster connectCluster = netConnectManager.getConnectCluster("DEFALT");
 		NetConnectAgent netConnectAgent = (NetConnectAgent) connectCluster.getProxy();
 		
 		return netConnectAgent.send(message);
-		
-		/*ConnectNode connectNode = netConnectManager.getConnectNode(queueName);
-		if (connectNode == null) {
-			logger.error("Send -> "
-					+ "Queue: " + message.getQueueName()
-					+ ", UUID: " + message.getUuid()
-					+ ", Get QueueAgent -> Null");
-			throw new ConnectionNothingQueueException("Producer Client Send -> Not have this queue");
-		}
-		
-		NetConnectAgent netConnectAgent = null;		
-		do {
-			netConnectAgent = (NetConnectAgent) connectNode.getConnectAgent();
-			if (netConnectAgent != null) {
-				try {
-					netConnectAgent.send(message);
-					break;
-				} catch (ConnectionUnableException e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("Send -> "
-								+ "Queue: " + message.getQueueName()
-								+ ", UUID: " + message.getUuid()
-								//+ ", Connect: " + ((ConnectAgent)netConnectAgent).getConnectId()
-								+ ", Send Message -> " + e);
-					}
-					continue;
-				} catch (ConnectionResetException e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("Send -> "
-								+ "Queue: " + message.getQueueName()
-								+ ", UUID: " + message.getUuid()
-								//+ ", Connect: " + ((ConnectAgent)netConnectAgent).getConnectId()
-								+ ", Send Message -> " + e);
-					}
-					continue;
-				} catch (ConnectionTimeoutException e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("Send -> "
-								+ "Queue: " + message.getQueueName()
-								+ ", UUID: " + message.getUuid()
-								//+ ", Connect: " + ((ConnectAgent)netConnectAgent).getConnectId()
-								+ ", Send Message -> " + e);
-					}
-					continue;
-				} catch (Exception e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("Send -> "
-								+ "Queue: " + message.getQueueName()
-								+ ", UUID: " + message.getUuid()
-								//+ ", Connect: " + ((ConnectAgent)netConnectAgent).getConnectId()
-								+ ", Send Message -> " + e);
-					}
-					throw e;
-				}
-			} else {
-				netConnectManager.runUpdateNow();
-				if (logger.isErrorEnabled()) {
-					logger.error("NoodleNotify have lose Message -> "
-								+ "Queue: " + message.getQueueName()
-								+ ", Content: " + message.getContent()
-								+ ", UUID: " + message.getUuid()
-								+ " " );
-				}
-				throw new ConnectionRefusedException("Producer Client Send -> Connection refused by all the net connect agent");
-			}
-		} while (netConnectAgent != null);*/
 	}
 
 	public void setNetConnectManager(ConnectManager netConnectManager) {
