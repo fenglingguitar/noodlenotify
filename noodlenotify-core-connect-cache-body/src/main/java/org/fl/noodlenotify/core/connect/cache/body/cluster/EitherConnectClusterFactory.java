@@ -7,6 +7,6 @@ public class EitherConnectClusterFactory extends AbstractConnectClusterFactory {
 
 	@Override
 	public ConnectCluster createConnectCluster(Class<?> serviceInterface) {
-		return new PartConnectCluster(serviceInterface, connectDistinguish, methodInterceptorList);
+		return new EitherConnectCluster(serviceInterface, connectDistinguish, methodInterceptorList);
 	}
 }

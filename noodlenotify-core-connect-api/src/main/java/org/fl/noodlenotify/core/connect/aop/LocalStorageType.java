@@ -4,7 +4,8 @@ public enum LocalStorageType {
 	
 	LAYER_CONNECT_CLUSTER("LocalStorageType.LayerConnectCluster"),
 	MESSAGE_DM("LocalStorageType.messageDm"),
-	QUEUE_DISTRIBUTER_VO("LocalStorageType.queueDistributerVo");
+	QUEUE_DISTRIBUTER_VO("LocalStorageType.queueDistributerVo"),
+	CONNECT_ID("LocalStorageType.connectId");
 	
 	private String code;
 

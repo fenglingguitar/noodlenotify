@@ -1,6 +1,5 @@
 package org.fl.noodlenotify.core.distribute;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -222,49 +221,23 @@ public class DistributeGet {
 				}
 				
 				if (messageDm.getContent() == null) {
-					DbConnectAgent dbConnectAgent = (DbConnectAgent)dbConnectManager.getConnectAgent(messageDm.getDb()).getProxy();
-					if (dbConnectAgent == null) {
-						if (logger.isErrorEnabled()) {
-							logger.error(queueCacheName + " -> "
-									+ "Queue: " + queueName
-									+ ", UUID: " + messageDm.getUuid()
-									+ ", DB: " + messageDm.getDb()
-									+ ", Get Db ConnectAgent -> Null");
-						}
-						removeQueue(queueCacheName, messageDm);
-						continue;
-					}
+					ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
+					DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
+					
+					ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), messageDm.getDb());
 					try {
 						MessageDm messageDmTemp = dbConnectAgent.selectById(queueName, messageDm.getContentId());
-						if (messageDmTemp != null) {
-							messageDm.setContent(messageDmTemp.getContent());
-						} else {
-							if (logger.isErrorEnabled()) {
-								logger.error(queueCacheName
-										+ " -> " + "Queue: " + queueName
-										+ ", UUID: " + messageDm.getUuid()
-										+ ", ID: " + messageDm.getId()
-										+ ", DB: " + messageDm.getDb()
-										//+ ", Ip: " + ((ConnectAgent)dbConnectAgent).getIp()
-										//+ ", Port: " + ((ConnectAgent)dbConnectAgent).getPort()
-										+ ", Get Body From DB -> Null");
-							}
+						if (messageDmTemp == null) {
 							removeQueue(queueCacheName, messageDm);
 							continue;
 						}
+						messageDm.setContent(messageDmTemp.getContent());
 					} catch (Exception e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("Runnable -> " + queueCacheName + " -> " 
-									+ "Queue: " + queueName
-									+ ", UUID: " + messageDm.getUuid()
-									+ ", ID: " + messageDm.getId()
-									+ ", DB: " + messageDm.getDb()
-									//+ ", Ip: " + ((ConnectAgent)dbConnectAgent).getIp()
-									//+ ", Port: " + ((ConnectAgent)dbConnectAgent).getPort()
-									+ ", Get Body From DB -> " + e);
-						}
+						e.printStackTrace();
 						removeQueue(queueCacheName, messageDm);
 						continue;
+					} finally {
+						ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 					}
 				}
 				
@@ -347,6 +320,7 @@ public class DistributeGet {
 				
 				ConnectCluster connectCluster = netConnectManager.getConnectCluster("DEFALT");
 				NetConnectAgent netConnectAgent = (NetConnectAgent) connectCluster.getProxy();
+				
 				ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
 				ConnectThreadLocalStorage.put(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode(), queueDistributerVo);
 				try {
@@ -355,11 +329,8 @@ public class DistributeGet {
 							messageDm.getUuid(), 
 							new String(messageDm.getContent(), "UTF-8")
 							));
-				} catch (UnsupportedEncodingException e1) {
-					e1.printStackTrace();
-					removeQueue(queueCacheName, messageDm);
-				} catch (Exception e1) {
-					e1.printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
 					removeQueue(queueCacheName, messageDm);
 				} finally {
 					ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());

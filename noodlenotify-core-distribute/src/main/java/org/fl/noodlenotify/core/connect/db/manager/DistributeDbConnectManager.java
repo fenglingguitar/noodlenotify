@@ -36,6 +36,7 @@ public class DistributeDbConnectManager extends AbstractConnectManager {
 		
 		if (connectClusterMap.isEmpty()) {
 			connectClusterMap.put("DEFALT", connectClusterFactoryMap.get("FAILOVER").createConnectCluster(DbConnectAgent.class));
+			connectClusterMap.put("ID", connectClusterFactoryMap.get("ID").createConnectCluster(DbConnectAgent.class));
 		}
 		
 		if (connectRouteMap.isEmpty()) {

@@ -2,8 +2,8 @@ package org.fl.noodlenotify.core.connect.constent;
 
 public enum ConnectAgentType {
 	
-	NET_HTTP("NET_HTTP"), 
-	NET_NETTY("NET_NETTY"),
+	NET_HTTP("HTTP"), 
+	NET_NETTY("NETTY"),
 	DB("DB"),
 	QUEUE_CACHE("QUEUE_CACHE"),
 	BODY_CACHE("BODY_CACHE");

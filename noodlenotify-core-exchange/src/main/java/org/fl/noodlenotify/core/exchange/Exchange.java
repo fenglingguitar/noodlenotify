@@ -294,6 +294,8 @@ public class Exchange implements NetConnectReceiver {
 		ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
 		try {
 			bodyCacheConnectAgent.set(messageDm);
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
 		}
