@@ -25,6 +25,30 @@
 	
 	<import resource="classpath:org/fl/noodlenotify/core/distribute/register/noodlenotify-core-distribute-register.xml" />
 	
+	<bean id="setPopMethodInterceptor" class="org.fl.noodlenotify.core.distribute.aop.SetPopMethodInterceptor">
+		<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
+	</bean>
+	<bean id="getCacheContentMethodInterceptor" class="org.fl.noodlenotify.core.distribute.aop.GetCacheContentMethodInterceptor">
+		<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
+	</bean>
+	<bean id="getDbContentMethodInterceptor" class="org.fl.noodlenotify.core.distribute.aop.GetDbContentMethodInterceptor">
+		<property name="connectDistinguish" ref="dbConnectDistinguish" />
+	</bean>
+	
+	<bean id="cacheMasterConnectClusterFactory" class="org.fl.noodlenotify.core.connect.cache.queue.cluster.MasterConnectClusterFactory">
+    	<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
+    	<property name="methodInterceptorList">
+			<list>
+				<ref bean="getDbContentMethodInterceptor" />
+				<ref bean="getCacheContentMethodInterceptor" />
+				<ref bean="setPopMethodInterceptor" />
+			</list>
+		</property>
+	</bean>
+	<bean id="cacheOtherConnectClusterFactory" class="org.fl.noodlenotify.core.connect.cache.queue.cluster.OtherConnectClusterFactory">
+    	<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
+	</bean>
+	
 	<bean id="distributeQueueCacheConnectManager" class="org.fl.noodlenotify.core.connect.cache.queue.manager.DistributeQueueCacheConnectManager"
 		init-method="start" destroy-method="destroy">
 		<property name="connectAgentFactoryMap">

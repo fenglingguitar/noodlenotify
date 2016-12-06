@@ -211,7 +211,6 @@ public class Distribute {
 					DistributeGet distributeGet = 
 							new DistributeGet(
 								queueDistributerVo.getQueue_Nm(),
-								dbConnectManager,
 								queueCacheConnectManager,
 								bodyCacheConnectManager,
 								netConnectManager,
@@ -273,7 +272,6 @@ public class Distribute {
 							}
 							distributeGet = new DistributeGet(
 										queueDistributerVo.getQueue_Nm(),
-										dbConnectManager,
 										queueCacheConnectManager,
 										bodyCacheConnectManager,
 										netConnectManager,
@@ -627,7 +625,6 @@ public class Distribute {
 					}
 				}
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} /*else {
 				List<ConnectAgent> connectAgentList = queueAgent.getConnectAgentAll();

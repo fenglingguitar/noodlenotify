@@ -20,7 +20,6 @@ import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
-import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
@@ -35,7 +34,6 @@ public class DistributeGet {
 
 	private String queueName;
 	
-	private ConnectManager dbConnectManager;
 	private ConnectManager queueCacheConnectManager;
 	private ConnectManager bodyCacheConnectManager;
 	private ConnectManager netConnectManager;
@@ -58,14 +56,12 @@ public class DistributeGet {
 	private QueueDistributerVo queueDistributerVo;
 	
 	public DistributeGet(String queueName,
-							ConnectManager dbConnectManager,
 							ConnectManager queueCacheConnectManager,
 							ConnectManager bodyCacheConnectManager,
 							ConnectManager netConnectManager,
 							DistributeConfParam distributeConfParam,
 							QueueDistributerVo queueDistributerVo) {
 		this.queueName = queueName;
-		this.dbConnectManager = dbConnectManager;
 		this.queueCacheConnectManager = queueCacheConnectManager;
 		this.bodyCacheConnectManager = bodyCacheConnectManager;
 		this.netConnectManager = netConnectManager;
@@ -193,52 +189,12 @@ public class DistributeGet {
 					messageDm = queueCacheConnectAgent.pop(queueName, queueType);
 				} catch (Exception e) {
 					e.printStackTrace();
+					removeQueue(queueCacheName, messageDm);
 					continue;
 				}
 				
 				if (messageDm == null) {
 					continue;
-				}
-				
-				ConnectCluster otherConnectCluster = queueCacheConnectManager.getConnectCluster("OTHER");
-				QueueCacheConnectAgent otherQueueCacheConnectAgent = (QueueCacheConnectAgent) otherConnectCluster.getProxy();
-				try {
-					otherQueueCacheConnectAgent.setPop(messageDm);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-				ConnectCluster bodyConnectCluster = bodyCacheConnectManager.getConnectCluster("EITHER");
-				BodyCacheConnectAgent bodyCacheConnectAgentOne = (BodyCacheConnectAgent) bodyConnectCluster.getProxy();
-				
-				ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
-				try {
-					bodyCacheConnectAgentOne.get(messageDm);
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
-				}
-				
-				if (messageDm.getContent() == null) {
-					ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
-					DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
-					
-					ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), messageDm.getDb());
-					try {
-						MessageDm messageDmTemp = dbConnectAgent.selectById(queueName, messageDm.getContentId());
-						if (messageDmTemp == null) {
-							removeQueue(queueCacheName, messageDm);
-							continue;
-						}
-						messageDm.setContent(messageDmTemp.getContent());
-					} catch (Exception e) {
-						e.printStackTrace();
-						removeQueue(queueCacheName, messageDm);
-						continue;
-					} finally {
-						ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
-					}
 				}
 				
 				try {
@@ -478,10 +434,6 @@ public class DistributeGet {
 
 	public void setQueueName(String queueName) {
 		this.queueName = queueName;
-	}
-	
-	public void setDbConnectManager(ConnectManager dbConnectManager) {
-		this.dbConnectManager = dbConnectManager;
 	}
 	
 	public void setQueueCacheConnectManager(ConnectManager queueCacheConnectManager) {

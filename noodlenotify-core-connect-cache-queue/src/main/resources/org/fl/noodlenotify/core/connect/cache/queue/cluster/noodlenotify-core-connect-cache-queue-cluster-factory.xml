@@ -23,12 +23,4 @@
     	<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
 	</bean>
 	
-	<bean id="cacheMasterConnectClusterFactory" class="org.fl.noodlenotify.core.connect.cache.queue.cluster.MasterConnectClusterFactory">
-    	<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
-	</bean>
-	
-	<bean id="cacheOtherConnectClusterFactory" class="org.fl.noodlenotify.core.connect.cache.queue.cluster.OtherConnectClusterFactory">
-    	<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
-	</bean>
-	
 </beans>
