@@ -11,13 +11,13 @@ import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.node.ConnectNode;
+import org.fl.noodle.common.distributedlock.db.DbDistributedLock;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
+import org.fl.noodlenotify.core.connect.db.mysql.MysqlDbConnectAgent;
 import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
-import org.fl.noodlenotify.core.distribute.locker.DistributeSetLocker;
-import org.fl.noodlenotify.core.distribute.locker.db.DbDistributeSetLocker;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public class DistributeSet {
 	
 	private AtomicLong middleIdFresh = new AtomicLong(0);
 	
-	private DistributeSetLocker dbDistributeSetLocker;
+	private DbDistributedLock dbDistributedLock;
 	
 	private QueueDistributerVo queueDistributerVo;
 
@@ -92,8 +92,15 @@ public class DistributeSet {
 						);
 			}
 			
-			dbDistributeSetLocker = new DbDistributeSetLocker(queueName, moduleId, dbConnectManager, dbId);
-			dbDistributeSetLocker.start();
+			dbDistributedLock = new DbDistributedLock();
+			dbDistributedLock.setJdbcTemplate(((MysqlDbConnectAgent)connectAgent).getJdbcTemplate());
+			dbDistributedLock.setLockId(moduleId);
+			dbDistributedLock.setTableName("MSG_" + queueName + "_LK");
+			try {
+				dbDistributedLock.start();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			if (logger.isDebugEnabled()) {
 				logger.debug("UpdateConnectAgent -> Start DB DistributeSet Locker -> " 
 						+ "QueueName: " + queueName 
@@ -123,10 +130,10 @@ public class DistributeSet {
 		
 		stopSign = true;
 		
-		if (dbDistributeSetLocker.getStatus() == false) {
+		if (dbDistributedLock.getStatus() == false) {
 			
-			if (dbDistributeSetLocker != null) {
-				dbDistributeSetLocker.destroy();
+			if (dbDistributedLock != null) {
+				dbDistributedLock.destroy();
 				if (logger.isDebugEnabled()) {
 					logger.debug("UpdateConnectAgent -> Destroy DB DistributeSet Locker -> " 
 							+ "QueueName: " + queueName 
@@ -165,8 +172,8 @@ public class DistributeSet {
 				}
 			}
 			
-			if (dbDistributeSetLocker != null) {
-				dbDistributeSetLocker.destroy();
+			if (dbDistributedLock != null) {
+				dbDistributedLock.destroy();
 				if (logger.isDebugEnabled()) {
 					logger.debug("UpdateConnectAgent -> Destroy DB DistributeSet Locker -> " 
 							+ "QueueName: " + queueName 
@@ -186,7 +193,7 @@ public class DistributeSet {
 			
 			while (true) {
 				
-				boolean isNewLocker = dbDistributeSetLocker.waitLocker();
+				boolean isNewLocker = dbDistributedLock.waitLocker();
 				
 				if (stopSign) {
 					break;
@@ -333,7 +340,7 @@ public class DistributeSet {
 							CountDownLatch countDownLatch = new CountDownLatch(messageDmList.size());
 							for (MessageDm messageDm : messageDmList) {
 								messageDm.setObjectOne(countDownLatch);
-								messageDm.setObjectTwo(dbDistributeSetLocker);
+								messageDm.setObjectTwo(dbDistributedLock);
 								messageDm.setObjectThree(countDown);
 								messageDm.setBool(true);
 							}
@@ -427,7 +434,7 @@ public class DistributeSet {
 			
 			while (true) {
 				
-				boolean isNewLocker = dbDistributeSetLocker.waitLocker();
+				boolean isNewLocker = dbDistributedLock.waitLocker();
 				
 				if (stopSign) {
 					break;
@@ -537,7 +544,7 @@ public class DistributeSet {
 							CountDownLatch countDownLatch = new CountDownLatch(messageDmList.size());
 							for (MessageDm messageDm : messageDmList) {
 								messageDm.setObjectOne(countDownLatch);
-								messageDm.setObjectTwo(dbDistributeSetLocker);
+								messageDm.setObjectTwo(dbDistributedLock);
 								messageDm.setObjectThree(countDown);
 								messageDm.setBool(true);
 							}
@@ -654,7 +661,7 @@ public class DistributeSet {
 			
 			while (true) {
 				
-				boolean isNewLocker = dbDistributeSetLocker.waitLocker();
+				boolean isNewLocker = dbDistributedLock.waitLocker();
 				
 				if (stopSign) {
 					break;
@@ -764,7 +771,7 @@ public class DistributeSet {
 							CountDownLatch countDownLatch = new CountDownLatch(messageDmList.size());
 							for (MessageDm messageDm : messageDmList) {
 								messageDm.setObjectOne(countDownLatch);
-								messageDm.setObjectTwo(dbDistributeSetLocker);
+								messageDm.setObjectTwo(dbDistributedLock);
 								messageDm.setObjectThree(countDown);
 								messageDm.setBool(false);
 							}
@@ -885,7 +892,7 @@ public class DistributeSet {
 			
 			while (true) {
 				
-				boolean isNewLocker = dbDistributeSetLocker.waitLocker();
+				boolean isNewLocker = dbDistributedLock.waitLocker();
 				
 				if (stopSign) {
 					break;

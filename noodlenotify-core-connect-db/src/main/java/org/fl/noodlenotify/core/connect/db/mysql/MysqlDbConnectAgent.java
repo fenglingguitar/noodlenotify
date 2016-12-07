@@ -43,6 +43,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	private final static Logger logger = LoggerFactory.getLogger(MysqlDbConnectAgent.class);
 
 	private JdbcTemplate jdbcTemplate;
+
 	private TransactionTemplate transactionTemplate;
 	private DbDataSourceFactory dbDataSourceFactory;
 	private DbDataSource dbDataSource;
@@ -182,24 +183,25 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 		sqLockTableStringBuilder.append("	`ID` bigint(16) NOT NULL,");
 		sqLockTableStringBuilder.append("	`OVERTIME` bigint(16) NOT NULL,");
 		sqLockTableStringBuilder.append("	`SET_ID` bigint(16) NOT NULL,");
+		sqLockTableStringBuilder.append("	`IP` char(16) NULL,");
 		sqLockTableStringBuilder.append("	PRIMARY KEY (`ID`)");
 		sqLockTableStringBuilder.append(") ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;");
 		
-		StringBuilder sqLocklInsertTableStringBuilder = new StringBuilder();
+		/*StringBuilder sqLocklInsertTableStringBuilder = new StringBuilder();
 		sqLocklInsertTableStringBuilder.append("INSERT INTO MSG_");
 		sqLocklInsertTableStringBuilder.append(queueName.toUpperCase().replace(".", "_"));
 		sqLocklInsertTableStringBuilder.append("_LK ");
 		sqLocklInsertTableStringBuilder.append("SELECT 1 AS ID, 0 AS OVERTIME, 0 AS SET_ID FROM DUAL ");
 		sqLocklInsertTableStringBuilder.append("WHERE (SELECT COUNT(*) FROM MSG_");
 		sqLocklInsertTableStringBuilder.append(queueName.toUpperCase().replace(".", "_"));
-		sqLocklInsertTableStringBuilder.append("_LK) = 0");
+		sqLocklInsertTableStringBuilder.append("_LK) = 0");*/
 				
 		try {
 			jdbcTemplate.update(sqlContentTableStringBuilder.toString());
 			jdbcTemplate.update(sqlTableStringBuilder.toString());
 			jdbcTemplate.update(sqlBackupTableStringBuilder.toString());
 			jdbcTemplate.update(sqLockTableStringBuilder.toString());
-			jdbcTemplate.update(sqLocklInsertTableStringBuilder.toString());
+			//jdbcTemplate.update(sqLocklInsertTableStringBuilder.toString());
 		} catch (RecoverableDataAccessException e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("CreateTable -> " 
@@ -1244,5 +1246,9 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 	@Override
 	protected Class<?> getServiceInterfaces() {
 		return DbConnectAgent.class;
+	}
+	
+	public JdbcTemplate getJdbcTemplate() {
+		return jdbcTemplate;
 	}
 }
