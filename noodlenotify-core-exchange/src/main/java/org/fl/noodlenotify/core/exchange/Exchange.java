@@ -18,7 +18,6 @@ import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
-import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.exception.ConnectionInvokeException;
 import org.fl.noodlenotify.core.connect.exception.ConnectionStopException;
@@ -289,22 +288,19 @@ public class Exchange implements NetConnectReceiver {
 			throw new ConnectionInvokeException("Set execute queue error, can not get queue consumer group num");
 		}
 		
-		ConnectCluster bodyCacheConnectCluster = bodyCacheConnectManager.getConnectCluster("DEFALT");		
-		BodyCacheConnectAgent bodyCacheConnectAgent = (BodyCacheConnectAgent) bodyCacheConnectCluster.getProxy();
+		ConnectCluster connectCluster = dbConnectManager.getConnectCluster("DEFALT");
+		DbConnectAgent dbConnectAgent = (DbConnectAgent) connectCluster.getProxy();
+		
+		messageDm.setBeginTime(System.currentTimeMillis());
 		ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
 		try {
-			bodyCacheConnectAgent.set(messageDm);
+			dbConnectAgent.insert(messageDm);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
 		}
 		
-		ConnectCluster connectCluster = dbConnectManager.getConnectCluster("DEFALT");
-		DbConnectAgent dbConnectAgent = (DbConnectAgent) connectCluster.getProxy();
-		
-		messageDm.setBeginTime(System.currentTimeMillis());
-		dbConnectAgent.insert(messageDm);
 	}	
 	
 	public void setDbConnectManager(org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager) {

@@ -24,6 +24,19 @@
 	<import resource="classpath:org/fl/noodlenotify/core/connect/route/noodlenotify-core-connect-route-factory.xml" />
 	
 	<import resource="classpath:org/fl/noodlenotify/core/exchange/register/noodlenotify-core-exchange-register.xml" />
+	
+	<bean id="setBodyMethodInterceptor" class="org.fl.noodlenotify.core.exchange.aop.SetBodyMethodInterceptor">
+		<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
+	</bean>
+	
+	<bean id="dbFailoverConnectClusterFactory" class="org.fl.noodle.common.connect.cluster.FailoverConnectClusterFactory">
+    	<property name="connectDistinguish" ref="dbConnectDistinguish" />
+    	<property name="methodInterceptorList">
+			<list>
+				<ref bean="setBodyMethodInterceptor" />
+			</list>
+		</property>
+    </bean>
 
 	<bean id="exchangeDbConnectManager" class="org.fl.noodlenotify.core.connect.db.manager.ExchangeDbConnectManager"
 		init-method="start" destroy-method="destroy">

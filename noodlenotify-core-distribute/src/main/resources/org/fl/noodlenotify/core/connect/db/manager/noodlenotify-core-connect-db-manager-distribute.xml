@@ -37,7 +37,7 @@
 				<entry key="FAILOVER" value-ref="dbFailoverConnectClusterFactory" />
 				<entry key="ONCE" value-ref="dbOnceConnectClusterFactory" />
 				<entry key="ALL" value-ref="dbAllConnectClusterFactory" />
-				<entry key="ID" value-ref="idConnectClusterFactory" />
+				<entry key="ID" value-ref="dbIdConnectClusterFactory" />
 			</map>
 		</property>
 		<property name="connectSerializeFactoryMap">
