@@ -11,11 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.fl.noodle.common.connect.manager.ConnectManager;
-import org.fl.noodlenotify.core.distribute.locker.DistributeSetLocker;
+import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodlenotify.core.distribute.locker.cache.queue.QueueCacheDistributeSetLocker;
 
 @ContextConfiguration(locations = {
-		"classpath:org/fl/noodlenotify/core/connect/cache/queue/manager/noodlenotify-core-connect-cache-queue-manager-distribute.xml"
+		"classpath:org/fl/noodlenotify/core/connect/cache/queue/manager/noodlenotify-core-connect-cache-queue-manager-distribute.xml",
+		"classpath:org/fl/noodlenotify/core/connect/cache/body/manager/noodlenotify-core-connect-cache-body-manager-distribute.xml",
+		"classpath:org/fl/noodlenotify/core/connect/db/manager/noodlenotify-core-connect-db-manager-distribute.xml"
 })
 
 public class QueueCacheDistributeSetLockerTest extends AbstractJUnit4SpringContextTests {
@@ -25,8 +27,11 @@ public class QueueCacheDistributeSetLockerTest extends AbstractJUnit4SpringConte
 	@Autowired
 	ConnectManager distributeQueueCacheConnectManager;
 	
-	public static DistributeSetLocker distributeSetLocker1;
-	public static DistributeSetLocker distributeSetLocker2;
+	@Autowired
+	ModuleRegister distributeModuleRegister;
+	
+	public static QueueCacheDistributeSetLocker distributeSetLocker1;
+	public static QueueCacheDistributeSetLocker distributeSetLocker2;
 	
 	private static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
@@ -34,17 +39,19 @@ public class QueueCacheDistributeSetLockerTest extends AbstractJUnit4SpringConte
 	@Test
 	public final void testGetStatus() throws Exception {
 		
-		//distributeQueueCacheConnectManager.setModuleId(4);
-		//distributeQueueCacheConnectManager.start();
-		Thread.sleep(2000);
-		logger.info("QueueCacheConnectManager Start...");
+		logger.info("QueueCacheConnectManager Start...");	
+		
+		distributeModuleRegister.setModuleId(1L);
+		distributeQueueCacheConnectManager.runUpdateNow();
 		
 		
-		distributeSetLocker1 = new QueueCacheDistributeSetLocker("TestQueue1", 1, 5000, 1000, distributeQueueCacheConnectManager);
+		distributeSetLocker1 = new QueueCacheDistributeSetLocker("TestQueue1", 1, distributeQueueCacheConnectManager);
+		distributeSetLocker1.setSleepTimeGetAlive(3000);
 		distributeSetLocker1.start();
 		logger.info("DistributeSetLocker1 Start...");
 		
-		distributeSetLocker2 = new QueueCacheDistributeSetLocker("TestQueue1", 2, 5000, 1000, distributeQueueCacheConnectManager);
+		distributeSetLocker2 = new QueueCacheDistributeSetLocker("TestQueue1", 2, distributeQueueCacheConnectManager);
+		distributeSetLocker2.setSleepTimeGetAlive(3000);
 		distributeSetLocker2.start();
 		logger.info("DistributeSetLocker2 Start...");
 		

@@ -13,11 +13,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodle.common.connect.register.ModuleRegister;
+import org.fl.noodle.common.distributedlock.api.DistributedLock;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
-import org.fl.noodlenotify.core.distribute.locker.DistributeSetLocker;
 import org.fl.noodlenotify.core.distribute.locker.cache.queue.QueueCacheDistributeSetLocker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class Distribute {
 	
 	private ConsoleRemotingInvoke consoleRemotingInvoke;
 	
-	private ConcurrentMap<String, DistributeSetLocker> queueCacheDistributeSetLockerMap = new ConcurrentHashMap<String, DistributeSetLocker>();
+	private ConcurrentMap<String, DistributedLock> queueCacheDistributeSetLockerMap = new ConcurrentHashMap<String, DistributedLock>();
 	private ConcurrentMap<String, Boolean> queueCacheDistributeSetStopSignMap = new ConcurrentHashMap<String, Boolean>();
 	private ExecutorService queueCacheDistributeSetLockerExecutorService = Executors.newCachedThreadPool();
 	
@@ -197,8 +197,12 @@ public class Distribute {
 				if (!queueDistributerVoMap.containsKey(queueDistributerVo.getQueue_Nm())) {
 					queueDistributerVoMap.put(queueDistributerVo.getQueue_Nm(), queueDistributerVo);
 					
-					DistributeSetLocker queueCacheDistributeSetLocker = new QueueCacheDistributeSetLocker(queueDistributerVo.getQueue_Nm(), moduleId, queueCacheConnectManager);
-					queueCacheDistributeSetLocker.start();
+					QueueCacheDistributeSetLocker queueCacheDistributeSetLocker = new QueueCacheDistributeSetLocker(queueDistributerVo.getQueue_Nm(), moduleId, queueCacheConnectManager);
+					try {
+						queueCacheDistributeSetLocker.start();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					queueCacheDistributeSetLockerMap.put(queueDistributerVo.getQueue_Nm(), queueCacheDistributeSetLocker);
 					queueCacheDistributeSetStopSignMap.put(queueDistributerVo.getQueue_Nm(), false);
 					queueCacheDistributeSetLockerExecutorService.execute(new CheckActiveRunnable(queueDistributerVo.getQueue_Nm(), queueCacheDistributeSetLocker));
@@ -447,7 +451,7 @@ public class Distribute {
 					queueDistributerVoMap.remove(queueName);
 
 					queueCacheDistributeSetStopSignMap.put(queueName, true);
-					DistributeSetLocker queueCacheDistributeSetLocker = queueCacheDistributeSetLockerMap.get(queueName);
+					QueueCacheDistributeSetLocker queueCacheDistributeSetLocker = (QueueCacheDistributeSetLocker) queueCacheDistributeSetLockerMap.get(queueName);
 					queueCacheDistributeSetLocker.destroy();
 					queueCacheDistributeSetLockerMap.remove(queueName);
 					if (logger.isDebugEnabled()) {
@@ -510,7 +514,7 @@ public class Distribute {
 			queueDistributerVoMap.remove(queueName);
 			
 			queueCacheDistributeSetStopSignMap.put(queueName, true);
-			DistributeSetLocker queueCacheDistributeSetLocker = queueCacheDistributeSetLockerMap.get(queueName);
+			QueueCacheDistributeSetLocker queueCacheDistributeSetLocker = (QueueCacheDistributeSetLocker) queueCacheDistributeSetLockerMap.get(queueName);
 			queueCacheDistributeSetLocker.destroy();
 			queueCacheDistributeSetLockerMap.remove(queueName);
 			if (logger.isDebugEnabled()) {
@@ -567,9 +571,9 @@ public class Distribute {
 	private class CheckActiveRunnable implements Runnable {
 		
 		private String queueName;
-		private DistributeSetLocker queueCacheDistributeSetLocker;
+		private DistributedLock queueCacheDistributeSetLocker;
 		
-		public CheckActiveRunnable(String queueName, DistributeSetLocker queueCacheDistributeSetLocker) {
+		public CheckActiveRunnable(String queueName, DistributedLock queueCacheDistributeSetLocker) {
 			this.queueName = queueName;
 			this.queueCacheDistributeSetLocker = queueCacheDistributeSetLocker;
 		}

@@ -104,7 +104,7 @@ public class QueueMsgStorageDaoImpl implements QueueMsgStorageDao {
 		paramsMap.put("msgStorage_Id", vo.getMsgStorage_Id());
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
-		return dynamicSqlTemplate.queryPage("queue-msgstorage-query-queue", paramsMap, page, rows, QueueMsgStorageVo.class);
+		return dynamicSqlTemplate.queryPage("queue-msgstorage-query-msgstorage", paramsMap, page, rows, QueueMsgStorageVo.class);
 	}
 
 	@Override

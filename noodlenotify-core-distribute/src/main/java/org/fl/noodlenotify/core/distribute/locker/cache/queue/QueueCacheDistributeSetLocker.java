@@ -6,27 +6,30 @@ import java.util.List;
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.node.ConnectNode;
+import org.fl.noodle.common.distributedlock.api.AbstractDistributedLock;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
-import org.fl.noodlenotify.core.distribute.locker.DistributeSetLockerAbstract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class QueueCacheDistributeSetLocker extends DistributeSetLockerAbstract {
+public class QueueCacheDistributeSetLocker extends AbstractDistributedLock {
 	
 	private final static Logger logger = LoggerFactory.getLogger(QueueCacheDistributeSetLocker.class);
 
 	private ConnectManager queueCacheConnectManager;
 	
-	public QueueCacheDistributeSetLocker(String queueName, long distributeId, ConnectManager queueCacheConnectManager) {
-		super(queueName, distributeId);
-		this.queueCacheConnectManager = queueCacheConnectManager;
-	}
+	private String queueName;
+	private long distributeId;
 	
-	public QueueCacheDistributeSetLocker(String queueName, long distributeId, long sleepTime, long delayTime, ConnectManager queueCacheConnectManager) {
-		super(queueName, distributeId, sleepTime, delayTime);
+	public QueueCacheDistributeSetLocker(String queueName, long distributeId, ConnectManager queueCacheConnectManager) {
+		this.queueName = queueName;
+		this.distributeId = distributeId;
 		this.queueCacheConnectManager = queueCacheConnectManager;
 	}
 
+	@Override
+	protected void init() throws Exception {		
+	}
+	
 	@Override
 	protected long getDiffTime() {
 		return 0;
@@ -34,7 +37,7 @@ public class QueueCacheDistributeSetLocker extends DistributeSetLockerAbstract {
 
 	@Override
 	protected boolean getAlive() {
-		long intervalTime = sleepTime + delayTime;
+		long intervalTime = sleepTimeGetAlive + delayTime;
 		boolean isAlive = false;
 		ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
 		if (connectNode != null) {
@@ -109,7 +112,7 @@ public class QueueCacheDistributeSetLocker extends DistributeSetLockerAbstract {
 
 	@Override
 	protected boolean keepAlive() {
-		long intervalTime = sleepTime + delayTime;
+		long intervalTime = sleepTimeKeepAlive + delayTime;
 		boolean isAlive = false;
 		ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
 		if (connectNode != null) {
@@ -175,7 +178,7 @@ public class QueueCacheDistributeSetLocker extends DistributeSetLockerAbstract {
 	}
 
 	@Override
-	protected void releaseAlive() {
+	protected boolean releaseAlive() {
 		ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
 		if (connectNode != null) {
 			List<ConnectAgent> queueCacheConnectAgentList = (List<ConnectAgent>) connectNode.getConnectAgentList();
@@ -183,6 +186,7 @@ public class QueueCacheDistributeSetLocker extends DistributeSetLockerAbstract {
 				QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) ConnectAgent;
 				try {
 					queueCacheConnectAgent.releaseAlive(queueName, distributeId);
+					return true;
 				} catch (Exception e1) {
 					if (logger.isErrorEnabled()) {
 						logger.error("KeepAlive -> "
@@ -191,8 +195,10 @@ public class QueueCacheDistributeSetLocker extends DistributeSetLockerAbstract {
 								+ ", Connect: " + ((ConnectAgent)queueCacheConnectAgent).getConnectId()
 								+ ", Queue Redis Release Alive -> " + e1);
 					}
+					
 				}
 			}
 		}
+		return false;
 	}
 }
