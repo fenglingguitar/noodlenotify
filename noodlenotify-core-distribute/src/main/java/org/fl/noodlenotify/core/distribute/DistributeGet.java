@@ -11,16 +11,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.manager.ConnectManager;
-import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
-import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
@@ -375,32 +372,13 @@ public class DistributeGet {
 	
 	private void removeQueue(String queueCacheName, MessageDm messageDm) {
 
-		ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
-		if (connectNode != null) {
-			List<ConnectAgent> queueCacheConnectAgentList = connectNode.getConnectAgentList();
-			for (ConnectAgent connectAgent : queueCacheConnectAgentList) {
-				QueueCacheConnectAgent queueCacheConnectAgentAll = (QueueCacheConnectAgent) connectAgent;
-				try {
-					queueCacheConnectAgentAll.removePop(messageDm);
-				} catch (ConnectionUnableException e) {
-					queueCacheConnectManager.runUpdate();
-				} catch (Exception e) {
-					if (logger.isErrorEnabled()) {
-						logger.error(queueCacheName + " -> RemoveQueue -> "
-								+ "Queue: " + queueName
-								+ ", UUID: " + messageDm.getUuid()
-								+ ", QueueCache: " + connectAgent.getConnectId()
-								+ ", RemovePop -> " + e);
-					}
-				}
-			}
-		} else {
-			if (logger.isErrorEnabled()) {
-				logger.error(queueCacheName + " -> RemoveQueue -> "
-						+ "QUEUE: " + queueName 
-						+ ", UUID: " + messageDm.getUuid()
-						+ ", Remove Pop -> Get Queue Agent -> Null");
-			}
+		ConnectCluster queueConnectCluster = queueCacheConnectManager.getConnectCluster("ALL");
+		QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent)queueConnectCluster.getProxy();
+		try {
+			queueCacheConnectAgent.removePop(messageDm);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
 		}
 	}
 	
@@ -408,13 +386,11 @@ public class DistributeGet {
 
 		ConnectCluster bodyConnectCluster = bodyCacheConnectManager.getConnectCluster("PARTALL");
 		BodyCacheConnectAgent bodyCacheConnectAgentOne = (BodyCacheConnectAgent) bodyConnectCluster.getProxy();
-		ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
 		try {
 			bodyCacheConnectAgentOne.remove(messageDm);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
 		}
 	}
 	
