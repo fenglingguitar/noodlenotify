@@ -12,6 +12,8 @@ import java.util.concurrent.Executors;
 
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
+import org.fl.noodle.common.connect.exception.ConnectInvokeException;
+import org.fl.noodle.common.connect.exception.ConnectStopException;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
@@ -19,8 +21,6 @@ import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
-import org.fl.noodlenotify.core.connect.exception.ConnectionInvokeException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionStopException;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
@@ -266,7 +266,7 @@ public class Exchange implements NetConnectReceiver {
 	public void receive(Message message) throws Exception {
 		
 		if (stopSign) {
-			throw new ConnectionStopException("Exchange is stopping");
+			throw new ConnectStopException("Exchange is stopping");
 		}
 		
 		MessageDm messageDm = new MessageDm(
@@ -276,7 +276,7 @@ public class Exchange implements NetConnectReceiver {
 				);
 		
 		if (messageDm.getContent().length > sizeLimit) {
-			throw new ConnectionInvokeException("Message body bigger then max limit: " + sizeLimit);
+			throw new ConnectInvokeException("Message body bigger then max limit: " + sizeLimit);
 		}
 		
 		Long queueConsumerGroupNum = queueConsumerGroupNumMap.get(messageDm.getQueueName());
@@ -285,7 +285,7 @@ public class Exchange implements NetConnectReceiver {
 			messageDm.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
 		} else {
 			startUpdateConnectAgent();
-			throw new ConnectionInvokeException("Set execute queue error, can not get queue consumer group num");
+			throw new ConnectInvokeException("Set execute queue error, can not get queue consumer group num");
 		}
 		
 		ConnectCluster connectCluster = dbConnectManager.getConnectCluster("DEFALT");

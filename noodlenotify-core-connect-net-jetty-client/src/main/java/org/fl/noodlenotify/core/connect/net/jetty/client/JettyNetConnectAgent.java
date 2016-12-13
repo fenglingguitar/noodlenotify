@@ -6,11 +6,11 @@ import java.util.List;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.agent.AbstractConnectAgent;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
+import org.fl.noodle.common.connect.exception.ConnectRefusedException;
+import org.fl.noodle.common.connect.exception.ConnectResetException;
+import org.fl.noodle.common.connect.exception.ConnectStopException;
+import org.fl.noodle.common.connect.exception.ConnectTimeoutException;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
-import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionStopException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionTimeoutException;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
@@ -50,7 +50,7 @@ public class JettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 						+ ", Port: " + port
 						+ ", Get Resource -> " + e);
 			}
-			throw new ConnectionRefusedException("Connection refused for create net jetty connect agent");
+			throw new ConnectRefusedException("Connection refused for create net jetty connect agent");
 		} 
 	}
 
@@ -67,7 +67,7 @@ public class JettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 						+ ", Port: " + port
 						+ ", Get Resource -> " + e);
 			}
-			throw new ConnectionRefusedException("Connection refused for create net jetty connect agent");
+			throw new ConnectRefusedException("Connection refused for create net jetty connect agent");
 		} 
 	}
 
@@ -97,7 +97,7 @@ public class JettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 						+ ", Send -> " + e
 						);
 			}
-			throw new ConnectionResetException("Connection refused for send by net jetty connect agent");
+			throw new ConnectResetException("Connection refused for send by net jetty connect agent");
 		} catch (java.io.FileNotFoundException e) { 
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
@@ -107,7 +107,7 @@ public class JettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 						+ ", Send -> " + e
 						);
 			}
-			throw new ConnectionResetException("Connection refused for send by net jetty connect agent");
+			throw new ConnectResetException("Connection refused for send by net jetty connect agent");
 		} catch (java.net.SocketException e) { 
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
@@ -117,7 +117,7 @@ public class JettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 						+ ", Send -> " + e
 						);
 			}
-			throw new ConnectionResetException("Connection reset for send by net jetty connect agent");
+			throw new ConnectResetException("Connection reset for send by net jetty connect agent");
 		} catch (java.net.SocketTimeoutException e) { 
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
@@ -127,8 +127,8 @@ public class JettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 						+ ", Send -> " + e
 						);
 			}
-			throw new ConnectionTimeoutException("Connection timeout for send by net jetty connect agent");
-		} catch (ConnectionStopException e) { 
+			throw new ConnectTimeoutException("Connection timeout for send by net jetty connect agent");
+		} catch (ConnectStopException e) { 
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
 						+ "ConnectId: " + connectId
@@ -137,7 +137,7 @@ public class JettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 						+ ", Send -> " + e
 						);
 			}
-			throw new ConnectionResetException("Connection refused for send by net jetty connect agent");
+			throw new ConnectResetException("Connection refused for send by net jetty connect agent");
 		} catch (Exception e) { 
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
@@ -167,7 +167,7 @@ public class JettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 						+ ", Send -> " + e
 						);
 			}
-			throw new ConnectionResetException("Connection refused for send by net jetty connect agent");
+			throw new ConnectResetException("Connection refused for send by net jetty connect agent");
 		} catch (java.io.FileNotFoundException e) { 
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
@@ -177,7 +177,7 @@ public class JettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 						+ ", Send -> " + e
 						);
 			}
-			throw new ConnectionResetException("Connection refused for send by net jetty connect agent");
+			throw new ConnectResetException("Connection refused for send by net jetty connect agent");
 		} catch (java.net.SocketException e) { 
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
@@ -187,7 +187,7 @@ public class JettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 						+ ", Send -> " + e
 						);
 			}
-			throw new ConnectionResetException("Connection reset for send by net jetty connect agent");
+			throw new ConnectResetException("Connection reset for send by net jetty connect agent");
 		} catch (java.net.SocketTimeoutException e) { 
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
@@ -197,8 +197,8 @@ public class JettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 						+ ", Send -> " + e
 						);
 			}
-			throw new ConnectionTimeoutException("Connection timeout for send by net jetty connect agent");
-		} catch (ConnectionStopException e) { 
+			throw new ConnectTimeoutException("Connection timeout for send by net jetty connect agent");
+		} catch (ConnectStopException e) { 
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 
 						+ "ConnectId: " + connectId
@@ -207,7 +207,7 @@ public class JettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 						+ ", Send -> " + e
 						);
 			}
-			throw new ConnectionResetException("Connection refused for send by net jetty connect agent");
+			throw new ConnectResetException("Connection refused for send by net jetty connect agent");
 		} catch (Exception e) { 
 			if (logger.isErrorEnabled()) {
 				logger.error("Send -> " 

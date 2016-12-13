@@ -8,9 +8,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
-
+import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.util.json.JsonTranslator;
-import org.fl.noodlenotify.core.connect.ConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheStatusChecker;
 import org.fl.noodlenotify.core.connect.cache.body.redis.RedisBodyCacheConnectAgent;
 import org.fl.noodlenotify.core.domain.message.MessageDm;

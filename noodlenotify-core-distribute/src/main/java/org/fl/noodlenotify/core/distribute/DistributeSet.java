@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
+import org.fl.noodle.common.connect.exception.ConnectUnableException;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodle.common.distributedlock.db.DbDistributedLock;
@@ -16,7 +17,6 @@ import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.db.mysql.MysqlDbConnectAgent;
-import org.fl.noodlenotify.core.connect.exception.ConnectionUnableException;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
@@ -1013,7 +1013,7 @@ public class DistributeSet {
 										QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) queueCacheConnectAgentIt;
 										try {
 											queueCacheConnectAgent.removePop(messageDm);
-										} catch (ConnectionUnableException e) {
+										} catch (ConnectUnableException e) {
 											queueCacheConnectManager.runUpdate();
 											if (logger.isErrorEnabled()) {
 												logger.error("DistributeSetDeleteTimeoutRunnable -> Queue Cache Remove Pop -> "

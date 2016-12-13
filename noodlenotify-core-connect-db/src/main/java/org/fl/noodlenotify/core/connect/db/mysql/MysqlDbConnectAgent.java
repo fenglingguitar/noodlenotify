@@ -13,13 +13,13 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
+import org.fl.noodle.common.connect.exception.ConnectRefusedException;
+import org.fl.noodle.common.connect.exception.ConnectResetException;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
-import org.fl.noodlenotify.core.connect.db.DbConnectAgentAbstract;
+import org.fl.noodlenotify.core.connect.db.AbstractDbConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.db.datasource.DbDataSource;
 import org.fl.noodlenotify.core.connect.db.datasource.DbDataSourceFactory;
-import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.fl.noodlenotify.core.domain.message.MessageVo;
@@ -38,7 +38,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
+public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 	
 	private final static Logger logger = LoggerFactory.getLogger(MysqlDbConnectAgent.class);
 
@@ -104,7 +104,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Connect -> " + e);
 			}
 			dbDataSource.close();
-			throw new ConnectionRefusedException("Connection refused for create mysql db connect agent");
+			throw new ConnectRefusedException("Connection refused for create mysql db connect agent");
 		}
 	}
 	
@@ -121,7 +121,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Reconnect -> " + e);
 			}
-			throw new ConnectionRefusedException("Connection refused for create mysql db connect agent");
+			throw new ConnectRefusedException("Connection refused for create mysql db connect agent");
 		}
 	}
 	
@@ -210,7 +210,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Create Table -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("CreateTable -> " 
@@ -325,7 +325,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 			}
 			for (MessageDm messageDm : messageDmList) {
 				messageDm.setResult(false);
-				messageDm.setException(new ConnectionResetException("Connection reset for insert by db connect agent"));
+				messageDm.setException(new ConnectResetException("Connection reset for insert by db connect agent"));
 			}
 		}
 	}
@@ -380,7 +380,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 			}
 			for (MessageDm messageDm : messageDmList) {
 				messageDm.setResult(false);
-				messageDm.setException(new ConnectionResetException("Connection reset for update by db connect agent"));
+				messageDm.setException(new ConnectResetException("Connection reset for update by db connect agent"));
 			}
 		}
 	}
@@ -496,7 +496,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Select -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("Select -> " 
@@ -536,7 +536,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Select -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("Select -> " 
@@ -596,7 +596,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Select -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("SelectFinishTimeout -> " 
@@ -640,7 +640,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Select By Id -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("SelectById -> " 
@@ -677,7 +677,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Get Max Id -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("MaxId -> " 
@@ -711,7 +711,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Get Max Id -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("maxIdDelay -> " 
@@ -745,7 +745,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Get Min Id -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("MinId -> " 
@@ -781,7 +781,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Get Min Finish Id -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("MinUnFinishId -> " 
@@ -818,7 +818,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Status: " + status
 						+ ", Get Min Id By Status -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("MinIdByStatus -> " 
@@ -855,7 +855,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Get Diff Time -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("GetDiffTime -> " 
@@ -899,7 +899,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Get Alive -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("GetAlive -> " 
@@ -939,7 +939,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Keep Alive -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("KeepAlive -> " 
@@ -976,7 +976,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Release Alive -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("ReleaseAlive -> " 
@@ -1009,7 +1009,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", Get Diff Time -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("CheckHealth -> " 
@@ -1045,7 +1045,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Status: " + MessageConstant.MESSAGE_STATUS_NEW
 						+ ", Get Count -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("CheckNewLen -> " 
@@ -1084,7 +1084,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Status: " + MessageConstant.MESSAGE_STATUS_PORTION
 						+ ", Get Count -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("checkPortionLen -> " 
@@ -1159,7 +1159,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", query portion message -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("queryPortionMessage -> " 
@@ -1193,7 +1193,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", save portion message -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("savePortionMessage -> " 
@@ -1226,7 +1226,7 @@ public class MysqlDbConnectAgent extends DbConnectAgentAbstract {
 						+ ", Port: " + port
 						+ ", delete portion message -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for create mysql db connect agent");
+			throw new ConnectResetException("Connection reset for create mysql db connect agent");
 		} catch (Exception e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("deletePortionMessage -> " 

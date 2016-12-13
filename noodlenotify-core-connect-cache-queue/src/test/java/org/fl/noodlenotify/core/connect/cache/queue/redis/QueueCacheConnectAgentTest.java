@@ -8,11 +8,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
-
-import org.fl.noodlenotify.core.connect.ConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheStatusChecker;
 import org.fl.noodlenotify.core.connect.cache.queue.redis.RedisQueueCacheConnectAgent;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
+import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.util.json.JsonTranslator;
 
 @ContextConfiguration(locations = {

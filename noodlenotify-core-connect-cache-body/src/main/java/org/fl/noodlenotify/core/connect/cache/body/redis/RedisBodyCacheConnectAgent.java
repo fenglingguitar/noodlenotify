@@ -4,14 +4,14 @@ import java.util.List;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
-import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentAbstract;
+import org.fl.noodle.common.connect.exception.ConnectRefusedException;
+import org.fl.noodle.common.connect.exception.ConnectResetException;
+import org.fl.noodlenotify.core.connect.cache.AbstractCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheStatusChecker;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
-import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ import redis.clients.jedis.Transaction;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 
-public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implements BodyCacheConnectAgent, BodyCacheStatusChecker {
+public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implements BodyCacheConnectAgent, BodyCacheStatusChecker {
 
 	private final static Logger logger = LoggerFactory.getLogger(RedisBodyCacheConnectAgent.class);
 
@@ -62,7 +62,7 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 						+ ", Get Resource -> " + e);
 			}
 			jedisPool.destroy();
-			throw new ConnectionRefusedException("Connection refused for create body redis connect agent");
+			throw new ConnectRefusedException("Connection refused for create body redis connect agent");
 		} 
 	}
 
@@ -79,7 +79,7 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 						+ ", Port: " + port
 						+ ", Get Resource -> " + e);
 			}
-			throw new ConnectionRefusedException("Connection refused for create body redis connect agent");
+			throw new ConnectRefusedException("Connection refused for create body redis connect agent");
 		}
 	}
 
@@ -228,7 +228,7 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 						+ ", Set -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for body redis connect agent");
+			throw new ConnectResetException("Connection reset for body redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("Get -> " 
@@ -267,7 +267,7 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 						+ ", Set -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for body redis connect agent");
+			throw new ConnectResetException("Connection reset for body redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("CheckHealth -> " 
@@ -301,7 +301,7 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 						+ ", Set -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for body redis connect agent");
+			throw new ConnectResetException("Connection reset for body redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("CheckHealth -> " 
@@ -334,7 +334,7 @@ public class RedisBodyCacheConnectAgent extends CacheConnectAgentAbstract implem
 						+ ", Port: " + port
 						+ ", Get Connect -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for body redis connect agent");
+			throw new ConnectResetException("Connection reset for body redis connect agent");
 		}
 	}
 	

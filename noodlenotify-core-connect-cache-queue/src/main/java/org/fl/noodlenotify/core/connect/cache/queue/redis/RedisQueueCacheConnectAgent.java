@@ -9,15 +9,15 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
+import org.fl.noodle.common.connect.exception.ConnectRefusedException;
+import org.fl.noodle.common.connect.exception.ConnectResetException;
 import org.fl.noodle.common.util.json.JsonTranslator;
-import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentAbstract;
+import org.fl.noodlenotify.core.connect.cache.AbstractCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheStatusChecker;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
-import org.fl.noodlenotify.core.connect.exception.ConnectionRefusedException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionResetException;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.fl.noodlenotify.core.domain.message.MessageQueueDm;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Transaction;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
-public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract implements QueueCacheConnectAgent, QueueCacheStatusChecker {
+public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent implements QueueCacheConnectAgent, QueueCacheStatusChecker {
 
 	private final static Logger logger = LoggerFactory.getLogger(RedisQueueCacheConnectAgent.class);
 	
@@ -90,7 +90,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Get Resource -> " + e);
 			}
 			jedisPool.destroy();
-			throw new ConnectionRefusedException("Connection refused for queue redis connect agent");
+			throw new ConnectRefusedException("Connection refused for queue redis connect agent");
 		}
 	}
 
@@ -107,7 +107,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Port: " + port
 						+ ", Get Resource -> " + e);
 			}
-			throw new ConnectionRefusedException("Connection refused for queue redis connect agent");
+			throw new ConnectRefusedException("Connection refused for queue redis connect agent");
 		}
 	}
 
@@ -385,7 +385,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Pop -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for queue redis connect agent");
+			throw new ConnectResetException("Connection reset for queue redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("Pop -> " 
@@ -421,7 +421,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Have Pop -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for queue redis connect agent");
+			throw new ConnectResetException("Connection reset for queue redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("HavePop -> " 
@@ -459,7 +459,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Set Pop -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for queue redis connect agent");
+			throw new ConnectResetException("Connection reset for queue redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("SetPop -> " 
@@ -541,7 +541,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Set Active -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for queue redis connect agent");
+			throw new ConnectResetException("Connection reset for queue redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("SetActive -> " 
@@ -586,7 +586,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Is Active -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for queue redis connect agent");
+			throw new ConnectResetException("Connection reset for queue redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("IsActive -> " 
@@ -651,7 +651,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Len -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for queue redis connect agent");
+			throw new ConnectResetException("Connection reset for queue redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("Len -> " 
@@ -689,7 +689,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Get DiffTime -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for queue redis connect agent");
+			throw new ConnectResetException("Connection reset for queue redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("GetDiffTime -> " 
@@ -739,7 +739,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Get Alive -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for queue redis connect agent");
+			throw new ConnectResetException("Connection reset for queue redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("GetAlive -> " 
@@ -793,7 +793,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Keep Alive -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for queue redis connect agent");
+			throw new ConnectResetException("Connection reset for queue redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("KeepAlive -> " 
@@ -845,7 +845,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Release Alive -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for queue redis connect agent");
+			throw new ConnectResetException("Connection reset for queue redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("ReleaseAlive -> " 
@@ -877,7 +877,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Check Health -> " + e);
 			}
 			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectionResetException("Connection reset for queue redis connect agent");
+			throw new ConnectResetException("Connection reset for queue redis connect agent");
 		} catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("CheckHealth -> " 
@@ -908,7 +908,7 @@ public class RedisQueueCacheConnectAgent extends CacheConnectAgentAbstract imple
 						+ ", Port: " + port
 						+ ", GetConnect -> " + e);
 			}
-			throw new ConnectionResetException("Connection reset for queue redis connect agent");
+			throw new ConnectResetException("Connection reset for queue redis connect agent");
 		}
 	}
 	

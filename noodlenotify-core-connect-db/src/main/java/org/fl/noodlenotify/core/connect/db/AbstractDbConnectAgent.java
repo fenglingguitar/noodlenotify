@@ -13,15 +13,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.agent.AbstractConnectAgent;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
+import org.fl.noodle.common.connect.exception.ConnectTimeoutException;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
-import org.fl.noodlenotify.core.connect.exception.ConnectionTimeoutException;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class DbConnectAgentAbstract extends AbstractConnectAgent implements DbConnectAgent, DbStatusChecker {
+public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implements DbConnectAgent, DbStatusChecker {
 	
-	private final static Logger logger = LoggerFactory.getLogger(DbConnectAgentAbstract.class);
+	private final static Logger logger = LoggerFactory.getLogger(AbstractDbConnectAgent.class);
 	
 	protected DbConnectAgentConfParam dbConnectAgentConfParam;
 
@@ -36,7 +36,7 @@ public abstract class DbConnectAgentAbstract extends AbstractConnectAgent implem
 	private CountDownLatch stopCountDownLatch;
 	private AtomicInteger  stopCountDownLatchCount;
 		
-	public DbConnectAgentAbstract(
+	public AbstractDbConnectAgent(
 			long connectId, String ip, int port, String url, 
 			int connectTimeout, int readTimeout, String encoding,
 			int invalidLimitNum, ConnectDistinguish connectDistinguish,
@@ -295,7 +295,7 @@ public abstract class DbConnectAgentAbstract extends AbstractConnectAgent implem
 					}
 				}
 			} else {
-				throw new ConnectionTimeoutException("Db connect agent insert timeout");
+				throw new ConnectTimeoutException("Db connect agent insert timeout");
 			}
 		}
 		
@@ -314,7 +314,7 @@ public abstract class DbConnectAgentAbstract extends AbstractConnectAgent implem
 		
 		if (!updateBlockingQueue.offer(messageDm, dbConnectAgentConfParam.getUpdateTimeout(), TimeUnit.MILLISECONDS)) {				
 			offerExecuteBatch(messageDm);
-			throw new ConnectionTimeoutException("Db connect agent update timeout");
+			throw new ConnectTimeoutException("Db connect agent update timeout");
 		}
 	}
 	

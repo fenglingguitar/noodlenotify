@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.fl.noodle.common.connect.exception.ConnectInvokeException;
+import org.fl.noodle.common.connect.exception.ConnectStopException;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
-import org.fl.noodlenotify.core.connect.exception.ConnectionInvokeException;
-import org.fl.noodlenotify.core.connect.exception.ConnectionStopException;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
@@ -58,16 +58,16 @@ public class ConsumerClient implements NetConnectReceiver {
 	public void receive(Message message) throws Exception {
 		
 		if (stopSign) {
-			throw new ConnectionStopException("Exchange is stopping");
+			throw new ConnectStopException("Exchange is stopping");
 		}
 		
 		ConsumerReceiver consumerReceiver = consumerReceiverMap.get(message.getQueueName());
 		if (consumerReceiver != null) {
 			if(!consumerReceiver.receive(message)) {
-				throw new ConnectionInvokeException("Consumer receiver consume message return false");
+				throw new ConnectInvokeException("Consumer receiver consume message return false");
 			}
 		} else {
-			throw new ConnectionInvokeException("Not have this queue consumer receiver");
+			throw new ConnectInvokeException("Not have this queue consumer receiver");
 		}
 	}
 	

@@ -17,9 +17,9 @@ import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class CacheConnectAgentAbstract extends AbstractConnectAgent {
+public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 	
-	private final static Logger logger = LoggerFactory.getLogger(CacheConnectAgentAbstract.class);
+	private final static Logger logger = LoggerFactory.getLogger(AbstractCacheConnectAgent.class);
 	
 	protected CacheConnectAgentConfParam cacheConnectAgentConfParam;
 	
@@ -33,7 +33,7 @@ public abstract class CacheConnectAgentAbstract extends AbstractConnectAgent {
 	private CountDownLatch stopCountDownLatch;
 	private AtomicInteger  stopCountDownLatchCount;
 
-	public CacheConnectAgentAbstract(
+	public AbstractCacheConnectAgent(
 			long connectId, String ip, int port, String url, String type, 
 			int connectTimeout, int readTimeout, String encoding,
 			int invalidLimitNum, ConnectDistinguish connectDistinguish,

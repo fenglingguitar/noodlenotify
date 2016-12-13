@@ -386,11 +386,13 @@ public class DistributeGet {
 
 		ConnectCluster bodyConnectCluster = bodyCacheConnectManager.getConnectCluster("PARTALL");
 		BodyCacheConnectAgent bodyCacheConnectAgentOne = (BodyCacheConnectAgent) bodyConnectCluster.getProxy();
+		ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
 		try {
 			bodyCacheConnectAgentOne.remove(messageDm);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
 		}
 	}
 	
