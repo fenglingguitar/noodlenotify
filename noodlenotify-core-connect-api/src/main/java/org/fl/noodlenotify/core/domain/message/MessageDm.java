@@ -1,6 +1,8 @@
 package org.fl.noodlenotify.core.domain.message;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MessageDm implements Serializable {
 	
@@ -29,6 +31,8 @@ public class MessageDm implements Serializable {
 	private Object objectFour;
 	private Object objectFive;
 	private boolean bool;
+	
+	private List<MessageCallback> messageCallbackList = new ArrayList<MessageCallback>();
 	
 	public MessageDm() {
 	}
@@ -225,5 +229,20 @@ public class MessageDm implements Serializable {
 
 	public void setBool(boolean bool) {
 		this.bool = bool;
+	}
+	
+	public void addMessageCallback(MessageCallback messageCallback) {
+		this.messageCallbackList.add(messageCallback);
+	}
+	
+	public void executeMessageCallback() {
+		for (MessageCallback messageCallback : this.messageCallbackList) {
+			try {
+				messageCallback.execute();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		this.messageCallbackList.clear();
 	}
 }

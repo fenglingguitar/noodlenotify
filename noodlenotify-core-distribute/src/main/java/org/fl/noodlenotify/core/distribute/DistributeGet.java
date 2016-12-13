@@ -186,7 +186,10 @@ public class DistributeGet {
 					messageDm = queueCacheConnectAgent.pop(queueName, queueType);
 				} catch (Exception e) {
 					e.printStackTrace();
-					removeQueue(queueCacheName, messageDm);
+					if (messageDm != null) {
+						removeQueue(queueCacheName, messageDm);
+					}
+					
 					continue;
 				}
 				
