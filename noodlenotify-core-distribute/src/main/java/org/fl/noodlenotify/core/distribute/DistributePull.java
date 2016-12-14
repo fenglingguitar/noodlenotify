@@ -22,9 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class DistributeSet {
+public class DistributePull {
 	
-	private final static Logger logger = LoggerFactory.getLogger(DistributeSet.class);
+	private final static Logger logger = LoggerFactory.getLogger(DistributePull.class);
 
 	private String queueName;
 	
@@ -49,7 +49,7 @@ public class DistributeSet {
 	
 	private QueueDistributerVo queueDistributerVo;
 
-	public DistributeSet(String queueName,
+	public DistributePull(String queueName,
 							long moduleId,
 							org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager,
 							ConnectManager queueCacheConnectManager,
@@ -101,7 +101,7 @@ public class DistributeSet {
 				e.printStackTrace();
 			}
 			if (logger.isDebugEnabled()) {
-				logger.debug("UpdateConnectAgent -> Start DB DistributeSet Locker -> " 
+				logger.debug("UpdateConnectAgent -> Start DB DistributePull Locker -> " 
 						+ "QueueName: " + queueName 
 						+ ", DB: " + dbId 
 						);
@@ -134,7 +134,7 @@ public class DistributeSet {
 			if (dbDistributedLock != null) {
 				dbDistributedLock.destroy();
 				if (logger.isDebugEnabled()) {
-					logger.debug("UpdateConnectAgent -> Destroy DB DistributeSet Locker -> " 
+					logger.debug("UpdateConnectAgent -> Destroy DB DistributePull Locker -> " 
 							+ "QueueName: " + queueName 
 							+ ", DB: " + dbId 
 							);
@@ -174,7 +174,7 @@ public class DistributeSet {
 			if (dbDistributedLock != null) {
 				dbDistributedLock.destroy();
 				if (logger.isDebugEnabled()) {
-					logger.debug("UpdateConnectAgent -> Destroy DB DistributeSet Locker -> " 
+					logger.debug("UpdateConnectAgent -> Destroy DB DistributePull Locker -> " 
 							+ "QueueName: " + queueName 
 							+ ", DB: " + dbId 
 							);
@@ -1042,7 +1042,7 @@ public class DistributeSet {
 			
 			stopCountDownLatch.countDown();
 			if (logger.isDebugEnabled()) {
-				logger.debug("DistributeSet -> DistributeSetDeleteTimeoutRunnable -> StopCountDownLatchCount CountDown -> "
+				logger.debug("DistributePull -> DistributeSetDeleteTimeoutRunnable -> StopCountDownLatchCount CountDown -> "
 						+ "QueueName: " + queueName 
 						+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
 						);

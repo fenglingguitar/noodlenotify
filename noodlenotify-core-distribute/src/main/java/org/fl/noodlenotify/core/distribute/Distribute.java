@@ -39,8 +39,8 @@ public class Distribute {
 	
 	private volatile boolean stopSign = false;
 	
-	private ConcurrentMap<String, DistributeGet> distributeGetMap = new ConcurrentHashMap<String, DistributeGet>();
-	private ConcurrentMap<String, ConcurrentMap<Long, DistributeSet>> distributeSetQueueMap = new ConcurrentHashMap<String, ConcurrentMap<Long, DistributeSet>>();
+	private ConcurrentMap<String, DistributePush> distributeGetMap = new ConcurrentHashMap<String, DistributePush>();
+	private ConcurrentMap<String, ConcurrentMap<Long, DistributePull>> distributeSetQueueMap = new ConcurrentHashMap<String, ConcurrentMap<Long, DistributePull>>();
 	ConcurrentMap<String, QueueDistributerVo> queueDistributerVoMap = new ConcurrentHashMap<String, QueueDistributerVo>();
 	
 	private CountDownLatch stopCountDownLatch;
@@ -207,22 +207,22 @@ public class Distribute {
 					queueCacheDistributeSetStopSignMap.put(queueDistributerVo.getQueue_Nm(), false);
 					queueCacheDistributeSetLockerExecutorService.execute(new CheckActiveRunnable(queueDistributerVo.getQueue_Nm(), queueCacheDistributeSetLocker));
 					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Start QueueCache DistributeSet Locker -> " 
+						logger.debug("UpdateConnectAgent -> Start QueueCache DistributePull Locker -> " 
 								+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
 								);
 					}
 					
-					DistributeGet distributeGet = 
-							new DistributeGet(
+					DistributePush distributePush = 
+							new DistributePush(
 								queueDistributerVo.getQueue_Nm(),
 								queueCacheConnectManager,
 								netConnectManager,
 								distributeConfParam,
 								queueDistributerVo);
-					distributeGet.start();
-					distributeGetMap.put(queueDistributerVo.getQueue_Nm(), distributeGet);
+					distributePush.start();
+					distributeGetMap.put(queueDistributerVo.getQueue_Nm(), distributePush);
 					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Add DistributeGet -> " 
+						logger.debug("UpdateConnectAgent -> Add DistributePush -> " 
 								+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
 								+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
 								+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
@@ -255,11 +255,11 @@ public class Distribute {
 												|| !queueDistributerVoOld.getPortion_Exe_ThreadNum().equals(queueDistributerVo.getPortion_Exe_ThreadNum())
 						) {
 							
-							DistributeGet distributeGet = distributeGetMap.get(queueDistributerVo.getQueue_Nm());
-							distributeGet.destroy();
+							DistributePush distributePush = distributeGetMap.get(queueDistributerVo.getQueue_Nm());
+							distributePush.destroy();
 							distributeGetMap.remove(queueDistributerVo.getQueue_Nm());
 							if (logger.isDebugEnabled()) {
-								logger.debug("UpdateConnectAgent -> Remove DistributeGet -> " 
+								logger.debug("UpdateConnectAgent -> Remove DistributePush -> " 
 										+ "QueueName: " + queueDistributerVoOld.getQueue_Nm() 
 										+ ", Is_Repeat: " + queueDistributerVoOld.getIs_Repeat()
 										+ ", Expire_Time: " + queueDistributerVoOld.getExpire_Time()
@@ -273,16 +273,16 @@ public class Distribute {
 										+ ", Queue Change"
 										);
 							}
-							distributeGet = new DistributeGet(
+							distributePush = new DistributePush(
 										queueDistributerVo.getQueue_Nm(),
 										queueCacheConnectManager,
 										netConnectManager,
 										distributeConfParam,
 										queueDistributerVo);
-							distributeGet.start();
-							distributeGetMap.put(queueDistributerVo.getQueue_Nm(), distributeGet);
+							distributePush.start();
+							distributeGetMap.put(queueDistributerVo.getQueue_Nm(), distributePush);
 							if (logger.isDebugEnabled()) {
-								logger.debug("UpdateConnectAgent -> Add DistributeGet -> " 
+								logger.debug("UpdateConnectAgent -> Add DistributePush -> " 
 										+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
 										+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
 										+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
@@ -301,10 +301,10 @@ public class Distribute {
 									|| !queueDistributerVoOld.getExpire_Time().equals(queueDistributerVo.getExpire_Time())
 											|| !queueDistributerVoOld.getInterval_Time().equals(queueDistributerVo.getInterval_Time())
 							) {
-								DistributeGet distributeGet = distributeGetMap.get(queueDistributerVo.getQueue_Nm());
-								distributeGet.setQueueDistributerVo(queueDistributerVo);
+								DistributePush distributePush = distributeGetMap.get(queueDistributerVo.getQueue_Nm());
+								distributePush.setQueueDistributerVo(queueDistributerVo);
 								if (logger.isDebugEnabled()) {
-									logger.debug("UpdateConnectAgent -> Change DistributeGet From -> " 
+									logger.debug("UpdateConnectAgent -> Change DistributePush From -> " 
 											+ "QueueName: " + queueDistributerVoOld.getQueue_Nm() 
 											+ ", Is_Repeat: " + queueDistributerVoOld.getIs_Repeat()
 											+ ", Expire_Time: " + queueDistributerVoOld.getExpire_Time()
@@ -317,7 +317,7 @@ public class Distribute {
 											+ ", Portion_Exe_ThreadNum: " + queueDistributerVoOld.getPortion_Exe_ThreadNum()
 											+ ", Queue Change"
 											);
-									logger.debug("UpdateConnectAgent -> Change DistributeGet To -> " 
+									logger.debug("UpdateConnectAgent -> Change DistributePush To -> " 
 											+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
 											+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
 											+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
@@ -336,12 +336,12 @@ public class Distribute {
 							if (!queueDistributerVoOld.getInterval_Time().equals(queueDistributerVo.getInterval_Time())
 									|| !queueDistributerVoOld.getDph_Delay_Time().equals(queueDistributerVo.getDph_Delay_Time())
 							) {
-								ConcurrentMap<Long, DistributeSet> distributeSetDbMap = distributeSetQueueMap.get(queueDistributerVo.getQueue_Nm());
+								ConcurrentMap<Long, DistributePull> distributeSetDbMap = distributeSetQueueMap.get(queueDistributerVo.getQueue_Nm());
 								for (Long dbId : distributeSetDbMap.keySet()) {
-									DistributeSet distributeSet = distributeSetDbMap.get(dbId);
-									distributeSet.setQueueDistributerVo(queueDistributerVo);
+									DistributePull distributePull = distributeSetDbMap.get(dbId);
+									distributePull.setQueueDistributerVo(queueDistributerVo);
 									if (logger.isDebugEnabled()) {
-										logger.debug("UpdateConnectAgent -> Change DistributeSet From -> " 
+										logger.debug("UpdateConnectAgent -> Change DistributePull From -> " 
 												+ "QueueName: " + queueDistributerVoOld.getQueue_Nm() 
 												+ ", DbId: " + dbId
 												+ ", Is_Repeat: " + queueDistributerVoOld.getIs_Repeat()
@@ -355,7 +355,7 @@ public class Distribute {
 												+ ", Portion_Exe_ThreadNum: " + queueDistributerVoOld.getPortion_Exe_ThreadNum()
 												+ ", Queue Change"
 												);
-										logger.debug("UpdateConnectAgent -> Change DistributeSet To -> " 
+										logger.debug("UpdateConnectAgent -> Change DistributePull To -> " 
 												+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
 												+ ", DbId: " + dbId
 												+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
@@ -376,9 +376,9 @@ public class Distribute {
 					}
 				}
 				
-				ConcurrentMap<Long, DistributeSet> distributeSetDbMap = distributeSetQueueMap.get(queueDistributerVo.getQueue_Nm());
+				ConcurrentMap<Long, DistributePull> distributeSetDbMap = distributeSetQueueMap.get(queueDistributerVo.getQueue_Nm());
 				if (distributeSetDbMap == null) {
-					distributeSetDbMap = new ConcurrentHashMap<Long, DistributeSet>();
+					distributeSetDbMap = new ConcurrentHashMap<Long, DistributePull>();
 					distributeSetQueueMap.put(queueDistributerVo.getQueue_Nm(), distributeSetDbMap);
 				}
 				Set<Long> dbIdSet = new HashSet<Long>();
@@ -388,8 +388,8 @@ public class Distribute {
 					for (org.fl.noodle.common.connect.agent.ConnectAgent connectAgent : connectAgentList) {
 						dbIdSet.add(connectAgent.getConnectId());
 						if (!distributeSetDbMap.containsKey(connectAgent.getConnectId())) {
-							DistributeSet distributeSet = 
-									new DistributeSet(
+							DistributePull distributePull = 
+									new DistributePull(
 										queueDistributerVo.getQueue_Nm(),
 										moduleId,
 										dbConnectManager,
@@ -397,10 +397,10 @@ public class Distribute {
 										distributeConfParam,
 										queueDistributerVo,
 										connectAgent.getConnectId());
-							distributeSet.start();
-							distributeSetDbMap.put(connectAgent.getConnectId(), distributeSet);
+							distributePull.start();
+							distributeSetDbMap.put(connectAgent.getConnectId(), distributePull);
 							if (logger.isDebugEnabled()) {
-								logger.debug("UpdateConnectAgent -> Add DistributeSet -> " 
+								logger.debug("UpdateConnectAgent -> Add DistributePull -> " 
 										+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
 										+ ", DbId: " + connectAgent.getConnectId()
 										+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
@@ -419,11 +419,11 @@ public class Distribute {
 				}
 				for (Long dbId : distributeSetDbMap.keySet()) {
 					if (!dbIdSet.contains(dbId)) {
-						DistributeSet distributeSet = distributeSetDbMap.get(dbId);
-						distributeSet.destroy();
+						DistributePull distributePull = distributeSetDbMap.get(dbId);
+						distributePull.destroy();
 						distributeSetDbMap.remove(dbId);
 						if (logger.isDebugEnabled()) {
-							logger.debug("UpdateConnectAgent -> Remove DistributeSet -> " 
+							logger.debug("UpdateConnectAgent -> Remove DistributePull -> " 
 									+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
 									+ ", DbId: " + dbId
 									+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
@@ -453,16 +453,16 @@ public class Distribute {
 					queueCacheDistributeSetLocker.destroy();
 					queueCacheDistributeSetLockerMap.remove(queueName);
 					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Destroy QueueCache DistributeSet Locker -> " 
+						logger.debug("UpdateConnectAgent -> Destroy QueueCache DistributePull Locker -> " 
 								+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
 								);
 					}
 					
-					DistributeGet distributeGet = distributeGetMap.get(queueName);
-					distributeGet.destroy();
+					DistributePush distributePush = distributeGetMap.get(queueName);
+					distributePush.destroy();
 					distributeGetMap.remove(queueName);
 					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Remove DistributeGet -> " 
+						logger.debug("UpdateConnectAgent -> Remove DistributePush -> " 
 								+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
 								+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
 								+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
@@ -476,13 +476,13 @@ public class Distribute {
 								);
 					}
 					
-					ConcurrentMap<Long, DistributeSet> distributeSetDbMap = distributeSetQueueMap.get(queueName);
+					ConcurrentMap<Long, DistributePull> distributeSetDbMap = distributeSetQueueMap.get(queueName);
 					for (Long dbId : distributeSetDbMap.keySet()) {
-						DistributeSet distributeSet = distributeSetDbMap.get(dbId);
-						distributeSet.destroy();
+						DistributePull distributePull = distributeSetDbMap.get(dbId);
+						distributePull.destroy();
 						distributeSetDbMap.remove(dbId);
 						if (logger.isDebugEnabled()) {
-							logger.debug("UpdateConnectAgent -> Remove DistributeSet -> " 
+							logger.debug("UpdateConnectAgent -> Remove DistributePull -> " 
 									+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
 									+ ", DbId: " + dbId
 									+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
@@ -516,16 +516,16 @@ public class Distribute {
 			queueCacheDistributeSetLocker.destroy();
 			queueCacheDistributeSetLockerMap.remove(queueName);
 			if (logger.isDebugEnabled()) {
-				logger.debug("UpdateConnectAgent -> Destroy QueueCache DistributeSet Locker -> " 
+				logger.debug("UpdateConnectAgent -> Destroy QueueCache DistributePull Locker -> " 
 						+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
 						);
 			}
 			
-			DistributeGet distributeGet = distributeGetMap.get(queueName);
-			distributeGet.destroy();
+			DistributePush distributePush = distributeGetMap.get(queueName);
+			distributePush.destroy();
 			distributeGetMap.remove(queueName);
 			if (logger.isDebugEnabled()) {
-				logger.debug("UpdateConnectAgent -> Remove DistributeGet -> " 
+				logger.debug("UpdateConnectAgent -> Remove DistributePush -> " 
 						+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
 						+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
 						+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
@@ -539,13 +539,13 @@ public class Distribute {
 						);
 			}
 			
-			ConcurrentMap<Long, DistributeSet> distributeSetDbMap = distributeSetQueueMap.get(queueName);
+			ConcurrentMap<Long, DistributePull> distributeSetDbMap = distributeSetQueueMap.get(queueName);
 			for (Long dbId : distributeSetDbMap.keySet()) {
-				DistributeSet distributeSet = distributeSetDbMap.get(dbId);
-				distributeSet.destroy();
+				DistributePull distributePull = distributeSetDbMap.get(dbId);
+				distributePull.destroy();
 				distributeSetDbMap.remove(dbId);
 				if (logger.isDebugEnabled()) {
-					logger.debug("UpdateConnectAgent -> Remove DistributeSet -> " 
+					logger.debug("UpdateConnectAgent -> Remove DistributePull -> " 
 							+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
 							+ ", DbId: " + dbId
 							+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()

@@ -21,9 +21,9 @@ import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DistributeGet {
+public class DistributePush {
 	
-	private final static Logger logger = LoggerFactory.getLogger(DistributeGet.class);
+	private final static Logger logger = LoggerFactory.getLogger(DistributePush.class);
 
 	private String queueName;
 	
@@ -44,7 +44,7 @@ public class DistributeGet {
 	
 	private QueueDistributerVo queueDistributerVo;
 	
-	public DistributeGet(String queueName,
+	public DistributePush(String queueName,
 							ConnectManager queueCacheConnectManager,
 							ConnectManager netConnectManager,
 							DistributeConfParam distributeConfParam,
