@@ -177,7 +177,6 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 							}
 						}
 						updateActual(messageDmList);
-						//offerExecuteBatchList(messageDmList);
 						for (MessageDm messageDm : messageDmList) {
 							messageDm.executeMessageCallback();
 						}
@@ -238,7 +237,9 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 						}
 						
 						deleteActual(messageDmList);
-						cancelCountDownLatchList(messageDmList);
+						for (MessageDm messageDm : messageDmList) {
+							messageDm.executeMessageCallback();
+						}
 						messageDmList.clear();
 					}
 				}
@@ -329,34 +330,13 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 		}*/
 		
 		if (!deleteBlockingQueue.offer(messageDm, dbConnectAgentConfParam.getDeleteTimeout(), TimeUnit.MILLISECONDS)) {
-			cancelCountDownLatch(messageDm);
-		}
-	}
-	
-	private void cancelCountDownLatchList(List<MessageDm> messageDmList) {
-		for (MessageDm messageDm : messageDmList) {			
-			cancelCountDownLatch(messageDm);
-		}
-	}
-	
-	private void cancelCountDownLatch(MessageDm messageDm) {
-		if (messageDm.getObjectOne() != null) {					
-			CountDownLatch countDownLatch = (CountDownLatch) messageDm.getObjectOne();
-			countDownLatch.countDown();
+			throw new ConnectTimeoutException("Db connect agent update timeout");
 		}
 	}
 	
 	protected abstract void insertActual(List<MessageDm> messageDmList);
 	protected abstract void updateActual(List<MessageDm> messageDmList);
 	protected abstract void deleteActual(List<MessageDm> messageDmList);
-	
-	public long getConnectId() {
-		return connectId;
-	}
-
-	public void setConnectId(long connectId) {
-		this.connectId = connectId;
-	}
 
 	public void setDbConnectAgentConfParam(DbConnectAgentConfParam dbConnectAgentConfParam) {
 		this.dbConnectAgentConfParam = dbConnectAgentConfParam;

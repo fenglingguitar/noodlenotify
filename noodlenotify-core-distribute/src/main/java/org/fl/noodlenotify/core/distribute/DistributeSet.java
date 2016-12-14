@@ -9,15 +9,14 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
-import org.fl.noodle.common.connect.exception.ConnectUnableException;
 import org.fl.noodle.common.connect.manager.ConnectManager;
-import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodle.common.distributedlock.db.DbDistributedLock;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.db.mysql.MysqlDbConnectAgent;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
+import org.fl.noodlenotify.core.distribute.callback.RemovePopMessageCallback;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -990,7 +989,7 @@ public class DistributeSet {
 					List<MessageDm> messageDmList = null;
 					
 					try {
-						messageDmList = dbConnectAgent.selectTimeout(queueName, start, end, MessageConstant.MESSAGE_STATUS_FINISH, System.currentTimeMillis() - distributeConfParam.getSelectDeleteTimeout());
+						messageDmList = dbConnectAgent.selectTimeout(queueName, start, end, MessageConstant.MESSAGE_STATUS_FINISH, System.currentTimeMillis() - 1);
 					} catch (Exception e) {
 						if (logger.isErrorEnabled()) {
 							logger.error("DistributeSetDeleteTimeoutRunnable -> DB Select Timeout Finish Massage -> "
@@ -1004,80 +1003,14 @@ public class DistributeSet {
 					logCount += messageDmList.size();
 					
 					if (messageDmList != null && messageDmList.size() > 0) {
-						ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
-						if (connectNode != null) {
-							List<ConnectAgent> queueCacheConnectAgentList = connectNode.getConnectAgentList();
-							if (queueCacheConnectAgentList.size() > 0) {
-								for (MessageDm messageDm : messageDmList) {
-									for (ConnectAgent queueCacheConnectAgentIt : queueCacheConnectAgentList) {
-										QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) queueCacheConnectAgentIt;
-										try {
-											queueCacheConnectAgent.removePop(messageDm);
-										} catch (ConnectUnableException e) {
-											queueCacheConnectManager.runUpdate();
-											if (logger.isErrorEnabled()) {
-												logger.error("DistributeSetDeleteTimeoutRunnable -> Queue Cache Remove Pop -> "
-														+ "Queue: " + queueName
-														+ ", UUID: " + messageDm.getUuid()
-														+ ", QueueCache: " + connectAgent.getConnectId()
-														+ ", Exception -> " + e);
-											}
-										} catch (Exception e) {
-											if (logger.isErrorEnabled()) {
-												logger.error("DistributeSetDeleteTimeoutRunnable -> Queue Cache Remove Pop -> "
-														+ "Queue: " + queueName
-														+ ", UUID: " + messageDm.getUuid()
-														+ ", QueueCache: " + connectAgent.getConnectId()
-														+ ", Exception -> " + e);
-											}
-										}
-									}
-								}
-							} else {
-								if (logger.isErrorEnabled()) {
-									logger.error("DistributeSetDeleteTimeoutRunnable -> Queue Cache Remove Pop -> "
-											+ "QUEUE: " + queueName 
-											+ ", Exception -> Get Connect Agent List Is Empty");
-								}
-							}
-						} else {
-							if (logger.isErrorEnabled()) {
-								logger.error("DistributeSetDeleteTimeoutRunnable -> Queue Cache Remove Pop -> "
-										+ "QUEUE: " + queueName 
-										+ ", Exception -> Get Queue Agent Return Null");
-							}
-						}
-						
-						CountDownLatch countDownLatch = new CountDownLatch(messageDmList.size());
 						for (MessageDm messageDm : messageDmList) {
-							messageDm.setObjectOne(countDownLatch);
-						}
-						
-						for (MessageDm messageDm : messageDmList) {
+							messageDm.addMessageCallback(new RemovePopMessageCallback(messageDm, queueCacheConnectManager));
 							try {
 								dbConnectAgent.delete(messageDm);
 							} catch (Exception e) {
-								if (logger.isErrorEnabled()) {
-									logger.error("DistributeSetDeleteTimeoutRunnable -> DB Delete Finish Message -> "
-											+ "Queue: " + queueName
-											+ ", UUID: " + messageDm.getUuid()
-											+ ", DB: " + ((ConnectAgent)dbConnectAgent).getConnectId()
-											+ ", Exception -> " + e);
-								}
+								e.printStackTrace();
 							}
 						}
-						
-						try {
-							countDownLatch.await();
-						} catch (InterruptedException e) {
-							if (logger.isErrorEnabled()) {
-								logger.error("DistributeSetDeleteTimeoutRunnable -> CountDownLatch Await -> "
-										+ "Queue: " + queueName
-										+ ", DB: " + connectAgent.getConnectId()
-										+ ", Exception -> " + e);
-							}
-						}
-						
 						messageDmList.clear();
 					}
 					

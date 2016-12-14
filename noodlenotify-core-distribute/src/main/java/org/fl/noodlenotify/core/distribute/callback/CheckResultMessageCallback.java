@@ -66,18 +66,10 @@ public class CheckResultMessageCallback extends AbstractMessageCallback {
 		}
 	}
 
-	public ConnectManager getQueueCacheConnectManager() {
-		return queueCacheConnectManager;
-	}
-
 	public void setQueueCacheConnectManager(ConnectManager queueCacheConnectManager) {
 		this.queueCacheConnectManager = queueCacheConnectManager;
 	}
-
-	public ConnectManager getBodyCacheConnectManager() {
-		return bodyCacheConnectManager;
-	}
-
+	
 	public void setBodyCacheConnectManager(ConnectManager bodyCacheConnectManager) {
 		this.bodyCacheConnectManager = bodyCacheConnectManager;
 	}	
