@@ -41,6 +41,7 @@ public class LayerConnectCluster extends AbstractConnectCluster {
 					try {
 						AopUtils.invokeJoinpointUsingReflection(connectCluster.getProxy(), method, args);
 					} catch (Throwable e) {
+						e.printStackTrace();
 						executeQueue >>= 1;
 						resultQueue >>= 1;
 						executeQueueNum <<= 1;

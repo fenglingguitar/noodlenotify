@@ -1,7 +1,5 @@
 package org.fl.noodlenotify.core.distribute.aop;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.fl.noodle.common.connect.agent.ConnectAgent;
@@ -68,17 +66,14 @@ public class PushLayerResultMethodInterceptor implements MethodInterceptor {
 				}
 			}
 			messageDm.setFinishTime(System.currentTimeMillis());
-			((AtomicInteger) messageDm.getObjectFive()).incrementAndGet();
+			//((AtomicInteger) messageDm.getObjectFive()).incrementAndGet();
 			try {
 				dbConnectAgent.update(messageDm);
 			} catch (Exception e) {
-				if (logger.isErrorEnabled()) {
-					logger.error("invoke ->"
-							+ "UUID: " + messageDm.getUuid()
-							+ ", DB: " + messageDm.getDb()
-							+ ", Execute Update -> " + e);
-				}
-				((AtomicInteger) messageDm.getObjectFive()).decrementAndGet();
+				e.printStackTrace();
+				messageDm.setResult(false);
+				messageDm.executeMessageCallback();
+				//((AtomicInteger) messageDm.getObjectFive()).decrementAndGet();
 			}
 		}
 	}

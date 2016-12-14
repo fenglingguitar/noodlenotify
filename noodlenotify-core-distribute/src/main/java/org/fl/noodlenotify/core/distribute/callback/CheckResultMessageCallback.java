@@ -1,4 +1,4 @@
-package org.fl.noodlenotify.core.distribute;
+package org.fl.noodlenotify.core.distribute.callback;
 
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
@@ -12,17 +12,17 @@ import org.fl.noodlenotify.core.domain.message.MessageDm;
 
 public class CheckResultMessageCallback extends AbstractMessageCallback {
 
-	private ConnectManager bodyCacheConnectManager;
 	private ConnectManager queueCacheConnectManager;
+	private ConnectManager bodyCacheConnectManager;
 	
 	public CheckResultMessageCallback(
 			MessageDm messageDm,
-			ConnectManager bodyCacheConnectManager,
-			ConnectManager queueCacheConnectManager
+			ConnectManager queueCacheConnectManager,
+			ConnectManager bodyCacheConnectManager
 			) {
 		this.messageDm = messageDm;
-		this.queueCacheConnectManager = queueCacheConnectManager;
 		this.bodyCacheConnectManager = bodyCacheConnectManager;
+		this.queueCacheConnectManager = queueCacheConnectManager;
 	}
 	
 	@Override
@@ -66,14 +66,6 @@ public class CheckResultMessageCallback extends AbstractMessageCallback {
 		}
 	}
 
-	public ConnectManager getBodyCacheConnectManager() {
-		return bodyCacheConnectManager;
-	}
-
-	public void setBodyCacheConnectManager(ConnectManager bodyCacheConnectManager) {
-		this.bodyCacheConnectManager = bodyCacheConnectManager;
-	}
-	
 	public ConnectManager getQueueCacheConnectManager() {
 		return queueCacheConnectManager;
 	}
@@ -81,4 +73,12 @@ public class CheckResultMessageCallback extends AbstractMessageCallback {
 	public void setQueueCacheConnectManager(ConnectManager queueCacheConnectManager) {
 		this.queueCacheConnectManager = queueCacheConnectManager;
 	}
+
+	public ConnectManager getBodyCacheConnectManager() {
+		return bodyCacheConnectManager;
+	}
+
+	public void setBodyCacheConnectManager(ConnectManager bodyCacheConnectManager) {
+		this.bodyCacheConnectManager = bodyCacheConnectManager;
+	}	
 }

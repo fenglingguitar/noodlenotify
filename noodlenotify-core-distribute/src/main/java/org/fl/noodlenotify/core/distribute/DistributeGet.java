@@ -1,8 +1,6 @@
 package org.fl.noodlenotify.core.distribute;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -16,11 +14,9 @@ import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
-import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
-import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +28,6 @@ public class DistributeGet {
 	private String queueName;
 	
 	private ConnectManager queueCacheConnectManager;
-	private ConnectManager bodyCacheConnectManager;
 	private ConnectManager netConnectManager;
 		
 	private DistributeConfParam distributeConfParam;
@@ -41,9 +36,6 @@ public class DistributeGet {
 	
 	private BlockingQueue<MessageDm> executeBlockingQueueNew;
 	private BlockingQueue<MessageDm> executeBlockingQueuePortion;
-	private BlockingQueue<MessageDm> executeBlockingQueueBatch;
-	private List<MessageDm> executeBatchOverflowList = new ArrayList<MessageDm>();
-	private AtomicInteger updatingCount = new AtomicInteger(0);
 	
 	private volatile boolean stopSign = false;
 	
@@ -54,13 +46,11 @@ public class DistributeGet {
 	
 	public DistributeGet(String queueName,
 							ConnectManager queueCacheConnectManager,
-							ConnectManager bodyCacheConnectManager,
 							ConnectManager netConnectManager,
 							DistributeConfParam distributeConfParam,
 							QueueDistributerVo queueDistributerVo) {
 		this.queueName = queueName;
 		this.queueCacheConnectManager = queueCacheConnectManager;
-		this.bodyCacheConnectManager = bodyCacheConnectManager;
 		this.netConnectManager = netConnectManager;
 		this.distributeConfParam = distributeConfParam;
 		this.queueDistributerVo = queueDistributerVo;
@@ -70,10 +60,6 @@ public class DistributeGet {
 		
 		executeBlockingQueueNew = new LinkedBlockingQueue<MessageDm>(distributeConfParam.getExecuteCapacityNew());
 		executeBlockingQueuePortion = new LinkedBlockingQueue<MessageDm>(distributeConfParam.getExecuteCapacityPortion());
-		executeBlockingQueueBatch = new LinkedBlockingQueue<MessageDm>(
-				distributeConfParam.getExecuteCapacityBatch() * 
-					(queueDistributerVo.getNew_Exe_ThreadNum() 
-							+ queueDistributerVo.getPortion_Exe_ThreadNum()));
 		
 		int allThreadCount = queueDistributerVo.getNew_Pop_ThreadNum() +
 							queueDistributerVo.getNew_Exe_ThreadNum() +
@@ -102,8 +88,6 @@ public class DistributeGet {
 		for (int i=0; i<queueDistributerVo.getPortion_Exe_ThreadNum(); i++) {
 			executorService.execute(new DistributeExecuteRunnable("Portion DistributeGetRunnableExe", executeBlockingQueuePortion, false));
 		}
-		
-		executorService.execute(new DistributeCheckRunnable());
 	}
 	
 	public void destroy() {
@@ -136,23 +120,16 @@ public class DistributeGet {
 			Iterator<MessageDm> messageDmItNew = executeBlockingQueueNew.iterator();
 			while (messageDmItNew.hasNext()) {
 				MessageDm messageDmNext = messageDmItNew.next();
-				removeQueue("Destroy", messageDmNext);
+				messageDmNext.setResult(false);
+				messageDmNext.executeMessageCallback();
 			}
 			
 			Iterator<MessageDm> messageDmItPortion = executeBlockingQueuePortion.iterator();
 			while (messageDmItPortion.hasNext()) {
 				MessageDm messageDmNext = messageDmItPortion.next();
-				removeQueue("Destroy", messageDmNext);
+				messageDmNext.setResult(false);
+				messageDmNext.executeMessageCallback();
 			}
-		}
-		
-		if (executeBlockingQueueBatch.size() > 0) {
-			List<MessageDm> messageDmList = new ArrayList<MessageDm>(executeBlockingQueueBatch);
-			checkUpdateResult(messageDmList);
-		}
-		
-		if (executeBatchOverflowList.size() > 0) {
-			checkUpdateResult(executeBatchOverflowList);
 		}
 	}
 	
@@ -187,7 +164,8 @@ public class DistributeGet {
 				} catch (Exception e) {
 					e.printStackTrace();
 					if (messageDm != null) {
-						removeQueue(queueCacheName, messageDm);
+						messageDm.setResult(false);
+						messageDm.executeMessageCallback();
 					}
 					
 					continue;
@@ -206,7 +184,8 @@ public class DistributeGet {
 											"QueueType: " + queueType 
 											);
 							}
-							removeQueue(queueCacheName, messageDm);
+							messageDm.setResult(false);
+							messageDm.executeMessageCallback();
 							break;
 						}
 					}
@@ -268,9 +247,6 @@ public class DistributeGet {
 					continue;
 				}			
 				
-				messageDm.setObjectFive(updatingCount);
-				messageDm.setObjectFour(executeBlockingQueueBatch);
-				messageDm.setObjectTwo(executeBatchOverflowList);
 				messageDm.setResult(false);
 				messageDm.setBool(queueType);
 				
@@ -287,7 +263,8 @@ public class DistributeGet {
 							));
 				} catch (Exception e) {
 					e.printStackTrace();
-					removeQueue(queueCacheName, messageDm);
+					messageDm.setResult(false);
+					messageDm.executeMessageCallback();
 				} finally {
 					ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
 					ConnectThreadLocalStorage.remove(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode());
@@ -301,101 +278,6 @@ public class DistributeGet {
 						+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
 						);
 			}
-		}
-	}
-	
-	private class DistributeCheckRunnable implements Runnable {
-		
-		@Override
-		public void run() {
-			
-			List<MessageDm> messageDmList = new ArrayList<MessageDm>(distributeConfParam.getExecuteBatchNum());
-			
-			while (true) {
-				while (true) {
-					try {
-						MessageDm messageDm = executeBlockingQueueBatch.poll(distributeConfParam.getExecuteBatchWaitTime(), TimeUnit.MILLISECONDS);
-						if (messageDm != null) {
-							messageDmList.add(messageDm);
-							if (messageDmList.size() == distributeConfParam.getExecuteBatchNum()) {
-								break;
-							}
-						} else {
-							if (messageDmList.size() > 0) {
-								break;
-							} else {
-								if (stopSign && (updatingCount.get() - executeBlockingQueueBatch.size() - executeBatchOverflowList.size()) == 0) {
-									stopCountDownLatch.countDown();
-									if (logger.isDebugEnabled()) {
-										logger.debug("DistributeCheckRunnable -> StopCountDownLatchCount CountDown -> " 
-												+ "StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
-												);
-									}
-									return;
-								}
-							}
-						}
-					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeCheckRunnable -> " 
-									+ "Poll -> " + e);
-						}
-					}
-				}
-				checkUpdateResult(messageDmList);
-				messageDmList.clear();
-			}
-		}
-	}
-	
-	private void checkUpdateResult(List<MessageDm> messageDmList) {
-		for (MessageDm messageDm : messageDmList) {
-			messageDm.setObjectOne(null);
-			messageDm.setObjectTwo(null);
-			updatingCount.decrementAndGet();
-			messageDm.setObjectThree(null);
-			if (messageDm.getResult() == false) {
-				if (logger.isErrorEnabled()) {
-					logger.error("DistributeCheckRunnable -> CheckUpdateResult -> "
-							+ "UUID: " + messageDm.getUuid()
-							+ ", DB: " + messageDm.getDb()
-							+ ", Execute Update -> " + messageDm.getException());
-				}
-				removeQueue("DistributeCheckRunnable -> CheckUpdateResult -> ", messageDm);
-				continue;
-			}
-			
-			if (messageDm.getStatus() == MessageConstant.MESSAGE_STATUS_FINISH) {
-				removeBody("DistributeCheckRunnable -> CheckUpdateResult -> ", messageDm);
-			} else {
-				removeQueue("DistributeCheckRunnable -> CheckUpdateResult -> ", messageDm);
-			}
-		}
-	}
-	
-	private void removeQueue(String queueCacheName, MessageDm messageDm) {
-
-		ConnectCluster queueConnectCluster = queueCacheConnectManager.getConnectCluster("ALL");
-		QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent)queueConnectCluster.getProxy();
-		try {
-			queueCacheConnectAgent.removePop(messageDm);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-		}
-	}
-	
-	private void removeBody(String queueCacheName, MessageDm messageDm) {
-
-		ConnectCluster bodyConnectCluster = bodyCacheConnectManager.getConnectCluster("PARTALL");
-		BodyCacheConnectAgent bodyCacheConnectAgentOne = (BodyCacheConnectAgent) bodyConnectCluster.getProxy();
-		ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
-		try {
-			bodyCacheConnectAgentOne.remove(messageDm);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
 		}
 	}
 	
@@ -419,10 +301,6 @@ public class DistributeGet {
 	
 	public void setQueueCacheConnectManager(ConnectManager queueCacheConnectManager) {
 		this.queueCacheConnectManager = queueCacheConnectManager;
-	}
-	
-	public void setBodyCacheConnectManager(ConnectManager bodyCacheConnectManager) {
-		this.bodyCacheConnectManager = bodyCacheConnectManager;
 	}
 
 	public void setNetConnectManager(ConnectManager netConnectManager) {

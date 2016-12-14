@@ -25,6 +25,10 @@
 	
 	<import resource="classpath:org/fl/noodlenotify/core/distribute/register/noodlenotify-core-distribute-register.xml" />
 	
+	<bean id="setCallbackMethodInterceptor" class="org.fl.noodlenotify.core.distribute.aop.SetCallbackMethodInterceptor">
+		<property name="queueCacheConnectDistinguish" ref="queueCacheConnectDistinguish" />
+		<property name="bodyCacheConnectDistinguish" ref="bodyCacheConnectDistinguish" />
+	</bean>
 	<bean id="setPopMethodInterceptor" class="org.fl.noodlenotify.core.distribute.aop.SetPopMethodInterceptor">
 		<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
 	</bean>
@@ -42,6 +46,7 @@
 				<ref bean="getDbContentMethodInterceptor" />
 				<ref bean="getCacheContentMethodInterceptor" />
 				<ref bean="setPopMethodInterceptor" />
+				<ref bean="setCallbackMethodInterceptor" />
 			</list>
 		</property>
 	</bean>

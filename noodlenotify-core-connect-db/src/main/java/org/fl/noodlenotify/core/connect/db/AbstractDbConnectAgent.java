@@ -177,7 +177,10 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 							}
 						}
 						updateActual(messageDmList);
-						offerExecuteBatchList(messageDmList);
+						//offerExecuteBatchList(messageDmList);
+						for (MessageDm messageDm : messageDmList) {
+							messageDm.executeMessageCallback();
+						}
 						messageDmList.clear();
 					}
 				}
@@ -313,7 +316,6 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 		}*/
 		
 		if (!updateBlockingQueue.offer(messageDm, dbConnectAgentConfParam.getUpdateTimeout(), TimeUnit.MILLISECONDS)) {				
-			offerExecuteBatch(messageDm);
 			throw new ConnectTimeoutException("Db connect agent update timeout");
 		}
 	}
@@ -341,35 +343,6 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 		if (messageDm.getObjectOne() != null) {					
 			CountDownLatch countDownLatch = (CountDownLatch) messageDm.getObjectOne();
 			countDownLatch.countDown();
-		}
-	}
-	
-	private void offerExecuteBatchList(List<MessageDm> messageDmList) {
-		for (MessageDm messageDm : messageDmList) {
-			offerExecuteBatch(messageDm);
-		}
-	}
-	
-	private void offerExecuteBatch(MessageDm messageDm) {
-		@SuppressWarnings("unchecked")
-		BlockingQueue<MessageDm> executeBlockingQueueBatch = (BlockingQueue<MessageDm>) messageDm.getObjectFour();
-		try {
-			while (!executeBlockingQueueBatch.offer(messageDm, 1000, TimeUnit.MILLISECONDS)) {
-				Thread.sleep(executeBlockingQueueBatch.size() > 0 ? executeBlockingQueueBatch.size() : 1000);
-				if (stopSign) {
-					@SuppressWarnings("unchecked")
-					List<MessageDm> executeBatchOverflowList = (List<MessageDm>) messageDm.getObjectTwo();
-					executeBatchOverflowList.add(messageDm);
-					break;
-				}
-			}
-		} catch (InterruptedException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("UpdateRunnable -> OfferExecuteBatchList -> " 
-						+ "Queue: " + messageDm.getQueueName()
-						+ ", UUID: " + messageDm.getUuid()
-						+ ", Offer To ExecuteBlockingQueue -> " + e);
-			}
 		}
 	}
 	

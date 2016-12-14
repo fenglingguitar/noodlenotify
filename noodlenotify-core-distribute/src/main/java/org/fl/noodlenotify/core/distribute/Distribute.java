@@ -216,7 +216,6 @@ public class Distribute {
 							new DistributeGet(
 								queueDistributerVo.getQueue_Nm(),
 								queueCacheConnectManager,
-								bodyCacheConnectManager,
 								netConnectManager,
 								distributeConfParam,
 								queueDistributerVo);
@@ -277,7 +276,6 @@ public class Distribute {
 							distributeGet = new DistributeGet(
 										queueDistributerVo.getQueue_Nm(),
 										queueCacheConnectManager,
-										bodyCacheConnectManager,
 										netConnectManager,
 										distributeConfParam,
 										queueDistributerVo);
