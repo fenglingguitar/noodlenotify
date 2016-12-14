@@ -7,11 +7,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.distributedlock.db.DbDistributedLock;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
+import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.db.mysql.MysqlDbConnectAgent;
@@ -67,44 +68,23 @@ public class DistributePull {
 	
 	public void start() {
 		
-		ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
-		if(connectAgent != null) {
-			
-			DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent.getProxy();
-			
-			try {
-				middleIdFresh.set(dbConnectAgent.maxIdDelay(queueName, System.currentTimeMillis() - queueDistributerVo.getDph_Delay_Time()));
-			} catch (Exception e) {
-				if (logger.isErrorEnabled()) {
-					logger.error("Start -> " + "Queue: " + queueName
-							+ ", DB: " + connectAgent.getConnectId()
-							+ ", Fresh Get Max ID -> " + e);
-				}
-			}
+		ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
+		DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
+		
+		ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
+		try {
+			middleIdFresh.set(dbConnectAgent.maxIdDelay(queueName, System.currentTimeMillis() - queueDistributerVo.getDph_Delay_Time()));
 			
 			stopCountDownLatch = new CountDownLatch(4);
-			if (logger.isDebugEnabled()) {
-				stopCountDownLatchCount = new AtomicInteger(4);
-				logger.debug("Start -> New StopCountDownLatchCount -> " 
-						+ "QueueName: " + queueName 
-						+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.get()
-						);
-			}
 			
 			dbDistributedLock = new DbDistributedLock();
-			dbDistributedLock.setJdbcTemplate(((MysqlDbConnectAgent)connectAgent).getJdbcTemplate());
+			dbDistributedLock.setJdbcTemplate(((MysqlDbConnectAgent)dbConnectManager.getConnectAgent(dbId)).getJdbcTemplate());
 			dbDistributedLock.setLockId(moduleId);
 			dbDistributedLock.setTableName("MSG_" + queueName + "_LK");
 			try {
 				dbDistributedLock.start();
 			} catch (Exception e) {
 				e.printStackTrace();
-			}
-			if (logger.isDebugEnabled()) {
-				logger.debug("UpdateConnectAgent -> Start DB DistributePull Locker -> " 
-						+ "QueueName: " + queueName 
-						+ ", DB: " + dbId 
-						);
 			}
 			
 			Thread distributeSetFreshThread = new Thread(new DistributeSetFreshRunnable());
@@ -122,6 +102,11 @@ public class DistributePull {
 			Thread distributeSetDeleteTimeoutThread = new Thread(new DistributeSetDeleteTimeoutRunnable());
 			distributeSetDeleteTimeoutThread.setPriority(distributeConfParam.getSetThreadPriorityDeleteTimeout());
 			executorService.execute(distributeSetDeleteTimeoutThread);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 		}
 	}
 	
@@ -198,69 +183,40 @@ public class DistributePull {
 					break;
 				}
 				
-				ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
-				if(connectAgent == null) {
-					if (logger.isErrorEnabled()) {
-						logger.error("DistributeSetFreshRunnable -> " 
-								+ "Queue: " + queueName
-								+ ", DB: " + dbId
-								+ ", Get DB ConnectAgent -> NULL");
-					}
-					try {
-						startSleep(1000);
-					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetFreshRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + dbId
-									+ ", Get DB ConnectAgent Sleep -> " + e);
-						}
-					}
-					continue;
-				}
-				
-				DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent.getProxy();
+				ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
+				DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
 				
 				long min = 0;
 				long max = 0;
 				
 				if (isNewLocker) {
+					ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 					try {
 						middleIdFresh.set(dbConnectAgent.maxIdDelay(queueName, System.currentTimeMillis() - queueDistributerVo.getDph_Delay_Time()));
 						notifySleep();
 					} catch (Exception e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetFreshRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
-									+ ", Fresh Get Max ID -> " + e);
-						}
+						e.printStackTrace();
+					} finally {
+						ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 					}
 				}
 				
+				ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 				try {
 					min = middleIdFresh.get() > 0 ? middleIdFresh.get() + 1 : dbConnectAgent.minId(queueName);
 					max = dbConnectAgent.maxIdDelay(queueName, System.currentTimeMillis() - queueDistributerVo.getDph_Delay_Time());
 				} catch (Exception e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("DistributeSetFreshRunnable -> " 
-								+ "Queue: " + queueName
-								+ ", DB: " + connectAgent.getConnectId()
-								+ ", Get Min Adn Max ID -> " + e);
-					}
+					e.printStackTrace();
 					continue;
+				} finally {
+					ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 				}
 				
 				if (max == 0 || min > max) {
 					try {
 						startSleep(distributeConfParam.getSelectMinMaxTimeIntervalFresh());
 					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetFreshRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
-									+ ", (max == 0 || min > max) Select Time Interval -> " + e);
-						}
+						e.printStackTrace();
 					}
 					continue;
 				}
@@ -290,16 +246,14 @@ public class DistributePull {
 						long expect = end - start + 1;
 						if (skipCount > 0) {
 							long completeCount = 0;
+							ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 							try {
 								completeCount = dbConnectAgent.selectCount(queueName, start, end, MessageConstant.MESSAGE_STATUS_NEW);
 							} catch (Exception e) {
-								if (logger.isErrorEnabled()) {
-									logger.error("DistributeSetFreshRunnable -> "
-											+ "Queue: " + queueName 
-											+ ", DB: " + connectAgent.getConnectId()
-											+ ", Select Massage -> " + e);
-								}
+								e.printStackTrace();
 								break;
+							} finally {
+								ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 							}
 							if (completeCount < expect) {
 								if (skipCount <= 20) {
@@ -310,17 +264,17 @@ public class DistributePull {
 								} 
 							}
 						}
+						
+						ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 						try {
 							messageDmList = dbConnectAgent.select(queueName, start, end, MessageConstant.MESSAGE_STATUS_NEW);
 						} catch (Exception e) {
-							if (logger.isErrorEnabled()) {
-								logger.error("DistributeSetFreshRunnable -> "
-										+ "Queue: " + queueName 
-										+ ", DB: " + connectAgent.getConnectId()
-										+ ", Select Massage -> " + e);
-							}
+							e.printStackTrace();
 							break;
+						} finally {
+							ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 						}
+						
 						if (messageDmList.size() < expect) {
 							if (skipCount <= 20) {
 								middleIdFresh.set(min - 1); 
@@ -347,12 +301,7 @@ public class DistributePull {
 							try {
 								countDownLatch.await();
 							} catch (InterruptedException e) {
-								if (logger.isErrorEnabled()) {
-									logger.error("DistributeSetFreshRunnable -> "
-											+ "Queue: " + queueName
-											+ ", DB: " + connectAgent.getConnectId()
-											+ ", Push Massage CountDownLatch Wait -> " + e);
-								}
+								e.printStackTrace();
 							}
 							messageDmList.clear();
 						}
@@ -367,7 +316,7 @@ public class DistributePull {
 				if (logger.isDebugEnabled()) {
 					logger.debug("DistributeSetFreshRunnable -> " 
 							+ "Queue: " + queueName
-							+ ", DB: " + connectAgent.getConnectId()
+							+ ", DB: " + dbId
 							+ ", Get Min Adn Max ID -> "
 							+ "Min: " + logMin
 							+ ", Max: " + logMax
@@ -381,12 +330,7 @@ public class DistributePull {
 					try {
 						startSleep(distributeConfParam.getSelectTimeIntervalFresh());
 					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetFreshRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
-									+ ", Select Time Interval -> " + e);
-						}
+						e.printStackTrace();
 					}
 					continue;
 				}
@@ -395,23 +339,13 @@ public class DistributePull {
 					try {
 						startSleep(distributeConfParam.getSelectLenTimeIntervalFresh());
 					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetFreshRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
-									+ ", Len Select Time Interval -> " + e);
-						}
+						e.printStackTrace();
 					}
 				} else {
 					try {
 						startSleep(distributeConfParam.getSelectTimeIntervalFresh());
 					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetFreshRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
-									+ ", Select Time Interval -> " + e);
-						}
+						e.printStackTrace();
 					}
 				}
 			}
@@ -439,28 +373,8 @@ public class DistributePull {
 					break;
 				}
 				
-				ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
-				if(connectAgent == null) {
-					if (logger.isErrorEnabled()) {
-						logger.error("DistributeSetNewRunnable -> " 
-								+ "Queue: " + queueName
-								+ ", DB: " + dbId
-								+ ", Get DB ConnectAgent -> NULL");
-					}
-					try {
-						startSleep(1000);
-					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetNewRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + dbId
-									+ ", Get DB ConnectAgent Sleep -> " + e);
-						}
-					}
-					continue;
-				}
-				
-				DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent.getProxy();
+				ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
+				DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
 				
 				long min = 0;
 				long max = 0;
@@ -478,29 +392,22 @@ public class DistributePull {
 					}
 				}
 				
+				ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 				try {
 					min = dbConnectAgent.minIdByStatus(queueName, MessageConstant.MESSAGE_STATUS_NEW);
 					max = middleIdFresh.get();
 				} catch (Exception e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("DistributeSetNewRunnable -> " 
-								+ "Queue: " + queueName
-								+ ", DB: " + connectAgent.getConnectId()
-								+ ", Get Min Adn Max ID -> " + e);
-					}
+					e.printStackTrace();
 					continue;
+				} finally {
+					ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 				}
 				
 				if (min == 0 || max == 0 || min > max) {
 					try {
 						startSleep(distributeConfParam.getSelectMinMaxTimeIntervalNew());
 					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetNewRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
-									+ ", (min == 0 || max == 0 || min > max) Select Time Interval -> " + e);
-						}
+						e.printStackTrace();
 					}
 					continue;
 				}
@@ -526,17 +433,16 @@ public class DistributePull {
 					
 					len = queueCacheLen("DistributeSetNewRunnable", queueCacheConnectManager, true);
 					if (len >= 0 && len < distributeConfParam.getQueueCacheCapacityNew()) {
+						ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 						try {
 							messageDmList = dbConnectAgent.select(queueName, start, end, MessageConstant.MESSAGE_STATUS_NEW);
 						} catch (Exception e) {
-							if (logger.isErrorEnabled()) {
-								logger.error("DistributeSetNewRunnable -> "
-										+ "Queue: " + queueName 
-										+ ", DB: " + connectAgent.getConnectId()
-										+ ", Select Massage -> " + e);
-							}
+							e.printStackTrace();
 							break;
+						} finally {
+							ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 						}
+						
 						count += messageDmList.size();
 						countDown.addAndGet(messageDmList.size());
 						if (messageDmList != null && messageDmList.size() > 0) {
@@ -551,12 +457,7 @@ public class DistributePull {
 							try {
 								countDownLatch.await();
 							} catch (InterruptedException e) {
-								if (logger.isErrorEnabled()) {
-									logger.error("DistributeSetNewRunnable -> "
-											+ "Queue: " + queueName
-											+ ", DB: " + connectAgent.getConnectId()
-											+ ", Push Massage CountDownLatch Wait -> " + e);
-								}
+								e.printStackTrace();
 							}
 							messageDmList.clear();
 							isNewEmpty = false;
@@ -571,7 +472,7 @@ public class DistributePull {
 				if (logger.isDebugEnabled()) {
 					logger.debug("DistributeSetNewRunnable -> " 
 							+ "Queue: " + queueName
-							+ ", DB: " + connectAgent.getConnectId()
+							+ ", DB: " + dbId
 							+ ", Get Min Adn Max ID -> "
 							+ "Min: " + logMin
 							+ ", Max: " + logMax
@@ -585,12 +486,7 @@ public class DistributePull {
 					try {
 						startSleep(distributeConfParam.getSelectEmptyTimeIntervalNew());
 					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetNewRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
-									+ ", New Empty -> Select Time Interval -> " + e);
-						}
+						e.printStackTrace();
 					}
 				} else {
 					if (len >= distributeConfParam.getQueueCacheCapacityNew()) {
@@ -600,7 +496,7 @@ public class DistributePull {
 						if (logger.isDebugEnabled()) {
 							logger.debug("DistributeSetNewRunnable -> " 
 									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
+									+ ", DB: " + dbId
 									+ ", Len Sleep -> "
 									+ "SleepTime: " + sleepTime
 									);
@@ -608,12 +504,7 @@ public class DistributePull {
 						try {
 							startSleep(sleepTime);
 						} catch (InterruptedException e) {
-							if (logger.isErrorEnabled()) {
-								logger.error("DistributeSetNewRunnable -> " 
-										+ "Queue: " + queueName
-										+ ", DB: " + connectAgent.getConnectId()
-										+ ", Len Select Time Interval -> " + e);
-							}
+							e.printStackTrace();
 						}
 					} else {
 						long sleepTime = 
@@ -624,7 +515,7 @@ public class DistributePull {
 						if (logger.isDebugEnabled()) {
 							logger.debug("DistributeSetNewRunnable -> " 
 									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
+									+ ", DB: " + dbId
 									+ ", CountDown Sleep -> "
 									+ "SleepTime: " + sleepTime
 									);
@@ -632,12 +523,7 @@ public class DistributePull {
 						try {
 							startSleep(sleepTime);
 						} catch (InterruptedException e) {
-							if (logger.isErrorEnabled()) {
-								logger.error("DistributeSetNewRunnable -> " 
-										+ "Queue: " + queueName
-										+ ", DB: " + connectAgent.getConnectId()
-										+ ", CountDown Select Time Interval -> " + e);
-							}
+							e.printStackTrace();
 						}
 					}
 				}				
@@ -666,28 +552,8 @@ public class DistributePull {
 					break;
 				}
 				
-				ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
-				if(connectAgent == null) {
-					if (logger.isErrorEnabled()) {
-						logger.error("DistributeSetNewRunnable -> " 
-								+ "Queue: " + queueName
-								+ ", DB: " + dbId
-								+ ", Get DB ConnectAgent -> NULL");
-					}
-					try {
-						startSleep(1000);
-					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetNewRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + dbId
-									+ ", Get DB ConnectAgent Sleep -> " + e);
-						}
-					}
-					continue;
-				}
-				
-				DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent.getProxy();
+				ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
+				DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
 				
 				long min = 0;
 				long max = 0;
@@ -705,29 +571,22 @@ public class DistributePull {
 					}
 				}
 				
+				ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 				try {
 					min = dbConnectAgent.minIdByStatus(queueName, MessageConstant.MESSAGE_STATUS_PORTION);
 					max = middleIdFresh.get();
 				} catch (Exception e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("DistributeSetPortionRunnable -> " 
-								+ "Queue: " + queueName
-								+ ", DB: " + connectAgent.getConnectId()
-								+ ", Get Min Adn Max ID -> " + e);
-					}
+					e.printStackTrace();
 					continue;
+				} finally {
+					ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 				}
 				
 				if (min == 0 || max == 0 || min > max) {
 					try {
 						startSleep(distributeConfParam.getSelectMinMaxTimeIntervalPortion());
 					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetPortionRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
-									+ ", (min == 0 || max == 0 || min > max) Select Time Interval -> " + e);
-						}
+						e.printStackTrace();
 					}
 					continue;
 				}
@@ -753,17 +612,16 @@ public class DistributePull {
 					
 					len = queueCacheLen("DistributeSetPortionRunnable", queueCacheConnectManager, false);
 					if (len >= 0 && len < distributeConfParam.getQueueCacheCapacityPortion()) {
+						ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 						try {
 							messageDmList = dbConnectAgent.selectTimeout(queueName, start, end, MessageConstant.MESSAGE_STATUS_PORTION, System.currentTimeMillis() - queueDistributerVo.getInterval_Time());
 						} catch (Exception e) {
-							if (logger.isErrorEnabled()) {
-								logger.error("DistributeSetPortionRunnable -> "
-										+ "Queue: " + queueName 
-										+ ", DB: " + connectAgent.getConnectId()
-										+ ", Select Massage -> " + e);
-							}
+							e.printStackTrace();
 							break;
+						} finally {
+							ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 						}
+						
 						count += messageDmList.size();
 						countDown.addAndGet(messageDmList.size());
 						if (messageDmList != null && messageDmList.size() > 0) {
@@ -778,12 +636,7 @@ public class DistributePull {
 							try {
 								countDownLatch.await();
 							} catch (InterruptedException e) {
-								if (logger.isErrorEnabled()) {
-									logger.error("DistributeSetPortionRunnable -> Portion Massage -> "
-											+ "Queue: " + queueName
-											+ ", DB: " + connectAgent.getConnectId()
-											+ ", Push Massage CountDownLatch Wait -> " + e);
-								}
+								e.printStackTrace();
 							}
 							messageDmList.clear();
 							isPortionEmpty = false;
@@ -798,7 +651,7 @@ public class DistributePull {
 				if (logger.isDebugEnabled()) {
 					logger.debug("DistributeSetPortionRunnable -> " 
 							+ "Queue: " + queueName
-							+ ", DB: " + connectAgent.getConnectId()
+							+ ", DB: " + dbId
 							+ ", Get Min Adn Max ID -> "
 							+ "Min: " + logMin
 							+ ", Max: " + logMax
@@ -812,12 +665,7 @@ public class DistributePull {
 					try {
 						startSleep(distributeConfParam.getSelectEmptyTimeIntervalPortion());
 					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetPortionRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
-									+ ", Portion Empty Select Time Interval -> " + e);
-						}
+						e.printStackTrace();
 					}
 				} else {
 					if (len >= distributeConfParam.getQueueCacheCapacityNew()) {
@@ -827,7 +675,7 @@ public class DistributePull {
 						if (logger.isDebugEnabled()) {
 							logger.debug("DistributeSetPortionRunnable -> " 
 									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
+									+ ", DB: " + dbId
 									+ ", Len Sleep -> "
 									+ "SleepTime: " + sleepTime
 									);
@@ -835,12 +683,7 @@ public class DistributePull {
 						try {
 							startSleep(sleepTime);
 						} catch (InterruptedException e) {
-							if (logger.isErrorEnabled()) {
-								logger.error("DistributeSetPortionRunnable -> " 
-										+ "Queue: " + queueName
-										+ ", DB: " + connectAgent.getConnectId()
-										+ ", Len Select Time Interval -> " + e);
-							}
+							e.printStackTrace();
 						}
 					} else {
 						long timeIntervalMin = distributeConfParam.getSelectCountDownTimeIntervalMinPortion();
@@ -855,7 +698,7 @@ public class DistributePull {
 						if (logger.isDebugEnabled()) {
 							logger.debug("DistributeSetPortionRunnable -> " 
 									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
+									+ ", DB: " + dbId
 									+ ", CountDown Sleep -> "
 									+ "SleepTime: " + sleepTime
 									);
@@ -863,12 +706,7 @@ public class DistributePull {
 						try {
 							startSleep(sleepTime);
 						} catch (InterruptedException e) {
-							if (logger.isErrorEnabled()) {
-								logger.error("DistributeSetPortionRunnable -> " 
-										+ "Queue: " + queueName
-										+ ", DB: " + connectAgent.getConnectId()
-										+ ", CountDown Select Time Interval -> " + e);
-							}
+							e.printStackTrace();
 						}
 					}
 				}				
@@ -897,28 +735,8 @@ public class DistributePull {
 					break;
 				}
 				
-				ConnectAgent connectAgent = dbConnectManager.getConnectAgent(dbId);
-				if(connectAgent == null) {
-					if (logger.isErrorEnabled()) {
-						logger.error("DistributeSetDeleteTimeoutRunnable -> Get DB ConnectAgent -> " 
-								+ "Queue: " + queueName
-								+ ", DB: " + dbId
-								+ ", Exception -> Get DB ConnectAgent Return Null");
-					}
-					try {
-						startSleep(1000);
-					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetNewRunnable -> Get DB ConnectAgent -> StartSleep -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + dbId
-									+ ", Exception -> " + e);
-						}
-					}
-					continue;
-				}
-				
-				DbConnectAgent dbConnectAgent = (DbConnectAgent) connectAgent.getProxy();
+				ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
+				DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
 				
 				long min = 0;
 				long max = 0;
@@ -935,24 +753,22 @@ public class DistributePull {
 						}
 					}
 				}
-
+				
+				ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 				try {
 					min = dbConnectAgent.minIdByStatus(queueName, MessageConstant.MESSAGE_STATUS_FINISH);
 					max = middleIdFresh.get();
 				} catch (Exception e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("DistributeSetDeleteTimeoutRunnable -> Get Min And Max ID -> " 
-								+ "Queue: " + queueName
-								+ ", DB: " + connectAgent.getConnectId()
-								+ ", Exception -> " + e);
-					}
+					e.printStackTrace();
 					continue;
+				} finally {
+					ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 				}
 				
 				if (logger.isDebugEnabled()) {
 					logger.debug("DistributeSetDeleteTimeoutRunnable -> Get Min And Max ID -> " 
 							+ "Queue: " + queueName
-							+ ", DB: " + connectAgent.getConnectId()
+							+ ", DB: " + dbId
 							+ ", Min: " + min
 							+ ", Max: " + max
 							);
@@ -962,12 +778,7 @@ public class DistributePull {
 					try {
 						startSleep(distributeConfParam.getSelectMinMaxTimeIntervalDeleteTimeout());
 					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetDeleteTimeoutRunnable -> (Min == 0 || Max == 0 || Min > Max) -> StartSleep -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + connectAgent.getConnectId()
-									+ ", Exception -> " + e);
-						}
+						e.printStackTrace();
 					}
 					continue;
 				}
@@ -988,16 +799,14 @@ public class DistributePull {
 					
 					List<MessageDm> messageDmList = null;
 					
+					ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 					try {
-						messageDmList = dbConnectAgent.selectTimeout(queueName, start, end, MessageConstant.MESSAGE_STATUS_FINISH, System.currentTimeMillis() - 1);
+						messageDmList = dbConnectAgent.selectTimeout(queueName, start, end, MessageConstant.MESSAGE_STATUS_FINISH, System.currentTimeMillis() - distributeConfParam.getSelectDeleteTimeout());
 					} catch (Exception e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetDeleteTimeoutRunnable -> DB Select Timeout Finish Massage -> "
-									+ "Queue: " + queueName 
-									+ ", DB: " + connectAgent.getConnectId()
-									+ ", Exception -> " + e);
-						}
+						e.printStackTrace();
 						break;
+					} finally {
+						ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 					}
 					
 					logCount += messageDmList.size();
@@ -1020,7 +829,7 @@ public class DistributePull {
 				if (logger.isDebugEnabled()) {
 					logger.debug("DistributeSetDeleteTimeoutRunnable -> Actual Operation Delete -> " 
 							+ "Queue: " + queueName
-							+ ", DB: " + connectAgent.getConnectId()
+							+ ", DB: " + dbId
 							+ ", Min: " + logMin
 							+ ", Max: " + logMax
 							+ ", Region: " + (logMax - logMin + 1)
@@ -1031,12 +840,7 @@ public class DistributePull {
 				try {
 					startSleep(distributeConfParam.getSelectEmptyTimeIntervalDeleteTimeout());
 				} catch (InterruptedException e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("DistributeSetDeleteTimeoutRunnable -> DB Select Timeout Finish Massage -> StartSleep -> " 
-								+ "Queue: " + queueName
-								+ ", DB: " + connectAgent.getConnectId()
-								+ ", Exception -> " + e);
-					}
+					e.printStackTrace();
 				}
 			}
 			
