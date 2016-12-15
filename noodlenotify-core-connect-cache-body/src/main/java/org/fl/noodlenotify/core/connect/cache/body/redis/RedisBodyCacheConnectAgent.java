@@ -5,16 +5,14 @@ import java.util.List;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.exception.ConnectRefusedException;
-import org.fl.noodle.common.connect.exception.ConnectResetException;
 import org.fl.noodlenotify.core.connect.cache.AbstractCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheStatusChecker;
+import org.fl.noodlenotify.core.connect.cache.redis.JedisTemplate;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -24,7 +22,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implements BodyCacheConnectAgent, BodyCacheStatusChecker {
 
-	private final static Logger logger = LoggerFactory.getLogger(RedisBodyCacheConnectAgent.class);
+	//private final static Logger logger = LoggerFactory.getLogger(RedisBodyCacheConnectAgent.class);
 
 	private JedisPool jedisPool;
 	
@@ -54,13 +52,7 @@ public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implem
 			Jedis jedis = jedisPool.getResource();
 			jedisPool.returnResource(jedis);
 		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("ConnectCacheActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Resource -> " + e);
-			}
+			e.printStackTrace();
 			jedisPool.destroy();
 			throw new ConnectRefusedException("Connection refused for create body redis connect agent");
 		} 
@@ -72,13 +64,7 @@ public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implem
 			Jedis jedis = jedisPool.getResource();
 			jedisPool.returnResource(jedis);
 		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("ReconnectCacheActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Resource -> " + e);
-			}
+			e.printStackTrace();
 			throw new ConnectRefusedException("Connection refused for create body redis connect agent");
 		}
 	}
@@ -90,116 +76,63 @@ public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implem
 	
 	@Override
 	protected void setActual(List<MessageDm> messageDmList) {
-		
-		Jedis jedis;
-		
 		try {
-			jedis = getConnect();
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("SetActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Connect -> " + e);
-			}
-			return;
-		}
-		
-		for (MessageDm messageDm : messageDmList) {
-			try {
-				if (messageDm.getContent() != null) {	
-					long dbSize = jedis.dbSize();
-					if (dbSize < bodyCacheConnectAgentConfParam.getCapacity()) {
-						jedis.multi();
-						Transaction transaction = new Transaction(jedis.getClient());
-						transaction.setnx(messageDm.getUuid(), new String(messageDm.getContent()));
-						transaction.expire(messageDm.getUuid(), bodyCacheConnectAgentConfParam.getExpire());
-						transaction.exec();
-					} else {
-						if (logger.isDebugEnabled()) {
-							logger.debug("SetActual -> " 
-									+ "ConnectId: " + connectId
-									+ ", Ip: " + ip
-									+ ", Port: " + port
-									+ ", Capacity: " + bodyCacheConnectAgentConfParam.getCapacity()
-									+ ", DbSize: " + dbSize
-									+ ", Beyond Capacity");
+			JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
+				
+				@Override
+				public Void doOperation(Jedis jedis) throws Exception {
+					
+					for (MessageDm messageDm : messageDmList) {
+						try {
+							if (messageDm.getContent() != null) {
+								long dbSize = jedis.dbSize();
+								if (dbSize < bodyCacheConnectAgentConfParam.getCapacity()) {
+									jedis.multi();
+									Transaction transaction = new Transaction(jedis.getClient());
+									transaction.setnx(messageDm.getUuid(), new String(messageDm.getContent()));
+									transaction.expire(messageDm.getUuid(), bodyCacheConnectAgentConfParam.getExpire());
+									transaction.exec();
+								}
+							}
+						} catch (JedisConnectionException e) {
+							e.printStackTrace();
+							break;
+						} catch (Exception e) {
+							e.printStackTrace();
 						}
-						continue;
 					}
+					return null;
 				}
-			} catch (JedisConnectionException e) {
-				if (logger.isErrorEnabled()) {
-					logger.error("SetActual -> " 
-							+ "ConnectId: " + connectId
-							+ ", Ip: " + ip
-							+ ", Port: " + port
-							+ ", Set -> " + e);
-				}
-				jedisPool.returnBrokenResource(jedis);
-				return;
-			} catch (Exception e) {
-				if (logger.isErrorEnabled()) {
-					logger.error("SetActual -> " 
-							+ "ConnectId: " + connectId
-							+ ", Ip: " + ip
-							+ ", Port: " + port
-							+ ", Message: " + messageDm.getUuid()
-							+ ", Set -> " + e);
-				}
-				continue;
-			} 
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
-		jedisPool.returnResource(jedis);
 	}
 
 	@Override
 	protected void removeActual(List<MessageDm> messageDmList) {
-		
-		Jedis jedis;
-		
 		try {
-			jedis = getConnect();
+			JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
+				
+				@Override
+				public Void doOperation(Jedis jedis) throws Exception {
+					
+					for (MessageDm messageDm : messageDmList) {
+						try {
+							jedis.del(messageDm.getUuid());
+						} catch (JedisConnectionException e) {
+							e.printStackTrace();
+							break;
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+					return null;
+				}
+			});
 		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("RemoveActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Connect -> " + e);
-			}
-			return;
+			e.printStackTrace();
 		}
-		
-		for (MessageDm messageDm : messageDmList) {
-			try {
-				jedis.del(messageDm.getUuid());
-			} catch (JedisConnectionException e) {
-				if (logger.isErrorEnabled()) {
-					logger.error("SetActual -> " 
-							+ "ConnectId: " + connectId
-							+ ", Ip: " + ip
-							+ ", Port: " + port
-							+ ", Set -> " + e);
-				}
-				jedisPool.returnBrokenResource(jedis);
-				return;
-			} catch (Exception e) {
-				if (logger.isErrorEnabled()) {
-					logger.error("RemoveActual -> " 
-							+ "ConnectId: " + connectId
-							+ ", Ip: " + ip
-							+ ", Port: " + port
-							+ ", Message: " + messageDm.getUuid()
-							+ ", Remove -> " + e);
-				}
-				continue;
-			}
-		}
-		
-		jedisPool.returnResource(jedis);
 	}
 	
 	@Override
@@ -210,40 +143,19 @@ public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implem
 	@Override
 	public MessageDm get(MessageDm messageDm) throws Exception {
 		
-		Jedis jedis = getConnect();
-		
-		try {
-			String messageDmContentStr = jedis.get(messageDm.getUuid());
-			if (messageDmContentStr == null) {
-				messageDm.setContent(null);
-			} else {
-				messageDm.setContent(messageDmContentStr.getBytes());
+		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<MessageDm>() {
+			
+			@Override
+			public MessageDm doOperation(Jedis jedis) throws Exception {
+				String messageDmContentStr = jedis.get(messageDm.getUuid());
+				if (messageDmContentStr == null) {
+					messageDm.setContent(null);
+				} else {
+					messageDm.setContent(messageDmContentStr.getBytes());
+				}
+				return messageDm;
 			}
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("SetActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Set -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for body redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Get -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
-		
-		jedisPool.returnResource(jedis);
-		
-		return messageDm;
+		});
 	}
 
 	@Override
@@ -254,88 +166,26 @@ public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implem
 	@Override
 	public void checkHealth() throws Exception {
 		
-		Jedis jedis = getConnect();
-		
-		try {
-			jedis.exists("CheckHealth");
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("SetActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Set -> " + e);
+		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
+			
+			@Override
+			public Void doOperation(Jedis jedis) throws Exception {
+				jedis.exists("CheckHealth");
+				return null;
 			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for body redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("CheckHealth -> " 
-						+ "QueueCache: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get DiffTime -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
-		
-		jedisPool.returnResource(jedis);
+		});
 	}
 	
 	@Override
 	public long checkSize() throws Exception {
 		
-		Jedis jedis = getConnect();
-		
-		long size = 0;
-		
-		try {
-			size = jedis.dbSize();
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("SetActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Set -> " + e);
+		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Long>() {
+			
+			@Override
+			public Long doOperation(Jedis jedis) throws Exception {
+				return jedis.dbSize();
 			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for body redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("CheckHealth -> " 
-						+ "QueueCache: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get DiffTime -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
-		
-		jedisPool.returnResource(jedis);
-		
-		return size;
-	}
-	
-	private Jedis getConnect() throws Exception {
-		
-		Jedis jedis = null;
-		
-		try {
-			jedis = jedisPool.getResource();
-			return jedis;
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("GetConnect -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Connect -> " + e);
-			}
-			throw new ConnectResetException("Connection reset for body redis connect agent");
-		}
+		});
 	}
 	
 	public void setBodyCacheConnectAgentConfParam(
