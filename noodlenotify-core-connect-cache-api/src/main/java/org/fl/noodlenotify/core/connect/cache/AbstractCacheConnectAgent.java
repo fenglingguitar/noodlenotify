@@ -113,7 +113,9 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 							}
 						}
 						setActual(messageDmList);
-						cancelCountDownLatchList(messageDmList);
+						for (MessageDm messageDm : messageDmList) {
+							messageDm.executeMessageCallback();
+						}
 						messageDmList.clear();
 					}
 				}
@@ -179,7 +181,9 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 							}
 						}
 						removeActual(messageDmList);
-						cancelCountDownLatchList(messageDmList);
+						for (MessageDm messageDm : messageDmList) {
+							messageDm.executeMessageCallback();
+						}
 						messageDmList.clear();
 					}
 				}
@@ -235,19 +239,6 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 	
 	private synchronized void notifySleep() {
 		notifyAll();
-	}
-	
-	private void cancelCountDownLatchList(List<MessageDm> messageDmList) {
-		for (MessageDm messageDm : messageDmList) {			
-			cancelCountDownLatch(messageDm);
-		}
-	}
-	
-	private void cancelCountDownLatch(MessageDm messageDm) {
-		if (messageDm.getObjectOne() != null) {					
-			CountDownLatch countDownLatch = (CountDownLatch) messageDm.getObjectOne();
-			countDownLatch.countDown();
-		}
 	}
 	
 	public void setCacheConnectAgentConfParam(

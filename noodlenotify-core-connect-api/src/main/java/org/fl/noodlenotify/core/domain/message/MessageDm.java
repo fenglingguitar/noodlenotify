@@ -25,11 +25,6 @@ public class MessageDm implements Serializable {
 	private long finishTime;
 	private long cacheTimestamp;
 	private long delayTime;
-	private Object objectOne;
-	private Object objectTwo;
-	private Object objectThree;
-	private Object objectFour;
-	private Object objectFive;
 	private boolean bool;
 	
 	private List<MessageCallback> messageCallbackList = new ArrayList<MessageCallback>();
@@ -181,46 +176,6 @@ public class MessageDm implements Serializable {
 
 	public void setDelayTime(long delayTime) {
 		this.delayTime = delayTime;
-	}
-
-	public Object getObjectOne() {
-		return objectOne;
-	}
-
-	public void setObjectOne(Object objectOne) {
-		this.objectOne = objectOne;
-	}
-
-	public Object getObjectTwo() {
-		return objectTwo;
-	}
-
-	public void setObjectTwo(Object objectTwo) {
-		this.objectTwo = objectTwo;
-	}
-
-	public Object getObjectThree() {
-		return objectThree;
-	}
-
-	public void setObjectThree(Object objectThree) {
-		this.objectThree = objectThree;
-	}
-
-	public Object getObjectFour() {
-		return objectFour;
-	}
-
-	public void setObjectFour(Object objectFour) {
-		this.objectFour = objectFour;
-	}
-
-	public Object getObjectFive() {
-		return objectFive;
-	}
-
-	public void setObjectFive(Object objectFive) {
-		this.objectFive = objectFive;
 	}
 
 	public boolean getBool() {
