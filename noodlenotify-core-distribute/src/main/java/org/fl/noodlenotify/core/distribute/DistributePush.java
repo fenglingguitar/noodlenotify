@@ -2,7 +2,6 @@ package org.fl.noodlenotify.core.distribute;
 
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -18,12 +17,10 @@ import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DistributePush {
 	
-	private final static Logger logger = LoggerFactory.getLogger(DistributePush.class);
+	//private final static Logger logger = LoggerFactory.getLogger(DistributePush.class);
 
 	private String queueName;
 	
@@ -31,6 +28,7 @@ public class DistributePush {
 	private ConnectManager netConnectManager;
 		
 	private DistributeConfParam distributeConfParam;
+	private QueueDistributerVo queueDistributerVo;
 	
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	
@@ -39,10 +37,7 @@ public class DistributePush {
 	
 	private volatile boolean stopSign = false;
 	
-	private CountDownLatch stopCountDownLatch;
-	private AtomicInteger  stopCountDownLatchCount;
-	
-	private QueueDistributerVo queueDistributerVo;
+	private AtomicInteger  stopCount;
 	
 	public DistributePush(String queueName,
 							ConnectManager queueCacheConnectManager,
@@ -64,29 +59,22 @@ public class DistributePush {
 		int allThreadCount = queueDistributerVo.getNew_Pop_ThreadNum() +
 							queueDistributerVo.getNew_Exe_ThreadNum() +
 							queueDistributerVo.getPortion_Pop_ThreadNum() +
-							queueDistributerVo.getPortion_Exe_ThreadNum() + 
-							1;
-		stopCountDownLatch = new CountDownLatch(allThreadCount);
-		if (logger.isDebugEnabled()) {
-			stopCountDownLatchCount = new AtomicInteger(allThreadCount);
-			logger.debug("Start -> New StopCountDownLatchCount -> " 
-					+ "QueueName: " + queueName 
-					+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.get()
-					);
-		}
+							queueDistributerVo.getPortion_Exe_ThreadNum();
+		
+		stopCount = new AtomicInteger(allThreadCount);
 		
 		for (int i=0; i<queueDistributerVo.getNew_Pop_ThreadNum(); i++) {
-			executorService.execute(new DistributeGetRunnable("New DistributeGetRunnablePop", executeBlockingQueueNew, true));
+			executorService.execute(new DistributeGetRunnable(executeBlockingQueueNew, true));
 		}
 		for (int i=0; i<queueDistributerVo.getNew_Exe_ThreadNum(); i++) {
-			executorService.execute(new DistributeExecuteRunnable("New DistributeGetRunnableExe", executeBlockingQueueNew, true));
+			executorService.execute(new DistributeExecuteRunnable(executeBlockingQueueNew, true));
 		}
 		
 		for (int i=0; i<queueDistributerVo.getPortion_Pop_ThreadNum(); i++) {
-			executorService.execute(new DistributeGetRunnable("Portion DistributeGetRunnablePop", executeBlockingQueuePortion, false));
+			executorService.execute(new DistributeGetRunnable(executeBlockingQueuePortion, false));
 		}
 		for (int i=0; i<queueDistributerVo.getPortion_Exe_ThreadNum(); i++) {
-			executorService.execute(new DistributeExecuteRunnable("Portion DistributeGetRunnableExe", executeBlockingQueuePortion, false));
+			executorService.execute(new DistributeExecuteRunnable(executeBlockingQueuePortion, false));
 		}
 	}
 	
@@ -94,36 +82,24 @@ public class DistributePush {
 		
 		stopSign = true;
 		
-		notifySleep();
-		
-		try {
-			stopCountDownLatch.await();
-		} catch (InterruptedException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Destroy -> "
-						+ "Queue: " + queueName 
-						+ ", StopCountDownLatch Await -> " + e);
-			}
-		}
-		
 		executorService.shutdown();
-		
-		int allMessageDmCount = executeBlockingQueueNew.size() + executeBlockingQueuePortion.size();
-		if (logger.isDebugEnabled()) {
-			logger.debug("Destroy -> Clean ExecuteBlockingQueue -> " + 
-						"AllMessageDmCount: " + allMessageDmCount +
-						", ExecuteBlockingQueueNew: " + executeBlockingQueueNew.size() +
-						", ExecuteBlockingQueuePortion: " + executeBlockingQueuePortion.size()
-						);
+		try {
+			if(!executorService.awaitTermination(60000, TimeUnit.MILLISECONDS)) {
+				
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		if (allMessageDmCount > 0) {
+		
+		if (executeBlockingQueueNew.size() > 0) {
 			Iterator<MessageDm> messageDmItNew = executeBlockingQueueNew.iterator();
 			while (messageDmItNew.hasNext()) {
 				MessageDm messageDmNext = messageDmItNew.next();
 				messageDmNext.setResult(false);
 				messageDmNext.executeMessageCallback();
 			}
-			
+		}
+		if (executeBlockingQueuePortion.size() > 0) {	
 			Iterator<MessageDm> messageDmItPortion = executeBlockingQueuePortion.iterator();
 			while (messageDmItPortion.hasNext()) {
 				MessageDm messageDmNext = messageDmItPortion.next();
@@ -135,14 +111,10 @@ public class DistributePush {
 	
 	private class DistributeGetRunnable implements Runnable {
 		
-		private String queueCacheName;
 		private BlockingQueue<MessageDm> executeBlockingQueue;
 		private boolean queueType;
 		
-		public DistributeGetRunnable(String queueCacheName,
-				BlockingQueue<MessageDm> executeBlockingQueue,
-				boolean queueType) {
-			this.queueCacheName = queueCacheName;
+		public DistributeGetRunnable(BlockingQueue<MessageDm> executeBlockingQueue, boolean queueType) {
 			this.executeBlockingQueue = executeBlockingQueue;
 			this.queueType = queueType;
 		}
@@ -153,6 +125,7 @@ public class DistributePush {
 			while (true) {
 				
 				if (stopSign) {
+					stopCount.decrementAndGet();
 					break;
 				}
 				
@@ -163,11 +136,6 @@ public class DistributePush {
 					messageDm = queueCacheConnectAgent.pop(queueName, queueType);
 				} catch (Exception e) {
 					e.printStackTrace();
-					if (messageDm != null) {
-						messageDm.setResult(false);
-						messageDm.executeMessageCallback();
-					}
-					
 					continue;
 				}
 				
@@ -176,49 +144,25 @@ public class DistributePush {
 				}
 				
 				try {
-					while (!executeBlockingQueue.offer(messageDm, 1000, TimeUnit.MILLISECONDS)) {
-						startSleep(Math.round(distributeConfParam.getExecuteOfferTimeoutWait() * executeBlockingQueue.size()));
-						if (stopSign) {
-							if (logger.isDebugEnabled()) {
-								logger.debug("Runnable -> " + queueCacheName + " -> Clean ExecuteBlockingQueue Offer -> " + 
-											"QueueType: " + queueType 
-											);
-							}
-							messageDm.setResult(false);
-							messageDm.executeMessageCallback();
-							break;
-						}
+					if (!executeBlockingQueue.offer(messageDm, 60000, TimeUnit.MILLISECONDS)) {
+						messageDm.setResult(false);
+						messageDm.executeMessageCallback();
 					}
 				} catch (InterruptedException e) {
-					if (logger.isErrorEnabled()) {
-						logger.error(queueCacheName + " -> " 
-								+ "Queue: " + queueName
-								+ ", UUID: " + messageDm.getUuid()
-								+ ", Offer To ExecuteBlockingQueue -> " + e);
-					}
+					messageDm.setResult(false);
+					messageDm.executeMessageCallback();
+					e.printStackTrace();
 				}
-			}
-			
-			stopCountDownLatch.countDown();
-			if (logger.isDebugEnabled()) {
-				logger.debug(queueCacheName + " -> StopCountDownLatchCount CountDown -> "
-						+ "QueueName: " + queueName 
-						+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
-						);
 			}
 		}
 	}
 	
 	private class DistributeExecuteRunnable implements Runnable {
 		
-		private String queueCacheName;
 		private BlockingQueue<MessageDm> executeBlockingQueue;
 		private boolean queueType;
 		
-		public DistributeExecuteRunnable(String queueCacheName,
-				BlockingQueue<MessageDm> executeBlockingQueue,
-				boolean queueType) {
-			this.queueCacheName = queueCacheName;
+		public DistributeExecuteRunnable(BlockingQueue<MessageDm> executeBlockingQueue, boolean queueType) {
 			this.executeBlockingQueue = executeBlockingQueue;
 			this.queueType = queueType;
 		}
@@ -229,6 +173,7 @@ public class DistributePush {
 			while (true) {
 				
 				if (stopSign) {
+					stopCount.decrementAndGet();
 					break;
 				}			
 				
@@ -236,11 +181,7 @@ public class DistributePush {
 				try {
 					messageDm = executeBlockingQueue.poll(1000, TimeUnit.MILLISECONDS);
 				} catch (InterruptedException e) {
-					if (logger.isErrorEnabled()) {
-						logger.error(queueCacheName + " -> "
-								+ "Queue: " + queueName
-								+ ", Poll From ExecuteBlockingQueue -> " + e);
-					}
+					e.printStackTrace();
 					continue;
 				}
 				if (messageDm == null) {
@@ -270,29 +211,7 @@ public class DistributePush {
 					ConnectThreadLocalStorage.remove(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode());
 				}
 			}
-			
-			stopCountDownLatch.countDown();
-			if (logger.isDebugEnabled()) {
-				logger.debug(queueCacheName + " -> StopCountDownLatchCount CountDown -> " 
-						+ "QueueName: " + queueName 
-						+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
-						);
-			}
 		}
-	}
-	
-	private synchronized void startSleep(long suspendTime) throws InterruptedException {
-		if (!stopSign && suspendTime > 0) {
-			wait(suspendTime);
-		}
-	}
-	
-	private synchronized void notifySleep() {
-		notifyAll();
-	}
-	
-	public String getQueueName() {
-		return queueName;
 	}
 
 	public void setQueueName(String queueName) {

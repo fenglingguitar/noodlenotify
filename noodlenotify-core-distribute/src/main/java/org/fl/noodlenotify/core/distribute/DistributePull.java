@@ -1,9 +1,9 @@
 package org.fl.noodlenotify.core.distribute;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -19,13 +19,11 @@ import org.fl.noodlenotify.core.connect.db.mysql.MysqlDbConnectAgent;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.distribute.callback.RemovePopMessageCallback;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class DistributePull {
 	
-	private final static Logger logger = LoggerFactory.getLogger(DistributePull.class);
+	//private final static Logger logger = LoggerFactory.getLogger(DistributePull.class);
 
 	private String queueName;
 	
@@ -41,8 +39,7 @@ public class DistributePull {
 	
 	private volatile boolean stopSign = false;
 	
-	private CountDownLatch stopCountDownLatch;
-	private AtomicInteger  stopCountDownLatchCount;
+	private AtomicInteger  stopCount;
 	
 	private AtomicLong middleIdFresh = new AtomicLong(0);
 	
@@ -75,8 +72,6 @@ public class DistributePull {
 		try {
 			middleIdFresh.set(dbConnectAgent.maxIdDelay(queueName, System.currentTimeMillis() - queueDistributerVo.getDph_Delay_Time()));
 			
-			stopCountDownLatch = new CountDownLatch(4);
-			
 			dbDistributedLock = new DbDistributedLock();
 			dbDistributedLock.setJdbcTemplate(((MysqlDbConnectAgent)dbConnectManager.getConnectAgent(dbId)).getJdbcTemplate());
 			dbDistributedLock.setLockId(moduleId);
@@ -86,6 +81,8 @@ public class DistributePull {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
+			stopCount = new AtomicInteger(4);
 			
 			Thread distributeSetFreshThread = new Thread(new DistributeSetFreshRunnable());
 			distributeSetFreshThread.setPriority(distributeConfParam.getSetThreadPriorityFresh());
@@ -118,52 +115,30 @@ public class DistributePull {
 			
 			if (dbDistributedLock != null) {
 				dbDistributedLock.destroy();
-				if (logger.isDebugEnabled()) {
-					logger.debug("UpdateConnectAgent -> Destroy DB DistributePull Locker -> " 
-							+ "QueueName: " + queueName 
-							+ ", DB: " + dbId 
-							);
-				}
 			}
 			
-			notifySleep();
-			
-			if (stopCountDownLatch != null) {
-				try {
-					stopCountDownLatch.await();
-				} catch (InterruptedException e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("Destroy -> "
-								+ "Queue: " + queueName 
-								+ ", CountDownLatch Await -> " + e);
-					}
+			executorService.shutdown();
+			try {
+				if(!executorService.awaitTermination(60000, TimeUnit.MILLISECONDS)) {
+					
 				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 			
 		} else {
 			
-			notifySleep();
-			
-			if (stopCountDownLatch != null) {
-				try {
-					stopCountDownLatch.await();
-				} catch (InterruptedException e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("Destroy -> "
-								+ "Queue: " + queueName 
-								+ ", CountDownLatch Await -> " + e);
-					}
+			executorService.shutdown();
+			try {
+				if(!executorService.awaitTermination(60000, TimeUnit.MILLISECONDS)) {
+					
 				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 			
 			if (dbDistributedLock != null) {
 				dbDistributedLock.destroy();
-				if (logger.isDebugEnabled()) {
-					logger.debug("UpdateConnectAgent -> Destroy DB DistributePull Locker -> " 
-							+ "QueueName: " + queueName 
-							+ ", DB: " + dbId 
-							);
-				}
 			}
 		}
 	}
@@ -180,6 +155,7 @@ public class DistributePull {
 				boolean isNewLocker = dbDistributedLock.waitLocker();
 				
 				if (stopSign) {
+					stopCount.decrementAndGet();
 					break;
 				}
 				
@@ -193,7 +169,7 @@ public class DistributePull {
 					ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 					try {
 						middleIdFresh.set(dbConnectAgent.maxIdDelay(queueName, System.currentTimeMillis() - queueDistributerVo.getDph_Delay_Time()));
-						notifySleep();
+						//notifySleep();
 					} catch (Exception e) {
 						e.printStackTrace();
 					} finally {
@@ -214,7 +190,7 @@ public class DistributePull {
 				
 				if (max == 0 || min > max) {
 					try {
-						startSleep(distributeConfParam.getSelectMinMaxTimeIntervalFresh());
+						Thread.sleep(distributeConfParam.getSelectMinMaxTimeIntervalFresh());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -222,10 +198,10 @@ public class DistributePull {
 				}
 				
 				long len = 0;
-				long count = 0;
+				//long count = 0;
 				AtomicLong countDown = new AtomicLong(0);
-				long logMin = min;
-				long logMax = max;
+				//long logMin = min;
+				//long logMax = max;
 				
 				boolean skip = false;
 				
@@ -287,7 +263,7 @@ public class DistributePull {
 						} else {
 							skipCount = 0;
 						}
-						count += messageDmList.size();
+						//count += messageDmList.size();
 						countDown.addAndGet(messageDmList.size());
 						if (messageDmList != null && messageDmList.size() > 0) {
 							for (MessageDm messageDm : messageDmList) {
@@ -310,24 +286,11 @@ public class DistributePull {
 					}
 					
 					min += distributeConfParam.getSelectByIdIntervalFresh() + 1;					
-				} 
-				
-				if (logger.isDebugEnabled()) {
-					logger.debug("DistributeSetFreshRunnable -> " 
-							+ "Queue: " + queueName
-							+ ", DB: " + dbId
-							+ ", Get Min Adn Max ID -> "
-							+ "Min: " + logMin
-							+ ", Max: " + logMax
-							+ ", Region: " + (logMax - logMin + 1)
-							+ ", Count: " + count
-							+ ", CountDown Subtract: " + (count - countDown.get())
-							);
 				}
 				
 				if(skip == true) {
 					try {
-						startSleep(distributeConfParam.getSelectTimeIntervalFresh());
+						Thread.sleep(distributeConfParam.getSelectTimeIntervalFresh());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -336,25 +299,17 @@ public class DistributePull {
 				
 				if (len >= distributeConfParam.getQueueCacheCapacityNew()) {
 					try {
-						startSleep(distributeConfParam.getSelectLenTimeIntervalFresh());
+						Thread.sleep(distributeConfParam.getSelectLenTimeIntervalFresh());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				} else {
 					try {
-						startSleep(distributeConfParam.getSelectTimeIntervalFresh());
+						Thread.sleep(distributeConfParam.getSelectTimeIntervalFresh());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				}
-			}
-			
-			stopCountDownLatch.countDown();
-			if (logger.isDebugEnabled()) {
-				logger.debug("DistributeSetFreshRunnable -> StopCountDownLatchCount CountDown -> "
-						+ "QueueName: " + queueName 
-						+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
-						);
 			}
 		}
 	}
@@ -369,6 +324,7 @@ public class DistributePull {
 				boolean isNewLocker = dbDistributedLock.waitLocker();
 				
 				if (stopSign) {
+					stopCount.decrementAndGet();
 					break;
 				}
 				
@@ -380,14 +336,9 @@ public class DistributePull {
 				
 				if (isNewLocker) {
 					try {
-						startSleep(30000);
+						Thread.sleep(30000);
 					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetNewRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + dbId
-									+ ", IsNewLocker Sleep -> " + e);
-						}
+						e.printStackTrace();
 					}
 				}
 				
@@ -404,7 +355,7 @@ public class DistributePull {
 				
 				if (min == 0 || max == 0 || min > max) {
 					try {
-						startSleep(distributeConfParam.getSelectMinMaxTimeIntervalNew());
+						Thread.sleep(distributeConfParam.getSelectMinMaxTimeIntervalNew());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -415,8 +366,8 @@ public class DistributePull {
 				long len = 0;
 				long count = 0;
 				AtomicLong countDown = new AtomicLong(0);
-				long logMin = min;
-				long logMax = max;
+				//long logMin = min;
+				//long logMax = max;
 				
 				while (min <= max) {
 					
@@ -467,22 +418,9 @@ public class DistributePull {
 					min += distributeConfParam.getSelectByIdIntervalNew() + 1;
 				}
 				
-				if (logger.isDebugEnabled()) {
-					logger.debug("DistributeSetNewRunnable -> " 
-							+ "Queue: " + queueName
-							+ ", DB: " + dbId
-							+ ", Get Min Adn Max ID -> "
-							+ "Min: " + logMin
-							+ ", Max: " + logMax
-							+ ", Region: " + (logMax - logMin + 1)
-							+ ", Count: " + count
-							+ ", CountDown Subtract: " + (count - countDown.get())
-							);
-				}
-				
 				if (isNewEmpty) {
 					try {
-						startSleep(distributeConfParam.getSelectEmptyTimeIntervalNew());
+						Thread.sleep(distributeConfParam.getSelectEmptyTimeIntervalNew());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -490,17 +428,9 @@ public class DistributePull {
 					if (len >= distributeConfParam.getQueueCacheCapacityNew()) {
 						long sleepTime = 
 								distributeConfParam.getSelectLenTimeIntervalNew()
-									+ Math.round(1.0f * countDown.get() * 1000 / distributeConfParam.getSelectLenTimeIntervalRatioNew());
-						if (logger.isDebugEnabled()) {
-							logger.debug("DistributeSetNewRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + dbId
-									+ ", Len Sleep -> "
-									+ "SleepTime: " + sleepTime
-									);
-						}		
+									+ Math.round(1.0f * countDown.get() * 1000 / distributeConfParam.getSelectLenTimeIntervalRatioNew());	
 						try {
-							startSleep(sleepTime);
+							Thread.sleep(sleepTime);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
@@ -510,29 +440,13 @@ public class DistributePull {
 										(Math.round(1.0f * countDown.get() * 1000 / distributeConfParam.getSelectCountDownTimeIntervalRatioNew()) 
 											+ distributeConfParam.getSelectCountDownTimeIntervalNew()))
 												+ distributeConfParam.getSelectCountDownTimeIntervalMinNew();
-						if (logger.isDebugEnabled()) {
-							logger.debug("DistributeSetNewRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + dbId
-									+ ", CountDown Sleep -> "
-									+ "SleepTime: " + sleepTime
-									);
-						}
 						try {
-							startSleep(sleepTime);
+							Thread.sleep(sleepTime);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					}
 				}				
-			}
-			
-			stopCountDownLatch.countDown();
-			if (logger.isDebugEnabled()) {
-				logger.debug("DistributeSetNewRunnable -> StopCountDownLatchCount CountDown -> "
-						+ "QueueName: " + queueName 
-						+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
-						);
 			}
 		}
 	}
@@ -547,6 +461,7 @@ public class DistributePull {
 				boolean isNewLocker = dbDistributedLock.waitLocker();
 				
 				if (stopSign) {
+					stopCount.decrementAndGet();
 					break;
 				}
 				
@@ -558,14 +473,9 @@ public class DistributePull {
 				
 				if (isNewLocker) {
 					try {
-						startSleep(30000);
+						Thread.sleep(30000);
 					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetNewRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + dbId
-									+ ", IsNewLocker Sleep -> " + e);
-						}
+						e.printStackTrace();
 					}
 				}
 				
@@ -582,7 +492,7 @@ public class DistributePull {
 				
 				if (min == 0 || max == 0 || min > max) {
 					try {
-						startSleep(distributeConfParam.getSelectMinMaxTimeIntervalPortion());
+						Thread.sleep(distributeConfParam.getSelectMinMaxTimeIntervalPortion());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -593,8 +503,8 @@ public class DistributePull {
 				long len = 0;
 				long count = 0;
 				AtomicLong countDown = new AtomicLong(0);
-				long logMin = min;
-				long logMax = max;
+				//long logMin = min;
+				//long logMax = max;
 				
 				while (min <= max) {
 					
@@ -645,22 +555,9 @@ public class DistributePull {
 					min += distributeConfParam.getSelectByIdIntervalPortion() + 1;					
 				}
 				
-				if (logger.isDebugEnabled()) {
-					logger.debug("DistributeSetPortionRunnable -> " 
-							+ "Queue: " + queueName
-							+ ", DB: " + dbId
-							+ ", Get Min Adn Max ID -> "
-							+ "Min: " + logMin
-							+ ", Max: " + logMax
-							+ ", Region: " + (logMax - logMin + 1)
-							+ ", Count: " + count
-							+ ", CountDown Subtract: " + (count - countDown.get())
-							);
-				}
-				
 				if (isPortionEmpty) {
 					try {
-						startSleep(distributeConfParam.getSelectEmptyTimeIntervalPortion());
+						Thread.sleep(distributeConfParam.getSelectEmptyTimeIntervalPortion());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -668,17 +565,9 @@ public class DistributePull {
 					if (len >= distributeConfParam.getQueueCacheCapacityNew()) {
 						long sleepTime = 
 								distributeConfParam.getSelectLenTimeIntervalPortion()
-									+ Math.round(1.0f * countDown.get() * 1000 / distributeConfParam.getSelectLenTimeIntervalRatioPortion());
-						if (logger.isDebugEnabled()) {
-							logger.debug("DistributeSetPortionRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + dbId
-									+ ", Len Sleep -> "
-									+ "SleepTime: " + sleepTime
-									);
-						}		
+									+ Math.round(1.0f * countDown.get() * 1000 / distributeConfParam.getSelectLenTimeIntervalRatioPortion());	
 						try {
-							startSleep(sleepTime);
+							Thread.sleep(sleepTime);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
@@ -692,29 +581,13 @@ public class DistributePull {
 										(Math.round(1.0f * countDown.get() * 1000 / distributeConfParam.getSelectCountDownTimeIntervalRatioPortion()) 
 											+ distributeConfParam.getSelectCountDownTimeIntervalPortion()))
 												+ timeIntervalMin;
-						if (logger.isDebugEnabled()) {
-							logger.debug("DistributeSetPortionRunnable -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + dbId
-									+ ", CountDown Sleep -> "
-									+ "SleepTime: " + sleepTime
-									);
-						}
 						try {
-							startSleep(sleepTime);
+							Thread.sleep(sleepTime);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					}
 				}				
-			}
-			
-			stopCountDownLatch.countDown();
-			if (logger.isDebugEnabled()) {
-				logger.debug("DistributeSetPortionRunnable -> StopCountDownLatchCount CountDown -> "
-						+ "QueueName: " + queueName 
-						+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
-						);
 			}
 		}
 	}
@@ -729,6 +602,7 @@ public class DistributePull {
 				boolean isNewLocker = dbDistributedLock.waitLocker();
 				
 				if (stopSign) {
+					stopCount.decrementAndGet();
 					break;
 				}
 				
@@ -740,14 +614,9 @@ public class DistributePull {
 				
 				if (isNewLocker) {
 					try {
-						startSleep(30000);
+						Thread.sleep(30000);
 					} catch (InterruptedException e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("DistributeSetNewRunnable -> IsNewLocker -> StartSleep -> " 
-									+ "Queue: " + queueName
-									+ ", DB: " + dbId
-									+ ", Exception -> " + e);
-						}
+						e.printStackTrace();
 					}
 				}
 				
@@ -762,27 +631,18 @@ public class DistributePull {
 					ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 				}
 				
-				if (logger.isDebugEnabled()) {
-					logger.debug("DistributeSetDeleteTimeoutRunnable -> Get Min And Max ID -> " 
-							+ "Queue: " + queueName
-							+ ", DB: " + dbId
-							+ ", Min: " + min
-							+ ", Max: " + max
-							);
-				}
-				
 				if (min == 0 || max == 0 || min > max) {
 					try {
-						startSleep(distributeConfParam.getSelectMinMaxTimeIntervalDeleteTimeout());
+						Thread.sleep(distributeConfParam.getSelectMinMaxTimeIntervalDeleteTimeout());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 					continue;
 				}
 				
-				long logCount = 0;
-				long logMin = min;
-				long logMax = max;
+				//long logCount = 0;
+				//long logMin = min;
+				//long logMax = max;
 				
 				while (min <= max) {
 					
@@ -806,7 +666,7 @@ public class DistributePull {
 						ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 					}
 					
-					logCount += messageDmList.size();
+					//logCount += messageDmList.size();
 					
 					if (messageDmList != null && messageDmList.size() > 0) {
 						for (MessageDm messageDm : messageDmList) {
@@ -826,30 +686,11 @@ public class DistributePull {
 					min += distributeConfParam.getSelectByIdIntervalDeleteTimeout() + 1;
 				}
 				
-				if (logger.isDebugEnabled()) {
-					logger.debug("DistributeSetDeleteTimeoutRunnable -> Actual Operation Delete -> " 
-							+ "Queue: " + queueName
-							+ ", DB: " + dbId
-							+ ", Min: " + logMin
-							+ ", Max: " + logMax
-							+ ", Region: " + (logMax - logMin + 1)
-							+ ", Count: " + logCount
-							);
-				}
-				
 				try {
-					startSleep(distributeConfParam.getSelectEmptyTimeIntervalDeleteTimeout());
+					Thread.sleep(distributeConfParam.getSelectEmptyTimeIntervalDeleteTimeout());
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			}
-			
-			stopCountDownLatch.countDown();
-			if (logger.isDebugEnabled()) {
-				logger.debug("DistributePull -> DistributeSetDeleteTimeoutRunnable -> StopCountDownLatchCount CountDown -> "
-						+ "QueueName: " + queueName 
-						+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
-						);
 			}
 		}
 	}
@@ -865,16 +706,6 @@ public class DistributePull {
 			e.printStackTrace();
 		}
 		return len;
-	}
-	
-	private synchronized void startSleep(long suspendTime) throws InterruptedException {
-		if (!stopSign && suspendTime > 0) {
-			wait(suspendTime);
-		}
-	}
-	
-	private synchronized void notifySleep() {
-		notifyAll();
 	}
 	
 	public void setQueueName(String queueName) {

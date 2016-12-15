@@ -43,6 +43,8 @@ public class GetDbContentMethodInterceptor implements MethodInterceptor {
 						messageDm.setContent(messageDmTemp.getContent());
 					} catch (Exception e) {
 						e.printStackTrace();
+						messageDm.setResult(false);
+						messageDm.executeMessageCallback();
 						throw e;
 					} finally {
 						ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
