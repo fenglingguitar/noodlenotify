@@ -3,25 +3,21 @@ package org.fl.noodlenotify.core.connect.cache.queue.redis;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.exception.ConnectRefusedException;
-import org.fl.noodle.common.connect.exception.ConnectResetException;
 import org.fl.noodle.common.util.json.JsonTranslator;
 import org.fl.noodlenotify.core.connect.cache.AbstractCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam;
+import org.fl.noodlenotify.core.connect.cache.CachePostfix;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheStatusChecker;
+import org.fl.noodlenotify.core.connect.cache.redis.JedisTemplate;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.fl.noodlenotify.core.domain.message.MessageQueueDm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -30,19 +26,8 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent implements QueueCacheConnectAgent, QueueCacheStatusChecker {
 
-	private final static Logger logger = LoggerFactory.getLogger(RedisQueueCacheConnectAgent.class);
+	//private final static Logger logger = LoggerFactory.getLogger(RedisQueueCacheConnectAgent.class);
 	
-	private String queuePostfix = "-Queue";
-	
-	private String hashPostfix = queuePostfix + "-Hash";
-	
-	private String typeNewPostfix = "-New";
-	private String typePortionPostfix = "-Portion";
-	
-	private final String activePostfix = "-IsActive";
-	
-	private final String diffTimeFullName = "DiffTime";
-	private final String lockerPostfix = "-Locker";
 	private final int lockerOvertime = 5;
 	
 	private JedisPool jedisPool;
@@ -50,13 +35,6 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	private QueueCacheConnectAgentConfParam queueCacheConnectAgentConfParam;
 	
 	private ConcurrentMap<String, Boolean> queueIsActiveMap = new ConcurrentHashMap<String, Boolean>();
-	
-	private ConcurrentMap<String, String> queueNewFullMap = new ConcurrentHashMap<String, String>();
-	private ConcurrentMap<String, String> hashNewFullMap = new ConcurrentHashMap<String, String>();
-	private ConcurrentMap<String, String> queuePortionFullMap = new ConcurrentHashMap<String, String>();
-	private ConcurrentMap<String, String> hashPortionFullMap = new ConcurrentHashMap<String, String>();
-	private ConcurrentMap<String, String> activeFullMap = new ConcurrentHashMap<String, String>();
-	private ConcurrentMap<String, String> lockerFullMap = new ConcurrentHashMap<String, String>();
 
 	public RedisQueueCacheConnectAgent(
 			long connectId, String ip, int port, String url, 
@@ -82,13 +60,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 			Jedis jedis = jedisPool.getResource();
 			jedisPool.returnResource(jedis);
 		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("ConnectCacheActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Resource -> " + e);
-			}
+			e.printStackTrace();
 			jedisPool.destroy();
 			throw new ConnectRefusedException("Connection refused for queue redis connect agent");
 		}
@@ -100,13 +72,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 			Jedis jedis = jedisPool.getResource();
 			jedisPool.returnResource(jedis);
 		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("ReconnectCacheActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Resource -> " + e);
-			}
+			e.printStackTrace();
 			throw new ConnectRefusedException("Connection refused for queue redis connect agent");
 		}
 	}
@@ -117,66 +83,42 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 	
 	protected void setActual(List<MessageDm> messageDmList) {
+	}
+	
+	@Override
+	protected void removeActual(List<MessageDm> messageDmList) {
+	}
+	
+	@Override
+	public boolean push(MessageDm messageDm) throws Exception {
 		
-		MessageQueueDm messageQueueDm = new MessageQueueDm();
-		
-		Jedis jedis;
-		
-		try {
-			jedis = getConnect();
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("SetActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Connect -> " + e);
-			}
-			return;
-		}
-		
-		for (MessageDm messageDm : messageDmList) {
+		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Boolean>() {
 			
-			String queueFullName = null;
-			String hashFullName = null;
-			
-			if (messageDm.getBool()) {				
-				queueFullName = queueNewFullMap.get(messageDm.getQueueName());
-				if (queueFullName == null) {
-					queueFullName = messageDm.getQueueName() + queuePostfix + typeNewPostfix;
-					queueNewFullMap.putIfAbsent(messageDm.getQueueName(), queueFullName);
+			@Override
+			public Boolean doOperation(Jedis jedis) throws Exception {
+				
+				MessageQueueDm messageQueueDm = new MessageQueueDm();
+
+				String queueFullName = null;
+				String hashFullName = null;
+				
+				if (messageDm.getBool()) {				
+					queueFullName = CachePostfix.getKey(messageDm.getQueueName(), CachePostfix.KeyPostfix.QUEUE_NEW);
+					hashFullName = CachePostfix.getKey(messageDm.getQueueName(), CachePostfix.KeyPostfix.QUEUE_HASH_NEW);
+					
+				} else {
+					queueFullName = CachePostfix.getKey(messageDm.getQueueName(), CachePostfix.KeyPostfix.QUEUE_PORTION);
+					hashFullName = CachePostfix.getKey(messageDm.getQueueName(), CachePostfix.KeyPostfix.QUEUE_HASH_PORTION);
 				}
-				hashFullName = hashNewFullMap.get(messageDm.getQueueName());
-				if (hashFullName == null) {
-					hashFullName = messageDm.getQueueName() + hashPostfix + typeNewPostfix;
-					hashNewFullMap.putIfAbsent(messageDm.getQueueName(), hashFullName);
-				}
-			} else {
-				queueFullName = queuePortionFullMap.get(messageDm.getQueueName());
-				if (queueFullName == null) {
-					queueFullName = messageDm.getQueueName() + queuePostfix + typePortionPostfix;
-					queuePortionFullMap.putIfAbsent(messageDm.getQueueName(), queueFullName);
-				}
-				hashFullName = hashPortionFullMap.get(messageDm.getQueueName());
-				if (hashFullName == null) {
-					hashFullName = messageDm.getQueueName() + hashPostfix + typePortionPostfix;
-					hashPortionFullMap.putIfAbsent(messageDm.getQueueName(), hashFullName);
-				}
-			}
-			String activeFullName = activeFullMap.get(messageDm.getQueueName());
-			if (activeFullName == null) {
-				activeFullName = messageDm.getQueueName() + activePostfix;
-				activeFullMap.putIfAbsent(messageDm.getQueueName(), activeFullName);
-			}
-			
-			try {
+				String activeFullName = CachePostfix.getKey(messageDm.getQueueName(), CachePostfix.KeyPostfix.QUEUE_ACTIVE);
+				
 				if (!jedis.exists(activeFullName)) {
 					queueIsActiveMap.put(messageDm.getQueueName(), false);
-					continue;
+					return false;
 				}
 				
 				if (jedis.exists(messageDm.getUuid())) {
-					continue;
+					return false;
 				}
 				
 				long nowTime = System.currentTimeMillis();
@@ -188,12 +130,12 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 							jedis.hdel(hashFullName, messageDm.getUuid());
 						}
 					}
-					continue;
+					return false;
 				}
 				
 				if (jedis.exists(messageDm.getUuid())) {
 					jedis.hdel(hashFullName, messageDm.getUuid());
-					continue;
+					return false;
 				}
 				
 				messageQueueDm.setQueueName(messageDm.getQueueName());
@@ -211,57 +153,96 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 				
 				jedis.rpush(queueFullName, JsonTranslator.toString(messageQueueDm));
 				
-				if (messageDm.getObjectThree() != null) {
-					AtomicLong countDown = (AtomicLong) messageDm.getObjectThree();
-					countDown.decrementAndGet();
+				return true;
+			}
+		});
+	}
+
+	@Override
+	public MessageDm pop(String queueName, boolean queueType) throws Exception {
+		
+		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<MessageDm>() {
+			
+			@Override
+			public MessageDm doOperation(Jedis jedis) throws Exception {
+				
+				String queueFullName = null;
+				String hashFullName = null;
+				
+				if (queueType) {				
+					queueFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_NEW);
+					hashFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_HASH_NEW);
+				} else {
+					queueFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_PORTION);
+					hashFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_HASH_PORTION);
+				}
+				String activeFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_ACTIVE);
+				
+				if (!jedis.exists(activeFullName)) {
+					queueIsActiveMap.put(queueName, false);
+					return null;
 				}
 				
-			} catch (JedisConnectionException e) {
-				if (logger.isErrorEnabled()) {
-					logger.error("SetActual -> " 
-							+ "ConnectId: " + connectId
-							+ ", Ip: " + ip
-							+ ", Port: " + port
-							+ ", Set -> " + e);
+				List<String> messageDmStrList = jedis.blpop(queueCacheConnectAgentConfParam.getPopTimeout(), queueFullName);
+				if (messageDmStrList != null && messageDmStrList.size() >= 2) {
+					
+					MessageDm messageDm = (MessageDm) JsonTranslator.fromString(messageDmStrList.get(1), MessageDm.class);
+					
+					String value = jedis.hget(hashFullName, messageDm.getUuid());
+					if (value != null && Long.valueOf(value) == messageDm.getCacheTimestamp()) {
+						
+						jedis.multi();
+						Transaction transaction = new Transaction(jedis.getClient());
+						transaction.set(messageDm.getUuid(), "");
+						transaction.expire(messageDm.getUuid(), queueCacheConnectAgentConfParam.getExpire());
+						transaction.hdel(hashFullName, messageDm.getUuid());
+						transaction.exec();
+						
+						return messageDm;
+					}
 				}
-				jedisPool.returnBrokenResource(jedis);
-				return;
-			} catch (Exception e) {
-				if (logger.isErrorEnabled()) {
-					logger.error("SetActual -> " 
-							+ "ConnectId: " + connectId
-							+ ", Ip: " + ip
-							+ ", Port: " + port
-							+ ", Message: " + messageDm.getUuid()
-							+ ", Set -> " + e);
-				}
-				continue;
-			} 
-		}
+				
+				return null;
+			}
+		});
+	}
+
+	@Override
+	public boolean havePop(MessageDm messageDm) throws Exception {
 		
-		jedisPool.returnResource(jedis);
+		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Boolean>() {
+			
+			@Override
+			public Boolean doOperation(Jedis jedis) throws Exception {
+				return jedis.exists(messageDm.getUuid());
+			}
+		});
 	}
 	
 	@Override
-	protected void removeActual(List<MessageDm> messageDmList) {
+	public void setPop(MessageDm messageDm) throws Exception {
 		
-		Jedis jedis;
-		
-		try {
-			jedis = getConnect();
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("RemoveActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Connect -> " + e);
+		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
+			
+			@Override
+			public Void doOperation(Jedis jedis) throws Exception {
+				jedis.multi();
+				Transaction transaction = new Transaction(jedis.getClient());
+				transaction.set(messageDm.getUuid(), "");
+				transaction.expire(messageDm.getUuid(), queueCacheConnectAgentConfParam.getExpire());
+				transaction.exec();
+				return null;
 			}
-			return;
-		}
+		});
+	}
+	
+	@Override
+	public void removePop(MessageDm messageDm) throws Exception {
 		
-		for (MessageDm messageDm : messageDmList) {
-			try {
+		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
+			
+			@Override
+			public Void doOperation(Jedis jedis) throws Exception {
 				if (messageDm.getDelayTime() > 0) {
 					long extendTime = System.currentTimeMillis() - messageDm.getFinishTime();
 					if (messageDm.getDelayTime() - extendTime > 1000) {
@@ -272,289 +253,40 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 				} else {					
 					jedis.del(messageDm.getUuid());
 				}
-			} catch (JedisConnectionException e) {
-				if (logger.isErrorEnabled()) {
-					logger.error("RemoveActual -> " 
-							+ "ConnectId: " + connectId
-							+ ", Ip: " + ip
-							+ ", Port: " + port
-							+ ", Remove -> " + e);
-				}
-				jedisPool.returnBrokenResource(jedis);
-				return;
-			} catch (Exception e) {
-				if (logger.isErrorEnabled()) {
-					logger.error("RemoveActual -> " 
-							+ "ConnectId: " + connectId
-							+ ", Ip: " + ip
-							+ ", Port: " + port
-							+ ", Message: " + messageDm.getUuid()
-							+ ", Remove -> " + e);
-				}
-				continue;
-			}
-		}
-		
-		jedisPool.returnResource(jedis);
-	}
-	
-	@Override
-	public void push(MessageDm messageDm) throws Exception {
-		
-		/*if (connectStatus.get() == false) {
-			cancelCountDownLatch(messageDm);
-			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}*/
-		
-		if (!setBlockingQueue.offer(messageDm, cacheConnectAgentConfParam.getSetTimeout(), TimeUnit.MILLISECONDS)) {
-			cancelCountDownLatch(messageDm);
-		}
-	}
-
-	@Override
-	public MessageDm pop(String queueName, boolean queueType) throws Exception {
-		
-		Jedis jedis = getConnect();
-		
-		String queueFullName = null;
-		String hashFullName = null;
-		
-		if (queueType) {				
-			queueFullName = queueNewFullMap.get(queueName);
-			if (queueFullName == null) {
-				queueFullName = queueName + queuePostfix + typeNewPostfix;
-				queueNewFullMap.putIfAbsent(queueName, queueFullName);
-			}
-			hashFullName = hashNewFullMap.get(queueName);
-			if (hashFullName == null) {
-				hashFullName = queueName + hashPostfix + typeNewPostfix;
-				hashNewFullMap.putIfAbsent(queueName, hashFullName);
-			}
-		} else {
-			queueFullName = queuePortionFullMap.get(queueName);
-			if (queueFullName == null) {
-				queueFullName = queueName + queuePostfix + typePortionPostfix;
-				queuePortionFullMap.putIfAbsent(queueName, queueFullName);
-			}
-			hashFullName = hashPortionFullMap.get(queueName);
-			if (hashFullName == null) {
-				hashFullName = queueName + hashPostfix + typePortionPostfix;
-				hashPortionFullMap.putIfAbsent(queueName, hashFullName);
-			}
-		}
-		String activeFullName = activeFullMap.get(queueName);
-		if (activeFullName == null) {
-			activeFullName = queueName + activePostfix;
-			activeFullMap.putIfAbsent(queueName, activeFullName);
-		}
-		
-		try {
-			
-			if (!jedis.exists(activeFullName)) {
-				queueIsActiveMap.put(queueName, false);
-				jedisPool.returnResource(jedis);
 				return null;
 			}
-			
-			List<String> messageDmStrList = jedis.blpop(queueCacheConnectAgentConfParam.getPopTimeout(), queueFullName);
-			if (messageDmStrList != null && messageDmStrList.size() >= 2) {
-				
-				MessageDm messageDm = (MessageDm) JsonTranslator.fromString(messageDmStrList.get(1), MessageDm.class);
-				
-				String value = jedis.hget(hashFullName, messageDm.getUuid());
-				if (value != null && Long.valueOf(value) == messageDm.getCacheTimestamp()) {
-					
-					jedis.multi();
-					Transaction transaction = new Transaction(jedis.getClient());
-					transaction.set(messageDm.getUuid(), "");
-					transaction.expire(messageDm.getUuid(), queueCacheConnectAgentConfParam.getExpire());
-					transaction.hdel(hashFullName, messageDm.getUuid());
-					transaction.exec();
-					
-					jedisPool.returnResource(jedis);
-					return messageDm;
-				}
-			}
-			
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Pop -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Pop -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for queue redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Pop -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Pop -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
-		
-		jedisPool.returnResource(jedis);
-		
-		return null;
-	}
-
-	@Override
-	public boolean havePop(MessageDm messageDm) throws Exception {
-		
-		Jedis jedis = getConnect();
-		
-		boolean bool = false;
-		
-		try {
-			bool = jedis.exists(messageDm.getUuid());
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("HavePop -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Have Pop -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for queue redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("HavePop -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Have Pop -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
-		
-		jedisPool.returnResource(jedis);
-		
-		return bool;
-	}
-	
-	@Override
-	public void setPop(MessageDm messageDm) throws Exception {
-		
-		Jedis jedis = getConnect();
-		
-		try {
-			jedis.multi();
-			Transaction transaction = new Transaction(jedis.getClient());
-			transaction.set(messageDm.getUuid(), "");
-			transaction.expire(messageDm.getUuid(), queueCacheConnectAgentConfParam.getExpire());
-			transaction.exec();
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("SetPop -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Set Pop -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for queue redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("SetPop -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Set Pop -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
-
-		jedisPool.returnResource(jedis);
-	}
-	
-	@Override
-	public void removePop(MessageDm messageDm) throws Exception {
-		
-		/*if (connectStatus.get() == false) {
-			cancelCountDownLatch(messageDm);
-			throw new ConnectionUnableException("Connection disable for the queue redis connect agent");
-		}*/
-		
-		if (!removeBlockingQueue.offer(messageDm)) {
-			cancelCountDownLatch(messageDm);
-		}
+		});
 	}
 
 	@Override
 	public void setActive(String queueName, boolean bool) throws Exception {
 		
-		Jedis jedis = getConnect();
-		
-		String queueNewFullName = queueNewFullMap.get(queueName);
-		if (queueNewFullName == null) {
-			queueNewFullName = queueName + queuePostfix + typeNewPostfix;
-			queueNewFullMap.putIfAbsent(queueName, queueNewFullName);
-		}
-		String hashNewFullName = hashNewFullMap.get(queueName);
-		if (hashNewFullName == null) {
-			hashNewFullName = queueName + hashPostfix + typeNewPostfix;
-			hashNewFullMap.putIfAbsent(queueName, hashNewFullName);
-		}
-		String queuePortionFullName = queuePortionFullMap.get(queueName);
-		if (queuePortionFullName == null) {
-			queuePortionFullName = queueName + queuePostfix + typePortionPostfix;;
-			queuePortionFullMap.putIfAbsent(queueName, queuePortionFullName);
-		}
-		String hashPortionFullName = hashPortionFullMap.get(queueName);
-		if (hashPortionFullName == null) {
-			hashPortionFullName = queueName + hashPostfix + typePortionPostfix;;
-			hashPortionFullMap.putIfAbsent(queueName, hashPortionFullName);
-		}
-		String activeFullName = activeFullMap.get(queueName);
-		if (activeFullName == null) {
-			activeFullName = queueName + activePostfix;
-			activeFullMap.putIfAbsent(queueName, activeFullName);
-		}
-		
-		try {
-			jedis.del(queueNewFullName, 
-					hashNewFullName, 
-					queuePortionFullName,
-					hashPortionFullName);
+		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
 			
-			if (bool) {
-				jedis.setnx(activeFullName, "");
-				queueIsActiveMap.put(queueName, true);
-			} else {
-				jedis.del(activeFullName);
-				queueIsActiveMap.put(queueName, false);
+			@Override
+			public Void doOperation(Jedis jedis) throws Exception {
+				
+				String queueNewFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_NEW);
+				String hashNewFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_HASH_NEW);
+				String queuePortionFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_PORTION);
+				String hashPortionFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_HASH_PORTION);
+				String activeFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_ACTIVE);
+				
+				jedis.del(queueNewFullName, 
+						hashNewFullName, 
+						queuePortionFullName,
+						hashPortionFullName);
+				if (bool) {
+					jedis.setnx(activeFullName, "");
+					queueIsActiveMap.put(queueName, true);
+				} else {
+					jedis.del(activeFullName);
+					queueIsActiveMap.put(queueName, false);
+				}
+				
+				return null;
 			}
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("SetActive -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Set Active -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for queue redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("SetActive -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Set Active -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
-		
-		jedisPool.returnResource(jedis);
+		});
 	}
 
 	@Override
@@ -565,363 +297,145 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 			return true;
 		}
 		
-		Jedis jedis = getConnect();
-
-		String activeFullName = activeFullMap.get(queueName);
-		if (activeFullName == null) {
-			activeFullName = queueName + activePostfix;
-			activeFullMap.putIfAbsent(queueName, activeFullName);
-		}
-		
-		boolean bool = false;
-		
-		try {
-			bool = jedis.exists(activeFullName);
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("IsActive -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Is Active -> " + e);
+		boolean bool =  JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Boolean>() {
+			
+			@Override
+			public Boolean doOperation(Jedis jedis) throws Exception {
+				return jedis.exists(CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_ACTIVE));
 			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for queue redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("IsActive -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Is Active -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
+		});
 		
 		queueIsActiveMap.put(queueName, bool);
-		
-		jedisPool.returnResource(jedis);
-		
+
 		return bool;
 	}
 	
-
 	@Override
 	public long len(String queueName, boolean queueType) throws Exception {
 		
-		Jedis jedis = getConnect();
-		
-		String queueFullName = null;
-		
-		if (queueType) {				
-			queueFullName = queueNewFullMap.get(queueName);
-			if (queueFullName == null) {
-				queueFullName = queueName + queuePostfix + typeNewPostfix;
-				queueNewFullMap.putIfAbsent(queueName, queueFullName);
+		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Long>() {
+			
+			@Override
+			public Long doOperation(Jedis jedis) throws Exception {
+				
+				String queueFullName = null;
+				
+				if (queueType) {				
+					queueFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_NEW);
+				} else {
+					queueFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_PORTION);
+				}
+				String activeFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_ACTIVE);
+				
+				if (!jedis.exists(activeFullName)) {
+					queueIsActiveMap.put(queueName, false);
+					return 0L;
+				}
+				return jedis.llen(queueFullName);
 			}
-		} else {
-			queueFullName = queuePortionFullMap.get(queueName);
-			if (queueFullName == null) {
-				queueFullName = queueName + queuePostfix + typePortionPostfix;
-				queuePortionFullMap.putIfAbsent(queueName, queueFullName);
-			}
-		}
-		String activeFullName = activeFullMap.get(queueName);
-		if (activeFullName == null) {
-			activeFullName = queueName + activePostfix;
-			activeFullMap.putIfAbsent(queueName, activeFullName);
-		}
-		
-		long len = 0;
-		
-		try {
-			if (!jedis.exists(activeFullName)) {
-				queueIsActiveMap.put(queueName, false);
-				jedisPool.returnResource(jedis);
-				return len;
-			}
-			len = jedis.llen(queueFullName);
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Len -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Len -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for queue redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Len -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Len -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
-		
-		jedisPool.returnResource(jedis);
-		
-		return len;
+		});
 	}
 
 	@Override
 	public long getDiffTime() throws Exception {
 		
-		Jedis jedis = getConnect();
-		
-		long diffTime = 0;
-		
-		try {
-			jedis.set(diffTimeFullName, "");
-			jedis.expireAt(diffTimeFullName, Integer.MAX_VALUE);
-			diffTime = System.currentTimeMillis() - (Integer.MAX_VALUE - jedis.ttl(diffTimeFullName)) * 1000;
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("GetDiffTime -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get DiffTime -> " + e);
+		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Long>() {
+			
+			@Override
+			public Long doOperation(Jedis jedis) throws Exception {
+				jedis.set(CachePostfix.KeyPostfix.QUEUE_DIFFTIME.getCode(), "");
+				jedis.expireAt(CachePostfix.KeyPostfix.QUEUE_DIFFTIME.getCode(), Integer.MAX_VALUE);
+				return System.currentTimeMillis() - (Integer.MAX_VALUE - jedis.ttl(CachePostfix.KeyPostfix.QUEUE_DIFFTIME.getCode())) * 1000;
 			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for queue redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("GetDiffTime -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get DiffTime -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
-		
-		jedisPool.returnResource(jedis);
-		
-		return diffTime;
+		});
 	}
 
 	@Override
 	public boolean getAlive(String queueName, long id, long diffTime, long intervalTime) throws Exception {
 		
-		Jedis jedis = getConnect();
-		
-		String lockerFullName = lockerFullMap.get(queueName);
-		if (lockerFullName == null) {
-			lockerFullName = queueName + lockerPostfix;
-			lockerFullMap.putIfAbsent(queueName, lockerFullName);
-		}
-		
-		boolean isAlive = false;
-		
-		try {
-			if(jedis.setnx(lockerFullName, String.valueOf(id)) != 0) {
-				if (jedis.expire(lockerFullName, (int)(intervalTime / 1000)) != 0) {
-					isAlive = true;
+		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Boolean>() {
+			
+			@Override
+			public Boolean doOperation(Jedis jedis) throws Exception {
+				
+				String lockerFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_LOCKER);
+				
+				if(jedis.setnx(lockerFullName, String.valueOf(id)) != 0) {
+					return jedis.expire(lockerFullName, (int)(intervalTime / 1000)) != 0;
+				} else {
+					if (jedis.ttl(lockerFullName) == -1) {
+						jedis.expire(lockerFullName, (int)(intervalTime / 1000));
+					}
 				}
-			} else {
-				if (jedis.ttl(lockerFullName) == -1) {
-					jedis.expire(lockerFullName, (int)(intervalTime / 1000));
-				}
+				
+				return false;
 			}
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("GetAlive -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Alive -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for queue redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("GetAlive -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Alive -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
-		
-		jedisPool.returnResource(jedis);
-		
-		return isAlive;
+		});
 	}
 
 	@Override
 	public boolean keepAlive(String queueName, long id, long diffTime, long intervalTime) throws Exception {
 		
-		Jedis jedis = getConnect();
-		
-		String lockerFullName = lockerFullMap.get(queueName);
-		if (lockerFullName == null) {
-			lockerFullName = queueName + lockerPostfix;
-			lockerFullMap.putIfAbsent(queueName, lockerFullName);
-		}
-		
-		boolean isAlive = false;
-		
-		try {
-			String strId = jedis.get(lockerFullName);
-			if (strId != null) {
-				if (Long.valueOf(strId) == id) {
-					if (jedis.expire(lockerFullName, (int)(intervalTime / 1000)) != 0) {
-						strId = jedis.get(lockerFullName);
-						if (strId != null) {
-							if (Long.valueOf(strId) == id) {
-								isAlive = true;
+		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Boolean>() {
+			
+			@Override
+			public Boolean doOperation(Jedis jedis) throws Exception {
+				
+				String lockerFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_LOCKER);
+				
+				String strId = jedis.get(lockerFullName);
+				if (strId != null) {
+					if (Long.valueOf(strId) == id) {
+						if (jedis.expire(lockerFullName, (int)(intervalTime / 1000)) != 0) {
+							strId = jedis.get(lockerFullName);
+							if (strId != null) {
+								return Long.valueOf(strId) == id;
 							}
 						}
 					}
 				}
+				return false;
 			}
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("KeepAlive -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Keep Alive -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for queue redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("KeepAlive -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Keep Alive -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
-		
-		jedisPool.returnResource(jedis);
-		
-		return isAlive;
+		});
 	}
 
 	@Override
 	public void releaseAlive(String queueName, long id) throws Exception {
 		
-		Jedis jedis = getConnect();
-		
-		String lockerFullName = lockerFullMap.get(queueName);
-		if (lockerFullName == null) {
-			lockerFullName = queueName + lockerPostfix;
-			lockerFullMap.putIfAbsent(queueName, lockerFullName);
-		}
-		
-		try {
-			String strId = jedis.get(lockerFullName);
-			if (strId != null) {
-				if (Long.valueOf(strId) == id) {
-					if (jedis.expire(lockerFullName, lockerOvertime) != 0) {
-						strId = jedis.get(lockerFullName);
-						if (strId != null) {
-							if (Long.valueOf(strId) == id) {
-								jedis.del(lockerFullName);
+		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
+			
+			@Override
+			public Void doOperation(Jedis jedis) throws Exception {
+				String lockerFullName = CachePostfix.getKey(queueName, CachePostfix.KeyPostfix.QUEUE_LOCKER);
+				String strId = jedis.get(lockerFullName);
+				if (strId != null) {
+					if (Long.valueOf(strId) == id) {
+						if (jedis.expire(lockerFullName, lockerOvertime) != 0) {
+							strId = jedis.get(lockerFullName);
+							if (strId != null) {
+								if (Long.valueOf(strId) == id) {
+									jedis.del(lockerFullName);
+								}
 							}
 						}
 					}
 				}
+				return null;
 			}
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("ReleaseAlive -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Release Alive -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for queue redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("ReleaseAlive -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Release Alive -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
-		
-		jedisPool.returnResource(jedis);
+		});
 	}
 	
 	@Override
 	public void checkHealth() throws Exception {
 		
-		Jedis jedis = getConnect();
-		
-		try {
-			jedis.exists("CheckHealth");
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("CheckHealth -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Check Health -> " + e);
+		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
+			
+			@Override
+			public Void doOperation(Jedis jedis) throws Exception {
+				jedis.exists("CheckHealth");
+				return null;
 			}
-			jedisPool.returnBrokenResource(jedis);
-			throw new ConnectResetException("Connection reset for queue redis connect agent");
-		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("CheckHealth -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Check Health -> " + e);
-			}
-			jedisPool.returnBrokenResource(jedis);
-			throw e;
-		}
-		
-		jedisPool.returnResource(jedis);
-	}
-	
-	private Jedis getConnect() throws Exception {
-		
-		Jedis jedis = null;
-		
-		try {
-			jedis = jedisPool.getResource();
-			return jedis;
-		} catch (JedisConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("GetConnect -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", GetConnect -> " + e);
-			}
-			throw new ConnectResetException("Connection reset for queue redis connect agent");
-		}
-	}
-	
-	private void cancelCountDownLatch(MessageDm messageDm) {
-		if (messageDm.getObjectOne() != null) {					
-			CountDownLatch countDownLatch = (CountDownLatch) messageDm.getObjectOne();
-			countDownLatch.countDown();
-		}
-	}
-	
-	public void setQueuePostfix(String queuePostfix) {
-		this.queuePostfix = queuePostfix;
-		this.hashPostfix = queuePostfix + "-Hash";
+		});
 	}
 
 	public void setQueueCacheConnectAgentConfParam(

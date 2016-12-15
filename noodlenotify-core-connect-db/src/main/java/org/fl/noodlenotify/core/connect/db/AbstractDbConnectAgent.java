@@ -310,12 +310,6 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 
 	@Override
 	public void update(MessageDm messageDm) throws Exception {
-		
-		/*if (connectStatus.get() == false) {
-			offerExecuteBatch(messageDm);
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}*/
-		
 		if (!updateBlockingQueue.offer(messageDm, dbConnectAgentConfParam.getUpdateTimeout(), TimeUnit.MILLISECONDS)) {				
 			throw new ConnectTimeoutException("Db connect agent update timeout");
 		}
@@ -323,12 +317,6 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 	
 	@Override
 	public void delete(MessageDm messageDm) throws Exception {
-		
-		/*if (connectStatus.get() == false) {
-			cancelCountDownLatch(messageDm);
-			throw new ConnectionUnableException("Connection disable for the db connect agent");
-		}*/
-		
 		if (!deleteBlockingQueue.offer(messageDm, dbConnectAgentConfParam.getDeleteTimeout(), TimeUnit.MILLISECONDS)) {
 			throw new ConnectTimeoutException("Db connect agent update timeout");
 		}

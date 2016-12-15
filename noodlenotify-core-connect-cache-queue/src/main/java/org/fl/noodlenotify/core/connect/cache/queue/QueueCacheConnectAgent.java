@@ -3,7 +3,7 @@ package org.fl.noodlenotify.core.connect.cache.queue;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 
 public interface QueueCacheConnectAgent {
-	public void push(MessageDm messageDm) throws Exception;
+	public boolean push(MessageDm messageDm) throws Exception;
 	public MessageDm pop(String queueName, boolean queueType) throws Exception;
 	public boolean havePop(MessageDm messageDm) throws Exception;
 	public void setPop(MessageDm messageDm) throws Exception;

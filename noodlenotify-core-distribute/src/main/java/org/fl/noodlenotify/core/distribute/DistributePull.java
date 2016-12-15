@@ -290,18 +290,17 @@ public class DistributePull {
 						count += messageDmList.size();
 						countDown.addAndGet(messageDmList.size());
 						if (messageDmList != null && messageDmList.size() > 0) {
-							CountDownLatch countDownLatch = new CountDownLatch(messageDmList.size());
 							for (MessageDm messageDm : messageDmList) {
-								messageDm.setObjectOne(countDownLatch);
-								messageDm.setObjectTwo(dbDistributedLock);
-								messageDm.setObjectThree(countDown);
 								messageDm.setBool(true);
-							}
-							push("DistributeSetFreshRunnable", queueCacheConnectManager, messageDmList);
-							try {
-								countDownLatch.await();
-							} catch (InterruptedException e) {
-								e.printStackTrace();
+								ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
+								QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+								try {
+									if (queueCacheConnectAgent.push(messageDm)) {
+										countDown.decrementAndGet();
+									}
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 							}
 							messageDmList.clear();
 						}
@@ -446,18 +445,17 @@ public class DistributePull {
 						count += messageDmList.size();
 						countDown.addAndGet(messageDmList.size());
 						if (messageDmList != null && messageDmList.size() > 0) {
-							CountDownLatch countDownLatch = new CountDownLatch(messageDmList.size());
 							for (MessageDm messageDm : messageDmList) {
-								messageDm.setObjectOne(countDownLatch);
-								messageDm.setObjectTwo(dbDistributedLock);
-								messageDm.setObjectThree(countDown);
 								messageDm.setBool(true);
-							}
-							push("DistributeSetNewRunnable", queueCacheConnectManager, messageDmList);
-							try {
-								countDownLatch.await();
-							} catch (InterruptedException e) {
-								e.printStackTrace();
+								ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
+								QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+								try {
+									if (queueCacheConnectAgent.push(messageDm)) {
+										countDown.decrementAndGet();
+									}
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 							}
 							messageDmList.clear();
 							isNewEmpty = false;
@@ -625,18 +623,17 @@ public class DistributePull {
 						count += messageDmList.size();
 						countDown.addAndGet(messageDmList.size());
 						if (messageDmList != null && messageDmList.size() > 0) {
-							CountDownLatch countDownLatch = new CountDownLatch(messageDmList.size());
 							for (MessageDm messageDm : messageDmList) {
-								messageDm.setObjectOne(countDownLatch);
-								messageDm.setObjectTwo(dbDistributedLock);
-								messageDm.setObjectThree(countDown);
 								messageDm.setBool(false);
-							}
-							push("DistributeSetPortionRunnable", queueCacheConnectManager, messageDmList);
-							try {
-								countDownLatch.await();
-							} catch (InterruptedException e) {
-								e.printStackTrace();
+								ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
+								QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+								try {
+									if (queueCacheConnectAgent.push(messageDm)) {
+										countDown.decrementAndGet();
+									}
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 							}
 							messageDmList.clear();
 							isPortionEmpty = false;
@@ -814,10 +811,13 @@ public class DistributePull {
 					if (messageDmList != null && messageDmList.size() > 0) {
 						for (MessageDm messageDm : messageDmList) {
 							messageDm.addMessageCallback(new RemovePopMessageCallback(messageDm, queueCacheConnectManager));
+							ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 							try {
 								dbConnectAgent.delete(messageDm);
 							} catch (Exception e) {
 								e.printStackTrace();
+							} finally {
+								ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 							}
 						}
 						messageDmList.clear();
@@ -854,58 +854,7 @@ public class DistributePull {
 		}
 	}
 	
-	private void push(String queueCacheName,
-			ConnectManager queueCacheConnectManager,
-			List<MessageDm> messageDmList) {
-		
-		ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
-		QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
-		for (MessageDm messageDm : messageDmList) {
-			try {
-				queueCacheConnectAgent.push(messageDm);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		//cancelCountDownLatchList(messageDmList);
-		
-		/*ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
-		if (connectNode != null) {
-			QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectNode.getConnectAgent();
-			if (queueCacheConnectAgent != null) {
-				for (MessageDm messageDm : messageDmList) {
-					try {
-						queueCacheConnectAgent.push(messageDm);
-					} catch (Exception e) {
-						if (logger.isErrorEnabled()) {
-							logger.error(queueCacheName + " -> Push -> "
-									+ "QUEUE: " + queueName
-									+ ", Connect: " + ((ConnectAgent)queueCacheConnectAgent).getConnectId()
-									+ ", Push Massage -> " + e);
-						}
-					}
-				}
-			} else {
-				if (logger.isErrorEnabled()) {
-					logger.error(queueCacheName + " -> Push -> "
-							+ "QUEUE: " + queueName
-							+ ", Push Massage -> Get Redis Connect Agent -> Null");
-				}
-				cancelCountDownLatchList(messageDmList);
-			}
-		} else {
-			if (logger.isErrorEnabled()) {
-				logger.error(queueCacheName + " -> Push -> "
-						+ "QUEUE: " + queueName 
-						+ ", Push Massage -> Get Queue Agent -> Null");
-			}
-			cancelCountDownLatchList(messageDmList);
-		}*/
-	}
-	
-	private long queueCacheLen(String queueCacheName, 
-			ConnectManager queueCacheConnectManager,
-			boolean queueType) {
+	private long queueCacheLen(String queueCacheName, ConnectManager queueCacheConnectManager, boolean queueType) {
 		
 		long len = -1;
 		ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
@@ -915,49 +864,8 @@ public class DistributePull {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		/*QueueAgent queueAgent = queueCacheConnectManager.getQueueAgent(queueName);
-		if (queueAgent != null) {
-			QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) queueAgent.getConnectAgent();
-			if (queueCacheConnectAgent != null) {
-				try {
-					len = queueCacheConnectAgent.len(queueName, queueType);
-				} catch (Exception e) {
-					if (logger.isErrorEnabled()) {
-						logger.error(queueCacheName + " -> GetLen -> "
-								+ "QUEUE: " + queueName
-								+ ", Connect: " + ((ConnectAgent)queueCacheConnectAgent).getConnectId()
-								+ ", Get Len -> " + e);
-					}
-				}
-			} else {
-				if (logger.isErrorEnabled()) {
-					logger.error(queueCacheName + " -> GetLen -> "
-							+ "QUEUE: " + queueName
-							+ ", Get Len -> Get Redis Connect Agent -> Null");
-				}
-			}
-		} else {
-			if (logger.isErrorEnabled()) {
-				logger.error(queueCacheName + " -> GetLen -> "
-						+ "QUEUE: " + queueName 
-						+ ", Get Len -> Get Queue Agent -> Null");
-			}
-		}*/
 		return len;
 	}
-	
-	/*private void cancelCountDownLatchList(List<MessageDm> messageDmList) {
-		for (MessageDm messageDm : messageDmList) {
-			cancelCountDownLatch(messageDm);
-		}
-	}*/
-	
-	/*private void cancelCountDownLatch(MessageDm messageDm) {
-		if (messageDm.getObjectOne() != null) {					
-			CountDownLatch countDownLatch = (CountDownLatch) messageDm.getObjectOne();
-			countDownLatch.countDown();
-		}
-	}*/
 	
 	private synchronized void startSleep(long suspendTime) throws InterruptedException {
 		if (!stopSign && suspendTime > 0) {
