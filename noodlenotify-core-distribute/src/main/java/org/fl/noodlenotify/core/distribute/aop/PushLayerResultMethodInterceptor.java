@@ -32,7 +32,7 @@ public class PushLayerResultMethodInterceptor implements MethodInterceptor {
 			if (messageDm.getResultQueue() == messageDm.getExecuteQueue()) {
 				messageDm.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
 			} else {
-				if (queueDistributerVo.getIs_Repeat() == MessageConstant.MESSAGE_IS_REPEAT_No) {
+				if (queueDistributerVo.getIs_Repeat() == MessageConstant.MESSAGE_IS_REPEAT_NO) {
 					messageDm.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
 				} else {
 					if (queueDistributerVo.getExpire_Time() > 0 

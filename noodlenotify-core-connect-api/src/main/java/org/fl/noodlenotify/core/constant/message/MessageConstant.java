@@ -7,5 +7,5 @@ public class MessageConstant {
 	public final static byte MESSAGE_STATUS_FINISH = 3;
 	
 	public final static byte MESSAGE_IS_REPEAT_YES = 1;
-	public final static byte MESSAGE_IS_REPEAT_No = 0;
+	public final static byte MESSAGE_IS_REPEAT_NO = 0;
 }
