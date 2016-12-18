@@ -148,102 +148,66 @@ public class DistributePull {
 		@Override
 		public void run() {
 			
-			int skipCount = 0;
-			
 			while (true) {
 				
-				boolean isNewLocker = dbDistributedLock.waitLocker();
-				
-				if (stopSign) {
-					stopCount.decrementAndGet();
-					break;
-				}
-				
-				ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
-				DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
-				
-				long min = 0;
-				long max = 0;
-				
-				if (isNewLocker) {
-					ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
-					try {
-						middleIdFresh.set(dbConnectAgent.maxIdDelay(queueName, System.currentTimeMillis() - queueDistributerVo.getDph_Delay_Time()));
-						//notifySleep();
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
-					}
-				}
-				
-				ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 				try {
-					min = middleIdFresh.get() > 0 ? middleIdFresh.get() + 1 : dbConnectAgent.minId(queueName);
-					max = dbConnectAgent.maxIdDelay(queueName, System.currentTimeMillis() - queueDistributerVo.getDph_Delay_Time());
-				} catch (Exception e) {
-					e.printStackTrace();
-					continue;
-				} finally {
-					ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
-				}
-				
-				if (max == 0 || min > max) {
-					try {
-						Thread.sleep(distributeConfParam.getSelectMinMaxTimeIntervalFresh());
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					continue;
-				}
-				
-				long len = 0;
-				//long count = 0;
-				AtomicLong countDown = new AtomicLong(0);
-				//long logMin = min;
-				//long logMax = max;
-				
-				boolean skip = false;
-				
-				while (min <= max) {
+					
+					boolean isNewLocker = dbDistributedLock.waitLocker();
 					
 					if (stopSign) {
 						break;
 					}
 					
-					long start = min;
-					long end = min + distributeConfParam.getSelectByIdIntervalFresh();
-					end = end <= max ? end : max;
+					ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
+					DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
 					
-					List<MessageDm> messageDmList = null;
-					
-					len = queueCacheLen("DistributeSetFreshRunnable", queueCacheConnectManager, true);
-					if (len >= 0 && len < distributeConfParam.getQueueCacheCapacityNew()) {
-						long expect = end - start + 1;
-						if (skipCount > 0) {
-							long completeCount = 0;
-							ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
-							try {
-								completeCount = dbConnectAgent.selectCount(queueName, start, end, MessageConstant.MESSAGE_STATUS_NEW);
-							} catch (Exception e) {
-								e.printStackTrace();
-								break;
-							} finally {
-								ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
-							}
-							if (completeCount < expect) {
-								if (skipCount <= 20) {
-									middleIdFresh.set(min - 1); 
-									skipCount++;
-									skip = true;
-									break;
-								} 
-							}
+					if (isNewLocker) {
+						ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
+						try {
+							middleIdFresh.set(dbConnectAgent.maxIdDelay(queueName, System.currentTimeMillis() - queueDistributerVo.getDph_Delay_Time()));
+						} catch (Exception e) {
+							e.printStackTrace();
+						} finally {
+							ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 						}
+					}
+					
+					long min = 0;
+					long max = 0;
+					ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
+					try {
+						min = middleIdFresh.get() > 0 ? middleIdFresh.get() + 1 : dbConnectAgent.minId(queueName);
+						max = dbConnectAgent.maxIdDelay(queueName, System.currentTimeMillis() - queueDistributerVo.getDph_Delay_Time());
+					} catch (Exception e) {
+						e.printStackTrace();
+						continue;
+					} finally {
+						ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
+					}
+					
+					for (long index = min; max > 0 && index <= max && !stopSign; index += distributeConfParam.getSelectByIdIntervalFresh() + 1) {
+						
+						long start = index;
+						long end = index + distributeConfParam.getSelectByIdIntervalFresh() <= max ? index + distributeConfParam.getSelectByIdIntervalFresh() : max;
+						
+						ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
+						QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+						try {
+							if (queueCacheConnectAgent.len(queueName, true) > distributeConfParam.getQueueCacheCapacityNew()) {
+								break;
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+							break;
+						}
+						
+						long expect = end - start + 1;
 						
 						ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 						try {
-							messageDmList = dbConnectAgent.select(queueName, start, end, MessageConstant.MESSAGE_STATUS_NEW);
+							if (dbConnectAgent.selectCount(queueName, start, end, MessageConstant.MESSAGE_STATUS_NEW) < expect) {
+								break;
+							}
 						} catch (Exception e) {
 							e.printStackTrace();
 							break;
@@ -251,28 +215,27 @@ public class DistributePull {
 							ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 						}
 						
-						if (messageDmList.size() < expect) {
-							if (skipCount <= 20) {
-								middleIdFresh.set(min - 1); 
-								skipCount++;
-								skip = true;
+						List<MessageDm> messageDmList = null;
+						ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
+						try {
+							messageDmList = dbConnectAgent.select(queueName, start, end, MessageConstant.MESSAGE_STATUS_NEW);
+							if (messageDmList.size() < expect) {
 								break;
-							} else {
-								skipCount = 0;
 							}
-						} else {
-							skipCount = 0;
+						} catch (Exception e) {
+							e.printStackTrace();
+							break;
+						} finally {
+							ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 						}
-						//count += messageDmList.size();
-						countDown.addAndGet(messageDmList.size());
+						
 						if (messageDmList != null && messageDmList.size() > 0) {
 							for (MessageDm messageDm : messageDmList) {
 								messageDm.setBool(true);
-								ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
-								QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+								ConnectCluster pushConnectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
+								QueueCacheConnectAgent pushQueueCacheConnectAgent = (QueueCacheConnectAgent) pushConnectCluster.getProxy();
 								try {
-									if (queueCacheConnectAgent.push(messageDm)) {
-										countDown.decrementAndGet();
+									if (!pushQueueCacheConnectAgent.push(messageDm)) {
 									}
 								} catch (Exception e) {
 									e.printStackTrace();
@@ -280,37 +243,21 @@ public class DistributePull {
 							}
 							messageDmList.clear();
 						}
-						middleIdFresh.set(end); 
-					} else {
-						break;
+						middleIdFresh.set(end); 					
 					}
 					
-					min += distributeConfParam.getSelectByIdIntervalFresh() + 1;					
-				}
-				
-				if(skip == true) {
 					try {
 						Thread.sleep(distributeConfParam.getSelectTimeIntervalFresh());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					continue;
-				}
-				
-				if (len >= distributeConfParam.getQueueCacheCapacityNew()) {
-					try {
-						Thread.sleep(distributeConfParam.getSelectLenTimeIntervalFresh());
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				} else {
-					try {
-						Thread.sleep(distributeConfParam.getSelectTimeIntervalFresh());
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
 				}
 			}
+			
+			stopCount.decrementAndGet();
 		}
 	}
 	
@@ -321,68 +268,58 @@ public class DistributePull {
 			
 			while (true) {
 				
-				boolean isNewLocker = dbDistributedLock.waitLocker();
-				
-				if (stopSign) {
-					stopCount.decrementAndGet();
-					break;
-				}
-				
-				ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
-				DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
-				
-				long min = 0;
-				long max = 0;
-				
-				if (isNewLocker) {
-					try {
-						Thread.sleep(30000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				
-				ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 				try {
-					min = dbConnectAgent.minIdByStatus(queueName, MessageConstant.MESSAGE_STATUS_NEW);
-					max = middleIdFresh.get();
-				} catch (Exception e) {
-					e.printStackTrace();
-					continue;
-				} finally {
-					ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
-				}
-				
-				if (min == 0 || max == 0 || min > max) {
-					try {
-						Thread.sleep(distributeConfParam.getSelectMinMaxTimeIntervalNew());
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					continue;
-				}
-				
-				boolean isNewEmpty = true;
-				long len = 0;
-				long count = 0;
-				AtomicLong countDown = new AtomicLong(0);
-				//long logMin = min;
-				//long logMax = max;
-				
-				while (min <= max) {
+					boolean isNewLocker = dbDistributedLock.waitLocker();
 					
 					if (stopSign) {
 						break;
 					}
 					
-					long start = min;
-					long end = min + distributeConfParam.getSelectByIdIntervalNew();
-					end = end <= max ? end : max;
+					ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
+					DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
 					
-					List<MessageDm> messageDmList = null;
+					long min = 0;
+					long max = 0;
 					
-					len = queueCacheLen("DistributeSetNewRunnable", queueCacheConnectManager, true);
-					if (len >= 0 && len < distributeConfParam.getQueueCacheCapacityNew()) {
+					if (isNewLocker) {
+						try {
+							Thread.sleep(30000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							if (stopSign) {
+								break;
+							}
+						}
+					}
+					
+					ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
+					try {
+						min = dbConnectAgent.minIdByStatus(queueName, MessageConstant.MESSAGE_STATUS_NEW);
+						max = middleIdFresh.get();
+					} catch (Exception e) {
+						e.printStackTrace();
+						continue;
+					} finally {
+						ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
+					}
+					
+					for (long index = min; max > 0 && index <= max && !stopSign; index += distributeConfParam.getSelectByIdIntervalNew() + 1) {
+
+						long start = index;
+						long end = index + distributeConfParam.getSelectByIdIntervalNew() <= max ? index + distributeConfParam.getSelectByIdIntervalNew() : max;
+											
+						ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
+						QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+						try {
+							if (queueCacheConnectAgent.len(queueName, true) > distributeConfParam.getQueueCacheCapacityNew()) {
+								break;
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+							break;
+						}
+						
+						List<MessageDm> messageDmList = null;
 						ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 						try {
 							messageDmList = dbConnectAgent.select(queueName, start, end, MessageConstant.MESSAGE_STATUS_NEW);
@@ -393,61 +330,34 @@ public class DistributePull {
 							ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 						}
 						
-						count += messageDmList.size();
-						countDown.addAndGet(messageDmList.size());
 						if (messageDmList != null && messageDmList.size() > 0) {
 							for (MessageDm messageDm : messageDmList) {
 								messageDm.setBool(true);
-								ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
-								QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+								ConnectCluster pushConnectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
+								QueueCacheConnectAgent pushQueueCacheConnectAgent = (QueueCacheConnectAgent) pushConnectCluster.getProxy();
 								try {
-									if (queueCacheConnectAgent.push(messageDm)) {
-										countDown.decrementAndGet();
+									if (pushQueueCacheConnectAgent.push(messageDm)) {
 									}
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
 							}
 							messageDmList.clear();
-							isNewEmpty = false;
 						}
-					} else {
-						break;
 					}
-
-					min += distributeConfParam.getSelectByIdIntervalNew() + 1;
-				}
-				
-				if (isNewEmpty) {
+					
 					try {
-						Thread.sleep(distributeConfParam.getSelectEmptyTimeIntervalNew());
+						Thread.sleep(10000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-				} else {
-					if (len >= distributeConfParam.getQueueCacheCapacityNew()) {
-						long sleepTime = 
-								distributeConfParam.getSelectLenTimeIntervalNew()
-									+ Math.round(1.0f * countDown.get() * 1000 / distributeConfParam.getSelectLenTimeIntervalRatioNew());	
-						try {
-							Thread.sleep(sleepTime);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					} else {
-						long sleepTime = 
-								Math.round(1.0f * countDown.get() / count * 
-										(Math.round(1.0f * countDown.get() * 1000 / distributeConfParam.getSelectCountDownTimeIntervalRatioNew()) 
-											+ distributeConfParam.getSelectCountDownTimeIntervalNew()))
-												+ distributeConfParam.getSelectCountDownTimeIntervalMinNew();
-						try {
-							Thread.sleep(sleepTime);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				}				
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+				}
 			}
+			
+			stopCount.decrementAndGet();
 		}
 	}
 	
