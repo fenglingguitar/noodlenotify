@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
@@ -35,11 +34,9 @@ public class DistributePull implements LockChangeHandler {
 	
 	private DistributeConfParam distributeConfParam;
 	
-	private ExecutorService executorService = Executors.newCachedThreadPool();
+	private ExecutorService executorService;
 	
 	private volatile boolean stopSign = false;
-	
-	private AtomicInteger  stopCount;
 	
 	private AtomicLong middleIdFresh = new AtomicLong(0);
 	
@@ -72,23 +69,11 @@ public class DistributePull implements LockChangeHandler {
 			e.printStackTrace();
 		}
 		
-		stopCount = new AtomicInteger(4);
-		
-		Thread distributeSetFreshThread = new Thread(new DistributeSetFreshRunnable());
-		distributeSetFreshThread.setPriority(distributeConfParam.getSetThreadPriorityFresh());
-		executorService.execute(distributeSetFreshThread);
-		
-		Thread distributeSetNewThread = new Thread(new DistributeSetNewRunnable());
-		distributeSetNewThread.setPriority(distributeConfParam.getSetThreadPriorityNew());
-		executorService.execute(distributeSetNewThread);
-		
-		Thread distributeSetPortionThread = new Thread(new DistributeSetPortionRunnable());
-		distributeSetPortionThread.setPriority(distributeConfParam.getSetThreadPriorityPortion());
-		executorService.execute(distributeSetPortionThread);
-		
-		Thread distributeSetDeleteTimeoutThread = new Thread(new DistributeSetDeleteTimeoutRunnable());
-		distributeSetDeleteTimeoutThread.setPriority(distributeConfParam.getSetThreadPriorityDeleteTimeout());
-		executorService.execute(distributeSetDeleteTimeoutThread);
+		executorService = Executors.newCachedThreadPool();
+		executorService.execute(new DistributeSetFreshRunnable());		
+		executorService.execute(new DistributeSetNewRunnable());		
+		executorService.execute(new DistributeSetPortionRunnable());		
+		executorService.execute(new DistributeSetDeleteTimeoutRunnable());
 	}
 
 	@Override
@@ -203,8 +188,6 @@ public class DistributePull implements LockChangeHandler {
 				} finally {
 				}
 			}
-			
-			stopCount.decrementAndGet();
 		}
 	}
 	
@@ -259,8 +242,6 @@ public class DistributePull implements LockChangeHandler {
 				} finally {
 				}
 			}
-			
-			stopCount.decrementAndGet();
 		}
 	}
 	
@@ -315,8 +296,6 @@ public class DistributePull implements LockChangeHandler {
 				} finally {
 				}		
 			}
-			
-			stopCount.decrementAndGet();
 		}
 	}
 	
@@ -367,8 +346,6 @@ public class DistributePull implements LockChangeHandler {
 				} finally {
 				}
 			}
-			
-			stopCount.decrementAndGet();
 		}
 	}
 	
