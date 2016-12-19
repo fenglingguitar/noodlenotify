@@ -36,7 +36,7 @@ public class DistributeConfParam {
 	
 	private long selectByIdIntervalDeleteTimeout = 100000;
 	private long selectMinMaxTimeIntervalDeleteTimeout = 10000;
-	private long selectEmptyTimeIntervalDeleteTimeout = 150000;
+	private long selectEmptyTimeIntervalDeleteTimeout = 180000;
 	private long selectDeleteTimeout = 300000;
 	
 	private int checkActiveTimeInterval = 3000;
