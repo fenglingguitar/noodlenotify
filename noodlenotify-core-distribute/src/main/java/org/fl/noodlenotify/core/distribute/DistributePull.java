@@ -44,14 +44,13 @@ public class DistributePull implements LockChangeHandler {
 	
 	private QueueDistributerVo queueDistributerVo;
 
-	public DistributePull(String queueName,
-							long moduleId,
+	public DistributePull(long moduleId,
 							ConnectManager dbConnectManager,
 							ConnectManager queueCacheConnectManager,
 							DistributeConfParam distributeConfParam,
 							QueueDistributerVo queueDistributerVo,
 							long dbId) {
-		this.queueName = queueName;
+		this.queueName = queueDistributerVo.getQueue_Nm();
 		this.moduleId = moduleId;
 		this.dbConnectManager = dbConnectManager;
 		this.queueCacheConnectManager = queueCacheConnectManager;

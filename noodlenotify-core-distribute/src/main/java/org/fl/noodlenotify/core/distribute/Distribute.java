@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodle.common.connect.register.ModuleRegister;
@@ -52,6 +53,9 @@ public class Distribute {
 	private int checkPort;
 	
 	private ModuleRegister distributeModuleRegister;
+	
+	private DistributePullFactory distributePullFactory;
+	private DistributePushFactory distributePushFactory;
 	
 	public void start() throws Exception {
 		
@@ -139,13 +143,7 @@ public class Distribute {
 					queueCacheDistributeSetStopSignMap.put(queueDistributerVo.getQueue_Nm(), false);
 					queueCacheDistributeSetLockerExecutorService.execute(new CheckActiveRunnable(queueDistributerVo.getQueue_Nm(), queueCacheDistributeSetLocker));
 					
-					DistributePush distributePush = 
-							new DistributePush(
-								queueDistributerVo.getQueue_Nm(),
-								queueCacheConnectManager,
-								netConnectManager,
-								distributeConfParam,
-								queueDistributerVo);
+					DistributePush distributePush = distributePushFactory.createDistributePush(queueDistributerVo);
 					distributePush.start();
 					distributeGetMap.put(queueDistributerVo.getQueue_Nm(), distributePush);
 				} else {
@@ -171,12 +169,7 @@ public class Distribute {
 							DistributePush distributePush = distributeGetMap.get(queueDistributerVo.getQueue_Nm());
 							distributePush.destroy();
 							distributeGetMap.remove(queueDistributerVo.getQueue_Nm());
-							distributePush = new DistributePush(
-										queueDistributerVo.getQueue_Nm(),
-										queueCacheConnectManager,
-										netConnectManager,
-										distributeConfParam,
-										queueDistributerVo);
+							distributePush = distributePushFactory.createDistributePush(queueDistributerVo);
 							distributePush.start();
 							distributeGetMap.put(queueDistributerVo.getQueue_Nm(), distributePush);
 						} else {
@@ -209,19 +202,11 @@ public class Distribute {
 				Set<Long> dbIdSet = new HashSet<Long>();
 				ConnectNode connectNode = dbConnectManager.getConnectNode(queueDistributerVo.getQueue_Nm());
 				if (connectNode != null) {
-					List<org.fl.noodle.common.connect.agent.ConnectAgent> connectAgentList = connectNode.getConnectAgentList();
-					for (org.fl.noodle.common.connect.agent.ConnectAgent connectAgent : connectAgentList) {
+					List<ConnectAgent> connectAgentList = connectNode.getConnectAgentList();
+					for (ConnectAgent connectAgent : connectAgentList) {
 						dbIdSet.add(connectAgent.getConnectId());
 						if (!distributeSetDbMap.containsKey(connectAgent.getConnectId())) {
-							DistributePull distributePull = 
-									new DistributePull(
-										queueDistributerVo.getQueue_Nm(),
-										moduleId,
-										dbConnectManager,
-										queueCacheConnectManager,
-										distributeConfParam,
-										queueDistributerVo,
-										connectAgent.getConnectId());
+							DistributePull distributePull = distributePullFactory.createDistributePull(queueDistributerVo, connectAgent.getConnectId());
 							distributePull.start();
 							distributeSetDbMap.put(connectAgent.getConnectId(), distributePull);
 						} 
@@ -388,5 +373,13 @@ public class Distribute {
 
 	public void setDistributeModuleRegister(ModuleRegister distributeModuleRegister) {
 		this.distributeModuleRegister = distributeModuleRegister;
+	}
+
+	public void setDistributePullFactory(DistributePullFactory distributePullFactory) {
+		this.distributePullFactory = distributePullFactory;
+	}
+
+	public void setDistributePushFactory(DistributePushFactory distributePushFactory) {
+		this.distributePushFactory = distributePushFactory;
 	}
 }

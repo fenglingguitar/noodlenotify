@@ -39,12 +39,11 @@ public class DistributePush {
 	
 	private AtomicInteger  stopCount;
 	
-	public DistributePush(String queueName,
-							ConnectManager queueCacheConnectManager,
+	public DistributePush(ConnectManager queueCacheConnectManager,
 							ConnectManager netConnectManager,
 							DistributeConfParam distributeConfParam,
 							QueueDistributerVo queueDistributerVo) {
-		this.queueName = queueName;
+		this.queueName = queueDistributerVo.getQueue_Nm();
 		this.queueCacheConnectManager = queueCacheConnectManager;
 		this.netConnectManager = netConnectManager;
 		this.distributeConfParam = distributeConfParam;

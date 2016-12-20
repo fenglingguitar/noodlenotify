@@ -69,6 +69,19 @@
 		
 	</bean>
 	
+	<bean id="distributePullFactory" class="org.fl.noodlenotify.core.distribute.DistributePullFactory">
+		<property name="dbConnectManager" ref="distributeDbConnectManager" />
+		<property name="queueCacheConnectManager" ref="distributeQueueCacheConnectManager" />
+		<property name="distributeConfParam" ref="distributeConfParam" />
+		<property name="distributeModuleRegister" ref="distributeModuleRegister" />
+	</bean>
+	
+	<bean id="distributePushFactory" class="org.fl.noodlenotify.core.distribute.DistributePushFactory">
+		<property name="queueCacheConnectManager" ref="distributeQueueCacheConnectManager" />
+		<property name="netConnectManager" ref="distributeNetConnectManager" />
+		<property name="distributeConfParam" ref="distributeConfParam" />
+	</bean>
+	
 	<bean id="distribute" class="org.fl.noodlenotify.core.distribute.Distribute" 
 			init-method="start" destroy-method="destroy"
 			parent="distributeParam">
@@ -79,6 +92,8 @@
 		<property name="netConnectManager" ref="distributeNetConnectManager" />
 		<property name="distributeConfParam" ref="distributeConfParam" />
 		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
+		<property name="distributePullFactory" ref="distributePullFactory" />
+		<property name="distributePushFactory" ref="distributePushFactory" />
 	</bean>
 
 </beans>
