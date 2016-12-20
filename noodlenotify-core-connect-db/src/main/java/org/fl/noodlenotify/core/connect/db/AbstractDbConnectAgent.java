@@ -3,12 +3,10 @@ package org.fl.noodlenotify.core.connect.db;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.agent.AbstractConnectAgent;
@@ -16,12 +14,10 @@ import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.exception.ConnectTimeoutException;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implements DbConnectAgent, DbStatusChecker {
 	
-	private final static Logger logger = LoggerFactory.getLogger(AbstractDbConnectAgent.class);
+	//private final static Logger logger = LoggerFactory.getLogger(AbstractDbConnectAgent.class);
 	
 	protected DbConnectAgentConfParam dbConnectAgentConfParam;
 
@@ -32,9 +28,6 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	
 	private volatile boolean stopSign = false;
-	
-	private CountDownLatch stopCountDownLatch;
-	private AtomicInteger  stopCountDownLatchCount;
 		
 	public AbstractDbConnectAgent(
 			long connectId, String ip, int port, String url, 
@@ -58,20 +51,6 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 		insertBlockingQueue = new LinkedBlockingQueue<MessageDm>(dbConnectAgentConfParam.getInsertCapacity());
 		updateBlockingQueue = new LinkedBlockingQueue<MessageDm>(dbConnectAgentConfParam.getUpdateCapacity());
 		deleteBlockingQueue = new LinkedBlockingQueue<MessageDm>(dbConnectAgentConfParam.getDeleteCapacity());
-		
-		int allThreadCount = dbConnectAgentConfParam.getInsertThreadCount() + 
-								dbConnectAgentConfParam.getUpdateThreadCount() + 
-								dbConnectAgentConfParam.getDeleteThreadCount();
-		stopCountDownLatch = new CountDownLatch(allThreadCount);
-		if (logger.isDebugEnabled()) {
-		stopCountDownLatchCount = new AtomicInteger(allThreadCount);
-		logger.debug("ConnectActual -> New StopCountDownLatchCount -> " 
-			+ "ConnectId: " + connectId
-			+ ", Ip: " + ip
-			+ ", Port: " + port
-			+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.get()
-			);
-		}
 
 		for (int i=0; i<dbConnectAgentConfParam.getInsertThreadCount(); i++) {
 			
@@ -94,27 +73,12 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 										break;
 									} else {
 										if (stopSign && insertBlockingQueue.size() == 0) {
-											stopCountDownLatch.countDown();
-											if (logger.isDebugEnabled()) {
-												logger.debug("InsertRunnable -> StopCountDownLatchCount CountDown -> " 
-														+ "ConnectId: " + connectId
-														+ ", Ip: " + ip
-														+ ", Port: " + port
-														+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
-														);
-											}
 											return;
 										}
 									}
 								}
 							} catch (InterruptedException e) {
-								if (logger.isErrorEnabled()) {
-									logger.error("InsertRunnable -> " 
-											+ "DB: " + connectId
-											+ ", Ip: " + ip
-											+ ", Port: " + port
-											+ ", Start Insert Threads -> " + e);
-								}
+								e.printStackTrace();
 							}
 						}
 						insertActual(messageDmList);
@@ -153,27 +117,12 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 										break;
 									} else {
 										if (stopSign && updateBlockingQueue.size() == 0) {
-											stopCountDownLatch.countDown();
-											if (logger.isDebugEnabled()) {
-												logger.debug("UpdateRunnable -> StopCountDownLatchCount CountDown -> " 
-														+ "ConnectId: " + connectId
-														+ ", Ip: " + ip
-														+ ", Port: " + port
-														+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
-														);
-											}
 											return;
 										}
 									}
 								}
 							} catch (InterruptedException e) {
-								if (logger.isErrorEnabled()) {
-									logger.error("UpdateRunnable -> " 
-											+ "DB: " + connectId
-											+ ", Ip: " + ip
-											+ ", Port: " + port
-											+ ", Start Update Threads -> " + e);
-								}
+								e.printStackTrace();
 							}
 						}
 						updateActual(messageDmList);
@@ -212,27 +161,12 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 										break;
 									} else {
 										if (stopSign && deleteBlockingQueue.size() == 0) {
-											stopCountDownLatch.countDown();
-											if (logger.isDebugEnabled()) {
-												logger.debug("SetRunnable -> StopCountDownLatchCount CountDown -> " 
-														+ "ConnectId: " + connectId
-														+ ", Ip: " + ip
-														+ ", Port: " + port
-														+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
-														);
-											}
 											return;
 										}
 									}
 								}
 							} catch (InterruptedException e) {
-								if (logger.isErrorEnabled()) {
-									logger.error("ConnectActual -> " 
-											+ "DB: " + connectId
-											+ ", Ip: " + ip
-											+ ", Port: " + port
-											+ ", Start Delete Threads -> " + e);
-								}
+								e.printStackTrace();
 							}
 						}
 						
@@ -259,21 +193,14 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 	public void closeActual() {
 		
 		stopSign = true;
-		
-		try {
-			stopCountDownLatch.await();
-		} catch (InterruptedException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("CloseActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port	
-						+ ", CountDownLatch Await -> " + e
-						);
-			}
-		}
-		
+
 		executorService.shutdown();
+		try {
+			if(!executorService.awaitTermination(60000, TimeUnit.MILLISECONDS)) {
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		
 		closeDbActual();
 	}
@@ -291,12 +218,7 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 				try {
 					messageDm.wait();
 				} catch (java.lang.InterruptedException e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("Insert -> wait -> " 
-								+ "Queue: " + messageDm.getQueueName()
-								+ ", UUID: " + messageDm.getUuid()
-								+ ", InterruptedException -> " + e);
-					}
+					e.printStackTrace();
 				}
 			} else {
 				throw new ConnectTimeoutException("Db connect agent insert timeout");

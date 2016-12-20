@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
@@ -25,12 +25,10 @@ import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Exchange implements NetConnectReceiver {
 
-	private final static Logger logger = LoggerFactory.getLogger(Exchange.class);
+	//private final static Logger logger = LoggerFactory.getLogger(Exchange.class);
 	
 	private long suspendTime = 300000;
 	
@@ -40,7 +38,6 @@ public class Exchange implements NetConnectReceiver {
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();	
 	
 	private volatile boolean stopSign = false;
-	private CountDownLatch stopCountDownLatch;
 	
 	private ConsoleRemotingInvoke consoleRemotingInvoke;
 	
@@ -71,24 +68,12 @@ public class Exchange implements NetConnectReceiver {
 		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
 		moduleId = consoleRemotingInvoke.saveExchangerRegister(localIp, localPort, url, type, checkPort, exchangeName);
 		
-		//MemoryStorage.moduleName = MonitorPerformanceConstant.MODULE_ID_EXCHANGE;
-		//MemoryStorage.moduleId = moduleId;
-		
 		exchangeModuleRegister.setModuleId(moduleId);
-		
-		//bodyCacheConnectManager.setModuleId(moduleId);
-		//bodyCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		//bodyCacheConnectManager.start();
+
 		bodyCacheConnectManager.runUpdateNow();
-		
-		//dbConnectManager.setModuleId(moduleId);
-		//dbConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		//dbConnectManager.start();
 		dbConnectManager.runUpdateNow();
 		
 		updateConnectAgent();
-		
-		stopCountDownLatch = new CountDownLatch(1);
 
 		executorService.execute(new Runnable() {
 			@Override
@@ -101,7 +86,6 @@ public class Exchange implements NetConnectReceiver {
 					}
 					updateConnectAgent();
 				}
-				stopCountDownLatch.countDown();
 			}
 		});				
 	}
@@ -111,23 +95,20 @@ public class Exchange implements NetConnectReceiver {
 		consoleRemotingInvoke.saveExchangerCancel(moduleId);
 
 		stopSign = true;
-		startUpdateConnectAgent();
-		stopCountDownLatch.await();
 		executorService.shutdown();
-		
-		//dbConnectManager.destroy();		
-		//bodyCacheConnectManager.destroy();
+		try {
+			if(!executorService.awaitTermination(60000, TimeUnit.MILLISECONDS)) {
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private synchronized void suspendUpdateConnectAgent() {
 		try {
 			wait(suspendTime);
 		} catch (InterruptedException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("SuspendUpdateConnectAgent -> Wait -> "
-						+ "ModuleId: " + moduleId
-						+ ", Wait Interrupted -> " + e);
-			}
+			e.printStackTrace();
 		}
 	}
 	
@@ -142,68 +123,27 @@ public class Exchange implements NetConnectReceiver {
 		try {
 			consoleInfoMapGroupNum = consoleRemotingInvoke.exchangerGetQueueConsumerGroupNum(moduleId);
 		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("UpdateConnectAgent -> "
-							+ "ModuleId: " + moduleId
-							+ ", Exchanger Get QueueConsumerGroupNum -> " + e);
-			}
+			e.printStackTrace();
 		}
 		
 		if (consoleInfoMapGroupNum != null) {
 			
-			if (logger.isDebugEnabled()) {
-				Set<String> set = consoleInfoMapGroupNum.keySet();
-				for (String queueName : set) {
-					logger.debug("UpdateConnectAgent -> ExchangerGetQueueConsumerGroupNum -> " 
-							+ "QueueName: " + queueName 
-							+ ", QueueConsumerGroupNum: " + consoleInfoMapGroupNum.get(queueName)
-							);
-				}
-			}
-			
 			for (String queueName : consoleInfoMapGroupNum.keySet()) {
 				if (!queueConsumerGroupNumMap.containsKey(queueName)) {
 					queueConsumerGroupNumMap.putIfAbsent(queueName, consoleInfoMapGroupNum.get(queueName));
-					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Add QueueConsumerGroupNum -> " 
-								+ "QueueName: " + queueName 
-								+ ", QueueConsumerGroupNum: " + consoleInfoMapGroupNum.get(queueName)
-								);
-					}
 				} else {
 					Long queueConsumerGroupNumOld = queueConsumerGroupNumMap.get(queueName);
 					Long queueConsumerGroupNumNew = consoleInfoMapGroupNum.get(queueName);
 					if (!queueConsumerGroupNumOld.equals(queueConsumerGroupNumNew)) {
 						queueConsumerGroupNumMap.remove(queueName);
-						if (logger.isDebugEnabled()) {
-							logger.debug("UpdateConnectAgent -> Remove QueueConsumerGroupNum -> " 
-									+ "QueueName: " + queueName 
-									+ ", QueueConsumerGroupNum: " + queueConsumerGroupNumOld
-									+ ", QueueConsumerGroupNum Change"
-									);
-						}
 						queueConsumerGroupNumMap.put(queueName, queueConsumerGroupNumNew);
-						if (logger.isDebugEnabled()) {
-							logger.debug("UpdateConnectAgent -> Add QueueConsumerGroupNum -> " 
-									+ "QueueName: " + queueName 
-									+ ", QueueConsumerGroupNum: " + queueConsumerGroupNumNew
-									+ ", QueueConsumerGroupNum Change"
-									);
-						}
 					}
 				}
 			}
 			
 			for (String queueName : queueConsumerGroupNumMap.keySet()) {
-				Long queueConsumerGroupNumOld = queueConsumerGroupNumMap.get(queueName);
 				if (!consoleInfoMapGroupNum.containsKey(queueName)) {
 					queueConsumerGroupNumMap.remove(queueName);
-					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Remove QueueConsumerGroupNum -> " 
-								+ "QueueName: " + queueName 
-								+ ", QueueConsumerGroupNum: " + queueConsumerGroupNumOld
-								);
-					}
 				}
 			}
 		}
@@ -213,22 +153,10 @@ public class Exchange implements NetConnectReceiver {
 		try {
 			consoleInfoMapQueues = consoleRemotingInvoke.exchangerGetQueues(moduleId);
 		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("UpdateConnectAgent -> "
-							+ "ModuleId: " + moduleId
-							+ ", Exchanger Get Queues -> " + e);
-			}
+			e.printStackTrace();
 		}
 		
 		if (consoleInfoMapQueues != null) {
-			
-			if (logger.isDebugEnabled()) {
-				for (QueueExchangerVo queueExchangerVo : consoleInfoMapQueues) {
-					logger.debug("UpdateConnectAgent -> ExchangerGetQueues -> " 
-							+ "QueueName: " + queueExchangerVo.getQueue_Nm() 
-							);
-				}
-			}
 			
 			Set<String> queueNameSet = new HashSet<String>();
 			
@@ -236,11 +164,6 @@ public class Exchange implements NetConnectReceiver {
 				queueNameSet.add(queueExchangerVo.getQueue_Nm());
 				if (!queueExchangerVoMap.containsKey(queueExchangerVo.getQueue_Nm())) {
 					queueExchangerVoMap.put(queueExchangerVo.getQueue_Nm(), queueExchangerVo);
-					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Add Queue -> " 
-								+ "QueueName: " + queueExchangerVo.getQueue_Nm() 
-								);
-					}
 				}
 			}
 			
@@ -248,11 +171,6 @@ public class Exchange implements NetConnectReceiver {
 				if (!queueNameSet.contains(queueName)) {
 					QueueExchangerVo queueExchangerVoOld = queueExchangerVoMap.get(queueName);
 					queueExchangerVoMap.remove(queueExchangerVoOld.getQueue_Nm());
-					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Remove Queue -> " 
-								+ "QueueName: " + queueExchangerVoOld.getQueue_Nm() 
-								);
-					}
 				} 
 			}
 		}

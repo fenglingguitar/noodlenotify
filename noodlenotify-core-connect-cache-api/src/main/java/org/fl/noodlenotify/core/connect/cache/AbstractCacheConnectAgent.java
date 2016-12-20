@@ -3,23 +3,19 @@ package org.fl.noodlenotify.core.connect.cache;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.agent.AbstractConnectAgent;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 	
-	private final static Logger logger = LoggerFactory.getLogger(AbstractCacheConnectAgent.class);
+	//private final static Logger logger = LoggerFactory.getLogger(AbstractCacheConnectAgent.class);
 	
 	protected CacheConnectAgentConfParam cacheConnectAgentConfParam;
 	
@@ -29,9 +25,6 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	
 	private volatile boolean stopSign = false;
-	
-	private CountDownLatch stopCountDownLatch;
-	private AtomicInteger  stopCountDownLatchCount;
 
 	public AbstractCacheConnectAgent(
 			long connectId, String ip, int port, String url, String type, 
@@ -55,22 +48,9 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 		setBlockingQueue = new LinkedBlockingQueue<MessageDm>(cacheConnectAgentConfParam.getSetCapacity());			
 		removeBlockingQueue = new LinkedBlockingQueue<MessageDm>(cacheConnectAgentConfParam.getRemoveCapacity());
 		
-		int allThreadCount = cacheConnectAgentConfParam.getSetThreadCount() + 
-								cacheConnectAgentConfParam.getRemoveThreadCount();
-		stopCountDownLatch = new CountDownLatch(allThreadCount);
-		if (logger.isDebugEnabled()) {
-			stopCountDownLatchCount = new AtomicInteger(allThreadCount);
-			logger.debug("ConnectActual -> New StopCountDownLatchCount -> " 
-					+ "ConnectId: " + connectId
-					+ ", Ip: " + ip
-					+ ", Port: " + port
-					+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.get()
-					);
-		}
-
 		for (int i=0; i<cacheConnectAgentConfParam.getSetThreadCount(); i++) {
 			
-			Thread connectAgentSetThread = new Thread(new Runnable() {
+			executorService.execute(new Runnable() {
 				
 				@Override
 				public void run() {
@@ -89,27 +69,12 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 										break;
 									} else {
 										if (stopSign) {
-											stopCountDownLatch.countDown();
-											if (logger.isDebugEnabled()) {
-												logger.debug("SetRunnable -> StopCountDownLatchCount CountDown -> " 
-														+ "ConnectId: " + connectId
-														+ ", Ip: " + ip
-														+ ", Port: " + port
-														+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
-														);
-											}
 											return;
 										}
 									}
 								}
 							} catch (InterruptedException e) {
-								if (logger.isErrorEnabled()) {
-									logger.error("ConnectActual -> " 
-											+ "ConnectId: " + connectId
-											+ ", Ip: " + ip
-											+ ", Port: " + port
-											+ ", Start Set Threads -> " + e);
-								}
+								e.printStackTrace();
 							}
 						}
 						setActual(messageDmList);
@@ -120,14 +85,11 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 					}
 				}
 			});
-			
-			connectAgentSetThread.setPriority(cacheConnectAgentConfParam.getSetThreadPriority());
-			executorService.execute(connectAgentSetThread);
 		}
 		
 		for (int i=0; i<cacheConnectAgentConfParam.getRemoveThreadCount(); i++) {
 			
-			Thread connectAgentRemoveThread = new Thread(new Runnable() {
+			executorService.execute(new Runnable() {
 				
 				@Override
 				public void run() {
@@ -146,39 +108,18 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 										break;
 									} else {
 										if (stopSign) {
-											stopCountDownLatch.countDown();
-											if (logger.isDebugEnabled()) {
-												logger.debug("RemoveRunnable -> StopCountDownLatchCount CountDown -> " 
-														+ "ConnectId: " + connectId
-														+ ", Ip: " + ip
-														+ ", Port: " + port
-														+ ", StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
-														);
-											}
 											return;
 										}
 									}
 								}
 							} catch (InterruptedException e) {
-								if (logger.isErrorEnabled()) {
-									logger.error("ConnectActual -> " 
-											+ "ConnectId: " + connectId
-											+ ", Ip: " + ip
-											+ ", Port: " + port
-											+ ", Start Remove Threads -> " + e);
-								}
+								e.printStackTrace();
 							}
 						}
 						try {
-							startSleep(cacheConnectAgentConfParam.getRemoveDelay());
+							Thread.sleep(cacheConnectAgentConfParam.getRemoveDelay());
 						} catch (InterruptedException e) {
-							if (logger.isErrorEnabled()) {
-								logger.error("ConnectActual -> " 
-										+ "ConnectId: " + connectId
-										+ ", Ip: " + ip
-										+ ", Port: " + port
-										+ ", StartSleep RemoveDelay -> " + e);
-							}
+							e.printStackTrace();
 						}
 						removeActual(messageDmList);
 						for (MessageDm messageDm : messageDmList) {
@@ -188,9 +129,6 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 					}
 				}
 			});
-			
-			connectAgentRemoveThread.setPriority(cacheConnectAgentConfParam.getSetThreadPriority());
-			executorService.execute(connectAgentRemoveThread);
 		}
 	}
 
@@ -203,22 +141,12 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 	protected void closeActual() {
 		
 		stopSign = true;
-		
-		notifySleep();
-		
-		if (stopCountDownLatch != null) {
-			try {
-				stopCountDownLatch.await();
-			} catch (InterruptedException e) {
-				if (logger.isErrorEnabled()) {
-					logger.error("CloseActual -> " 
-							+ "ConnectId: " + connectId
-							+ ", Ip: " + ip
-							+ ", Port: " + port	
-							+ ", CountDownLatch Await -> " + e
-							);
-				}
+		executorService.shutdown();
+		try {
+			if(!executorService.awaitTermination(60000, TimeUnit.MILLISECONDS)) {
 			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		
 		closeCacheActual();
@@ -230,19 +158,8 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 	
 	protected abstract void setActual(List<MessageDm> messageDmList);
 	protected abstract void removeActual(List<MessageDm> messageDmList);
-
-	private synchronized void startSleep(long suspendTime) throws InterruptedException {
-		if (!stopSign && suspendTime > 0) {
-			wait(suspendTime);
-		}
-	}
 	
-	private synchronized void notifySleep() {
-		notifyAll();
-	}
-	
-	public void setCacheConnectAgentConfParam(
-			CacheConnectAgentConfParam cacheConnectAgentConfParam) {
+	public void setCacheConnectAgentConfParam(CacheConnectAgentConfParam cacheConnectAgentConfParam) {
 		this.cacheConnectAgentConfParam = cacheConnectAgentConfParam;
 	}
 }

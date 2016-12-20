@@ -5,10 +5,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.TimeUnit;
 
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.node.ConnectNode;
@@ -19,12 +18,10 @@ import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.distribute.locker.cache.queue.QueueCacheDistributeSetLocker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Distribute {
 	
-	private final static Logger logger = LoggerFactory.getLogger(Distribute.class);
+	//private final static Logger logger = LoggerFactory.getLogger(Distribute.class);
 
 	private long suspendTime = 300000;
 	
@@ -43,15 +40,11 @@ public class Distribute {
 	private ConcurrentMap<String, ConcurrentMap<Long, DistributePull>> distributeSetQueueMap = new ConcurrentHashMap<String, ConcurrentMap<Long, DistributePull>>();
 	ConcurrentMap<String, QueueDistributerVo> queueDistributerVoMap = new ConcurrentHashMap<String, QueueDistributerVo>();
 	
-	private CountDownLatch stopCountDownLatch;
-	
 	private ConsoleRemotingInvoke consoleRemotingInvoke;
 	
 	private ConcurrentMap<String, DistributedLock> queueCacheDistributeSetLockerMap = new ConcurrentHashMap<String, DistributedLock>();
 	private ConcurrentMap<String, Boolean> queueCacheDistributeSetStopSignMap = new ConcurrentHashMap<String, Boolean>();
 	private ExecutorService queueCacheDistributeSetLockerExecutorService = Executors.newCachedThreadPool();
-	
-	private AtomicInteger  stopCountDownLatchCount = new AtomicInteger();
 	
 	private String distributeName;
 	private long moduleId;
@@ -69,40 +62,14 @@ public class Distribute {
 		localIp = localIp == null ? NetAddressUtil.getLocalIp(): localIp;
 		moduleId = consoleRemotingInvoke.saveDistributerRegister(localIp, checkPort, distributeName);
 		
-		//MemoryStorage.moduleName = MonitorPerformanceConstant.MODULE_ID_DISTRIBUTE;
-		//MemoryStorage.moduleId = moduleId;
-		
 		distributeModuleRegister.setModuleId(moduleId);
 
-		//netConnectManager.setModuleId(moduleId);
-		//netConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		//netConnectManager.start();
 		netConnectManager.runUpdateNow();
-		
-		//bodyCacheConnectManager.setModuleId(moduleId);
-		//bodyCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		//bodyCacheConnectManager.start();
 		bodyCacheConnectManager.runUpdateNow();
-
-		//queueCacheConnectManager.setModuleId(moduleId);
-		//queueCacheConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		//queueCacheConnectManager.start();
 		queueCacheConnectManager.runUpdateNow();
-
-		//dbConnectManager.setModuleId(moduleId);
-		//dbConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		//dbConnectManager.start();
 		dbConnectManager.runUpdateNow();
 		
 		updateConnectAgent();
-		
-		stopCountDownLatch = new CountDownLatch(1);
-		if (logger.isDebugEnabled()) {
-			stopCountDownLatchCount = new AtomicInteger(1);
-			logger.debug("UpdateConnectAgentRunnable -> New StopCountDownLatchCount -> "
-					+ "StopCountDownLatchCount: " + stopCountDownLatchCount.get()
-					);
-		}
 		
 		executorService.execute(new Runnable() {
 			
@@ -117,13 +84,6 @@ public class Distribute {
 					}
 					updateConnectAgent();
 				}
-				
-				stopCountDownLatch.countDown();
-				if (logger.isDebugEnabled()) {
-					logger.debug("UpdateConnectAgentRunnable -> StopCountDownLatchCount CountDown -> "
-							+ "StopCountDownLatchCount: " + stopCountDownLatchCount.decrementAndGet()
-							);
-				}
 			}
 		});		
 	}
@@ -133,28 +93,21 @@ public class Distribute {
 		consoleRemotingInvoke.saveDistributerCancel(moduleId);
 
 		stopSign = true;
-		startUpdateConnectAgent();
-		stopCountDownLatch.await();
 		executorService.shutdown();
-		
-		//dbConnectManager.destroy();
-		//queueCacheConnectManager.destroy();
-		//bodyCacheConnectManager.destroy();
-		//netConnectManager.destroy();		
+		try {
+			if(!executorService.awaitTermination(60000, TimeUnit.MILLISECONDS)) {
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private synchronized void suspendUpdateConnectAgent() {
 		try {
 			wait(suspendTime);
 		} catch (InterruptedException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("SuspendUpdateConnectAgent -> " + e);
-			}
+			e.printStackTrace();
 		}
-	}
-	
-	private synchronized void startUpdateConnectAgent() {
-		notifyAll();
 	}
 	
 	private void updateConnectAgent() {
@@ -164,31 +117,10 @@ public class Distribute {
 		try {
 			consoleInfoList = consoleRemotingInvoke.distributerGetQueues(moduleId);
 		} catch (Exception e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("UpdateConnectAgent -> "
-							+ "ModuleId: " + moduleId
-							+ ", Distributer Get Queues -> " + e);
-			}
+			e.printStackTrace();
 		}
 				
 		if (consoleInfoList != null) {
-			
-			if (logger.isDebugEnabled()) {
-				for (QueueDistributerVo queueDistributerVo : consoleInfoList) {
-					logger.debug("UpdateConnectAgent -> DistributerGetQueues -> " 
-							+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-							+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
-							+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
-							+ ", Interval_Time: " + queueDistributerVo.getInterval_Time()
-							+ ", Dph_Delay_Time: " + queueDistributerVo.getDph_Delay_Time()
-							+ ", Dph_Timeout: " + queueDistributerVo.getDph_Timeout()
-							+ ", New_Pop_ThreadNum: " + queueDistributerVo.getNew_Pop_ThreadNum()
-							+ ", New_Exe_ThreadNum: " + queueDistributerVo.getNew_Exe_ThreadNum()
-							+ ", Portion_Pop_ThreadNum: " + queueDistributerVo.getPortion_Pop_ThreadNum()
-							+ ", Portion_Exe_ThreadNum: " + queueDistributerVo.getPortion_Exe_ThreadNum()
-							);
-				}
-			}
 			
 			Set<String> queueNameSet = new HashSet<String>();
 			
@@ -206,11 +138,6 @@ public class Distribute {
 					queueCacheDistributeSetLockerMap.put(queueDistributerVo.getQueue_Nm(), queueCacheDistributeSetLocker);
 					queueCacheDistributeSetStopSignMap.put(queueDistributerVo.getQueue_Nm(), false);
 					queueCacheDistributeSetLockerExecutorService.execute(new CheckActiveRunnable(queueDistributerVo.getQueue_Nm(), queueCacheDistributeSetLocker));
-					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Start QueueCache DistributePull Locker -> " 
-								+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-								);
-					}
 					
 					DistributePush distributePush = 
 							new DistributePush(
@@ -221,20 +148,6 @@ public class Distribute {
 								queueDistributerVo);
 					distributePush.start();
 					distributeGetMap.put(queueDistributerVo.getQueue_Nm(), distributePush);
-					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Add DistributePush -> " 
-								+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-								+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
-								+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
-								+ ", Interval_Time: " + queueDistributerVo.getInterval_Time()
-								+ ", Dph_Delay_Time: " + queueDistributerVo.getDph_Delay_Time()
-								+ ", Dph_Timeout: " + queueDistributerVo.getDph_Timeout()
-								+ ", New_Pop_ThreadNum: " + queueDistributerVo.getNew_Pop_ThreadNum()
-								+ ", New_Exe_ThreadNum: " + queueDistributerVo.getNew_Exe_ThreadNum()
-								+ ", Portion_Pop_ThreadNum: " + queueDistributerVo.getPortion_Pop_ThreadNum()
-								+ ", Portion_Exe_ThreadNum: " + queueDistributerVo.getPortion_Exe_ThreadNum()
-								);
-					}
 				} else {
 					QueueDistributerVo queueDistributerVoOld = queueDistributerVoMap.get(queueDistributerVo.getQueue_Nm());
 					if (!queueDistributerVoOld.getIs_Repeat().equals(queueDistributerVo.getIs_Repeat())
@@ -258,21 +171,6 @@ public class Distribute {
 							DistributePush distributePush = distributeGetMap.get(queueDistributerVo.getQueue_Nm());
 							distributePush.destroy();
 							distributeGetMap.remove(queueDistributerVo.getQueue_Nm());
-							if (logger.isDebugEnabled()) {
-								logger.debug("UpdateConnectAgent -> Remove DistributePush -> " 
-										+ "QueueName: " + queueDistributerVoOld.getQueue_Nm() 
-										+ ", Is_Repeat: " + queueDistributerVoOld.getIs_Repeat()
-										+ ", Expire_Time: " + queueDistributerVoOld.getExpire_Time()
-										+ ", Interval_Time: " + queueDistributerVoOld.getInterval_Time()
-										+ ", Dph_Delay_Time: " + queueDistributerVoOld.getDph_Delay_Time()
-										+ ", Dph_Timeout: " + queueDistributerVoOld.getDph_Timeout()
-										+ ", New_Pop_ThreadNum: " + queueDistributerVoOld.getNew_Pop_ThreadNum()
-										+ ", New_Exe_ThreadNum: " + queueDistributerVoOld.getNew_Exe_ThreadNum()
-										+ ", Portion_Pop_ThreadNum: " + queueDistributerVoOld.getPortion_Pop_ThreadNum()
-										+ ", Portion_Exe_ThreadNum: " + queueDistributerVoOld.getPortion_Exe_ThreadNum()
-										+ ", Queue Change"
-										);
-							}
 							distributePush = new DistributePush(
 										queueDistributerVo.getQueue_Nm(),
 										queueCacheConnectManager,
@@ -281,21 +179,6 @@ public class Distribute {
 										queueDistributerVo);
 							distributePush.start();
 							distributeGetMap.put(queueDistributerVo.getQueue_Nm(), distributePush);
-							if (logger.isDebugEnabled()) {
-								logger.debug("UpdateConnectAgent -> Add DistributePush -> " 
-										+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-										+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
-										+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
-										+ ", Interval_Time: " + queueDistributerVo.getInterval_Time()
-										+ ", Dph_Delay_Time: " + queueDistributerVo.getDph_Delay_Time()
-										+ ", Dph_Timeout: " + queueDistributerVo.getDph_Timeout()
-										+ ", New_Pop_ThreadNum: " + queueDistributerVo.getNew_Pop_ThreadNum()
-										+ ", New_Exe_ThreadNum: " + queueDistributerVo.getNew_Exe_ThreadNum()
-										+ ", Portion_Pop_ThreadNum: " + queueDistributerVo.getPortion_Pop_ThreadNum()
-										+ ", Portion_Exe_ThreadNum: " + queueDistributerVo.getPortion_Exe_ThreadNum()
-										+ ", Queue Change"
-										);
-							}
 						} else {
 							if (!queueDistributerVoOld.getIs_Repeat().equals(queueDistributerVo.getIs_Repeat())
 									|| !queueDistributerVoOld.getExpire_Time().equals(queueDistributerVo.getExpire_Time())
@@ -303,34 +186,6 @@ public class Distribute {
 							) {
 								DistributePush distributePush = distributeGetMap.get(queueDistributerVo.getQueue_Nm());
 								distributePush.setQueueDistributerVo(queueDistributerVo);
-								if (logger.isDebugEnabled()) {
-									logger.debug("UpdateConnectAgent -> Change DistributePush From -> " 
-											+ "QueueName: " + queueDistributerVoOld.getQueue_Nm() 
-											+ ", Is_Repeat: " + queueDistributerVoOld.getIs_Repeat()
-											+ ", Expire_Time: " + queueDistributerVoOld.getExpire_Time()
-											+ ", Interval_Time: " + queueDistributerVoOld.getInterval_Time()
-											+ ", Dph_Delay_Time: " + queueDistributerVoOld.getDph_Delay_Time()
-											+ ", Dph_Timeout: " + queueDistributerVoOld.getDph_Timeout()
-											+ ", New_Pop_ThreadNum: " + queueDistributerVoOld.getNew_Pop_ThreadNum()
-											+ ", New_Exe_ThreadNum: " + queueDistributerVoOld.getNew_Exe_ThreadNum()
-											+ ", Portion_Pop_ThreadNum: " + queueDistributerVoOld.getPortion_Pop_ThreadNum()
-											+ ", Portion_Exe_ThreadNum: " + queueDistributerVoOld.getPortion_Exe_ThreadNum()
-											+ ", Queue Change"
-											);
-									logger.debug("UpdateConnectAgent -> Change DistributePush To -> " 
-											+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-											+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
-											+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
-											+ ", Interval_Time: " + queueDistributerVo.getInterval_Time()
-											+ ", Dph_Delay_Time: " + queueDistributerVo.getDph_Delay_Time()
-											+ ", Dph_Timeout: " + queueDistributerVo.getDph_Timeout()
-											+ ", New_Pop_ThreadNum: " + queueDistributerVo.getNew_Pop_ThreadNum()
-											+ ", New_Exe_ThreadNum: " + queueDistributerVo.getNew_Exe_ThreadNum()
-											+ ", Portion_Pop_ThreadNum: " + queueDistributerVo.getPortion_Pop_ThreadNum()
-											+ ", Portion_Exe_ThreadNum: " + queueDistributerVo.getPortion_Exe_ThreadNum()
-											+ ", Queue Change"
-											);
-								}
 							}
 								
 							if (!queueDistributerVoOld.getInterval_Time().equals(queueDistributerVo.getInterval_Time())
@@ -340,36 +195,6 @@ public class Distribute {
 								for (Long dbId : distributeSetDbMap.keySet()) {
 									DistributePull distributePull = distributeSetDbMap.get(dbId);
 									distributePull.setQueueDistributerVo(queueDistributerVo);
-									if (logger.isDebugEnabled()) {
-										logger.debug("UpdateConnectAgent -> Change DistributePull From -> " 
-												+ "QueueName: " + queueDistributerVoOld.getQueue_Nm() 
-												+ ", DbId: " + dbId
-												+ ", Is_Repeat: " + queueDistributerVoOld.getIs_Repeat()
-												+ ", Expire_Time: " + queueDistributerVoOld.getExpire_Time()
-												+ ", Interval_Time: " + queueDistributerVoOld.getInterval_Time()
-												+ ", Dph_Delay_Time: " + queueDistributerVoOld.getDph_Delay_Time()
-												+ ", Dph_Timeout: " + queueDistributerVoOld.getDph_Timeout()
-												+ ", New_Pop_ThreadNum: " + queueDistributerVoOld.getNew_Pop_ThreadNum()
-												+ ", New_Exe_ThreadNum: " + queueDistributerVoOld.getNew_Exe_ThreadNum()
-												+ ", Portion_Pop_ThreadNum: " + queueDistributerVoOld.getPortion_Pop_ThreadNum()
-												+ ", Portion_Exe_ThreadNum: " + queueDistributerVoOld.getPortion_Exe_ThreadNum()
-												+ ", Queue Change"
-												);
-										logger.debug("UpdateConnectAgent -> Change DistributePull To -> " 
-												+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-												+ ", DbId: " + dbId
-												+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
-												+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
-												+ ", Interval_Time: " + queueDistributerVo.getInterval_Time()
-												+ ", Dph_Delay_Time: " + queueDistributerVo.getDph_Delay_Time()
-												+ ", Dph_Timeout: " + queueDistributerVo.getDph_Timeout()
-												+ ", New_Pop_ThreadNum: " + queueDistributerVo.getNew_Pop_ThreadNum()
-												+ ", New_Exe_ThreadNum: " + queueDistributerVo.getNew_Exe_ThreadNum()
-												+ ", Portion_Pop_ThreadNum: " + queueDistributerVo.getPortion_Pop_ThreadNum()
-												+ ", Portion_Exe_ThreadNum: " + queueDistributerVo.getPortion_Exe_ThreadNum()
-												+ ", Queue Change"
-												);
-									}
 								}
 							}
 						}
@@ -399,21 +224,6 @@ public class Distribute {
 										connectAgent.getConnectId());
 							distributePull.start();
 							distributeSetDbMap.put(connectAgent.getConnectId(), distributePull);
-							if (logger.isDebugEnabled()) {
-								logger.debug("UpdateConnectAgent -> Add DistributePull -> " 
-										+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-										+ ", DbId: " + connectAgent.getConnectId()
-										+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
-										+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
-										+ ", Interval_Time: " + queueDistributerVo.getInterval_Time()
-										+ ", Dph_Delay_Time: " + queueDistributerVo.getDph_Delay_Time()
-										+ ", Dph_Timeout: " + queueDistributerVo.getDph_Timeout()
-										+ ", New_Pop_ThreadNum: " + queueDistributerVo.getNew_Pop_ThreadNum()
-										+ ", New_Exe_ThreadNum: " + queueDistributerVo.getNew_Exe_ThreadNum()
-										+ ", Portion_Pop_ThreadNum: " + queueDistributerVo.getPortion_Pop_ThreadNum()
-										+ ", Portion_Exe_ThreadNum: " + queueDistributerVo.getPortion_Exe_ThreadNum()
-										);
-							} 
 						} 
 					}
 				}
@@ -422,21 +232,6 @@ public class Distribute {
 						DistributePull distributePull = distributeSetDbMap.get(dbId);
 						distributePull.destroy();
 						distributeSetDbMap.remove(dbId);
-						if (logger.isDebugEnabled()) {
-							logger.debug("UpdateConnectAgent -> Remove DistributePull -> " 
-									+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-									+ ", DbId: " + dbId
-									+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
-									+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
-									+ ", Interval_Time: " + queueDistributerVo.getInterval_Time()
-									+ ", Dph_Delay_Time: " + queueDistributerVo.getDph_Delay_Time()
-									+ ", Dph_Timeout: " + queueDistributerVo.getDph_Timeout()
-									+ ", New_Pop_ThreadNum: " + queueDistributerVo.getNew_Pop_ThreadNum()
-									+ ", New_Exe_ThreadNum: " + queueDistributerVo.getNew_Exe_ThreadNum()
-									+ ", Portion_Pop_ThreadNum: " + queueDistributerVo.getPortion_Pop_ThreadNum()
-									+ ", Portion_Exe_ThreadNum: " + queueDistributerVo.getPortion_Exe_ThreadNum()
-									);
-						}
 					}
 				}
 			}
@@ -444,7 +239,6 @@ public class Distribute {
 			Set<String> keySetGet = queueDistributerVoMap.keySet();
 			for (String queueName : keySetGet) {
 				if (!queueNameSet.contains(queueName)) {
-					QueueDistributerVo queueDistributerVo = queueDistributerVoMap.get(queueName);
 					
 					queueDistributerVoMap.remove(queueName);
 
@@ -452,50 +246,16 @@ public class Distribute {
 					QueueCacheDistributeSetLocker queueCacheDistributeSetLocker = (QueueCacheDistributeSetLocker) queueCacheDistributeSetLockerMap.get(queueName);
 					queueCacheDistributeSetLocker.destroy();
 					queueCacheDistributeSetLockerMap.remove(queueName);
-					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Destroy QueueCache DistributePull Locker -> " 
-								+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-								);
-					}
 					
 					DistributePush distributePush = distributeGetMap.get(queueName);
 					distributePush.destroy();
 					distributeGetMap.remove(queueName);
-					if (logger.isDebugEnabled()) {
-						logger.debug("UpdateConnectAgent -> Remove DistributePush -> " 
-								+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-								+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
-								+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
-								+ ", Interval_Time: " + queueDistributerVo.getInterval_Time()
-								+ ", Dph_Delay_Time: " + queueDistributerVo.getDph_Delay_Time()
-								+ ", Dph_Timeout: " + queueDistributerVo.getDph_Timeout()
-								+ ", New_Pop_ThreadNum: " + queueDistributerVo.getNew_Pop_ThreadNum()
-								+ ", New_Exe_ThreadNum: " + queueDistributerVo.getNew_Exe_ThreadNum()
-								+ ", Portion_Pop_ThreadNum: " + queueDistributerVo.getPortion_Pop_ThreadNum()
-								+ ", Portion_Exe_ThreadNum: " + queueDistributerVo.getPortion_Exe_ThreadNum()
-								);
-					}
 					
 					ConcurrentMap<Long, DistributePull> distributeSetDbMap = distributeSetQueueMap.get(queueName);
 					for (Long dbId : distributeSetDbMap.keySet()) {
 						DistributePull distributePull = distributeSetDbMap.get(dbId);
 						distributePull.destroy();
 						distributeSetDbMap.remove(dbId);
-						if (logger.isDebugEnabled()) {
-							logger.debug("UpdateConnectAgent -> Remove DistributePull -> " 
-									+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-									+ ", DbId: " + dbId
-									+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
-									+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
-									+ ", Interval_Time: " + queueDistributerVo.getInterval_Time()
-									+ ", Dph_Delay_Time: " + queueDistributerVo.getDph_Delay_Time()
-									+ ", Dph_Timeout: " + queueDistributerVo.getDph_Timeout()
-									+ ", New_Pop_ThreadNum: " + queueDistributerVo.getNew_Pop_ThreadNum()
-									+ ", New_Exe_ThreadNum: " + queueDistributerVo.getNew_Exe_ThreadNum()
-									+ ", Portion_Pop_ThreadNum: " + queueDistributerVo.getPortion_Pop_ThreadNum()
-									+ ", Portion_Exe_ThreadNum: " + queueDistributerVo.getPortion_Exe_ThreadNum()
-									);
-						}
 					}
 					distributeSetQueueMap.remove(queueName);
 				}
@@ -507,7 +267,6 @@ public class Distribute {
 		
 		Set<String> keySetGet = queueDistributerVoMap.keySet();
 		for (String queueName : keySetGet) {
-			QueueDistributerVo queueDistributerVo = queueDistributerVoMap.get(queueName);
 			
 			queueDistributerVoMap.remove(queueName);
 			
@@ -515,50 +274,16 @@ public class Distribute {
 			QueueCacheDistributeSetLocker queueCacheDistributeSetLocker = (QueueCacheDistributeSetLocker) queueCacheDistributeSetLockerMap.get(queueName);
 			queueCacheDistributeSetLocker.destroy();
 			queueCacheDistributeSetLockerMap.remove(queueName);
-			if (logger.isDebugEnabled()) {
-				logger.debug("UpdateConnectAgent -> Destroy QueueCache DistributePull Locker -> " 
-						+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-						);
-			}
 			
 			DistributePush distributePush = distributeGetMap.get(queueName);
 			distributePush.destroy();
 			distributeGetMap.remove(queueName);
-			if (logger.isDebugEnabled()) {
-				logger.debug("UpdateConnectAgent -> Remove DistributePush -> " 
-						+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-						+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
-						+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
-						+ ", Interval_Time: " + queueDistributerVo.getInterval_Time()
-						+ ", Dph_Delay_Time: " + queueDistributerVo.getDph_Delay_Time()
-						+ ", Dph_Timeout: " + queueDistributerVo.getDph_Timeout()
-						+ ", New_Pop_ThreadNum: " + queueDistributerVo.getNew_Pop_ThreadNum()
-						+ ", New_Exe_ThreadNum: " + queueDistributerVo.getNew_Exe_ThreadNum()
-						+ ", Portion_Pop_ThreadNum: " + queueDistributerVo.getPortion_Pop_ThreadNum()
-						+ ", Portion_Exe_ThreadNum: " + queueDistributerVo.getPortion_Exe_ThreadNum()
-						);
-			}
 			
 			ConcurrentMap<Long, DistributePull> distributeSetDbMap = distributeSetQueueMap.get(queueName);
 			for (Long dbId : distributeSetDbMap.keySet()) {
 				DistributePull distributePull = distributeSetDbMap.get(dbId);
 				distributePull.destroy();
 				distributeSetDbMap.remove(dbId);
-				if (logger.isDebugEnabled()) {
-					logger.debug("UpdateConnectAgent -> Remove DistributePull -> " 
-							+ "QueueName: " + queueDistributerVo.getQueue_Nm() 
-							+ ", DbId: " + dbId
-							+ ", Is_Repeat: " + queueDistributerVo.getIs_Repeat()
-							+ ", Expire_Time: " + queueDistributerVo.getExpire_Time()
-							+ ", Interval_Time: " + queueDistributerVo.getInterval_Time()
-							+ ", Dph_Delay_Time: " + queueDistributerVo.getDph_Delay_Time()
-							+ ", Dph_Timeout: " + queueDistributerVo.getDph_Timeout()
-							+ ", New_Pop_ThreadNum: " + queueDistributerVo.getNew_Pop_ThreadNum()
-							+ ", New_Exe_ThreadNum: " + queueDistributerVo.getNew_Exe_ThreadNum()
-							+ ", Portion_Pop_ThreadNum: " + queueDistributerVo.getPortion_Pop_ThreadNum()
-							+ ", Portion_Exe_ThreadNum: " + queueDistributerVo.getPortion_Exe_ThreadNum()
-							);
-				}
 			}
 			distributeSetQueueMap.remove(queueName);
 		}
@@ -592,11 +317,7 @@ public class Distribute {
 				try {
 					Thread.sleep(distributeConfParam.getCheckActiveTimeInterval());
 				} catch (InterruptedException e) {
-					if (logger.isErrorEnabled()) {
-						logger.error("CheckActiveRunnable -> " 
-								+ "Queue: " + queueName
-								+ ", CheckActive Time Interval -> " + e);
-					}
+					e.printStackTrace();
 				}
 			}
 		}
@@ -611,48 +332,14 @@ public class Distribute {
 				if (queueCacheConnectAgent != null && !queueCacheConnectAgent.isActive(queueName)) {
 					try {
 						queueCacheConnectAgent.setActive(queueName, true);
-						if (logger.isInfoEnabled()) {
-							logger.info("CheckActiveRunnable -> SetActive -> "
-									+ "QUEUE: " + queueName
-									//+ ", ConnectId: " + ((ConnectAgent) queueCacheConnectAgentOther).getConnectId()
-									+ ", Set Cache Queue Active");
-						}
 					} catch (Exception e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("CheckActiveRunnable -> SetActive -> "
-									+ "QUEUE: " + queueName
-									//+ ", ConnectId: " + ((ConnectAgent) queueCacheConnectAgentOther).getConnectId()
-									+ ", Set Active -> Set Cache Queue Active -> " + e);
-						}
+						e.printStackTrace();
 					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-			} /*else {
-				List<ConnectAgent> connectAgentList = queueAgent.getConnectAgentAll();
-				for (ConnectAgent connectAgent : connectAgentList) {
-					QueueCacheConnectAgent queueCacheConnectAgentOther = (QueueCacheConnectAgent) connectAgent;
-					if (queueCacheConnectAgentOther != queueCacheConnectAgent) {
-						try {
-							queueCacheConnectAgentOther.setActive(queueName, false);
-						} catch (Exception e) {
-							if (logger.isInfoEnabled()) {
-								logger.info("CheckActiveRunnable -> SetActive -> "
-										+ "QUEUE: " + queueName
-										+ ", ConnectId: " + connectAgent.getConnectId()
-										+ ", Set Active False");
-							}
-						}
-					}
-				}
-			}*/
-		} /*else {
-			if (logger.isErrorEnabled()) {
-				logger.error("CheckActiveRunnable -> SetActive -> "
-						+ "QUEUE: " + queueName 
-						+ ", Set Active -> Get Queue Agent -> Null");
-			}
-		}*/
+			} 
+		}
 	}
 	
 	public void setDbConnectManager(ConnectManager dbConnectManager) {
