@@ -13,11 +13,12 @@
 	default-autowire="byName">
 	
 	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
 	
 	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/connect/db/manager/noodlenotify-core-connect-db-manager-exchange.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/body/manager/noodlenotify-core-connect-cache-body-manager-exchange.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/exchange/manager/noodlenotify-core-manager-exchange.xml" />
 	
 	<bean id="netConnectReceiver" class="org.fl.noodlenotify.core.exchange.Exchange" 
 			init-method="start" destroy-method="destroy"
@@ -26,6 +27,7 @@
 		<property name="localIp" value="127.0.0.1" />
 		<property name="dbConnectManager" ref="exchangeDbConnectManager" />
 		<property name="bodyCacheConnectManager" ref="exchangeBodyCacheConnectManager" />
+		<property name="exchangeConnectManager" ref="exchangeConnectManager" />
 		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
 	</bean>
     

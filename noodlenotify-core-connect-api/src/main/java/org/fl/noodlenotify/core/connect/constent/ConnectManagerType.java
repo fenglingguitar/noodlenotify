@@ -5,7 +5,9 @@ public enum ConnectManagerType {
 	NET("NET"),
 	DB("DB"),
 	BODY_CACHE("BODY_CACHE"),
-	QUEUE_CACHE("QUEUE_CACHE");
+	QUEUE_CACHE("QUEUE_CACHE"),
+	EXCHANGE("EXCHANGE"),
+	DISTRIBUTE("DISTRIBUTE");
 	
 	private String code;
 

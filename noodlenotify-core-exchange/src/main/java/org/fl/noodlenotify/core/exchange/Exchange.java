@@ -1,15 +1,5 @@
 package org.fl.noodlenotify.core.exchange;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.exception.ConnectInvokeException;
@@ -18,31 +8,25 @@ import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
-import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
+import org.fl.noodlenotify.core.exchange.manager.ExchangeConnectManager;
 
 public class Exchange implements NetConnectReceiver {
 
 	//private final static Logger logger = LoggerFactory.getLogger(Exchange.class);
 	
-	private long suspendTime = 300000;
-	
 	private ConnectManager dbConnectManager;
 	private ConnectManager bodyCacheConnectManager;
-	
-	private ExecutorService executorService = Executors.newSingleThreadExecutor();	
+	private ExchangeConnectManager exchangeConnectManager;
 	
 	private volatile boolean stopSign = false;
 	
 	private ConsoleRemotingInvoke consoleRemotingInvoke;
-	
-	private ConcurrentMap<String, Long> queueConsumerGroupNumMap = new ConcurrentHashMap<String, Long>();
-	private ConcurrentMap<String, QueueExchangerVo> queueExchangerVoMap = new ConcurrentHashMap<String, QueueExchangerVo>();
 	
 	private String exchangeName;
 	private long moduleId;
@@ -72,112 +56,11 @@ public class Exchange implements NetConnectReceiver {
 
 		bodyCacheConnectManager.runUpdateNow();
 		dbConnectManager.runUpdateNow();
-		
-		updateConnectAgent();
-
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				while (true) {
-					suspendUpdateConnectAgent();
-					if (stopSign) {
-						destroyConnectAgent();
-						break;
-					}
-					updateConnectAgent();
-				}
-			}
-		});				
+		exchangeConnectManager.runUpdateNow();
 	}
 	
 	public void destroy() throws Exception {
-		
 		consoleRemotingInvoke.saveExchangerCancel(moduleId);
-
-		stopSign = true;
-		executorService.shutdown();
-		try {
-			if(!executorService.awaitTermination(60000, TimeUnit.MILLISECONDS)) {
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private synchronized void suspendUpdateConnectAgent() {
-		try {
-			wait(suspendTime);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private synchronized void startUpdateConnectAgent() {
-		notifyAll();
-	}
-	
-	private void updateConnectAgent() {
-		
-		Map<String, Long> consoleInfoMapGroupNum = null;
-		
-		try {
-			consoleInfoMapGroupNum = consoleRemotingInvoke.exchangerGetQueueConsumerGroupNum(moduleId);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		if (consoleInfoMapGroupNum != null) {
-			
-			for (String queueName : consoleInfoMapGroupNum.keySet()) {
-				if (!queueConsumerGroupNumMap.containsKey(queueName)) {
-					queueConsumerGroupNumMap.putIfAbsent(queueName, consoleInfoMapGroupNum.get(queueName));
-				} else {
-					Long queueConsumerGroupNumOld = queueConsumerGroupNumMap.get(queueName);
-					Long queueConsumerGroupNumNew = consoleInfoMapGroupNum.get(queueName);
-					if (!queueConsumerGroupNumOld.equals(queueConsumerGroupNumNew)) {
-						queueConsumerGroupNumMap.remove(queueName);
-						queueConsumerGroupNumMap.put(queueName, queueConsumerGroupNumNew);
-					}
-				}
-			}
-			
-			for (String queueName : queueConsumerGroupNumMap.keySet()) {
-				if (!consoleInfoMapGroupNum.containsKey(queueName)) {
-					queueConsumerGroupNumMap.remove(queueName);
-				}
-			}
-		}
-		
-		List<QueueExchangerVo> consoleInfoMapQueues = null;
-		
-		try {
-			consoleInfoMapQueues = consoleRemotingInvoke.exchangerGetQueues(moduleId);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		if (consoleInfoMapQueues != null) {
-			
-			Set<String> queueNameSet = new HashSet<String>();
-			
-			for (QueueExchangerVo queueExchangerVo : consoleInfoMapQueues) {
-				queueNameSet.add(queueExchangerVo.getQueue_Nm());
-				if (!queueExchangerVoMap.containsKey(queueExchangerVo.getQueue_Nm())) {
-					queueExchangerVoMap.put(queueExchangerVo.getQueue_Nm(), queueExchangerVo);
-				}
-			}
-			
-			for (String queueName : queueExchangerVoMap.keySet()) {
-				if (!queueNameSet.contains(queueName)) {
-					QueueExchangerVo queueExchangerVoOld = queueExchangerVoMap.get(queueName);
-					queueExchangerVoMap.remove(queueExchangerVoOld.getQueue_Nm());
-				} 
-			}
-		}
-	}
-	
-	private void destroyConnectAgent() {
-		queueConsumerGroupNumMap.clear();
 	}
 	
 	@Override
@@ -197,12 +80,12 @@ public class Exchange implements NetConnectReceiver {
 			throw new ConnectInvokeException("Message body bigger then max limit: " + sizeLimit);
 		}
 		
-		Long queueConsumerGroupNum = queueConsumerGroupNumMap.get(messageDm.getQueueName());
+		Long queueConsumerGroupNum = exchangeConnectManager.getQueueConsumerGroupNumMap().get(messageDm.getQueueName());
 		if (queueConsumerGroupNum != null) {
 			messageDm.setExecuteQueue(queueConsumerGroupNum);
 			messageDm.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
 		} else {
-			startUpdateConnectAgent();
+			exchangeConnectManager.runUpdate();
 			throw new ConnectInvokeException("Set execute queue error, can not get queue consumer group num");
 		}
 		
@@ -221,7 +104,7 @@ public class Exchange implements NetConnectReceiver {
 		
 	}	
 	
-	public void setDbConnectManager(org.fl.noodle.common.connect.manager.ConnectManager dbConnectManager) {
+	public void setDbConnectManager(ConnectManager dbConnectManager) {
 		this.dbConnectManager = dbConnectManager;
 	}
 
@@ -229,8 +112,8 @@ public class Exchange implements NetConnectReceiver {
 		this.bodyCacheConnectManager = bodyCacheConnectManager;
 	}
 
-	public void setSuspendTime(long suspendTime) {
-		this.suspendTime = suspendTime;
+	public void setExchangeConnectManager(ExchangeConnectManager exchangeConnectManager) {
+		this.exchangeConnectManager = exchangeConnectManager;
 	}
 
 	public void setConsoleRemotingInvoke(ConsoleRemotingInvoke consoleRemotingInvoke) {

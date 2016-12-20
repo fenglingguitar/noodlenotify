@@ -18,7 +18,7 @@
 		<property name="port" value="20622"/>
 	</bean>
 	<import resource="classpath:org/fl/noodlenotify/demo/exchange/noodlenotify-demo-exchange.xml" />
-	<bean id="exchangeParam" abstract="true" parent="commonParam">
+	<bean id="exchangeParam" abstract="true">
 		<property name="exchangeName" value="TestExchange-Jetty" />
 		<property name="localPort" value="20102" />
 		<property name="checkPort" value="20622" />
