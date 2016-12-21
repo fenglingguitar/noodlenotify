@@ -3,16 +3,15 @@ package org.fl.noodlenotify.core.pclient;
 import java.util.UUID;
 
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
-import org.fl.noodle.common.connect.manager.ConnectManager;
+import org.fl.noodle.common.connect.manager.ConnectManagerPool;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
+import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 
 public class ProducerClientImpl implements ProducerClient {
-
-	protected ConnectManager netConnectManager;
 	
 	protected ConsoleRemotingInvoke consoleRemotingInvoke;
 	
@@ -24,9 +23,8 @@ public class ProducerClientImpl implements ProducerClient {
 	private String checkType;
 	
 	protected ModuleRegister producerModuleRegister;
-
-	public ProducerClientImpl() {
-	}
+	
+	protected ConnectManagerPool connectManagerPool;
 	
 	public void start() throws Exception {
 		
@@ -38,18 +36,14 @@ public class ProducerClientImpl implements ProducerClient {
 		moduleId = consoleRemotingInvoke.saveProducerRegister(localIp, checkPort, checkUrl, checkType, producerClientName);		
 
 		producerModuleRegister.setModuleId(moduleId);
-		
-		//netConnectManager.setModuleId(0);
-		//netConnectManager.setConsoleRemotingInvoke(consoleRemotingInvoke);
-		//netConnectManager.start();
-		
-		netConnectManager.runUpdateNow();
+
+		connectManagerPool.startConnectManager();
 	}
 
 	public void destroy() throws Exception {
 		
 		consoleRemotingInvoke.saveProducerCancel(moduleId);
-		//netConnectManager.destroy();
+		connectManagerPool.destroyConnectManager();
 	}
 	
 	@Override
@@ -61,14 +55,10 @@ public class ProducerClientImpl implements ProducerClient {
 		message.setUuid(uuid);
 		message.setContent(content);
 		
-		ConnectCluster connectCluster = netConnectManager.getConnectCluster("DEFALT");
+		ConnectCluster connectCluster = connectManagerPool.getConnectManager(ConnectManagerType.NET.getCode()).getConnectCluster("DEFALT");
 		NetConnectAgent netConnectAgent = (NetConnectAgent) connectCluster.getProxy();
 		
 		return netConnectAgent.send(message);
-	}
-
-	public void setNetConnectManager(ConnectManager netConnectManager) {
-		this.netConnectManager = netConnectManager;
 	}
 
 	public void setConsoleRemotingInvoke(ConsoleRemotingInvoke consoleRemotingInvoke) {
@@ -101,5 +91,9 @@ public class ProducerClientImpl implements ProducerClient {
 	
 	public void setProducerModuleRegister(ModuleRegister producerModuleRegister) {
 		this.producerModuleRegister = producerModuleRegister;
+	}
+
+	public void setConnectManagerPool(ConnectManagerPool connectManagerPool) {
+		this.connectManagerPool = connectManagerPool;
 	}
 }

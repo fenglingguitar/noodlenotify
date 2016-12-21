@@ -38,8 +38,7 @@
 		</property>
     </bean>
 
-	<bean id="exchangeDbConnectManager" class="org.fl.noodlenotify.core.connect.db.manager.ExchangeDbConnectManager"
-		init-method="start" destroy-method="destroy">
+	<bean id="exchangeDbConnectManager" class="org.fl.noodlenotify.core.connect.db.manager.ExchangeDbConnectManager">
 		<property name="connectAgentFactoryMap">
 			<map>
 				<entry key="MYSQL" value-ref="mysqlDbConnectAgentFactory" />

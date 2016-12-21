@@ -24,8 +24,7 @@
 
 	<bean id="producerModuleRegister" class="org.fl.noodle.common.connect.register.ModuleRegister" />
 
-    <bean id="producerNetConnectManager" class="org.fl.noodlenotify.core.connect.net.manager.ProducerNetConnectManager" 
-    	init-method="start" destroy-method="destroy">
+    <bean id="producerNetConnectManager" class="org.fl.noodlenotify.core.connect.net.manager.ProducerNetConnectManager">
 		<property name="connectAgentFactoryMap">
 			<map>
 				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />

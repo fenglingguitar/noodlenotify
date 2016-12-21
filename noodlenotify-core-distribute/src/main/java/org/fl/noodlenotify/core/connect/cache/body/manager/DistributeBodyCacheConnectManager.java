@@ -276,7 +276,7 @@ public class DistributeBodyCacheConnectManager extends AbstractConnectManager {
 	}
 	
 	@Override
-	protected String getManagerName() {
+	public String getManagerName() {
 		return ConnectManagerType.BODY_CACHE.getCode();
 	}
 	

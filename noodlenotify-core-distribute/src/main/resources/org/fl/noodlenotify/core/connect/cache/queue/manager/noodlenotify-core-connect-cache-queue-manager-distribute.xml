@@ -54,8 +54,7 @@
     	<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
 	</bean>
 	
-	<bean id="distributeQueueCacheConnectManager" class="org.fl.noodlenotify.core.connect.cache.queue.manager.DistributeQueueCacheConnectManager"
-		init-method="start" destroy-method="destroy">
+	<bean id="distributeQueueCacheConnectManager" class="org.fl.noodlenotify.core.connect.cache.queue.manager.DistributeQueueCacheConnectManager">
 		<property name="connectAgentFactoryMap">
 			<map>
 				<entry key="CACHE_QUEUE" value-ref="redisQueueCacheConnectAgentFactory" />

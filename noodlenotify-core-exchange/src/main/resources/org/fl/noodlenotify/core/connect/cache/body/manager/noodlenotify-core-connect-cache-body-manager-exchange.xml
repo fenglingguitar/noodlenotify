@@ -25,8 +25,7 @@
 	
 	<import resource="classpath:org/fl/noodlenotify/core/exchange/register/noodlenotify-core-exchange-register.xml" />
 	
-	<bean id="exchangeBodyCacheConnectManager" class="org.fl.noodlenotify.core.connect.cache.body.manager.ExchangeBodyCacheConnectManager"
-		init-method="start" destroy-method="destroy">
+	<bean id="exchangeBodyCacheConnectManager" class="org.fl.noodlenotify.core.connect.cache.body.manager.ExchangeBodyCacheConnectManager">
 		<property name="connectAgentFactoryMap">
 			<map>
 				<entry key="CACHE_BODY" value-ref="redisBodyCacheConnectAgentFactory" />

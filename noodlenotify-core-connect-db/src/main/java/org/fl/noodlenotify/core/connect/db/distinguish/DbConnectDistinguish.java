@@ -10,9 +10,11 @@ import org.fl.noodlenotify.core.domain.message.MessageDm;
 
 public class DbConnectDistinguish implements ConnectDistinguish {
 
+	private ConnectManagerPool connectManagerPool;
+	
 	@Override
 	public ConnectManager getConnectManager() {
-		return ConnectManagerPool.getConnectManager(ConnectManagerType.DB.getCode());
+		return connectManagerPool.getConnectManager(ConnectManagerType.DB.getCode());
 	}
 
 	@Override
@@ -39,5 +41,9 @@ public class DbConnectDistinguish implements ConnectDistinguish {
 	@Override
 	public String getModuleName(Object[] args) {
 		return ConnectManagerType.DB.getCode();
+	}
+	
+	public void setConnectManagerPool(ConnectManagerPool connectManagerPool) {
+		this.connectManagerPool = connectManagerPool;
 	}
 }

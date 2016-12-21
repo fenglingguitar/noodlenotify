@@ -305,7 +305,7 @@ public class ProducerNetConnectManager extends AbstractConnectManager {
 	}
 
 	@Override
-	protected String getManagerName() {
+	public String getManagerName() {
 		return ConnectManagerType.NET.getCode();
 	}
 	

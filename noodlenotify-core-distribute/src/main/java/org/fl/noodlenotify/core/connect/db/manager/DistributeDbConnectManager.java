@@ -380,7 +380,7 @@ public class DistributeDbConnectManager extends AbstractConnectManager {
 	}
 	
 	@Override
-	protected String getManagerName() {
+	public String getManagerName() {
 		return ConnectManagerType.DB.getCode();
 	}
 	

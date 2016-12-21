@@ -275,7 +275,7 @@ public class DistributeQueueCacheConnectManager extends AbstractConnectManager {
 	}
 	
 	@Override
-	protected String getManagerName() {
+	public String getManagerName() {
 		return ConnectManagerType.QUEUE_CACHE.getCode();
 	}
 	

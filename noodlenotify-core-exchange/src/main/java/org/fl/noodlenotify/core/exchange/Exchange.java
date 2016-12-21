@@ -3,12 +3,12 @@ package org.fl.noodlenotify.core.exchange;
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.exception.ConnectInvokeException;
-import org.fl.noodle.common.connect.exception.ConnectStopException;
-import org.fl.noodle.common.connect.manager.ConnectManager;
+import org.fl.noodle.common.connect.manager.ConnectManagerPool;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
+import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
@@ -19,12 +19,6 @@ import org.fl.noodlenotify.core.exchange.manager.ExchangeConnectManager;
 public class Exchange implements NetConnectReceiver {
 
 	//private final static Logger logger = LoggerFactory.getLogger(Exchange.class);
-	
-	private ConnectManager dbConnectManager;
-	private ConnectManager bodyCacheConnectManager;
-	private ExchangeConnectManager exchangeConnectManager;
-	
-	private volatile boolean stopSign = false;
 	
 	private ConsoleRemotingInvoke consoleRemotingInvoke;
 	
@@ -40,8 +34,7 @@ public class Exchange implements NetConnectReceiver {
 	
 	private ModuleRegister exchangeModuleRegister;
 	
-	public Exchange() {
-	}
+	private ConnectManagerPool connectManagerPool;
 	
 	public void start() throws Exception {
 		
@@ -50,25 +43,20 @@ public class Exchange implements NetConnectReceiver {
 			exchangeName = NetAddressUtil.getLocalHostName();
 		}
 		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
-		moduleId = consoleRemotingInvoke.saveExchangerRegister(localIp, localPort, url, type, checkPort, exchangeName);
 		
+		moduleId = consoleRemotingInvoke.saveExchangerRegister(localIp, localPort, url, type, checkPort, exchangeName);
 		exchangeModuleRegister.setModuleId(moduleId);
 
-		bodyCacheConnectManager.runUpdateNow();
-		dbConnectManager.runUpdateNow();
-		exchangeConnectManager.runUpdateNow();
+		connectManagerPool.startConnectManager();
 	}
 	
 	public void destroy() throws Exception {
 		consoleRemotingInvoke.saveExchangerCancel(moduleId);
+		connectManagerPool.destroyConnectManager();
 	}
 	
 	@Override
 	public void receive(Message message) throws Exception {
-		
-		if (stopSign) {
-			throw new ConnectStopException("Exchange is stopping");
-		}
 		
 		MessageDm messageDm = new MessageDm(
 				message.getQueueName(), 
@@ -80,16 +68,16 @@ public class Exchange implements NetConnectReceiver {
 			throw new ConnectInvokeException("Message body bigger then max limit: " + sizeLimit);
 		}
 		
-		Long queueConsumerGroupNum = exchangeConnectManager.getQueueConsumerGroupNumMap().get(messageDm.getQueueName());
+		Long queueConsumerGroupNum = ((ExchangeConnectManager) connectManagerPool.getConnectManager(ConnectManagerType.EXCHANGE.getCode())).getQueueConsumerGroupNumMap().get(messageDm.getQueueName());
 		if (queueConsumerGroupNum != null) {
 			messageDm.setExecuteQueue(queueConsumerGroupNum);
 			messageDm.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
 		} else {
-			exchangeConnectManager.runUpdate();
+			connectManagerPool.getConnectManager(ConnectManagerType.EXCHANGE.getCode()).runUpdate();
 			throw new ConnectInvokeException("Set execute queue error, can not get queue consumer group num");
 		}
 		
-		ConnectCluster connectCluster = dbConnectManager.getConnectCluster("DEFALT");
+		ConnectCluster connectCluster = connectManagerPool.getConnectManager(ConnectManagerType.DB.getCode()).getConnectCluster("DEFALT");
 		DbConnectAgent dbConnectAgent = (DbConnectAgent) connectCluster.getProxy();
 		
 		messageDm.setBeginTime(System.currentTimeMillis());
@@ -102,18 +90,6 @@ public class Exchange implements NetConnectReceiver {
 			ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
 		}
 		
-	}	
-	
-	public void setDbConnectManager(ConnectManager dbConnectManager) {
-		this.dbConnectManager = dbConnectManager;
-	}
-
-	public void setBodyCacheConnectManager(ConnectManager bodyCacheConnectManager) {
-		this.bodyCacheConnectManager = bodyCacheConnectManager;
-	}
-
-	public void setExchangeConnectManager(ExchangeConnectManager exchangeConnectManager) {
-		this.exchangeConnectManager = exchangeConnectManager;
 	}
 
 	public void setConsoleRemotingInvoke(ConsoleRemotingInvoke consoleRemotingInvoke) {
@@ -154,5 +130,9 @@ public class Exchange implements NetConnectReceiver {
 
 	public void setExchangeModuleRegister(ModuleRegister exchangeModuleRegister) {
 		this.exchangeModuleRegister = exchangeModuleRegister;
+	}
+
+	public void setConnectManagerPool(ConnectManagerPool connectManagerPool) {
+		this.connectManagerPool = connectManagerPool;
 	}
 }

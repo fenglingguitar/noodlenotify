@@ -91,7 +91,7 @@ public class ExchangeConnectManager extends AbstractConnectManager {
 	}
 
 	@Override
-	protected String getManagerName() {
+	public String getManagerName() {
 		return ConnectManagerType.EXCHANGE.getCode();
 	}
 

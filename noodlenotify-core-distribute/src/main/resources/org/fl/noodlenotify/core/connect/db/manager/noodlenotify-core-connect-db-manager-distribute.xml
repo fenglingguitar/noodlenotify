@@ -25,8 +25,7 @@
 	
 	<import resource="classpath:org/fl/noodlenotify/core/distribute/register/noodlenotify-core-distribute-register.xml" />
 	
-	<bean id="distributeDbConnectManager" class="org.fl.noodlenotify.core.connect.db.manager.DistributeDbConnectManager"
-		init-method="start" destroy-method="destroy">
+	<bean id="distributeDbConnectManager" class="org.fl.noodlenotify.core.connect.db.manager.DistributeDbConnectManager">
 		<property name="connectAgentFactoryMap">
 			<map>
 				<entry key="MYSQL" value-ref="mysqlDbConnectAgentFactory" />

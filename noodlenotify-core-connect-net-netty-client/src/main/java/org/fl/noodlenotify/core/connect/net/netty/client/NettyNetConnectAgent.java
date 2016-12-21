@@ -14,12 +14,10 @@ import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
 import org.fl.noodlenotify.core.connect.net.netty.client.exception.NettyConnectionException;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class NettyNetConnectAgent extends AbstractConnectAgent implements NetConnectAgent, NetStatusChecker  {
 
-	private final static Logger logger = LoggerFactory.getLogger(NettyNetConnectAgent.class);
+	//private final static Logger logger = LoggerFactory.getLogger(NettyNetConnectAgent.class);
 
 	private NettyNetConnectPool nettyNetConnectPool;
 	
@@ -48,13 +46,7 @@ public class NettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 			NettyNetConnect nettyNetConnect = nettyNetConnectPool.getResource();
 			nettyNetConnectPool.returnResource(nettyNetConnect);
 		} catch (NettyConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("ConnectActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Resource -> " + e);
-			}
+			e.printStackTrace();
 			nettyNetConnectPool.destroy();
 			throw new ConnectRefusedException("Connection refused for create net netty connect agent");
 		} 
@@ -67,13 +59,7 @@ public class NettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 			NettyNetConnect nettyNetConnect = nettyNetConnectPool.getResource();
 			nettyNetConnectPool.returnResource(nettyNetConnect);
 		} catch (NettyConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("ReconnectActual -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Resource -> " + e);
-			}
+			e.printStackTrace();
 			throw new ConnectRefusedException("Connection refused for create net netty connect agent");
 		} 
 	}
@@ -98,58 +84,23 @@ public class NettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 		try {
 			uuid = nettyNetConnect.send(message, readTimeout);
 		} catch (NettyConnectionException e) { 
-			if (logger.isErrorEnabled()) {
-				logger.error("Send -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Send -> " + e
-						);
-			}
+			e.printStackTrace();
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectResetException("Connection reset for send by net netty connect agent");
 		} catch (java.net.SocketException e) { 
-			if (logger.isErrorEnabled()) {
-				logger.error("Send -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Send -> " + e
-						);
-			}
+			e.printStackTrace();
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectResetException("Connection reset for send by net netty connect agent");
 		} catch (java.net.SocketTimeoutException e) { 
-			if (logger.isErrorEnabled()) {
-				logger.error("Send -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Send -> " + e
-						);
-			}
+			e.printStackTrace();
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectTimeoutException("Connection timeout for send by net netty connect agent");
 		} catch (ConnectStopException e) { 
-			if (logger.isErrorEnabled()) {
-				logger.error("Send -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Send -> " + e
-						);
-			}
+			e.printStackTrace();
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectResetException("Connection reset for send by net netty connect agent");
 		} catch (Exception e) { 
-			if (logger.isErrorEnabled()) {
-				logger.error("Send -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Send -> " + e
-						);
-			}
+			e.printStackTrace();
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw e;
 		}
@@ -167,58 +118,23 @@ public class NettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 		try {
 			nettyNetConnect.send("CheckHealth", nettyNetConnectPoolConfParam.getTimeout());
 		} catch (NettyConnectionException e) { 
-			if (logger.isErrorEnabled()) {
-				logger.error("Send -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Send -> " + e
-						);
-			}
+			e.printStackTrace();
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectResetException("Connection reset for send by net netty connect agent");
 		} catch (java.net.SocketException e) { 
-			if (logger.isErrorEnabled()) {
-				logger.error("Send -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Send -> " + e
-						);
-			}
+			e.printStackTrace();
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectResetException("Connection reset for send by net netty connect agent");
 		} catch (java.net.SocketTimeoutException e) { 
-			if (logger.isErrorEnabled()) {
-				logger.error("Send -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Send -> " + e
-						);
-			}
+			e.printStackTrace();
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectTimeoutException("Connection timeout for send by net netty connect agent");
 		} catch (ConnectStopException e) { 
-			if (logger.isErrorEnabled()) {
-				logger.error("Send -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Send -> " + e
-						);
-			}
+			e.printStackTrace();
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw new ConnectResetException("Connection reset for send by net netty connect agent");
 		} catch (Exception e) { 
-			if (logger.isErrorEnabled()) {
-				logger.error("Send -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Send -> " + e
-						);
-			}
+			e.printStackTrace();
 			nettyNetConnectPool.returnBrokenResource(nettyNetConnect);
 			throw e;
 		}
@@ -231,13 +147,7 @@ public class NettyNetConnectAgent extends AbstractConnectAgent implements NetCon
 			NettyNetConnect nettyNetConnect = nettyNetConnectPool.getResource();
 			return nettyNetConnect;
 		} catch (NettyConnectionException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("GetConnect -> " 
-						+ "ConnectId: " + connectId
-						+ ", Ip: " + ip
-						+ ", Port: " + port
-						+ ", Get Connect -> " + e);
-			}
+			e.printStackTrace();
 			throw new ConnectResetException("Connection reset for send by net netty connect agent");
 		}
 	}

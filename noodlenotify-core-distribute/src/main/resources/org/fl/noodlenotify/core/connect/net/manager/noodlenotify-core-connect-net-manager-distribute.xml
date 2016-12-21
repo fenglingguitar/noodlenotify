@@ -40,8 +40,7 @@
     	<property name="connectDistinguish" ref="netConnectDistinguish" />
 	</bean>
  
-    <bean id="distributeNetConnectManager" class="org.fl.noodlenotify.core.connect.net.manager.DistributeNetConnectManager" 
-		init-method="start" destroy-method="destroy">
+    <bean id="distributeNetConnectManager" class="org.fl.noodlenotify.core.connect.net.manager.DistributeNetConnectManager">
 		<property name="connectAgentFactoryMap">
 			<map>
 				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />

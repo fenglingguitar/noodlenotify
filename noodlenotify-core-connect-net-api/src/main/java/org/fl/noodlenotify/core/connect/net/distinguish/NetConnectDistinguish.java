@@ -10,9 +10,11 @@ import org.fl.noodlenotify.core.connect.net.pojo.Message;
 
 public class NetConnectDistinguish implements ConnectDistinguish {
 
+	private ConnectManagerPool connectManagerPool;
+	
 	@Override
 	public ConnectManager getConnectManager() {
-		return ConnectManagerPool.getConnectManager(ConnectManagerType.NET.getCode());
+		return connectManagerPool.getConnectManager(ConnectManagerType.NET.getCode());
 	}
 
 	@Override
@@ -33,5 +35,9 @@ public class NetConnectDistinguish implements ConnectDistinguish {
 	@Override
 	public String getModuleName(Object[] args) {
 		return ConnectManagerType.NET.getCode();
+	}
+	
+	public void setConnectManagerPool(ConnectManagerPool connectManagerPool) {
+		this.connectManagerPool = connectManagerPool;
 	}
 }

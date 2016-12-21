@@ -19,8 +19,6 @@
 	
 	<import resource="classpath:org/fl/noodlenotify/core/exchange/register/noodlenotify-core-exchange-register.xml" />
 
-	<bean id="exchangeConnectManager" class="org.fl.noodlenotify.core.exchange.manager.ExchangeConnectManager"
-		init-method="start" destroy-method="destroy">
-	</bean>
+	<bean id="exchangeConnectManager" class="org.fl.noodlenotify.core.exchange.manager.ExchangeConnectManager" />
 	
 </beans>
