@@ -6,8 +6,9 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.fl.noodle.common.connect.server.ConnectServer;
 
-public class JettyNetConnectServer {
+public class JettyNetConnectServer implements ConnectServer {
 	
 	private final static Logger logger = LoggerFactory.getLogger(JettyNetConnectServer.class);
 	
@@ -17,6 +18,7 @@ public class JettyNetConnectServer {
 	
 	private Handler servletHandler;
 
+	@Override
 	public void start() throws Exception {
 		
 		server = new Server();
@@ -30,6 +32,7 @@ public class JettyNetConnectServer {
 		}
 	}
 
+	@Override
 	public void destroy() throws Exception {
 		
 		server.stop();

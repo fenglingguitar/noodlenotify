@@ -33,11 +33,11 @@
 	
 	<bean id="netConnectReceiver" class="org.fl.noodlenotify.core.exchange.Exchange" 
 			init-method="start" destroy-method="destroy"
-			parent="exchangeParam"  
-			depends-on="netConnectReceiveServer">
+			parent="exchangeParam">
 		<property name="localIp" value="127.0.0.1" />
 		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
 		<property name="connectManagerPool" ref="connectManagerPool" />
+		<property name="connectServer" ref="netConnectServer" />
 	</bean>
     
 </beans>

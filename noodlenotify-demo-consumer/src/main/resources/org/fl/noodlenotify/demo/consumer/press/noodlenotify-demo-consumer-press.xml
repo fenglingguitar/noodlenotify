@@ -25,10 +25,8 @@
 		<property name="monitorInterval" value="1000"/>
     </bean>
 	
-	<bean id="netConnectReceiver" class="org.fl.noodlenotify.core.cclient.ConsumerClient"
-			init-method="start" destroy-method="destroy"
-			parent="consumerClientParam" 
-			depends-on="netConnectReceiveServer">
+	<bean id="netConnectReceiver" class="org.fl.noodlenotify.core.cclient.ConsumerClient" 
+		init-method="start" destroy-method="destroy" parent="consumerClientParam">
 		<property name="consumerGroupName" value="TestConsumerGroup1" />
 		<property name="consumerClientName" value="TestConsumerClient1" />
 		<property name="localIp" value="127.0.0.1" />
@@ -40,6 +38,7 @@
 				<entry key="TestQueue1" value-ref="consumerReceiverProxy" />
 			</map>
 		</property>
+		<property name="connectServer" ref="netConnectServer" />
 	</bean>
 
 </beans>

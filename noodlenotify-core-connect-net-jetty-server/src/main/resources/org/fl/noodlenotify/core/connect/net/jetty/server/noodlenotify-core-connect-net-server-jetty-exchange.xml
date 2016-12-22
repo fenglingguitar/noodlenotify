@@ -16,8 +16,7 @@
 		<property name="netConnectReceiver" ref="netConnectReceiver" />
 	</bean>
 	
-	<bean id="netConnectReceiveServer" class="org.fl.noodlenotify.core.connect.net.jetty.server.JettyNetConnectServer"
-			init-method="start" destroy-method="destroy" >
+	<bean id="netConnectServer" class="org.fl.noodlenotify.core.connect.net.jetty.server.JettyNetConnectServer">
 		<property name="port" value="20102"/>
 		<property name="servletHandler" ref="jettyNetConnectServerReceiveHandler" />
 	</bean>

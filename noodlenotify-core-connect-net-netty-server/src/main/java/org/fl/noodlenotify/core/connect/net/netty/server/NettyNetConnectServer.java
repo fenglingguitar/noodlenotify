@@ -5,6 +5,7 @@ import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.fl.noodle.common.connect.server.ConnectServer;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
@@ -21,7 +22,7 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.frame.FrameDecoder;
 import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
 
-public class NettyNetConnectServer {
+public class NettyNetConnectServer implements ConnectServer {
 	
 	private final static Logger logger = LoggerFactory.getLogger(NettyNetConnectServer.class);
 	
@@ -34,6 +35,7 @@ public class NettyNetConnectServer {
 	
 	private int workerCount = 8;
 	
+	@Override
 	public void start() throws Exception {
 		
 		factory = new NioServerSocketChannelFactory(
@@ -62,6 +64,7 @@ public class NettyNetConnectServer {
 		}
 	}
 	
+	@Override
 	public void destroy() throws Exception {
 		ChannelGroupFuture future = allChannels.close();
 		future.awaitUninterruptibly();

@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.fl.noodle.common.connect.exception.ConnectInvokeException;
-import org.fl.noodle.common.connect.exception.ConnectStopException;
 import org.fl.noodle.common.connect.register.ModuleRegister;
+import org.fl.noodle.common.connect.server.ConnectServer;
 import org.fl.noodle.common.util.net.NetAddressUtil;
+import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
-import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 
 public class ConsumerClient implements NetConnectReceiver {
 	
@@ -33,7 +33,7 @@ public class ConsumerClient implements NetConnectReceiver {
 	
 	private ModuleRegister consumerModuleRegister;
 	
-	private volatile boolean stopSign = false;
+	private ConnectServer connectServer;
 	
 	public void start() throws Exception {
 		
@@ -42,25 +42,22 @@ public class ConsumerClient implements NetConnectReceiver {
 			consumerClientName = NetAddressUtil.getLocalHostName();
 		}		
 		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
+		
+		connectServer.start();
+		
 		moduleId = consoleRemotingInvoke.saveConsumerRegister(localIp, localPort, url, type, checkPort,
 					checkUrl, checkType, consumerClientName, consumerGroupName, 
 					new ArrayList<String>(consumerReceiverMap.keySet()));
-		
 		consumerModuleRegister.setModuleId(moduleId);
 	}
 	
 	public void destroy() throws Exception {
 		consoleRemotingInvoke.saveConsumerCancel(moduleId);
-		stopSign = true;
+		connectServer.destroy();
 	}
 	
 	@Override
 	public void receive(Message message) throws Exception {
-		
-		if (stopSign) {
-			throw new ConnectStopException("Exchange is stopping");
-		}
-		
 		ConsumerReceiver consumerReceiver = consumerReceiverMap.get(message.getQueueName());
 		if (consumerReceiver != null) {
 			if(!consumerReceiver.receive(message)) {
@@ -121,5 +118,9 @@ public class ConsumerClient implements NetConnectReceiver {
 
 	public void setConsumerModuleRegister(ModuleRegister consumerModuleRegister) {
 		this.consumerModuleRegister = consumerModuleRegister;
+	}
+	
+	public void setConnectServer(ConnectServer connectServer) {
+		this.connectServer = connectServer;
 	}
 }

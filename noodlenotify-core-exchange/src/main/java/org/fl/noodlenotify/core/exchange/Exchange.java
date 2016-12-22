@@ -5,6 +5,7 @@ import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.exception.ConnectInvokeException;
 import org.fl.noodle.common.connect.manager.ConnectManagerPool;
 import org.fl.noodle.common.connect.register.ModuleRegister;
+import org.fl.noodle.common.connect.server.ConnectServer;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
@@ -36,6 +37,8 @@ public class Exchange implements NetConnectReceiver {
 	
 	private ConnectManagerPool connectManagerPool;
 	
+	private ConnectServer connectServer;
+	
 	public void start() throws Exception {
 		
 		if (exchangeName == null || 
@@ -43,6 +46,8 @@ public class Exchange implements NetConnectReceiver {
 			exchangeName = NetAddressUtil.getLocalHostName();
 		}
 		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
+		
+		connectServer.start();
 		
 		moduleId = consoleRemotingInvoke.saveExchangerRegister(localIp, localPort, url, type, checkPort, exchangeName);
 		exchangeModuleRegister.setModuleId(moduleId);
@@ -52,6 +57,7 @@ public class Exchange implements NetConnectReceiver {
 	
 	public void destroy() throws Exception {
 		consoleRemotingInvoke.saveExchangerCancel(moduleId);
+		connectServer.destroy();
 		connectManagerPool.destroyConnectManager();
 	}
 	
@@ -134,5 +140,9 @@ public class Exchange implements NetConnectReceiver {
 
 	public void setConnectManagerPool(ConnectManagerPool connectManagerPool) {
 		this.connectManagerPool = connectManagerPool;
+	}
+
+	public void setConnectServer(ConnectServer connectServer) {
+		this.connectServer = connectServer;
 	}
 }

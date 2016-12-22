@@ -16,8 +16,7 @@
 		<property name="netConnectReceiver" ref="netConnectReceiver" />
 	</bean>
 	
-	<bean id="netConnectReceiveServer" class="org.fl.noodlenotify.core.connect.net.netty.server.NettyNetConnectServer"
-			init-method="start" destroy-method="destroy">
+	<bean id="netConnectServer" class="org.fl.noodlenotify.core.connect.net.netty.server.NettyNetConnectServer">
 		<property name="port" value="20101"/>
 		<property name="workerCount" value="16"/>
 		<property name="channelHandler" ref="nettyNetConnectServerReceiveHandler" />

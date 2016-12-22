@@ -15,12 +15,4 @@ public class NetConnectReceiverTest implements NetConnectReceiver {
 	public void receive(Message message) throws Exception {
 		logger.info("Receive: " + JsonTranslator.toString(message));
 	}
-
-	@Override
-	public void start() throws Exception {
-	}
-
-	@Override
-	public void destroy() throws Exception {
-	}
 }
