@@ -14,8 +14,8 @@ public class LayerFailoverConnectCluster extends FailoverConnectCluster {
 	
 	public LayerFailoverConnectCluster(Class<?> serviceInterface,
 			ConnectDistinguish connectDistinguish,
-			List<MethodInterceptor> methodInterceptorList) {
-		super(serviceInterface, connectDistinguish, methodInterceptorList);
+			List<MethodInterceptor> methodInterceptorList, String type) {
+		super(serviceInterface, connectDistinguish, methodInterceptorList, type);
 	}
 	
 	protected ConnectNode getConnectNode(Object[] args) throws ConnectInvokeException {

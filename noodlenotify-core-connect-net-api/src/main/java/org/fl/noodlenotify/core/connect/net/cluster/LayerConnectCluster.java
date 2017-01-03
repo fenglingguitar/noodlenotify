@@ -19,8 +19,8 @@ public class LayerConnectCluster extends AbstractConnectCluster {
 	
 	public LayerConnectCluster(Class<?> serviceInterface,
 			ConnectDistinguish connectDistinguish,
-			List<MethodInterceptor> methodInterceptorList) {
-		super(serviceInterface, connectDistinguish, methodInterceptorList);
+			List<MethodInterceptor> methodInterceptorList, String type) {
+		super(serviceInterface, connectDistinguish, methodInterceptorList, type);
 	}
 
 	@Override

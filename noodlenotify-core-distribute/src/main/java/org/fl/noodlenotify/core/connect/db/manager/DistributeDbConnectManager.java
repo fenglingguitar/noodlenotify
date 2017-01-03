@@ -25,51 +25,79 @@ public class DistributeDbConnectManager extends AbstractConnectManager {
 	
 	private ConsoleRemotingInvoke consoleRemotingInvoke;
 	
-	private Map<String, List<Object>> consoleInfoMap = null;
+	private Map<String, List<Object>> connectAndNodeInfoMap = null;
+	private Map<String, Object> clusterInfoMap = null;
+	private Map<String, Object> routeInfoMap = null;
 	
 	private List<String> addNodeList = null;
 	private List<Object> addConnectList = null;
 	private Map<String, List<Object>> addConnectMappingMap = null;
+	private List<String> addClusterList = null;
+	private List<String> addRouteList = null;
 	
 	private List<String> reduceNodeList = null;
 	private List<ConnectAgent> reduceConnectList = null;
 	private Map<String, List<ConnectAgent>> reduceConnectMappingMap = null;
+	private List<String> reduceClusterList = null;
+	private List<String> reduceRouteList = null;
 	
 	@Override
 	protected void updateConnectAgent() {
 		
-		if (connectClusterMap.isEmpty()) {
-			connectClusterMap.put("DEFALT", connectClusterFactoryMap.get("FAILOVER").createConnectCluster(DbConnectAgent.class));
-			connectClusterMap.put("ID", connectClusterFactoryMap.get("ID").createConnectCluster(DbConnectAgent.class));
-		}
-		
-		if (connectRouteMap.isEmpty()) {
-			connectRouteMap.put("DEFALT", connectRouteFactoryMap.get("RANDOM").createConnectRoute());
-		}
-		
 		queryInfo();
 		
-		if (consoleInfoMap == null || consoleInfoMap.isEmpty()) { return; }
+		if (connectAndNodeInfoMap != null && !connectAndNodeInfoMap.isEmpty()) {
+			getAddConnect();
+			addConnect();
+			getAddNode();
+			addNode();
+			getAddConnectMapping();
+			addConnectMapping();
+			
+			getReduceConnectMapping();
+			reduceConnectMapping();
+			getReduceConnect();
+			reduceConnect();
+			getReduceNode();
+			reduceNode();
+		}
 		
-		getAddConnect();
-		addConnect();
-		getAddNode();
-		addNode();
-		getAddConnectMapping();
-		addConnectMapping();
+		if (clusterInfoMap != null && !clusterInfoMap.isEmpty()) {
+			getAddCluster();
+			addCluster();
+			getReduceCluster();
+			reduceCluster();
+		}
 		
-		getReduceConnectMapping();
-		reduceConnectMapping();
-		getReduceConnect();
-		reduceConnect();
-		getReduceNode();
-		reduceNode();
+		if (routeInfoMap != null && !routeInfoMap.isEmpty()) {
+			getAddRoute();
+			addRoute();
+			getReduceRoute();
+			reduceRoute(); 
+		}
 	}
-	
+
 	private void queryInfo() {
-		consoleInfoMap = null;
+		connectAndNodeInfoMap = null;
 		try {
-			getConsoleInfoMap(consoleRemotingInvoke.distributerGetMsgStorages(distributeModuleRegister.getModuleId()));
+			getConnectAndNodeInfoMap(consoleRemotingInvoke.distributerGetMsgStorages(distributeModuleRegister.getModuleId()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			Map<String, String> clusterInfoMapTemp = new HashMap<String, String>();
+			clusterInfoMapTemp.put("DEFALT", "FAILOVER");
+			clusterInfoMapTemp.put("ID", "ID");
+			getClusterInfoMap(clusterInfoMapTemp);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			Map<String, String> routeInfoMapTemp = new HashMap<String, String>();
+			routeInfoMapTemp.put("DEFALT", "RANDOM");
+			getRouteInfoMap(routeInfoMapTemp);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -77,7 +105,7 @@ public class DistributeDbConnectManager extends AbstractConnectManager {
 	
 	private void getAddNode() {
 		addNodeList = new ArrayList<String>();
-		for (String name : consoleInfoMap.keySet()) {
+		for (String name : connectAndNodeInfoMap.keySet()) {
 			if (!connectNodeMap.containsKey(name)) {
 				addNodeList.add(name);
 			}
@@ -93,7 +121,7 @@ public class DistributeDbConnectManager extends AbstractConnectManager {
 	private void getAddConnect() {
 		addConnectList = new ArrayList<Object>();
 		Map<Long, Object> objectMap = new HashMap<Long, Object>();
-		for (List<Object> objectListIt : consoleInfoMap.values()) {
+		for (List<Object> objectListIt : connectAndNodeInfoMap.values()) {
 			for (Object objectIt : objectListIt) {
 				if (!objectMap.containsKey(getId(objectIt))) {
 					objectMap.put(getId(objectIt), objectIt);
@@ -138,8 +166,8 @@ public class DistributeDbConnectManager extends AbstractConnectManager {
 	
 	private void getAddConnectMapping() {
 		addConnectMappingMap = new HashMap<String, List<Object>>();
-		for (String name : consoleInfoMap.keySet()) {
-			List<Object> objectList = consoleInfoMap.get(name);
+		for (String name : connectAndNodeInfoMap.keySet()) {
+			List<Object> objectList = connectAndNodeInfoMap.get(name);
 			List<ConnectAgent> connectAgentList = connectNodeMap.get(name).getConnectAgentList();
 			for (Object objectIt : objectList) {
 				boolean isHave = false;
@@ -173,7 +201,7 @@ public class DistributeDbConnectManager extends AbstractConnectManager {
 	private void getReduceNode() {
 		reduceNodeList = new ArrayList<String>();
 		for (String name : connectNodeMap.keySet()) {
-			if (!consoleInfoMap.containsKey(name)) {
+			if (!connectAndNodeInfoMap.containsKey(name)) {
 				reduceNodeList.add(name);
 			}
 		}
@@ -188,7 +216,7 @@ public class DistributeDbConnectManager extends AbstractConnectManager {
 	private void getReduceConnect() {
 		reduceConnectList = new ArrayList<ConnectAgent>();
 		Map<Long, Object> objectMap = new HashMap<Long, Object>();
-		for (List<Object> objectListIt : consoleInfoMap.values()) {
+		for (List<Object> objectListIt : connectAndNodeInfoMap.values()) {
 			for (Object objectIt : objectListIt) {
 				if (!objectMap.containsKey(getId(objectIt))) {
 					objectMap.put(getId(objectIt), objectIt);
@@ -210,8 +238,8 @@ public class DistributeDbConnectManager extends AbstractConnectManager {
 	
 	private void getReduceConnectMapping() {
 		reduceConnectMappingMap = new HashMap<String, List<ConnectAgent>>();
-		for (String name : consoleInfoMap.keySet()) {
-			List<Object> objectList = consoleInfoMap.get(name);
+		for (String name : connectAndNodeInfoMap.keySet()) {
+			List<Object> objectList = connectAndNodeInfoMap.get(name);
 			List<ConnectAgent> connectAgentList = connectNodeMap.get(name).getConnectAgentList();
 			for (ConnectAgent connectAgentIt : connectAgentList) {
 				boolean isHave = false;
@@ -239,9 +267,79 @@ public class DistributeDbConnectManager extends AbstractConnectManager {
 		}
 	}
 	
+	private void getAddCluster() {
+		addClusterList = new ArrayList<String>();
+		for (String name : clusterInfoMap.keySet()) {
+			if (!connectClusterMap.containsKey(name) || !connectClusterMap.get(name).getType().equals(clusterInfoMap.get(name))) {
+				addClusterList.add(name);
+			}
+		}
+	}
+	
+	private void addCluster() {
+		for (String name : addClusterList) {
+			connectClusterMap.put(name, connectClusterFactoryMap.get(clusterInfoMap.get(name)).createConnectCluster(getConnectAgentClass()));
+		}
+	}
+
+	private void getReduceCluster() {
+		reduceClusterList = new ArrayList<String>();
+		for (String name : connectClusterMap.keySet()) {
+			if (!clusterInfoMap.containsKey(name)) {
+				reduceClusterList.add(name);
+			}
+		}
+	}
+	
+	private void reduceCluster() {
+		for (String name : reduceClusterList) {
+			connectClusterMap.remove(name);
+		}
+	}
+	
+	private void getAddRoute() {
+		addRouteList = new ArrayList<String>();
+		for (String name : routeInfoMap.keySet()) {
+			if (!connectRouteMap.containsKey(name) || !connectRouteMap.get(name).getType().equals(routeInfoMap.get(name))) {
+				addRouteList.add(name);
+			}
+		}
+	}
+
+	private void addRoute() {
+		for (String name : addRouteList) {
+			connectRouteMap.put(name, connectRouteFactoryMap.get(routeInfoMap.get(name)).createConnectRoute());
+		}
+	}
+	
+	private void getReduceRoute() {
+		reduceRouteList = new ArrayList<String>();
+		for (String name : connectRouteMap.keySet()) {
+			if (!routeInfoMap.containsKey(name)) {
+				reduceRouteList.add(name);
+			}
+		}
+	}
+
+	private void reduceRoute() {
+		for (String name : reduceRouteList) {
+			connectRouteMap.remove(name);
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
-	private void getConsoleInfoMap(Object object) {
-		consoleInfoMap = (Map<String, List<Object>>) object;
+	private void getConnectAndNodeInfoMap(Object object) {
+		connectAndNodeInfoMap = (Map<String, List<Object>>) object;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void getClusterInfoMap(Object object) {
+		clusterInfoMap = (Map<String, Object>) object;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void getRouteInfoMap(Object object) {
+		routeInfoMap = (Map<String, Object>) object;
 	}
 	
 	private Long getId(Object object) {
@@ -263,6 +361,10 @@ public class DistributeDbConnectManager extends AbstractConnectManager {
 	
 	private boolean isSameConnect(ConnectAgent connectAgent, Object object) {
 		return connectAgent.isSameConnect(((QueueMsgStorageVo)object).getIp(), ((QueueMsgStorageVo)object).getPort(), null, ConnectAgentType.DB.getCode());
+	}
+	
+	private Class<?> getConnectAgentClass() {
+		return DbConnectAgent.class;
 	}
 	
 	@Override
