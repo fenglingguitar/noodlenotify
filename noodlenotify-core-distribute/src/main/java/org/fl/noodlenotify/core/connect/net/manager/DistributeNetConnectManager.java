@@ -186,7 +186,7 @@ public class DistributeNetConnectManager extends AbstractConnectManagerRestructu
 			for (Long childId : connectAndNodeAndChildInfoMap.get(name).keySet()) {
 				for (Object objectIt : connectAndNodeAndChildInfoMap.get(name).get(childId)) {
 					boolean isHave = false;
-					for (ConnectAgent connectAgentIt : connectNodeMap.get(name).getChildConnectNode(childId).getConnectAgentList()) {
+					for (ConnectAgent connectAgentIt : connectNodeMap.get(name).getChildConnectNode(childId).getAllConnectAgentList()) {
 						if (connectAgentIt.getConnectId() == getId(objectIt)) {
 							isHave = true;
 						}
@@ -226,7 +226,7 @@ public class DistributeNetConnectManager extends AbstractConnectManagerRestructu
 		reduceChildConnectMappingMap = new HashMap<String, Map<Long, List<ConnectAgent>>>();
 		for (String name : connectNodeMap.keySet()) {
 			for (Long childId : connectNodeMap.get(name).getChildConnectNodeMap().keySet()) {
-				for (ConnectAgent connectAgentIt : connectNodeMap.get(name).getChildConnectNode(childId).getConnectAgentList()) {
+				for (ConnectAgent connectAgentIt : connectNodeMap.get(name).getChildConnectNode(childId).getAllConnectAgentList()) {
 					boolean isHave = false;
 					for (Object objectIt : connectAndNodeAndChildInfoMap.get(name).get(childId)) {
 						if (connectAgentIt.getConnectId() == getId(objectIt)) {

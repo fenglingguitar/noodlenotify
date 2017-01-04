@@ -41,7 +41,7 @@ public class QueueCacheDistributeSetLocker extends AbstractDistributedLock {
 		boolean isAlive = false;
 		ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
 		if (connectNode != null) {
-			List<ConnectAgent> queueCacheConnectAgentList = (List<ConnectAgent>) connectNode.getConnectAgentList();
+			List<ConnectAgent> queueCacheConnectAgentList = (List<ConnectAgent>) connectNode.getHealthyConnectAgentList();
 			List<QueueCacheConnectAgent> queueCacheConnectAgentBackList = new ArrayList<QueueCacheConnectAgent>(queueCacheConnectAgentList.size());
 			for (ConnectAgent ConnectAgent : queueCacheConnectAgentList) {
 				QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) ConnectAgent;
@@ -116,7 +116,7 @@ public class QueueCacheDistributeSetLocker extends AbstractDistributedLock {
 		boolean isAlive = false;
 		ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
 		if (connectNode != null) {
-			List<ConnectAgent> queueCacheConnectAgentList = (List<ConnectAgent>) connectNode.getConnectAgentList();
+			List<ConnectAgent> queueCacheConnectAgentList = (List<ConnectAgent>) connectNode.getHealthyConnectAgentList();
 			List<QueueCacheConnectAgent> queueCacheConnectAgentBackList = new ArrayList<QueueCacheConnectAgent>(queueCacheConnectAgentList.size());
 			for (ConnectAgent ConnectAgent : queueCacheConnectAgentList) {
 				QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) ConnectAgent;
@@ -181,7 +181,7 @@ public class QueueCacheDistributeSetLocker extends AbstractDistributedLock {
 	protected boolean releaseAlive() {
 		ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
 		if (connectNode != null) {
-			List<ConnectAgent> queueCacheConnectAgentList = (List<ConnectAgent>) connectNode.getConnectAgentList();
+			List<ConnectAgent> queueCacheConnectAgentList = (List<ConnectAgent>) connectNode.getHealthyConnectAgentList();
 			for (ConnectAgent ConnectAgent : queueCacheConnectAgentList) {
 				QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) ConnectAgent;
 				try {

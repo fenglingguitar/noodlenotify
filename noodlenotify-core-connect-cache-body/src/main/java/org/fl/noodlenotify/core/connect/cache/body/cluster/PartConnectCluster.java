@@ -34,7 +34,7 @@ public class PartConnectCluster extends AbstractConnectCluster {
 		ConnectNode connectNode = getConnectNode(args);
 		ConnectRoute connectRoute = getConnectRoute(args);
 		
-		if (connectNode.getConnectAgentList().isEmpty()) {
+		if (connectNode.getHealthyConnectAgentList().isEmpty()) {
 			getConnectManager().runUpdate();
 			throw new ConnectNoAliveException("all connect agent is no alive");
 		}
@@ -48,7 +48,7 @@ public class PartConnectCluster extends AbstractConnectCluster {
 		List<ConnectAgent> connectAgentListSelected = new LinkedList<ConnectAgent>();
 		ConnectAgent connectAgent = null;		
 		do {
-			connectAgent = connectRoute.selectConnect(connectNode.getConnectAgentList(), connectAgentListSelected, connectDistinguish.getMethodKay(method, args));
+			connectAgent = connectRoute.selectConnect(connectNode.getHealthyConnectAgentList(), connectAgentListSelected, connectDistinguish.getMethodKay(method, args));
 			if (connectAgent != null) {
 				connectAgentListSelected.add(connectAgent);
 				try {

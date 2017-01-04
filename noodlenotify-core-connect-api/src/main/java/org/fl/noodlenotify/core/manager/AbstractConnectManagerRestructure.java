@@ -242,12 +242,10 @@ public abstract class AbstractConnectManagerRestructure implements ConnectManage
 	protected void getAddConnectMapping() {
 		addConnectMappingMap = new HashMap<String, List<Object>>();
 		for (String name : connectAndNodeInfoMap.keySet()) {
-			List<Object> objectList = connectAndNodeInfoMap.get(name);
-			List<ConnectAgent> connectAgentList = connectNodeMap.get(name).getConnectAgentList();
-			for (Object objectIt : objectList) {
+			for (Object objectIt : connectAndNodeInfoMap.get(name)) {
 				boolean isHave = false;
-				for (ConnectAgent connectAgentIt : connectAgentList) {
-					if (connectAgentIt.getConnectId() == getId(objectIt)) {
+				for (ConnectAgent connectAgentIt : connectNodeMap.get(name).getAllConnectAgentList()) {
+					if (getId(objectIt) == connectAgentIt.getConnectId() ) {
 						isHave = true;
 					}
 				}
@@ -313,12 +311,10 @@ public abstract class AbstractConnectManagerRestructure implements ConnectManage
 	
 	protected void getReduceConnectMapping() {
 		reduceConnectMappingMap = new HashMap<String, List<ConnectAgent>>();
-		for (String name : connectAndNodeInfoMap.keySet()) {
-			List<Object> objectList = connectAndNodeInfoMap.get(name);
-			List<ConnectAgent> connectAgentList = connectNodeMap.get(name).getConnectAgentList();
-			for (ConnectAgent connectAgentIt : connectAgentList) {
+		for (String name : connectNodeMap.keySet()) {
+			for (ConnectAgent connectAgentIt : connectNodeMap.get(name).getAllConnectAgentList()) {
 				boolean isHave = false;
-				for (Object objectIt : objectList) {
+				for (Object objectIt : connectAndNodeInfoMap.get(name)) {
 					if (connectAgentIt.getConnectId() == getId(objectIt)) {
 						isHave = true;
 					}

@@ -52,6 +52,7 @@
 				<entry key="RESPONSE" value-ref="responseConnectRouteFactory" />
 			</map>
 		</property>
+		<property name="bootPriority" value="1" />
 	</bean>
 	
 </beans>

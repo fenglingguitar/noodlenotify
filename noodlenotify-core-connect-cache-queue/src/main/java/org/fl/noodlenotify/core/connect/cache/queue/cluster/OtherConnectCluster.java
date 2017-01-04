@@ -29,7 +29,7 @@ public class OtherConnectCluster extends AbstractConnectCluster {
 		ConnectManager connectManager = getConnectManager();
 		ConnectNode connectNode = getConnectNode(args);
 		
-		if (connectNode.getConnectAgentList().isEmpty()) {
+		if (connectNode.getHealthyConnectAgentList().isEmpty()) {
 			getConnectManager().runUpdate();
 			throw new ConnectNoAliveException("all connect agent is no alive");
 		}
@@ -37,7 +37,7 @@ public class OtherConnectCluster extends AbstractConnectCluster {
 		ConnectAgent connectAgentMain = null;
 		
 		try {
-			ConnectAgent connectAgent = connectNode.getConnectAgentList().get(0);
+			ConnectAgent connectAgent = connectNode.getHealthyConnectAgentList().get(0);
 			QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectAgent.getProxy();
 			try {
 				if (queueCacheConnectAgent.isActive(connectDistinguish.getMethodKay(method, args))) {
@@ -53,7 +53,7 @@ public class OtherConnectCluster extends AbstractConnectCluster {
 			throw new ConnectNoAliveException("all connect agent is no alive");
 		}
 		
-		List<ConnectAgent> queueCacheConnectAgentList = connectManager.getConnectNode(connectDistinguish.getMethodKay(method, args)).getConnectAgentList();
+		List<ConnectAgent> queueCacheConnectAgentList = connectManager.getConnectNode(connectDistinguish.getMethodKay(method, args)).getHealthyConnectAgentList();
 		for (ConnectAgent connectAgent : queueCacheConnectAgentList) {
 			if (connectAgentMain != null && connectAgent == connectAgentMain) {
 				continue;

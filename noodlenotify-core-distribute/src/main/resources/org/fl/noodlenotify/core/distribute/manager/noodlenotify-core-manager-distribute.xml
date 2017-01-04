@@ -43,6 +43,7 @@
 		<property name="queueCacheConnectDistinguish" ref="queueCacheConnectDistinguish" />
 		<property name="dbConnectDistinguish" ref="dbConnectDistinguish" />
 		<property name="distributeConfParam" ref="distributeConfParam" />
+		<property name="bootPriority" value="2" />
 	</bean>
 	
 </beans>

@@ -27,7 +27,7 @@ public class MasterConnectCluster extends AbstractConnectCluster {
 		
 		ConnectNode connectNode = getConnectNode(args);
 		
-		if (connectNode.getConnectAgentList().isEmpty()) {
+		if (connectNode.getHealthyConnectAgentList().isEmpty()) {
 			getConnectManager().runUpdate();
 			throw new ConnectNoAliveException("all connect agent is no alive");
 		}
@@ -35,7 +35,7 @@ public class MasterConnectCluster extends AbstractConnectCluster {
 		ConnectAgent connectAgentMain = null;
 		
 		try {
-			ConnectAgent connectAgent = connectNode.getConnectAgentList().get(0);
+			ConnectAgent connectAgent = connectNode.getHealthyConnectAgentList().get(0);
 			QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectAgent.getProxy();
 			try {
 				if (queueCacheConnectAgent.isActive(connectDistinguish.getMethodKay(method, args))) {
@@ -52,13 +52,13 @@ public class MasterConnectCluster extends AbstractConnectCluster {
 		}
 		
 		if (connectAgentMain == null) {
-			for (ConnectAgent connectAgent : connectNode.getConnectAgentList()) {
+			for (ConnectAgent connectAgent : connectNode.getHealthyConnectAgentList()) {
 				QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectAgent.getProxy();
 				try {
 					if (queueCacheConnectAgent.isActive(connectDistinguish.getMethodKay(method, args))) {
 						connectAgentMain = connectAgent;
-						connectNode.getConnectAgentList().remove(connectAgent);
-						connectNode.getConnectAgentList().add(0, connectAgent);
+						connectNode.getHealthyConnectAgentList().remove(connectAgent);
+						connectNode.getHealthyConnectAgentList().add(0, connectAgent);
 						break;
 					} 
 				} catch (Exception e) {

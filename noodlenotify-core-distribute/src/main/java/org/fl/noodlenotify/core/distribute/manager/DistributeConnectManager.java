@@ -139,7 +139,7 @@ public class DistributeConnectManager extends AbstractConnectManager {
 				Set<Long> dbIdSet = new HashSet<Long>();
 				ConnectNode connectNode = dbConnectDistinguish.getConnectManager().getConnectNode(queueDistributerVo.getQueue_Nm());
 				if (connectNode != null) {
-					List<ConnectAgent> connectAgentList = connectNode.getConnectAgentList();
+					List<ConnectAgent> connectAgentList = connectNode.getHealthyConnectAgentList();
 					for (ConnectAgent connectAgent : connectAgentList) {
 						dbIdSet.add(connectAgent.getConnectId());
 						if (!distributeSetDbMap.containsKey(connectAgent.getConnectId())) {
@@ -254,8 +254,8 @@ public class DistributeConnectManager extends AbstractConnectManager {
 	private void setActive(String queueName, ConnectManager queueCacheConnectManager) {
 		
 		ConnectNode connectNode = queueCacheConnectManager.getConnectNode(queueName);
-		if (connectNode != null && connectNode.getConnectAgentList().size() > 0) {
-			QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectNode.getConnectAgentList().get(0);
+		if (connectNode != null && connectNode.getHealthyConnectAgentList().size() > 0) {
+			QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectNode.getHealthyConnectAgentList().get(0);
 			try {
 				if (queueCacheConnectAgent != null && !queueCacheConnectAgent.isActive(queueName)) {
 					try {
