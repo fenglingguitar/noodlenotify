@@ -10,9 +10,9 @@ import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
-import org.fl.noodlenotify.core.manager.AbstractConnectManagerRestructure;
+import org.fl.noodlenotify.core.manager.AbstractConnectManagerTemplate;
 
-public class ProducerNetConnectManager extends AbstractConnectManagerRestructure {
+public class ProducerNetConnectManager extends AbstractConnectManagerTemplate {
 	
 	//private final static Logger logger = LoggerFactory.getLogger(ProducerNetConnectManager.class);
 	

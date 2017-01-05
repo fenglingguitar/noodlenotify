@@ -20,7 +20,6 @@
 	<import resource="classpath:org/fl/noodlenotify/core/distribute/register/noodlenotify-core-distribute-register.xml" />
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/queue/distinguish/noodlenotify-core-connect-cache-queue-distinguish.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/connect/db/distinguish/noodlenotify-core-connect-db-distinguish.xml" />
 
 	<bean id="distributePullFactory" class="org.fl.noodlenotify.core.distribute.DistributePullFactory">
 		<property name="dbConnectManager" ref="distributeDbConnectManager" />
@@ -41,8 +40,6 @@
 		<property name="distributePullFactory" ref="distributePullFactory" />
 		<property name="distributePushFactory" ref="distributePushFactory" />
 		<property name="queueCacheConnectDistinguish" ref="queueCacheConnectDistinguish" />
-		<property name="dbConnectDistinguish" ref="dbConnectDistinguish" />
-		<property name="distributeConfParam" ref="distributeConfParam" />
 		<property name="bootPriority" value="2" />
 	</bean>
 	

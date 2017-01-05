@@ -332,15 +332,29 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	}
 
 	@Override
-	public List<QueueDistributerVo> distributerGetQueues(long distributerId) throws Exception {
+	public Map<QueueDistributerVo, List<QueueMsgStorageVo>> distributerGetQueues(long distributerId) throws Exception {
 		if (!distributerDao.ifDistributerValid(distributerId)) {
-			return new ArrayList<QueueDistributerVo>();
+			return new HashMap<QueueDistributerVo, List<QueueMsgStorageVo>>();
 		}
+		
+		Map<QueueDistributerVo, List<QueueMsgStorageVo>> result = new HashMap<QueueDistributerVo, List<QueueMsgStorageVo>>();
 		QueueDistributerVo queueDistributerVo = new QueueDistributerVo();
 		queueDistributerVo.setDistributer_Id(distributerId);
 		queueDistributerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		List<QueueDistributerVo> queueDistributers = queueDistributerDao.queryQueuesByDistributer(queueDistributerVo);
-		return queueDistributers;
+		List<QueueDistributerVo> queues = queueDistributerDao.queryQueuesByDistributer(queueDistributerVo);
+		if (queues == null) {
+			return result;
+		}
+
+		QueueMsgStorageVo queueMsgStorageVo = new QueueMsgStorageVo();
+		queueMsgStorageVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
+		queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
+		for (QueueDistributerVo qd : queues) {
+			queueMsgStorageVo.setQueue_Nm(qd.getQueue_Nm());
+			List<QueueMsgStorageVo> msgStorages = queueMsgStorageDao.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
+			result.put(qd, msgStorages);
+		}
+		return result;
 	}
 
 	@Override

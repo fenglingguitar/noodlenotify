@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.fl.noodlenotify.console.vo.QueueConsumerVo;
-import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgQueueCacheVo;
@@ -178,11 +177,11 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 
 	@Test
 	public void testDistributerGetQueues() throws Exception {
-		long distributerId = 4;
+		/*long distributerId = 4;
 		List<QueueDistributerVo> list = remotingInvoke.distributerGetQueues(distributerId);
 		for (QueueDistributerVo queueDistributerVo : list) {
 			logger.info("QueueName: " + queueDistributerVo.getQueue_Nm() + ", ExchangerId: " + queueDistributerVo.getDistributer_Id());
-		}
+		}*/
 	}
 
 	@Test

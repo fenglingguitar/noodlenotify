@@ -11,9 +11,9 @@ import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
-import org.fl.noodlenotify.core.manager.AbstractConnectManagerRestructure;
+import org.fl.noodlenotify.core.manager.AbstractConnectManagerTemplate;
 
-public class DistributeBodyCacheConnectManager extends AbstractConnectManagerRestructure {
+public class DistributeBodyCacheConnectManager extends AbstractConnectManagerTemplate {
 
 	//private final static Logger logger = LoggerFactory.getLogger(DistributeBodyCacheConnectManager.class);
 	

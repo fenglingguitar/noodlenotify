@@ -17,9 +17,9 @@ import org.fl.noodlenotify.console.vo.QueueConsumerVo;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.cluster.LayerConnectCluster;
-import org.fl.noodlenotify.core.manager.AbstractConnectManagerRestructure;
+import org.fl.noodlenotify.core.manager.AbstractConnectManagerTemplate;
 
-public class DistributeNetConnectManager extends AbstractConnectManagerRestructure {
+public class DistributeNetConnectManager extends AbstractConnectManagerTemplate {
 	
 	//private final static Logger logger = LoggerFactory.getLogger(DistributeNetConnectManager.class);
 	

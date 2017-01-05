@@ -11,9 +11,9 @@ import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
-import org.fl.noodlenotify.core.manager.AbstractConnectManagerRestructure;
+import org.fl.noodlenotify.core.manager.AbstractConnectManagerTemplate;
 
-public class ExchangeDbConnectManager extends AbstractConnectManagerRestructure {
+public class ExchangeDbConnectManager extends AbstractConnectManagerTemplate {
 	
 	//private final static Logger logger = LoggerFactory.getLogger(ExchangeDbConnectManager.class);
 	

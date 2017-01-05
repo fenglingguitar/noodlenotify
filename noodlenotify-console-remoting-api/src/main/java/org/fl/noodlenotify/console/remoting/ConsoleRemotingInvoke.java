@@ -38,7 +38,7 @@ public interface ConsoleRemotingInvoke {
 
 	public Map<String, Long> exchangerGetQueueConsumerGroupNum(long exchangerId) throws Exception;
 
-	public List<QueueDistributerVo> distributerGetQueues(long distributerId) throws Exception;
+	public Map<QueueDistributerVo, List<QueueMsgStorageVo>> distributerGetQueues(long distributerId) throws Exception;
 
 	public Map<String, List<QueueMsgStorageVo>> distributerGetMsgStorages(long distributerId) throws Exception;
 
