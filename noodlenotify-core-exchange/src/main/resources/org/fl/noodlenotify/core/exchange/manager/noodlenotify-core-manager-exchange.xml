@@ -20,7 +20,7 @@
 	<import resource="classpath:org/fl/noodlenotify/core/exchange/register/noodlenotify-core-exchange-register.xml" />
 
 	<bean id="exchangeConnectManager" class="org.fl.noodlenotify.core.exchange.manager.ExchangeConnectManager" >
-		<property name="bootPriority" value="2" />
+		<property name="updateLevel" value="2" />
 	</bean>
 	
 </beans>

@@ -99,6 +99,67 @@ public class DistributeConnectManager extends AbstractConnectManager {
 		}
 	}
 	
+	@Override
+	public synchronized void runUpdateAddComponent() {	
+		cleanComponent();
+		queryInfo();
+		addComponent();
+	}
+	
+	@Override
+	public synchronized void runUpdateReduceComponent() {
+		cleanComponent();
+		queryInfo();
+		reduceComponent();
+	}
+	
+	protected void cleanComponent() {
+		queueDistributerInfoMap = null;
+	}
+	
+	protected void addComponent() {
+		if (queueDistributerInfoMap != null && !queueDistributerInfoMap.isEmpty()) {
+			getAddPush();
+			getAddLocker();
+			getAddPull();
+			addPush();
+			addLocker();
+			addPull();
+		}
+	}
+	
+	protected void reduceComponent() {
+		if (queueDistributerInfoMap != null && !queueDistributerInfoMap.isEmpty()) {
+			getReducePush();
+			getReduceLocker();
+			getReducePull();
+			reducePush();
+			reduceLocker();
+			reducePull();
+		}
+	}
+	
+	protected void updateComponent() {
+		if (queueDistributerInfoMap != null && !queueDistributerInfoMap.isEmpty()) {			
+			getUpdatePush();
+			updatePush();
+			getUpdatePull();
+			updatePull();
+		}
+	}
+	
+	protected void runUpdateLowLevel() {
+		if (!addPushList.isEmpty() || !addLockerList.isEmpty() || !addPullMap.isEmpty()) {			
+			connectManagerPool.runUpdateLowLevel(this);
+		}
+	}
+	
+	protected void runUpdateHighLevel() {
+		if (!reducePushList.isEmpty() || !reduceLockerList.isEmpty() || !reducePullMap.isEmpty()) {			
+			connectManagerPool.runUpdateHighLevel(this);
+		}
+	}
+	
 	protected void queryInfo() {
 		try {
 			queueDistributerInfoMap = consoleRemotingInvoke.distributerGetQueues(distributeModuleRegister.getModuleId());

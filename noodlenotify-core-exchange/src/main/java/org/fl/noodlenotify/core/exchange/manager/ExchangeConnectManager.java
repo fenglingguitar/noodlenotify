@@ -106,4 +106,16 @@ public class ExchangeConnectManager extends AbstractConnectManager {
 	public void setConsoleRemotingInvoke(ConsoleRemotingInvoke consoleRemotingInvoke) {
 		this.consoleRemotingInvoke = consoleRemotingInvoke;
 	}
+
+	@Override
+	public void runUpdateAddComponent() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void runUpdateReduceComponent() {
+		// TODO Auto-generated method stub
+		
+	}
 }

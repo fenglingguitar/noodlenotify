@@ -40,7 +40,7 @@
 		<property name="distributePullFactory" ref="distributePullFactory" />
 		<property name="distributePushFactory" ref="distributePushFactory" />
 		<property name="queueCacheConnectDistinguish" ref="queueCacheConnectDistinguish" />
-		<property name="bootPriority" value="2" />
+		<property name="updateLevel" value="2" />
 	</bean>
 	
 </beans>
