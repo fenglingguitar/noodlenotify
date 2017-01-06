@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
+import org.fl.noodle.common.connect.manager.AbstractConnectManagerTemplate;
 import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodle.common.connect.node.ConnectNodeImpl;
 import org.fl.noodle.common.connect.register.ModuleRegister;
@@ -17,7 +18,6 @@ import org.fl.noodlenotify.console.vo.QueueConsumerVo;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.cluster.LayerConnectCluster;
-import org.fl.noodlenotify.core.manager.AbstractConnectManagerTemplate;
 
 public class DistributeNetConnectManager extends AbstractConnectManagerTemplate {
 	

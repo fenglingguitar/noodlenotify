@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.fl.noodle.common.connect.agent.ConnectAgent;
+import org.fl.noodle.common.connect.manager.AbstractConnectManagerTemplate;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.connect.route.ConnectRoute;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
@@ -11,7 +12,6 @@ import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
-import org.fl.noodlenotify.core.manager.AbstractConnectManagerTemplate;
 
 public class ExchangeDbConnectManager extends AbstractConnectManagerTemplate {
 	
