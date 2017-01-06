@@ -159,7 +159,7 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 	private void getAddNodeChild() {
 		addChildNodeMap = new HashMap<String, List<Long>>();
 		for (String name : connectAndNodeAndChildInfoMap.keySet()) {
-			for (Long childId : connectAndNodeAndChildInfoMap.get(name).keySet()) {
+			for (long childId : connectAndNodeAndChildInfoMap.get(name).keySet()) {
 				if (!connectNodeMap.get(name).isContainsChildConnectNode(childId)) {
 					List<Long> childList = addChildNodeMap.get(name);
 					if (childList == null) {
@@ -173,7 +173,7 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 
 	private void addNodeChild() {
 		for (String name : addChildNodeMap.keySet()) {
-			for (Long childId : addChildNodeMap.get(name)) {
+			for (long childId : addChildNodeMap.get(name)) {
 				connectNodeMap.get(name).addChildConnectNode(childId, new ConnectNodeImpl(name));
 			}
 		}
@@ -183,7 +183,7 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 	protected void getAddConnectMapping() {
 		addChildConnectMappingMap = new HashMap<String, Map<Long, List<Object>>>();
 		for (String name : connectAndNodeAndChildInfoMap.keySet()) {
-			for (Long childId : connectAndNodeAndChildInfoMap.get(name).keySet()) {
+			for (long childId : connectAndNodeAndChildInfoMap.get(name).keySet()) {
 				for (Object objectIt : connectAndNodeAndChildInfoMap.get(name).get(childId)) {
 					boolean isHave = false;
 					for (ConnectAgent connectAgentIt : connectNodeMap.get(name).getChildConnectNode(childId).getAllConnectAgentList()) {
@@ -210,7 +210,7 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 	@Override
 	protected void addConnectMapping() {
 		for (String name : addChildConnectMappingMap.keySet()) {
-			for (Long childId : addChildConnectMappingMap.get(name).keySet()) {
+			for (long childId : addChildConnectMappingMap.get(name).keySet()) {
 				for (Object objectIt : addChildConnectMappingMap.get(name).get(childId)) {
 					ConnectAgent connectAgent = connectAgentMap.get(getId(objectIt));
 					if (connectAgent.isHealthyConnect()) {
@@ -225,7 +225,7 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 	protected void getReduceConnectMapping() {
 		reduceChildConnectMappingMap = new HashMap<String, Map<Long, List<ConnectAgent>>>();
 		for (String name : connectNodeMap.keySet()) {
-			for (Long childId : connectNodeMap.get(name).getChildConnectNodeMap().keySet()) {
+			for (long childId : connectNodeMap.get(name).getChildConnectNodeMap().keySet()) {
 				for (ConnectAgent connectAgentIt : connectNodeMap.get(name).getChildConnectNode(childId).getAllConnectAgentList()) {
 					boolean isHave = false;
 					for (Object objectIt : connectAndNodeAndChildInfoMap.get(name).get(childId)) {
@@ -253,7 +253,7 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 	@Override
 	protected void reduceConnectMapping() {
 		for (String name : reduceChildConnectMappingMap.keySet()) {
-			for (Long childId : reduceChildConnectMappingMap.get(name).keySet()) {
+			for (long childId : reduceChildConnectMappingMap.get(name).keySet()) {
 				for (ConnectAgent connectAgentIt : reduceChildConnectMappingMap.get(name).get(childId)) {
 					connectNodeMap.get(name).getChildConnectNode(childId).removeConnectAgent(connectAgentIt);
 				}
@@ -295,7 +295,7 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 	private void getReduceNodeChild() {
 		reduceChildNodeMap = new HashMap<String, List<Long>>();
 		for (String name : connectNodeMap.keySet()) {
-			for (Long childId : connectNodeMap.get(name).getChildConnectNodeMap().keySet()) {
+			for (long childId : connectNodeMap.get(name).getChildConnectNodeMap().keySet()) {
 				if (!connectAndNodeAndChildInfoMap.get(name).containsKey(childId)) {
 					if (!reduceChildNodeMap.containsKey(name)) {
 						reduceChildNodeMap.put(name, new ArrayList<Long>());
@@ -309,7 +309,7 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 
 	private void reduceNodeChild() {
 		for (String name : reduceChildNodeMap.keySet()) {
-			for (Long childId : reduceChildNodeMap.get(name)) {
+			for (long childId : reduceChildNodeMap.get(name)) {
 				connectNodeMap.get(name).removeChildConnectNode(childId);
 			}
 		}

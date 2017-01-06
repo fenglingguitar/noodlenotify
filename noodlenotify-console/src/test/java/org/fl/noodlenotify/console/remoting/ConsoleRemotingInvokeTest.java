@@ -244,7 +244,7 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 		for (String queueName : set) {
 			Map<Long, List<QueueConsumerVo>> map1 = map.get(queueName);
 			Set<Long> set1 = map1.keySet();
-			for (Long l : set1) {
+			for (long l : set1) {
 				List<QueueConsumerVo> list = map1.get(l);
 				for (QueueConsumerVo queueConsumerVo : list) {
 					logger.info("QueueName: " + queueName + ", ConsumerNum: " + l + ", ConsumerId: " + queueConsumerVo.getConsumer_Id());

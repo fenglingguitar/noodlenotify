@@ -16,7 +16,7 @@ public class CheckActiveLockChangeHandler implements LockChangeHandler {
 	
 	private volatile boolean stopSign = false;
 	
-	private ExecutorService executorService = Executors.newCachedThreadPool();
+	private ExecutorService executorService;
 	
 	public CheckActiveLockChangeHandler(String queueName, ConnectDistinguish queueCacheConnectDistinguish) {
 		this.queueName = queueName;
@@ -25,6 +25,7 @@ public class CheckActiveLockChangeHandler implements LockChangeHandler {
 	
 	@Override
 	public void onMessageGetLock() {
+		executorService = Executors.newCachedThreadPool();
 		executorService.execute(new CheckActiveRunnable());
 	}
 

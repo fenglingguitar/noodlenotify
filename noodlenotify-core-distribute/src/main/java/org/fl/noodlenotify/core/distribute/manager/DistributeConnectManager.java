@@ -140,7 +140,7 @@ public class DistributeConnectManager extends AbstractConnectManager {
 									|| !queueDistributerVoOld.getDph_Delay_Time().equals(queueDistributerVo.getDph_Delay_Time())
 							) {
 								ConcurrentMap<Long, DistributePull> distributeSetDbMap = distributePullMap.get(queueDistributerVo.getQueue_Nm());
-								for (Long dbId : distributeSetDbMap.keySet()) {
+								for (long dbId : distributeSetDbMap.keySet()) {
 									DistributePull distributePull = distributeSetDbMap.get(dbId);
 									distributePull.setQueueDistributerVo(queueDistributerVo);
 								}
@@ -167,7 +167,7 @@ public class DistributeConnectManager extends AbstractConnectManager {
 						} 
 					}
 				}
-				for (Long dbId : distributeSetDbMap.keySet()) {
+				for (long dbId : distributeSetDbMap.keySet()) {
 					if (!dbIdSet.contains(dbId)) {
 						DistributePull distributePull = distributeSetDbMap.get(dbId);
 						distributePull.destroy();
@@ -191,7 +191,7 @@ public class DistributeConnectManager extends AbstractConnectManager {
 					distributePushMap.remove(queueName);
 					
 					ConcurrentMap<Long, DistributePull> distributeSetDbMap = distributePullMap.get(queueName);
-					for (Long dbId : distributeSetDbMap.keySet()) {
+					for (long dbId : distributeSetDbMap.keySet()) {
 						DistributePull distributePull = distributeSetDbMap.get(dbId);
 						distributePull.destroy();
 						distributeSetDbMap.remove(dbId);
@@ -216,7 +216,7 @@ public class DistributeConnectManager extends AbstractConnectManager {
 			queueCacheDistributeSetLockerMap.remove(queueName).destroy();
 			
 			ConcurrentMap<Long, DistributePull> distributeSetDbMap = distributePullMap.get(queueName);
-			for (Long dbId : distributePullMap.get(queueName).keySet()) {
+			for (long dbId : distributePullMap.get(queueName).keySet()) {
 				distributeSetDbMap.remove(dbId).destroy();
 			}
 			distributePullMap.remove(queueName);
@@ -305,7 +305,7 @@ public class DistributeConnectManager extends AbstractConnectManager {
 	
 	private void addPull() {
 		for (QueueDistributerVo queueDistributerVoIt : addPullMap.keySet()) {
-			for (Long id : addPullMap.get(queueDistributerVoIt)) {
+			for (long id : addPullMap.get(queueDistributerVoIt)) {
 				DistributePull distributePull = distributePullFactory.createDistributePull(queueDistributerVoIt, id);
 				distributePull.start();
 				distributePullMap.get(queueDistributerVoIt.getQueue_Nm()).put(id, distributePull);
@@ -361,7 +361,7 @@ public class DistributeConnectManager extends AbstractConnectManager {
 	private void getReducePull() {
 		reducePullMap = new HashMap<String, List<Long>>();
 		for (String name : distributePullMap.keySet()) {
-			for (Long id : distributePullMap.get(name).keySet()) {
+			for (long id : distributePullMap.get(name).keySet()) {
 				boolean isHave = false;
 				for (QueueDistributerVo queueDistributerVoIt : queueDistributerInfoMap.keySet()) {
 					if (name.equals(queueDistributerVoIt.getQueue_Nm())) {
@@ -386,7 +386,7 @@ public class DistributeConnectManager extends AbstractConnectManager {
 	
 	private void reducePull() {
 		for (String name : reducePullMap.keySet()) {
-			for (Long id : reducePullMap.get(name)) {
+			for (long id : reducePullMap.get(name)) {
 				distributePullMap.get(name).remove(id).destroy();
 			}
 			if (distributePullMap.get(name).isEmpty()) {
@@ -428,7 +428,7 @@ public class DistributeConnectManager extends AbstractConnectManager {
 	
 	private void updatePull() {
 		for (QueueDistributerVo queueDistributerVoIt : updatePullList) {
-			for (Long id : distributePullMap.get(queueDistributerVoIt.getQueue_Nm()).keySet()) {
+			for (long id : distributePullMap.get(queueDistributerVoIt.getQueue_Nm()).keySet()) {
 				distributePullMap.get(queueDistributerVoIt.getQueue_Nm()).get(id).setQueueDistributerVo(queueDistributerVoIt);
 			}
 		}
