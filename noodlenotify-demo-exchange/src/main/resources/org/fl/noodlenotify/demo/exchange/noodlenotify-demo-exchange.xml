@@ -17,8 +17,8 @@
 	
 	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
 	
-	<import resource="classpath:org/fl/noodlenotify/core/connect/db/manager/noodlenotify-core-connect-db-manager-exchange.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/body/manager/noodlenotify-core-connect-cache-body-manager-exchange.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/exchange/manager/noodlenotify-core-manager-exchange-db.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/exchange/manager/noodlenotify-core-manager-exchange-cache-body.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/exchange/manager/noodlenotify-core-manager-exchange.xml" />
 	
 	<bean id="connectManagerPool" class="org.fl.noodle.common.connect.manager.ConnectManagerPool">

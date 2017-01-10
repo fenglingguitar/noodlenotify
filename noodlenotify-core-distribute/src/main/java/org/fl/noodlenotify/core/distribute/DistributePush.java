@@ -78,10 +78,8 @@ public class DistributePush {
 	}
 	
 	public void destroy() {
-		
 		stopSign = true;
-		
-		executorService.shutdown();
+		executorService.shutdownNow();
 		try {
 			if(!executorService.awaitTermination(60000, TimeUnit.MILLISECONDS)) {
 				

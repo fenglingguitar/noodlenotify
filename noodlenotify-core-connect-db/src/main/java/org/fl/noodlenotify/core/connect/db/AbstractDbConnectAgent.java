@@ -191,10 +191,8 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 		
 	@Override
 	public void closeActual() {
-		
 		stopSign = true;
-
-		executorService.shutdown();
+		executorService.shutdownNow();
 		try {
 			if(!executorService.awaitTermination(60000, TimeUnit.MILLISECONDS)) {
 			}

@@ -77,10 +77,8 @@ public class DistributePull implements LockChangeHandler {
 
 	@Override
 	public void onMessageLossLock() {
-		
 		stopSign = true;
-		
-		executorService.shutdown();
+		executorService.shutdownNow();
 		try {
 			if(!executorService.awaitTermination(60000, TimeUnit.MILLISECONDS)) {
 			}
@@ -91,16 +89,7 @@ public class DistributePull implements LockChangeHandler {
 
 	@Override
 	public void onMessageReleaseLock() {
-		
-		stopSign = true;
-		
-		executorService.shutdown();
-		try {
-			if(!executorService.awaitTermination(60000, TimeUnit.MILLISECONDS)) {
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		onMessageLossLock();
 	}
 
 	@Override

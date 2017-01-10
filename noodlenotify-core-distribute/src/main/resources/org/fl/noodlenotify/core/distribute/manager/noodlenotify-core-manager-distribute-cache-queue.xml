@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
+	default-autowire="byName">
+	
+	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
+	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/queue/redis/noodlenotify-core-connect-cache-queue-factory.xml" />
+
+	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/queue/cluster/noodlenotify-core-connect-cache-queue-cluster-factory.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/serialize/noodlenotify-core-connect-serialize-factory.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/route/noodlenotify-core-connect-route-factory.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/register/noodlenotify-core-distribute-register.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/body/distinguish/noodlenotify-core-connect-cache-body-distinguish.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/queue/distinguish/noodlenotify-core-connect-cache-queue-distinguish.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/db/distinguish/noodlenotify-core-connect-db-distinguish.xml" />
+	
+	<bean id="setCallbackMethodInterceptor" class="org.fl.noodlenotify.core.distribute.aop.SetCallbackMethodInterceptor">
+		<property name="queueCacheConnectDistinguish" ref="queueCacheConnectDistinguish" />
+		<property name="bodyCacheConnectDistinguish" ref="bodyCacheConnectDistinguish" />
+	</bean>
+	<bean id="setPopMethodInterceptor" class="org.fl.noodlenotify.core.distribute.aop.SetPopMethodInterceptor">
+		<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
+	</bean>
+	<bean id="getCacheContentMethodInterceptor" class="org.fl.noodlenotify.core.distribute.aop.GetCacheContentMethodInterceptor">
+		<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
+	</bean>
+	<bean id="getDbContentMethodInterceptor" class="org.fl.noodlenotify.core.distribute.aop.GetDbContentMethodInterceptor">
+		<property name="connectDistinguish" ref="dbConnectDistinguish" />
+	</bean>
+	
+	<bean id="cacheMasterConnectClusterFactory" class="org.fl.noodlenotify.core.connect.cache.queue.cluster.MasterConnectClusterFactory">
+    	<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
+    	<property name="methodInterceptorList">
+			<list>
+				<ref bean="getDbContentMethodInterceptor" />
+				<ref bean="getCacheContentMethodInterceptor" />
+				<ref bean="setPopMethodInterceptor" />
+				<ref bean="setCallbackMethodInterceptor" />
+			</list>
+		</property>
+	</bean>
+	<bean id="cacheOtherConnectClusterFactory" class="org.fl.noodlenotify.core.connect.cache.queue.cluster.OtherConnectClusterFactory">
+    	<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
+	</bean>
+	
+	<bean id="distributeQueueCacheConnectManager" class="org.fl.noodlenotify.core.distribute.manager.DistributeQueueCacheConnectManager">
+		<property name="connectAgentFactoryMap">
+			<map>
+				<entry key="CACHE_QUEUE" value-ref="redisQueueCacheConnectAgentFactory" />
+			</map>
+		</property>
+		<property name="connectClusterFactoryMap">
+			<map>
+				<entry key="FAILOVER" value-ref="cacheQueueFailoverConnectClusterFactory" />
+				<entry key="ONCE" value-ref="cacheQueueOnceConnectClusterFactory" />
+				<entry key="ALL" value-ref="cacheQueueAllConnectClusterFactory" />
+				<entry key="MASTER" value-ref="cacheMasterConnectClusterFactory" />
+				<entry key="OTHER" value-ref="cacheOtherConnectClusterFactory" />
+			</map>
+		</property>
+		<property name="connectSerializeFactoryMap">
+			<map>
+				<entry key="JSON" value-ref="jsonNetConnectSerializeFactory" />
+			</map>
+		</property>
+		<property name="connectRouteFactoryMap">
+			<map>
+				<entry key="RANDOM" value-ref="randomConnectRouteFactory" />
+				<entry key="WEIGHT" value-ref="weightConnectRouteFactory" />
+				<entry key="RESPONSE" value-ref="responseConnectRouteFactory" />
+			</map>
+		</property>
+		<property name="updateLevel" value="5" />
+	</bean>
+	
+</beans>

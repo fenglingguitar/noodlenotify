@@ -18,7 +18,7 @@ import org.fl.noodlenotify.core.distribute.DistributePull;
 import org.fl.noodlenotify.core.distribute.DistributePullFactory;
 import org.fl.noodlenotify.core.distribute.DistributePush;
 import org.fl.noodlenotify.core.distribute.DistributePushFactory;
-import org.fl.noodlenotify.core.distribute.locker.cache.queue.QueueCacheDistributeSetLocker;
+import org.fl.noodlenotify.core.distribute.locker.QueueCacheDistributeSetLocker;
 
 public class DistributeConnectManager extends AbstractConnectManager {
 

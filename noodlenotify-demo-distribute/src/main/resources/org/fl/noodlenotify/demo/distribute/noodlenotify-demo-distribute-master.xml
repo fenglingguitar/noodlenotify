@@ -15,10 +15,10 @@
 	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
 
-	<import resource="classpath:org/fl/noodlenotify/core/connect/db/manager/noodlenotify-core-connect-db-manager-distribute.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/queue/manager/noodlenotify-core-connect-cache-queue-manager-distribute.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/body/manager/noodlenotify-core-connect-cache-body-manager-distribute.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/connect/net/manager/noodlenotify-core-connect-net-manager-distribute.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute-db.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute-cache-queue.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute-cache-body.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute-net.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute.xml" />
 
 	<import resource="classpath:org/fl/noodlenotify/demo/distribute/noodlenotify-demo-distribute.xml" />

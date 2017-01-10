@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
+	default-autowire="byName">
+	
+	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
+	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/connect/db/mysql/noodlenotify-core-connect-db-mysql-factory.xml" />
+
+	<import resource="classpath:org/fl/noodlenotify/core/connect/db/cluster/noodlenotify-core-connect-db-cluster-factory.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/serialize/noodlenotify-core-connect-serialize-factory.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/connect/route/noodlenotify-core-connect-route-factory.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/register/noodlenotify-core-distribute-register.xml" />
+	
+	<bean id="distributeDbConnectManager" class="org.fl.noodlenotify.core.distribute.manager.DistributeDbConnectManager">
+		<property name="connectAgentFactoryMap">
+			<map>
+				<entry key="MYSQL" value-ref="mysqlDbConnectAgentFactory" />
+			</map>
+		</property>
+		<property name="connectClusterFactoryMap">
+			<map>
+				<entry key="FAILOVER" value-ref="dbFailoverConnectClusterFactory" />
+				<entry key="ONCE" value-ref="dbOnceConnectClusterFactory" />
+				<entry key="ALL" value-ref="dbAllConnectClusterFactory" />
+				<entry key="ID" value-ref="dbIdConnectClusterFactory" />
+			</map>
+		</property>
+		<property name="connectSerializeFactoryMap">
+			<map>
+				<entry key="JSON" value-ref="jsonNetConnectSerializeFactory" />
+			</map>
+		</property>
+		<property name="connectRouteFactoryMap">
+			<map>
+				<entry key="RANDOM" value-ref="randomConnectRouteFactory" />
+				<entry key="WEIGHT" value-ref="weightConnectRouteFactory" />
+				<entry key="RESPONSE" value-ref="responseConnectRouteFactory" />
+			</map>
+		</property>
+		<property name="updateLevel" value="10" />
+	</bean>
+	
+</beans>

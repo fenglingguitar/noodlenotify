@@ -35,7 +35,7 @@
 	<bean id="redisBodyCacheConnectAgentFactory" class="org.fl.noodlenotify.core.connect.cache.body.redis.RedisBodyCacheConnectAgentFactory">
 		<property name="cacheConnectAgentConfParam" ref="cacheConnectAgentConfParam" />
 		<property name="bodyCacheConnectAgentConfParam" ref="bodyCacheConnectAgentConfParam" />
-		<property name="connectDistinguish" ref="dbConnectDistinguish" />
+		<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
 	</bean>
     
 </beans>
