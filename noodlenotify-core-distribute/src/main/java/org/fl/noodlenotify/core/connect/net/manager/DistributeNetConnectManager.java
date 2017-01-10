@@ -51,50 +51,6 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 		}
 		connectAgentMap.clear();
 	}
-	
-	@Override
-	protected synchronized void updateConnectAgent() {
-		
-		connectAndNodeAndChildInfoMap = null;
-		clusterInfoMap = null;
-		routeInfoMap = null;
-		
-		queryInfo();
-		
-		if (connectAndNodeAndChildInfoMap != null && !connectAndNodeAndChildInfoMap.isEmpty()) {
-			getAddConnect();
-			addConnect();
-			getAddNode();
-			addNode();
-			getAddNodeChild();
-			addNodeChild();
-			getAddConnectMapping();
-			addConnectMapping();
-			
-			getReduceConnectMapping();
-			reduceConnectMapping();
-			getReduceConnect();
-			reduceConnect();
-			getReduceNodeChild();
-			reduceNodeChild();
-			getReduceNode();
-			reduceNode();
-		}
-		
-		if (clusterInfoMap != null && !clusterInfoMap.isEmpty()) {
-			getAddCluster();
-			addCluster();
-			getReduceCluster();
-			reduceCluster();
-		}
-		
-		if (routeInfoMap != null && !routeInfoMap.isEmpty()) {
-			getAddRoute();
-			addRoute();
-			getReduceRoute();
-			reduceRoute(); 
-		}
-	}
 
 	@Override
 	protected void queryInfo() {
@@ -121,6 +77,72 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 		}
 	}
 
+	@Override
+	public void runUpdateAddComponent() {	
+		cleanComponent();
+		queryInfo();
+		addComponent();
+	}
+	
+	@Override
+	public void runUpdateReduceComponent() {
+		cleanComponent();
+		queryInfo();
+		reduceComponent();
+	}
+	
+	protected void cleanComponent() {
+		connectAndNodeAndChildInfoMap = null;
+		clusterInfoMap = null;
+		routeInfoMap = null;
+	}
+	
+	protected void addComponent() {
+		if (connectAndNodeAndChildInfoMap != null) {
+			getAddConnect();
+			addConnect();
+			getAddNode();
+			addNode();
+			getAddNodeChild();
+			addNodeChild();
+			getAddConnectMapping();
+			addConnectMapping();
+		}
+		
+		if (clusterInfoMap != null) {
+			getAddCluster();
+			addCluster();
+		}
+		
+		if (routeInfoMap != null) {
+			getAddRoute();
+			addRoute();
+		}
+	}
+	
+	protected void reduceComponent() {
+		if (connectAndNodeAndChildInfoMap != null) {
+			getReduceConnectMapping();
+			reduceConnectMapping();
+			getReduceConnect();
+			reduceConnect();
+			getReduceNodeChild();
+			reduceNodeChild();
+			getReduceNode();
+			reduceNode();
+		}
+		
+		if (clusterInfoMap != null) {
+			getReduceCluster();
+			reduceCluster();
+		}
+		
+		if (routeInfoMap != null) {
+			getReduceRoute();
+			reduceRoute(); 
+		}
+	}
+	
 	@Override
 	protected void getAddConnect() {
 		addConnectList = new ArrayList<Object>();
@@ -228,9 +250,11 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 			for (long childId : connectNodeMap.get(name).getChildConnectNodeMap().keySet()) {
 				for (ConnectAgent connectAgentIt : connectNodeMap.get(name).getChildConnectNode(childId).getAllConnectAgentList()) {
 					boolean isHave = false;
-					for (Object objectIt : connectAndNodeAndChildInfoMap.get(name).get(childId)) {
-						if (connectAgentIt.getConnectId() == getId(objectIt)) {
-							isHave = true;
+					if (connectAndNodeAndChildInfoMap.containsKey(name)) {
+						for (Object objectIt : connectAndNodeAndChildInfoMap.get(name).get(childId)) {
+							if (connectAgentIt.getConnectId() == getId(objectIt)) {
+								isHave = true;
+							}
 						}
 					}
 					if (!isHave) {
@@ -296,7 +320,7 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 		reduceChildNodeMap = new HashMap<String, List<Long>>();
 		for (String name : connectNodeMap.keySet()) {
 			for (long childId : connectNodeMap.get(name).getChildConnectNodeMap().keySet()) {
-				if (!connectAndNodeAndChildInfoMap.get(name).containsKey(childId)) {
+				if (!connectAndNodeAndChildInfoMap.containsKey(name) || !connectAndNodeAndChildInfoMap.get(name).containsKey(childId)) {
 					if (!reduceChildNodeMap.containsKey(name)) {
 						reduceChildNodeMap.put(name, new ArrayList<Long>());
 					}

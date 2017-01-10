@@ -34,12 +34,12 @@ public class Distribute {
 		moduleId = consoleRemotingInvoke.saveDistributerRegister(localIp, checkPort, distributeName);
 		distributeModuleRegister.setModuleId(moduleId);
 
-		connectManagerPool.startConnectManager();
+		connectManagerPool.start();
 	}
 	
 	public void destroy() throws Exception {
 		consoleRemotingInvoke.saveDistributerCancel(moduleId);
-		connectManagerPool.destroyConnectManager();
+		connectManagerPool.destroy();
 	}
 	
 	public void setConsoleRemotingInvoke(ConsoleRemotingInvoke consoleRemotingInvoke) {

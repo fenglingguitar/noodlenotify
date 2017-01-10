@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.manager.AbstractConnectManager;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
@@ -19,7 +18,6 @@ import org.fl.noodlenotify.core.distribute.DistributePull;
 import org.fl.noodlenotify.core.distribute.DistributePullFactory;
 import org.fl.noodlenotify.core.distribute.DistributePush;
 import org.fl.noodlenotify.core.distribute.DistributePushFactory;
-import org.fl.noodlenotify.core.distribute.locker.cache.queue.CheckActiveLockChangeHandler;
 import org.fl.noodlenotify.core.distribute.locker.cache.queue.QueueCacheDistributeSetLocker;
 
 public class DistributeConnectManager extends AbstractConnectManager {
@@ -30,8 +28,6 @@ public class DistributeConnectManager extends AbstractConnectManager {
 	
 	private DistributePullFactory distributePullFactory;
 	private DistributePushFactory distributePushFactory;
-
-	private ConnectDistinguish queueCacheConnectDistinguish;
 	
 	private ConcurrentMap<String, DistributePush> distributePushMap = new ConcurrentHashMap<String, DistributePush>();
 	private ConcurrentMap<String, ConcurrentMap<Long, DistributePull>> distributePullMap = new ConcurrentHashMap<String, ConcurrentMap<Long, DistributePull>>();
@@ -42,44 +38,13 @@ public class DistributeConnectManager extends AbstractConnectManager {
 	private Map<QueueDistributerVo, List<QueueMsgStorageVo>> queueDistributerInfoMap = null;
 	
 	private List<QueueDistributerVo> addPushList = null;
-	private List<QueueDistributerVo> addLockerList = null;
 	private Map<QueueDistributerVo, List<Long>> addPullMap = null;
 	
 	private List<String> reducePushList = null;
-	private List<String> reduceLockerList = null;
 	private Map<String, List<Long>> reducePullMap = null;
 	
 	private List<QueueDistributerVo> updatePushList = null;
 	private List<QueueDistributerVo> updatePullList = null;
-	
-	@Override
-	protected synchronized void updateConnectAgent() {
-		
-		queueDistributerInfoMap = null;
-		
-		queryInfo();
-		
-		if (queueDistributerInfoMap != null && !queueDistributerInfoMap.isEmpty()) {
-			getAddPush();
-			addPush();
-			getAddLocker();
-			addLocker();
-			getAddPull();
-			addPull();
-			
-			getReducePush();
-			reducePush();
-			getReduceLocker();
-			reduceLocker();
-			getReducePull();
-			reducePull();
-			
-			getUpdatePush();
-			updatePush();
-			getUpdatePull();
-			updatePull();
-		}
-	}
 
 	@Override
 	protected void destroyConnectAgent() {
@@ -100,14 +65,15 @@ public class DistributeConnectManager extends AbstractConnectManager {
 	}
 	
 	@Override
-	public synchronized void runUpdateAddComponent() {	
+	public void runUpdateAddComponent() {	
 		cleanComponent();
 		queryInfo();
 		addComponent();
+		updateComponent();
 	}
 	
 	@Override
-	public synchronized void runUpdateReduceComponent() {
+	public void runUpdateReduceComponent() {
 		cleanComponent();
 		queryInfo();
 		reduceComponent();
@@ -118,45 +84,29 @@ public class DistributeConnectManager extends AbstractConnectManager {
 	}
 	
 	protected void addComponent() {
-		if (queueDistributerInfoMap != null && !queueDistributerInfoMap.isEmpty()) {
+		if (queueDistributerInfoMap != null) {
 			getAddPush();
-			getAddLocker();
-			getAddPull();
 			addPush();
-			addLocker();
+			getAddPull();
 			addPull();
 		}
 	}
 	
 	protected void reduceComponent() {
-		if (queueDistributerInfoMap != null && !queueDistributerInfoMap.isEmpty()) {
-			getReducePush();
-			getReduceLocker();
+		if (queueDistributerInfoMap != null) {
 			getReducePull();
-			reducePush();
-			reduceLocker();
 			reducePull();
+			getReducePush();
+			reducePush();
 		}
 	}
 	
 	protected void updateComponent() {
-		if (queueDistributerInfoMap != null && !queueDistributerInfoMap.isEmpty()) {			
+		if (queueDistributerInfoMap != null) {			
 			getUpdatePush();
 			updatePush();
 			getUpdatePull();
 			updatePull();
-		}
-	}
-	
-	protected void runUpdateLowLevel() {
-		if (!addPushList.isEmpty() || !addLockerList.isEmpty() || !addPullMap.isEmpty()) {			
-			connectManagerPool.runUpdateLowLevel(this);
-		}
-	}
-	
-	protected void runUpdateHighLevel() {
-		if (!reducePushList.isEmpty() || !reduceLockerList.isEmpty() || !reducePullMap.isEmpty()) {			
-			connectManagerPool.runUpdateHighLevel(this);
 		}
 	}
 	
@@ -178,8 +128,7 @@ public class DistributeConnectManager extends AbstractConnectManager {
 				if (!queueDistributerVoOld.getNew_Pop_ThreadNum().equals(queueDistributerVoIt.getNew_Pop_ThreadNum())
 						|| !queueDistributerVoOld.getNew_Exe_ThreadNum().equals(queueDistributerVoIt.getNew_Exe_ThreadNum())
 								|| !queueDistributerVoOld.getPortion_Pop_ThreadNum().equals(queueDistributerVoIt.getPortion_Pop_ThreadNum())
-										|| !queueDistributerVoOld.getPortion_Exe_ThreadNum().equals(queueDistributerVoIt.getPortion_Exe_ThreadNum())
-				) {
+										|| !queueDistributerVoOld.getPortion_Exe_ThreadNum().equals(queueDistributerVoIt.getPortion_Exe_ThreadNum())) {
 					addPushList.add(queueDistributerVoIt);
 				}
 			}
@@ -196,28 +145,6 @@ public class DistributeConnectManager extends AbstractConnectManager {
 			DistributePush distributePush = distributePushFactory.createDistributePush(queueDistributerVoIt);
 			distributePush.start();
 			distributePushMap.put(queueDistributerVoIt.getQueue_Nm(), distributePush);
-		}
-	}
-
-	private void getAddLocker() {
-		addLockerList = new ArrayList<QueueDistributerVo>();
-		for (QueueDistributerVo queueDistributerVoIt : queueDistributerInfoMap.keySet()) {
-			if (!queueCacheDistributeSetLockerMap.containsKey(queueDistributerVoIt.getQueue_Nm())) {
-				addLockerList.add(queueDistributerVoIt);
-			}
-		}
-	}
-	
-	private void addLocker() {
-		for (QueueDistributerVo queueDistributerVoIt : addLockerList) {
-			QueueCacheDistributeSetLocker queueCacheDistributeSetLocker = new QueueCacheDistributeSetLocker(queueDistributerVoIt.getQueue_Nm(), distributeModuleRegister.getModuleId(), queueCacheConnectDistinguish.getConnectManager());
-			queueCacheDistributeSetLocker.setLockChangeHandler(new CheckActiveLockChangeHandler(queueDistributerVoIt.getQueue_Nm(), queueCacheConnectDistinguish));
-			try {
-				queueCacheDistributeSetLocker.start();
-				queueCacheDistributeSetLockerMap.put(queueDistributerVoIt.getQueue_Nm(), queueCacheDistributeSetLocker);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
 	}
 	
@@ -270,28 +197,6 @@ public class DistributeConnectManager extends AbstractConnectManager {
 		for (String name : reducePushList) {
 			distributePushMap.remove(name).destroy();
 			queueDistributerVoMap.remove(name);
-		}
-	}
-	
-	private void getReduceLocker() {
-		reduceLockerList = new ArrayList<String>();
-		for (String name : queueCacheDistributeSetLockerMap.keySet()) {
-			boolean isHave = false;
-			for(QueueDistributerVo queueDistributerVoIt : queueDistributerInfoMap.keySet()) {
-				if (name.equals(queueDistributerVoIt.getQueue_Nm())) {
-					isHave = true;
-					break;
-				}
-			}
-			if (!isHave) {
-				reduceLockerList.add(name);
-			}
-		}
-	}
-	
-	private void reduceLocker() {
-		for (String name : reduceLockerList) {
-			queueCacheDistributeSetLockerMap.remove(name).destroy();
 		}
 	}
 	
@@ -390,9 +295,5 @@ public class DistributeConnectManager extends AbstractConnectManager {
 
 	public void setDistributePushFactory(DistributePushFactory distributePushFactory) {
 		this.distributePushFactory = distributePushFactory;
-	}
-
-	public void setQueueCacheConnectDistinguish(ConnectDistinguish queueCacheConnectDistinguish) {
-		this.queueCacheConnectDistinguish = queueCacheConnectDistinguish;
 	}
 }

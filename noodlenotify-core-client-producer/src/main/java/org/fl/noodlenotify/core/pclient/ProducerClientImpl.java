@@ -37,13 +37,13 @@ public class ProducerClientImpl implements ProducerClient {
 
 		producerModuleRegister.setModuleId(moduleId);
 
-		connectManagerPool.startConnectManager();
+		connectManagerPool.start();
 	}
 
 	public void destroy() throws Exception {
 		
 		consoleRemotingInvoke.saveProducerCancel(moduleId);
-		connectManagerPool.destroyConnectManager();
+		connectManagerPool.destroy();
 	}
 	
 	@Override

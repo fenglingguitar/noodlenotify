@@ -52,13 +52,13 @@ public class Exchange implements NetConnectReceiver {
 		moduleId = consoleRemotingInvoke.saveExchangerRegister(localIp, localPort, url, type, checkPort, exchangeName);
 		exchangeModuleRegister.setModuleId(moduleId);
 
-		connectManagerPool.startConnectManager();
+		connectManagerPool.start();
 	}
 	
 	public void destroy() throws Exception {
 		consoleRemotingInvoke.saveExchangerCancel(moduleId);
 		connectServer.destroy();
-		connectManagerPool.destroyConnectManager();
+		connectManagerPool.destroy();
 	}
 	
 	@Override

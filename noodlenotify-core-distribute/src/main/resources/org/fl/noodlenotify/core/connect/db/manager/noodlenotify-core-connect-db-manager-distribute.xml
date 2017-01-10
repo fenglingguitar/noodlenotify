@@ -51,7 +51,7 @@
 				<entry key="RESPONSE" value-ref="responseConnectRouteFactory" />
 			</map>
 		</property>
-		<property name="updateLevel" value="1" />
+		<property name="updateLevel" value="10" />
 	</bean>
 	
 </beans>

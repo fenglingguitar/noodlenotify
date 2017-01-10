@@ -1,16 +1,15 @@
 package org.fl.noodlenotify.core.exchange.manager;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.fl.noodle.common.connect.manager.AbstractConnectManager;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
-import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 
 public class ExchangeConnectManager extends AbstractConnectManager {
@@ -20,70 +19,11 @@ public class ExchangeConnectManager extends AbstractConnectManager {
 	private ConsoleRemotingInvoke consoleRemotingInvoke;
 	
 	private ConcurrentMap<String, Long> queueConsumerGroupNumMap = new ConcurrentHashMap<String, Long>();
-	private ConcurrentMap<String, QueueExchangerVo> queueExchangerVoMap = new ConcurrentHashMap<String, QueueExchangerVo>();
 	
-	@Override
-	protected void updateConnectAgent() {
-
-		long moduleId = exchangeModuleRegister.getModuleId();
-		
-		Map<String, Long> consoleInfoMapGroupNum = null;
-		
-		try {
-			consoleInfoMapGroupNum = consoleRemotingInvoke.exchangerGetQueueConsumerGroupNum(moduleId);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		if (consoleInfoMapGroupNum != null) {
-			
-			for (String queueName : consoleInfoMapGroupNum.keySet()) {
-				if (!queueConsumerGroupNumMap.containsKey(queueName)) {
-					queueConsumerGroupNumMap.putIfAbsent(queueName, consoleInfoMapGroupNum.get(queueName));
-				} else {
-					Long queueConsumerGroupNumOld = queueConsumerGroupNumMap.get(queueName);
-					Long queueConsumerGroupNumNew = consoleInfoMapGroupNum.get(queueName);
-					if (!queueConsumerGroupNumOld.equals(queueConsumerGroupNumNew)) {
-						queueConsumerGroupNumMap.remove(queueName);
-						queueConsumerGroupNumMap.put(queueName, queueConsumerGroupNumNew);
-					}
-				}
-			}
-			
-			for (String queueName : queueConsumerGroupNumMap.keySet()) {
-				if (!consoleInfoMapGroupNum.containsKey(queueName)) {
-					queueConsumerGroupNumMap.remove(queueName);
-				}
-			}
-		}
-		
-		List<QueueExchangerVo> consoleInfoMapQueues = null;
-		
-		try {
-			consoleInfoMapQueues = consoleRemotingInvoke.exchangerGetQueues(moduleId);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		if (consoleInfoMapQueues != null) {
-			
-			Set<String> queueNameSet = new HashSet<String>();
-			
-			for (QueueExchangerVo queueExchangerVo : consoleInfoMapQueues) {
-				queueNameSet.add(queueExchangerVo.getQueue_Nm());
-				if (!queueExchangerVoMap.containsKey(queueExchangerVo.getQueue_Nm())) {
-					queueExchangerVoMap.put(queueExchangerVo.getQueue_Nm(), queueExchangerVo);
-				}
-			}
-			
-			for (String queueName : queueExchangerVoMap.keySet()) {
-				if (!queueNameSet.contains(queueName)) {
-					QueueExchangerVo queueExchangerVoOld = queueExchangerVoMap.get(queueName);
-					queueExchangerVoMap.remove(queueExchangerVoOld.getQueue_Nm());
-				} 
-			}
-		}
-	}
+	private Map<String, Long> groupNumInfoMap = null;
+	
+	private Map<String, Long> addGroupNumInfoMap = null;
+	private List<String> reduceGroupNumInfoList = null;
 
 	@Override
 	protected void destroyConnectAgent() {
@@ -109,13 +49,72 @@ public class ExchangeConnectManager extends AbstractConnectManager {
 
 	@Override
 	public void runUpdateAddComponent() {
-		// TODO Auto-generated method stub
-		
+		cleanComponent();
+		queryInfo();
+		addComponent();
 	}
 
 	@Override
 	public void runUpdateReduceComponent() {
-		// TODO Auto-generated method stub
-		
+		cleanComponent();
+		queryInfo();
+		reduceComponent();
+	}
+	
+	protected void cleanComponent() {
+		groupNumInfoMap = null;
+	}
+	
+	protected void addComponent() {
+		if (groupNumInfoMap != null) {
+			getAddGroupNum();
+			addGroupNum();
+		}
+	}
+	
+	protected void reduceComponent() {
+		if (groupNumInfoMap != null) {
+			getReduceGroupNum();
+			reduceGroupNum();
+		}
+	}
+	
+	protected void queryInfo() {
+		try {
+			groupNumInfoMap = consoleRemotingInvoke.exchangerGetQueueConsumerGroupNum(exchangeModuleRegister.getModuleId());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void getAddGroupNum() {
+		addGroupNumInfoMap = new HashMap<String, Long>();
+		for (String name : groupNumInfoMap.keySet()) {
+			if (!queueConsumerGroupNumMap.containsKey(name)
+					|| !queueConsumerGroupNumMap.get(name).equals(groupNumInfoMap.get(name))) {
+				addGroupNumInfoMap.put(name, groupNumInfoMap.get(name));
+			}
+		}
+	}
+	
+	private void addGroupNum() {
+		for (String name : addGroupNumInfoMap.keySet()) {
+			queueConsumerGroupNumMap.put(name, addGroupNumInfoMap.get(name));
+		}
+	}
+	
+	private void getReduceGroupNum() {
+		reduceGroupNumInfoList = new ArrayList<String>();
+		for (String name : queueConsumerGroupNumMap.keySet()) {
+			if (!groupNumInfoMap.containsKey(name)) {
+				reduceGroupNumInfoList.add(name);
+			}
+		}
+	}
+	
+	private void reduceGroupNum() {
+		for (String name : reduceGroupNumInfoList) {
+			queueConsumerGroupNumMap.remove(name);
+		}
 	}
 }

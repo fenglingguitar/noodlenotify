@@ -69,15 +69,15 @@ public class MasterConnectCluster extends AbstractConnectCluster {
 			}
 		}
 		
-		if (connectAgentMain != null) {
-			try {
-				return AopUtils.invokeJoinpointUsingReflection(connectAgentMain.getProxy(), method, args);
-			} catch (Throwable e) {
-				logger.error("doInvoke -> method.invoke -> Exception:{}", e.getMessage());
-				throw e;
-			}
+		if (connectAgentMain == null) {
+			throw new ConnectNoAliveException("main connect agent is no alive");
 		}
 		
-		return null;
+		try {
+			return AopUtils.invokeJoinpointUsingReflection(connectAgentMain.getProxy(), method, args);
+		} catch (Throwable e) {
+			logger.error("doInvoke -> method.invoke -> Exception:{}", e.getMessage());
+			throw e;
+		}
 	}
 }

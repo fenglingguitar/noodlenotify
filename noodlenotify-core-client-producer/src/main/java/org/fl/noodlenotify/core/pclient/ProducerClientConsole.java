@@ -4,10 +4,10 @@ public class ProducerClientConsole extends ProducerClientImpl {
 	
 	public void start() throws Exception {
 		producerModuleRegister.setModuleId(0L);
-		connectManagerPool.startConnectManager();
+		connectManagerPool.start();
 	}
 
 	public void destroy() throws Exception {
-		connectManagerPool.destroyConnectManager();
+		connectManagerPool.destroy();
 	}
 }
