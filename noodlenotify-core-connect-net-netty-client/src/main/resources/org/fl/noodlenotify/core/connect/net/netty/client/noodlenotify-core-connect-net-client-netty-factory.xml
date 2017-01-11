@@ -26,6 +26,7 @@
 	<bean id="connectAgentFactoryNetty" class="org.fl.noodlenotify.core.connect.net.netty.client.NettyNetConnectAgentFactory">
 		<property name="connectDistinguish" ref="netConnectDistinguish" />
 		<property name="nettyNetConnectPoolConfParam" ref="nettyNetConnectPoolConfParam"/>
+		<property name="readTimeout" value="10000"/>
 	</bean>
     
 </beans>

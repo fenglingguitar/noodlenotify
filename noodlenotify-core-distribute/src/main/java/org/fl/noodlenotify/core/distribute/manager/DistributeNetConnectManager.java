@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
+import org.fl.noodle.common.connect.agent.AbstractNetConnectAgent;
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.connect.manager.AbstractConnectManagerTemplate;
@@ -18,6 +19,7 @@ import org.fl.noodlenotify.console.vo.QueueConsumerVo;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.cluster.LayerConnectCluster;
+import org.fl.noodlenotify.core.connect.net.constent.NetConnectSerializeType;
 
 public class DistributeNetConnectManager extends AbstractConnectManagerTemplate {
 	
@@ -354,7 +356,9 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 
 	@Override
 	protected ConnectAgent createConnectAgent(Object object) {
-		return connectAgentFactoryMap.get(((QueueConsumerVo)object).getType()).createConnectAgent(((QueueConsumerVo)object).getConsumer_Id(), ((QueueConsumerVo)object).getIp(), ((QueueConsumerVo)object).getPort(), ((QueueConsumerVo)object).getUrl());
+		ConnectAgent connectAgent = connectAgentFactoryMap.get(((QueueConsumerVo)object).getType()).createConnectAgent(((QueueConsumerVo)object).getConsumer_Id(), ((QueueConsumerVo)object).getIp(), ((QueueConsumerVo)object).getPort(), ((QueueConsumerVo)object).getUrl());
+		((AbstractNetConnectAgent)connectAgent).setConnectSerialize(connectSerializeFactoryMap.get(NetConnectSerializeType.JSON.getCode()).createConnectSerialize());
+		return connectAgent;
 	}
 	
 	@Override

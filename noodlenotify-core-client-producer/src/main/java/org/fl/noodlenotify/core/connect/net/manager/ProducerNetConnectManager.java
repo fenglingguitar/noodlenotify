@@ -3,6 +3,7 @@ package org.fl.noodlenotify.core.connect.net.manager;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.fl.noodle.common.connect.agent.AbstractNetConnectAgent;
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.connect.manager.AbstractConnectManagerTemplate;
 import org.fl.noodle.common.connect.register.ModuleRegister;
@@ -11,6 +12,7 @@ import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
+import org.fl.noodlenotify.core.connect.net.constent.NetConnectSerializeType;
 
 public class ProducerNetConnectManager extends AbstractConnectManagerTemplate {
 	
@@ -52,7 +54,9 @@ public class ProducerNetConnectManager extends AbstractConnectManagerTemplate {
 
 	@Override
 	protected ConnectAgent createConnectAgent(Object object) {
-		return connectAgentFactoryMap.get(((QueueExchangerVo)object).getType()).createConnectAgent(((QueueExchangerVo)object).getExchanger_Id(), ((QueueExchangerVo)object).getIp(), ((QueueExchangerVo)object).getPort(), ((QueueExchangerVo)object).getUrl());
+		ConnectAgent connectAgent = connectAgentFactoryMap.get(((QueueExchangerVo)object).getType()).createConnectAgent(((QueueExchangerVo)object).getExchanger_Id(), ((QueueExchangerVo)object).getIp(), ((QueueExchangerVo)object).getPort(), ((QueueExchangerVo)object).getUrl());
+		((AbstractNetConnectAgent)connectAgent).setConnectSerialize(connectSerializeFactoryMap.get(NetConnectSerializeType.JSON.getCode()).createConnectSerialize());
+		return connectAgent;
 	}
 	
 	@Override

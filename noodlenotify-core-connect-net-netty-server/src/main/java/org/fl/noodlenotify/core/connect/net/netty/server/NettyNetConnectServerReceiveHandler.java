@@ -8,7 +8,6 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
-
 import org.fl.noodle.common.util.json.JsonTranslator;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
@@ -24,12 +23,12 @@ public class NettyNetConnectServerReceiveHandler extends SimpleChannelHandler {
 	public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e)
 			throws Exception {
 		
-		Object object = e.getMessage();
+		NettyNetConnectServerModel nettyNetConnectServerModel = (NettyNetConnectServerModel) e.getMessage();
 		
 		String uuid = null;
 		
 		try {
-			Message message = JsonTranslator.fromString((String)object, Message.class);
+			Message message = JsonTranslator.fromString(nettyNetConnectServerModel.getData(), Message.class);
 			if (message.getUuid() == null) {
 				uuid = UUID.randomUUID().toString().replaceAll("-", ""); 
 				message.setUuid(uuid);

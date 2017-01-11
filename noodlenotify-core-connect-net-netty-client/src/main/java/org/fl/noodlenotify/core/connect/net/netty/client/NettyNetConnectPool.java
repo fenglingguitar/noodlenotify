@@ -2,78 +2,76 @@ package org.fl.noodlenotify.core.connect.net.netty.client;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.apache.commons.pool.impl.GenericObjectPool.Config;
-
-import org.fl.noodlenotify.core.connect.net.netty.client.exception.NettyConnectionException;
-import org.fl.noodlenotify.core.connect.net.netty.client.exception.NettyException;
+import org.fl.noodle.common.net.socket.SocketConnect;
 
 public class NettyNetConnectPool {
 	
 	protected GenericObjectPool internalPool;
     
-    public NettyNetConnectPool(Config poolConfig, String ip, int port, int timeout) {
-    	this.internalPool = new GenericObjectPool(new NettyNetConnectFactory(ip, port, timeout), poolConfig);
+    public NettyNetConnectPool(String ip, int port, int connectTimeout, int readTimeout, String encoding, NettyNetConnectPoolConfParam nettyNetConnectPoolConfParam) {
+    	this.internalPool = new GenericObjectPool(new NettyNetConnectFactory(ip, port, connectTimeout, readTimeout, encoding), nettyNetConnectPoolConfParam);
     }
     
-    public NettyNetConnect getResource() {
-        try {
-            return (NettyNetConnect) internalPool.borrowObject();
-        } catch (Exception e) {
-            throw new NettyConnectionException("Could not get a resource from the pool", e);
-        }
+    public SocketConnect getResource() throws Exception {
+    	return (SocketConnect) internalPool.borrowObject();
     }
         
     public void returnResource(Object resource) {
-        try {
-            internalPool.returnObject(resource);
-        } catch (Exception e) {
-            throw new NettyException("Could not return the resource to the pool", e);
-        }
+    	try {
+			internalPool.returnObject(resource);
+		} catch (Exception e) {
+		}
     }
 
     protected void returnBrokenResource(Object resource) {
         try {
             internalPool.invalidateObject(resource);
         } catch (Exception e) {
-            throw new NettyException("Could not return the resource to the pool", e);
         }
     }
 
     public void destroy() {
-        try {
-        	internalPool.clear();
+
+    	try {
             internalPool.close();
         } catch (Exception e) {
-            throw new NettyException("Could not destroy the pool", e);
         }
     }
     
     private static class NettyNetConnectFactory extends BasePoolableObjectFactory {
     	
-        private final String host;
-        private final int port;
-        private final int timeout;
+        private String ip;
+        private int port;
+        private int connectTimeout;
+    	private int readTimeout;
+        private String encoding;
 
-        public NettyNetConnectFactory(final String host, final int port, final int timeout) {
+        public NettyNetConnectFactory(String ip, int port, int connectTimeout, int readTimeout, String encoding) {
             super();
-            this.host = host;
+            this.ip = ip;
             this.port = port;
-            this.timeout = timeout;
+            this.connectTimeout = connectTimeout;
+            this.readTimeout = readTimeout;
+            this.encoding = encoding;
         }
 
         public Object makeObject() throws Exception {
         	
-            final NettyNetConnect nettyNetConnect = new NettyNetConnect(this.host, this.port, this.timeout);
-            nettyNetConnect.connect();
-            return nettyNetConnect;
+            final SocketConnect socketConnect = new SocketConnect(ip, port, connectTimeout, readTimeout, encoding);
+            try {
+            	socketConnect.connect();
+            } catch (Exception e) {
+            	
+            }
+            return socketConnect;
         }
 
         public void destroyObject(final Object obj) throws Exception {
-            if (obj instanceof NettyNetConnect) {
-                final NettyNetConnect nettyNetConnect = (NettyNetConnect) obj;
-                if (nettyNetConnect.isConnected()) {
+            if (obj instanceof SocketConnect) {
+                final SocketConnect socketConnect = (SocketConnect) obj;
+                if (socketConnect.isConnected()) {
                     try {
-                    	nettyNetConnect.close();
+                    	socketConnect.close();
                     } catch (Exception e) {
                     	
                     }
@@ -82,13 +80,9 @@ public class NettyNetConnectPool {
         }
 
         public boolean validateObject(final Object obj) {
-            if (obj instanceof NettyNetConnect) {
-                final NettyNetConnect nettyNetConnect = (NettyNetConnect) obj;
-                try {
-                    return nettyNetConnect.isConnected();
-                } catch (final Exception e) {
-                    return false;
-                }
+            if (obj instanceof SocketConnect) {
+                final SocketConnect socketConnect = (SocketConnect) obj;
+                return socketConnect.isConnected();
             } else {
                 return false;
             }

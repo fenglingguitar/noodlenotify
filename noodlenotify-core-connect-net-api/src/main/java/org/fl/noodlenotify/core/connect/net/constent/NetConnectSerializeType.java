@@ -2,7 +2,7 @@ package org.fl.noodlenotify.core.connect.net.constent;
 
 public enum NetConnectSerializeType {
 	
-	JSON("JSON"), HESSIAN("HESSIAN");
+	JSON("JSON");
 	
 	private String code;
 

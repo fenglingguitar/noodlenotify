@@ -3,8 +3,6 @@ package org.fl.noodlenotify.core.connect.net.netty.server;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.fl.noodle.common.connect.server.ConnectServer;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -21,6 +19,8 @@ import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.frame.FrameDecoder;
 import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NettyNetConnectServer implements ConnectServer {
 	
@@ -35,7 +35,6 @@ public class NettyNetConnectServer implements ConnectServer {
 	
 	private int workerCount = 8;
 	
-	@Override
 	public void start() throws Exception {
 		
 		factory = new NioServerSocketChannelFactory(
@@ -60,17 +59,16 @@ public class NettyNetConnectServer implements ConnectServer {
 		Channel channel = bootstrap.bind(new InetSocketAddress(port));
 		allChannels.add(channel);
 		if (logger.isDebugEnabled()) {
-			logger.debug("Start a NettyNetConnectServer -> Port: " + port);
+			logger.debug("start a netty server -> Port: {}", port);
 		}
 	}
 	
-	@Override
 	public void destroy() throws Exception {
 		ChannelGroupFuture future = allChannels.close();
 		future.awaitUninterruptibly();
 		factory.releaseExternalResources();
 		if (logger.isDebugEnabled()) {
-			logger.debug("Close a NettyNetConnectServer -> Port: " + port);
+			logger.debug("close a netty server -> Port: {}", port);
 		}
 	}
 	
@@ -89,8 +87,7 @@ public class NettyNetConnectServer implements ConnectServer {
 	private class JsonEncoder extends OneToOneEncoder {
 
 		@Override
-		protected Object encode(ChannelHandlerContext ctx, Channel channel,
-				Object msg) throws Exception {
+		protected Object encode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
 			
 			String jMessage = (String) msg;
 			
@@ -110,8 +107,7 @@ public class NettyNetConnectServer implements ConnectServer {
 	private class JsonDecoder extends FrameDecoder {
 
 		@Override
-		protected Object decode(ChannelHandlerContext ctx, Channel channel,
-				ChannelBuffer buffer) throws Exception {
+		protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer) throws Exception {
 			
 			if (buffer.readableBytes() < 4) {
 				return null;
@@ -128,7 +124,26 @@ public class NettyNetConnectServer implements ConnectServer {
 			
 			ChannelBuffer channelBuffer = buffer.readBytes(bufRecvSize);
 			
-			return new String(channelBuffer.array(), "UTF-8");
+			NettyNetConnectServerModel nettyNetConnectServerModel = new NettyNetConnectServerModel();
+			nettyNetConnectServerModel.setName(new String(channelBuffer.array(), "UTF-8"));
+			
+			if (buffer.readableBytes() < 4) {
+				buffer.resetReaderIndex();
+				return null;
+			}
+			
+			bufRecvSize = buffer.readInt();
+			
+			if (buffer.readableBytes() < bufRecvSize) {
+				buffer.resetReaderIndex();
+				return null;
+			}
+			
+			channelBuffer = buffer.readBytes(bufRecvSize);
+			
+			nettyNetConnectServerModel.setData(new String(channelBuffer.array(), "UTF-8"));
+			
+			return nettyNetConnectServerModel;
 		}
 	}
 }
