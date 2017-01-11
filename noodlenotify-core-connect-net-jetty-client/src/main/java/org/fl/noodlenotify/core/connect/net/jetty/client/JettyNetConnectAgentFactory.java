@@ -5,6 +5,8 @@ import org.fl.noodle.common.connect.agent.ConnectAgent;
 
 public class JettyNetConnectAgentFactory extends AbstractConnectAgentFactory {
 
+	private String inputName = "input";
+	
 	@Override
 	public ConnectAgent createConnectAgent(
 			long connectId, String ip, int port, String url, 
@@ -12,6 +14,10 @@ public class JettyNetConnectAgentFactory extends AbstractConnectAgentFactory {
 		return new JettyNetConnectAgent(
 				connectId, ip, port, url,
 				connectTimeout, readTimeout, encoding, invalidLimitNum,
-				connectDistinguish, methodInterceptorList);
-	}	
+				inputName, connectDistinguish, methodInterceptorList);
+	}
+	
+	public void setInputName(String inputName) {
+		this.inputName = inputName;
+	}
 }

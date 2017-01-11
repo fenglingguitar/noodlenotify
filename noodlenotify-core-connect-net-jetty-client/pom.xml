@@ -21,6 +21,11 @@
   
   <dependencies>
   
+  	<dependency>
+		<groupId>org.fl.noodle.common.net</groupId>
+		<artifactId>noodlecommon-net</artifactId>
+	</dependency>
+  
 	<dependency>
 		<groupId>org.fl.noodle.common.util</groupId>
 		<artifactId>noodlecommon-util</artifactId>

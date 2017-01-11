@@ -119,16 +119,18 @@ public class NettyNetConnectAgent extends AbstractNetConnectAgent implements Net
 		
 		nettyNetConnectPool.returnResource(socketConnect);
 		
-		MessageResult messageResult = connectSerialize.deserializationFromString(deserializationString, MessageResult.class);
+		MessageResult messageResult = null;
+		try {
+			messageResult = connectSerialize.deserializationFromString(deserializationString, MessageResult.class);
+		} catch (Exception e) { 
+			throw new ConnectSerializeException("object deserialization from string fail");
+		}
+		
 		if (messageResult.getResult() == false) {
 			throw new ConnectInvokeException(messageResult.getError());
 		}
 		
-		try {
-			return connectSerialize.deserializationFromString(deserializationString, MessageResult.class).getUuid();
-		} catch (Exception e) { 
-			throw new ConnectSerializeException("object deserialization from string fail");
-		}
+		return messageResult.getUuid();
 	}
 
 	@Override

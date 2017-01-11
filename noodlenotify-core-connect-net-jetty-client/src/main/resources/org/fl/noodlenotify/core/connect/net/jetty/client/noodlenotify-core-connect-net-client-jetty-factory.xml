@@ -16,6 +16,7 @@
 	
 	<bean id="connectAgentFactoryJetty" class="org.fl.noodlenotify.core.connect.net.jetty.client.JettyNetConnectAgentFactory">
 		<property name="connectDistinguish" ref="netConnectDistinguish" />
+		<property name="readTimeout" value="10000"/>
 	</bean>
     
 </beans>
