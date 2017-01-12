@@ -24,7 +24,7 @@ public class JettyNetConnectServerCheckHandler extends AbstractHandler {
 	        throws IOException, ServletException {
 		response.setContentType("application/x-www-form-urlencoded;charset=utf-8");  
         response.setStatus(HttpServletResponse.SC_OK);  
-        baseRequest.setHandled(true);  
+        baseRequest.setHandled(true);
 		if (target.equals(url)) {
 			doReceive(request, response);
 		}

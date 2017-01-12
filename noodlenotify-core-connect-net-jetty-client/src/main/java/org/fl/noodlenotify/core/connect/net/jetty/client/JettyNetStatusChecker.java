@@ -30,7 +30,7 @@ public class JettyNetStatusChecker extends AbstractStatusChecker implements NetS
 
 	@Override
 	public void connect() throws Exception {
-		String fullUrl = new StringBuilder("http://").append(ip).append(":").append(port).append(url).toString();
+		String fullUrl = new StringBuilder("http://").append(ip).append(":").append(port).append(url).append("/check").toString();
 		httpConnect = new HttpConnectJdk(fullUrl, connectTimeout, readTimeout, encoding);
 		try {
 			httpConnect.connect();

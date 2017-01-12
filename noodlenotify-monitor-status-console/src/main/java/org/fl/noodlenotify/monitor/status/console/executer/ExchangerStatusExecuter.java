@@ -30,9 +30,9 @@ public class ExchangerStatusExecuter extends AbstractExecuter {
 		for (ExchangerVo exchangerVo : exchangerVoList) {
 			byte systemStatus = exchangerVo.getSystem_Status();
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;
-			StatusCheckerFactory statusCheckerFactory = statusCheckerFactoryMap.get("HTTP");
+			StatusCheckerFactory statusCheckerFactory = statusCheckerFactoryMap.get(exchangerVo.getType());
 			if (statusCheckerFactory != null) {
-				NetStatusChecker netStatusChecker = (NetStatusChecker) statusCheckerFactory.createStatusChecker(exchangerVo.getExchanger_Id(), exchangerVo.getIp(), exchangerVo.getCheck_Port(), "/noodlenotify").getProxy();
+				NetStatusChecker netStatusChecker = (NetStatusChecker) statusCheckerFactory.createStatusChecker(exchangerVo.getExchanger_Id(), exchangerVo.getIp(), exchangerVo.getPort(), exchangerVo.getUrl()).getProxy();
 				try {
 					netStatusChecker.checkHealth();
 					currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_ON_LINE;

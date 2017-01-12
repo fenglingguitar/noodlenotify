@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-
 import org.fl.noodle.common.util.json.JsonTranslator;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
@@ -23,14 +22,23 @@ public class JettyNetConnectServerReceiveHandler extends AbstractHandler {
 	
 	private NetConnectReceiver netConnectReceiver;
 	
+	private String healthUrl = "/noodlenotify/check";
 	private String url = "/noodlenotify";
 	
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 	        throws IOException, ServletException {
 		response.setContentType("application/x-www-form-urlencoded;charset=utf-8");  
         response.setStatus(HttpServletResponse.SC_OK);  
-        baseRequest.setHandled(true);  
-		if (target.equals(url)) {
+        baseRequest.setHandled(true);
+        if (target.startsWith(healthUrl)) {
+        	try {
+    			response.getWriter().print(JsonTranslator.toString(new MessageResult(true)));
+    		} catch (Exception exception) {
+    			if (logger.isErrorEnabled()) {
+    				logger.error("MessageReceived -> JsonTranslator toString -> ReceiveException -> " + exception);
+    			}
+    		}
+        } else if (target.startsWith(url)) {
 			doReceive(request, response);
 		}
 	}

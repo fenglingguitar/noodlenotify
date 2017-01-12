@@ -19,11 +19,23 @@ public class NettyNetConnectServerReceiveHandler extends SimpleChannelHandler {
 	
 	private NetConnectReceiver netConnectReceiver;
 	
+	private String healthName = "/check";
+	
 	@Override
 	public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e)
 			throws Exception {
 		
 		NettyNetConnectServerModel nettyNetConnectServerModel = (NettyNetConnectServerModel) e.getMessage();
+		
+		if (nettyNetConnectServerModel.getName().startsWith(healthName)) {
+			try {
+				ctx.getChannel().write(JsonTranslator.toString(new MessageResult(true)));
+			} catch (Exception exception) {
+				if (logger.isErrorEnabled()) {
+					logger.error("MessageReceived -> JsonTranslator toString -> ReceiveException -> " + exception);
+				}
+			}
+		}
 		
 		String uuid = null;
 		
