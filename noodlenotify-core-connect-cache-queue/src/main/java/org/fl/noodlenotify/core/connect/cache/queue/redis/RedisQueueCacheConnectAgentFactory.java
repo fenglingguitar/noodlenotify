@@ -7,11 +7,9 @@ import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgentConfPa
 
 public class RedisQueueCacheConnectAgentFactory extends AbstractConnectAgentFactory {
 	
-	private CacheConnectAgentConfParam cacheConnectAgentConfParam
-				= new CacheConnectAgentConfParam();
+	private CacheConnectAgentConfParam cacheConnectAgentConfParam = new CacheConnectAgentConfParam();
 	
-	private QueueCacheConnectAgentConfParam queueCacheConnectAgentConfParam 
-			 	= new QueueCacheConnectAgentConfParam();
+	private QueueCacheConnectAgentConfParam queueCacheConnectAgentConfParam = new QueueCacheConnectAgentConfParam();
 
 	@Override
 	public ConnectAgent createConnectAgent(
@@ -28,8 +26,7 @@ public class RedisQueueCacheConnectAgentFactory extends AbstractConnectAgentFact
 		this.cacheConnectAgentConfParam = cacheConnectAgentConfParam;
 	}
 
-	public void setQueueCacheConnectAgentConfParam(
-			QueueCacheConnectAgentConfParam queueCacheConnectAgentConfParam) {
+	public void setQueueCacheConnectAgentConfParam(QueueCacheConnectAgentConfParam queueCacheConnectAgentConfParam) {
 		this.queueCacheConnectAgentConfParam = queueCacheConnectAgentConfParam;
 	}
 }

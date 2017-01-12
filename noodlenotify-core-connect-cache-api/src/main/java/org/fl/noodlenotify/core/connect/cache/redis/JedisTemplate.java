@@ -38,6 +38,18 @@ public class JedisTemplate {
 		}
 	}
 	
+	public static <T> T execute(Jedis jedis, JedisOperation<T> jedisOperation) throws Exception {
+		try {
+			return jedisOperation.doOperation(jedis);
+		} catch (JedisConnectionException e) {
+			e.printStackTrace();
+			throw new ConnectResetException("Connection reset for queue redis connect agent");
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
+	
 	public static interface JedisOperation<T> {
 		public T doOperation(Jedis jedis) throws Exception;
 	}

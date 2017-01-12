@@ -13,7 +13,6 @@ import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.CachePostfix;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgentConfParam;
-import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheStatusChecker;
 import org.fl.noodlenotify.core.connect.cache.redis.JedisTemplate;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
@@ -24,7 +23,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Transaction;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
-public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent implements QueueCacheConnectAgent, QueueCacheStatusChecker {
+public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent implements QueueCacheConnectAgent {
 
 	//private final static Logger logger = LoggerFactory.getLogger(RedisQueueCacheConnectAgent.class);
 	
@@ -424,40 +423,11 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 			}
 		});
 	}
-	
-	@Override
-	public void checkHealth() throws Exception {
-		
-		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
-			
-			@Override
-			public Void doOperation(Jedis jedis) throws Exception {
-				jedis.exists("CheckHealth");
-				return null;
-			}
-		});
-	}
 
-	public void setQueueCacheConnectAgentConfParam(
-			QueueCacheConnectAgentConfParam queueCacheConnectAgentConfParam) {
+	public void setQueueCacheConnectAgentConfParam(QueueCacheConnectAgentConfParam queueCacheConnectAgentConfParam) {
 		this.queueCacheConnectAgentConfParam = queueCacheConnectAgentConfParam;
 	}
-
-	@Override
-	public boolean checkIsActive(String queueName) throws Exception {
-		return isActive(queueName);
-	}
-
-	@Override
-	public long checkNewLen(String queueName) throws Exception {
-		return len(queueName, true);
-	}
-
-	@Override
-	public long checkPortionLen(String queueName) throws Exception {
-		return len(queueName, false);
-	}
-
+	
 	@Override
 	protected Class<?> getServiceInterfaces() {
 		return QueueCacheConnectAgent.class;

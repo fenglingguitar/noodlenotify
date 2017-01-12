@@ -2,26 +2,23 @@ package org.fl.noodlenotify.monitor.status.console.executer;
 
 import java.util.List;
 
-import org.fl.noodle.common.connect.agent.ConnectAgent;
-import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.QueueMsgStorageService;
 import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
 import org.fl.noodlenotify.core.connect.db.DbStatusChecker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.fl.noodlenotify.core.status.StatusCheckerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class MsgStorageCapacityStatusExecuter extends AbstractExecuter {
 
-	private final static Logger logger = LoggerFactory.getLogger(MsgStorageCapacityStatusExecuter.class);
+	//private final static Logger logger = LoggerFactory.getLogger(MsgStorageCapacityStatusExecuter.class);
 	
 	@Autowired
 	private QueueMsgStorageService queueMsgStorageService;
 
 	@Autowired
-	private ConnectAgentFactory dbConnectAgentFactory;
+	private StatusCheckerFactory mysqlDbStatusCheckerFactory;
 
 	@Override
 	public void execute() throws Exception {
@@ -30,21 +27,14 @@ public class MsgStorageCapacityStatusExecuter extends AbstractExecuter {
 		queueMsgStorageVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
 		queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
 		List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryQueueMsgStorageIncludeList(queueMsgStorageVo);
-		for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
-			ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
+		for (QueueMsgStorageVo queueMsgStorageVoIt : queueMsgStorages) {
+			DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbStatusCheckerFactory.createStatusChecker(queueMsgStorageVoIt.getMsgStorage_Id(), queueMsgStorageVoIt.getIp(), queueMsgStorageVoIt.getPort(), null).getProxy();
 			try {
-				connectAgent.connect();
-				long newLen = ((DbStatusChecker) connectAgent).checkNewLen(queueMsgStorage.getQueue_Nm());
-				long portionLen = ((DbStatusChecker) connectAgent).checkPortionLen(queueMsgStorage.getQueue_Nm());
-				queueMsgStorage.setNew_Len(newLen);
-				queueMsgStorage.setPortion_Len(portionLen);
-				queueMsgStorageService.updateQueueMsgStorageSimple(queueMsgStorage);
+				queueMsgStorageVoIt.setNew_Len(dbStatusChecker.checkNewLen(queueMsgStorageVoIt.getQueue_Nm()));
+				queueMsgStorageVoIt.setPortion_Len(dbStatusChecker.checkPortionLen(queueMsgStorageVoIt.getQueue_Nm()));
+				queueMsgStorageService.updateQueueMsgStorageSimple(queueMsgStorageVoIt);
 			} catch (Exception e) {
-				if (logger.isDebugEnabled()) {
-					logger.error("execute -> " + e);
-				}
-			} finally {
-				connectAgent.close();
+				e.printStackTrace();
 			}
 		}
 	}

@@ -15,15 +15,7 @@
 	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
 	
-	<bean id="cacheConnectAgentConfParamBody" class="org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam">
-		<property name="timeout" value="3000"/>
-		<property name="setThreadCount" value="0"/>
-		<property name="removeThreadCount" value="0"/>
-	</bean>
-	
-	<bean id="redisBodyCacheConnectAgentFactory" class="org.fl.noodlenotify.core.connect.cache.body.redis.RedisBodyCacheConnectAgentFactory">
-		<property name="cacheConnectAgentConfParam" ref="cacheConnectAgentConfParamBody" />
-	</bean>
+	<bean id="redisBodyCacheStatusCheckerFactory" class="org.fl.noodlenotify.core.connect.cache.body.redis.RedisBodyCacheStatusCheckerFactory" />
 		
 	<bean id="msgBodyCacheCapacityStatusExecuter" class="org.fl.noodlenotify.monitor.status.console.executer.MsgBodyCacheCapacityStatusExecuter" />
 	

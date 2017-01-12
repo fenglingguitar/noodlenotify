@@ -3,26 +3,23 @@ package org.fl.noodlenotify.monitor.status.console.executer;
 import java.util.List;
 import java.util.Map;
 
-import org.fl.noodle.common.connect.agent.ConnectAgent;
-import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.DistributerService;
 import org.fl.noodlenotify.console.vo.DistributerVo;
 import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.fl.noodlenotify.core.status.StatusCheckerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class DistributerStatusExecuter extends AbstractExecuter {
 
-	private final static Logger logger = LoggerFactory.getLogger(DistributerStatusExecuter.class);
+	//private final static Logger logger = LoggerFactory.getLogger(DistributerStatusExecuter.class);
 	
 	@Autowired
 	private DistributerService distributerService;
 
 	@Autowired
-	private Map<String, ConnectAgentFactory> connectAgentFactoryMap;
+	private Map<String, StatusCheckerFactory> statusCheckerFactoryMap;
 	
 	@Override
 	public void execute() throws Exception {
@@ -33,19 +30,14 @@ public class DistributerStatusExecuter extends AbstractExecuter {
 		for (DistributerVo distributerVo : distributerVoList) {
 			byte systemStatus = distributerVo.getSystem_Status();
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;
-			ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get("HTTP");
-			if (connectAgentFactory != null) {
-				ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(distributerVo.getDistributer_Id(), distributerVo.getIp(), distributerVo.getCheck_Port(), "/noodlenotify");
+			StatusCheckerFactory statusCheckerFactory = statusCheckerFactoryMap.get("HTTP");
+			if (statusCheckerFactory != null) {
+				NetStatusChecker netStatusChecker = (NetStatusChecker) statusCheckerFactory.createStatusChecker(distributerVo.getDistributer_Id(), distributerVo.getIp(), distributerVo.getCheck_Port(), "/noodlenotify").getProxy();
 				try {
-					connectAgent.connect();
-					((NetStatusChecker)connectAgent).checkHealth();
+					netStatusChecker.checkHealth();
 					currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_ON_LINE;
 				} catch (Exception e) {
-					if (logger.isDebugEnabled()) {
-						logger.error("CheckHealth -> " + e);
-					}
-				} finally {
-					connectAgent.close();
+					e.printStackTrace();
 				}
 				if (systemStatus != currentSysTemStatus) {
 					DistributerVo currentDistributerVo = new DistributerVo();
@@ -57,7 +49,7 @@ public class DistributerStatusExecuter extends AbstractExecuter {
 		}
 	}
 	
-	public void setConnectAgentFactoryMap(Map<String, ConnectAgentFactory> connectAgentFactoryMap) {
-		this.connectAgentFactoryMap = connectAgentFactoryMap;
+	public void setStatusCheckerFactoryMap(Map<String, StatusCheckerFactory> statusCheckerFactoryMap) {
+		this.statusCheckerFactoryMap = statusCheckerFactoryMap;
 	}
 }

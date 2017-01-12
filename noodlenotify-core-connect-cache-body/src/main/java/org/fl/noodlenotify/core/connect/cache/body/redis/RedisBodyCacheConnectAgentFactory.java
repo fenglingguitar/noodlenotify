@@ -7,11 +7,9 @@ import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgentConfPara
 
 public class RedisBodyCacheConnectAgentFactory extends AbstractConnectAgentFactory {
 	
-	private CacheConnectAgentConfParam cacheConnectAgentConfParam
-				= new CacheConnectAgentConfParam();
+	private CacheConnectAgentConfParam cacheConnectAgentConfParam = new CacheConnectAgentConfParam();
 	
-	private BodyCacheConnectAgentConfParam bodyCacheConnectAgentConfParam
-				= new BodyCacheConnectAgentConfParam();
+	private BodyCacheConnectAgentConfParam bodyCacheConnectAgentConfParam = new BodyCacheConnectAgentConfParam();
 
 	@Override
 	public ConnectAgent createConnectAgent(
@@ -28,8 +26,7 @@ public class RedisBodyCacheConnectAgentFactory extends AbstractConnectAgentFacto
 		this.cacheConnectAgentConfParam = cacheConnectAgentConfParam;
 	}
 
-	public void setBodyCacheConnectAgentConfParam(
-			BodyCacheConnectAgentConfParam bodyCacheConnectAgentConfParam) {
+	public void setBodyCacheConnectAgentConfParam(BodyCacheConnectAgentConfParam bodyCacheConnectAgentConfParam) {
 		this.bodyCacheConnectAgentConfParam = bodyCacheConnectAgentConfParam;
 	}
 }

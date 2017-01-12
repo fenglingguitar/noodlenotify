@@ -4,13 +4,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.fl.noodle.common.connect.agent.ConnectAgent;
-import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.ConsumerService;
 import org.fl.noodlenotify.console.vo.ConsumerVo;
 import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
+import org.fl.noodlenotify.core.status.StatusCheckerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ public class ConsumerStatusExecuter extends AbstractExecuter {
 	private ConsumerService consumerService;
 
 	@Autowired
-	private Map<String, ConnectAgentFactory> connectAgentFactoryMap;
+	private Map<String, StatusCheckerFactory> statusCheckerFactoryMap;
 	
 	private long maxInterval = 10 * 1000;
 
@@ -42,23 +41,18 @@ public class ConsumerStatusExecuter extends AbstractExecuter {
 			}
 		}
 		if (consumerVoToOnlineList != null) {
-			for (ConsumerVo ConsumerVoToOnline : consumerVoToOnlineList) {
-				ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get(ConsumerVoToOnline.getCheck_Type());
-				if (connectAgentFactory != null) {
-					ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(ConsumerVoToOnline.getConsumer_Id(), ConsumerVoToOnline.getIp(), ConsumerVoToOnline.getCheck_Port(), ConsumerVoToOnline.getUrl());
+			for (ConsumerVo consumerVoToOnline : consumerVoToOnlineList) {
+				StatusCheckerFactory statusCheckerFactory = statusCheckerFactoryMap.get(consumerVoToOnline.getCheck_Type());
+				if (statusCheckerFactory != null) {
+					NetStatusChecker netStatusChecker = (NetStatusChecker) statusCheckerFactory.createStatusChecker(consumerVoToOnline.getConsumer_Id(), consumerVoToOnline.getIp(), consumerVoToOnline.getCheck_Port(), consumerVoToOnline.getUrl()).getProxy();
 					try {
-						connectAgent.connect();
-						((NetStatusChecker)connectAgent).checkHealth();
+						netStatusChecker.checkHealth();
 						ConsumerVo currentConsumerVo = new ConsumerVo();
-						currentConsumerVo.setConsumer_Id(ConsumerVoToOnline.getConsumer_Id());
+						currentConsumerVo.setConsumer_Id(consumerVoToOnline.getConsumer_Id());
 						currentConsumerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
 						consumerService.updateConsumerSystemStatus(currentConsumerVo);
 					} catch (Exception e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("CheckHealth -> " + e);
-						}
-					} finally {
-						connectAgent.close();
+						e.printStackTrace();
 					}
 				}
 			}
@@ -75,29 +69,24 @@ public class ConsumerStatusExecuter extends AbstractExecuter {
 		}
 		if (consumerVoToOfflineList != null) {
 			for (ConsumerVo consumerVoToOffline : consumerVoToOfflineList) {
-				ConnectAgentFactory connectAgentFactory = connectAgentFactoryMap.get(consumerVoToOffline.getCheck_Type());
-				if (connectAgentFactory != null) {
-					ConnectAgent connectAgent = connectAgentFactory.createConnectAgent(consumerVoToOffline.getConsumer_Id(), consumerVoToOffline.getIp(), consumerVoToOffline.getCheck_Port(), consumerVoToOffline.getCheck_Url());
+				StatusCheckerFactory statusCheckerFactory = statusCheckerFactoryMap.get(consumerVoToOffline.getCheck_Type());
+				if (statusCheckerFactory != null) {
+					NetStatusChecker netStatusChecker = (NetStatusChecker) statusCheckerFactory.createStatusChecker(consumerVoToOffline.getConsumer_Id(), consumerVoToOffline.getIp(), consumerVoToOffline.getCheck_Port(), consumerVoToOffline.getUrl());
 					try {
-						connectAgent.connect();
-						((NetStatusChecker)connectAgent).checkHealth();
+						netStatusChecker.checkHealth();
 					} catch (Exception e) {
-						if (logger.isErrorEnabled()) {
-							logger.error("CheckHealth -> " + e);
-						}
+						e.printStackTrace();
 						ConsumerVo currentConsumerVo = new ConsumerVo();
 						currentConsumerVo.setConsumer_Id(consumerVoToOffline.getConsumer_Id());
 						currentConsumerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
 						consumerService.updateConsumerSystemStatus(currentConsumerVo);
-					} finally {
-						connectAgent.close();
 					}
 				}
 			}
 		}
 	}
 
-	public void setConnectAgentFactoryMap(Map<String, ConnectAgentFactory> connectAgentFactoryMap) {
-		this.connectAgentFactoryMap = connectAgentFactoryMap;
+	public void setStatusCheckerFactoryMap(Map<String, StatusCheckerFactory> statusCheckerFactoryMap) {
+		this.statusCheckerFactoryMap = statusCheckerFactoryMap;
 	}
 }

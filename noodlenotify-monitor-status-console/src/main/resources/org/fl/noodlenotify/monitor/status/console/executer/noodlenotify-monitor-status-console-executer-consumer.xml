@@ -15,14 +15,14 @@
 	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
 		
-	<bean id="connectAgentFactoryNetty" class="org.fl.noodlenotify.core.connect.net.netty.client.NettyNetConnectAgentFactory" />
-	<bean id="connectAgentFactoryJetty" class="org.fl.noodlenotify.core.connect.net.jetty.client.JettyNetConnectAgentFactory" />
+	<bean id="nettyNetStatusCheckerFactory" class="org.fl.noodlenotify.core.connect.net.netty.client.NettyNetStatusCheckerFactory" />
+	<bean id="jettyNetStatusCheckerFactory" class="org.fl.noodlenotify.core.connect.net.jetty.client.JettyNetStatusCheckerFactory" />
 	
 	<bean id="consumerStatusExecuter" class="org.fl.noodlenotify.monitor.status.console.executer.ConsumerStatusExecuter" >
-		<property name="connectAgentFactoryMap">
+		<property name="statusCheckerFactoryMap">
 			<map>
-				<entry key="NETTY" value-ref="connectAgentFactoryNetty" />
-				<entry key="HTTP" value-ref="connectAgentFactoryJetty" />
+				<entry key="NETTY" value-ref="nettyNetStatusCheckerFactory" />
+				<entry key="HTTP" value-ref="jettyNetStatusCheckerFactory" />
 			</map>
 		</property>
     </bean>

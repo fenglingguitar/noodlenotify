@@ -18,8 +18,4 @@ public interface DbConnectAgent {
 	public long minId(String queueName) throws Exception;
 	public long minUnFinishId(String queueName) throws Exception;
 	public long minIdByStatus(String queueName, byte status) throws Exception;
-	public long getDiffTime() throws Exception;
-	public boolean getAlive(String queueName, long id, long diffTime, long intervalTime) throws Exception;
-	public boolean keepAlive(String queueName, long id, long diffTime, long intervalTime) throws Exception;
-	public void releaseAlive(String queueName, long id) throws Exception;
 }

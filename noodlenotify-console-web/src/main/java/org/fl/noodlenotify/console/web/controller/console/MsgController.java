@@ -3,8 +3,6 @@ package org.fl.noodlenotify.console.web.controller.console;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fl.noodle.common.connect.agent.ConnectAgent;
-import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.mvc.annotation.NoodleRequestParam;
 import org.fl.noodle.common.mvc.annotation.NoodleResponseBody;
 import org.fl.noodle.common.mvc.vo.VoidVo;
@@ -12,11 +10,11 @@ import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.QueueMsgStorageService;
 import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
 import org.fl.noodlenotify.core.connect.db.DbStatusChecker;
+import org.fl.noodlenotify.core.connect.db.mysql.MysqlDbStatusCheckerFactory;
 import org.fl.noodlenotify.core.domain.message.MessageVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 
 @Controller
 @RequestMapping(value = "console/message")
@@ -26,7 +24,7 @@ public class MsgController {
 	private QueueMsgStorageService queueMsgStorageService;
 
 	@Autowired(required = false)
-	private ConnectAgentFactory dbConnectAgentFactory;
+	private MysqlDbStatusCheckerFactory mysqlDbStatusCheckerFactory;
 	
 	@RequestMapping(value = "/queryportionmessage")
 	@NoodleResponseBody(type = "json-millisecond")
@@ -43,13 +41,8 @@ public class MsgController {
 		queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
 		List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
 		for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
-			ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
-			try {
-				connectAgent.connect();	
-				result.addAll(((DbStatusChecker) connectAgent).queryPortionMessage(queueMsgStorage.getQueue_Nm(), vo.getUuid(), vo.getRegion(), vo.getContent(), pageInt * rowsInt, rowsInt));
-			} finally {
-				connectAgent.close();
-			}
+			DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbStatusCheckerFactory.createStatusChecker(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
+			result.addAll(dbStatusChecker.queryPortionMessage(queueMsgStorage.getQueue_Nm(), vo.getUuid(), vo.getRegion(), vo.getContent(), pageInt * rowsInt, rowsInt));
 		}
 		
 		return result;
@@ -66,13 +59,8 @@ public class MsgController {
 		List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
 		for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
 			if (queueMsgStorage.getMsgStorage_Id() == vo.getDb()) {
-				ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
-				try {
-					connectAgent.connect();	
-					((DbStatusChecker) connectAgent).savePortionMessage(queueMsgStorage.getQueue_Nm(), vo.getContentId(), vo.getContent());
-				} finally {
-					connectAgent.close();
-				}
+				DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbStatusCheckerFactory.createStatusChecker(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
+				dbStatusChecker.savePortionMessage(queueMsgStorage.getQueue_Nm(), vo.getContentId(), vo.getContent());
 			}
 		}
 		return VoidVo.VOID;
@@ -90,17 +78,11 @@ public class MsgController {
 			List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
 			for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
 				if (queueMsgStorage.getMsgStorage_Id() == vo.getDb()) {
-					ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
-					try {
-						connectAgent.connect();	
-						((DbStatusChecker) connectAgent).deletePortionMessage(queueMsgStorage.getQueue_Nm(), vo.getId());
-					} finally {
-						connectAgent.close();
-					}
+					DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbStatusCheckerFactory.createStatusChecker(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
+					dbStatusChecker.deletePortionMessage(queueMsgStorage.getQueue_Nm(), vo.getId());
 				}
 			}
 		}
-		
 		return VoidVo.VOID;
 	}
 }

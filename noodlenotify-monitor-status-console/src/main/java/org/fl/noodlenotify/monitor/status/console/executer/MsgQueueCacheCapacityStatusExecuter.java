@@ -2,13 +2,12 @@ package org.fl.noodlenotify.monitor.status.console.executer;
 
 import java.util.List;
 
-import org.fl.noodle.common.connect.agent.ConnectAgent;
-import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.QueueMsgQueueCacheService;
 import org.fl.noodlenotify.console.vo.QueueMsgQueueCacheVo;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheStatusChecker;
+import org.fl.noodlenotify.core.status.StatusCheckerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ public class MsgQueueCacheCapacityStatusExecuter extends AbstractExecuter {
 	private QueueMsgQueueCacheService queueMsgQueueCacheService;
 
 	@Autowired
-	private ConnectAgentFactory redisQueueCacheConnectAgentFactory;
+	private StatusCheckerFactory redisQueueCacheStatusCheckerFactory;
 
 	@Override
 	public void execute() throws Exception {
@@ -30,14 +29,13 @@ public class MsgQueueCacheCapacityStatusExecuter extends AbstractExecuter {
 		queueMsgQueueCacheVoParam.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
 		List<QueueMsgQueueCacheVo> queueMsgQueueCacheList = queueMsgQueueCacheService.queryQueueMsgQueueCacheByQueue(queueMsgQueueCacheVoParam);
 		for (QueueMsgQueueCacheVo queueMsgQueueCacheVo : queueMsgQueueCacheList) {
-			ConnectAgent connectAgent = redisQueueCacheConnectAgentFactory.createConnectAgent(queueMsgQueueCacheVo.getMsgQueueCache_Id(), queueMsgQueueCacheVo.getIp(), queueMsgQueueCacheVo.getPort(), null);
+			QueueCacheStatusChecker queueCacheStatusChecker = (QueueCacheStatusChecker) redisQueueCacheStatusCheckerFactory.createStatusChecker(queueMsgQueueCacheVo.getMsgQueueCache_Id(), queueMsgQueueCacheVo.getIp(), queueMsgQueueCacheVo.getPort(), null).getProxy();
 			try {
-				connectAgent.connect();
-				boolean isActive = ((QueueCacheStatusChecker)connectAgent).checkIsActive(queueMsgQueueCacheVo.getQueue_Nm());
+				boolean isActive = queueCacheStatusChecker.checkIsActive(queueMsgQueueCacheVo.getQueue_Nm());
 				if (isActive) {
 					queueMsgQueueCacheVo.setIs_Active(ConsoleConstants.IS_TRUE);
-					queueMsgQueueCacheVo.setNew_Len(((QueueCacheStatusChecker)connectAgent).checkNewLen(queueMsgQueueCacheVo.getQueue_Nm()));
-					queueMsgQueueCacheVo.setPortion_Len(((QueueCacheStatusChecker)connectAgent).checkPortionLen(queueMsgQueueCacheVo.getQueue_Nm()));
+					queueMsgQueueCacheVo.setNew_Len(queueCacheStatusChecker.checkNewLen(queueMsgQueueCacheVo.getQueue_Nm()));
+					queueMsgQueueCacheVo.setPortion_Len(queueCacheStatusChecker.checkPortionLen(queueMsgQueueCacheVo.getQueue_Nm()));
 					queueMsgQueueCacheService.updateQueueMsgQueueCacheSimple(queueMsgQueueCacheVo);
 				} else if (queueMsgQueueCacheVo.getIs_Active() == ConsoleConstants.IS_TRUE) {
 					queueMsgQueueCacheVo.setIs_Active(ConsoleConstants.IS_FALSE);
@@ -49,8 +47,6 @@ public class MsgQueueCacheCapacityStatusExecuter extends AbstractExecuter {
 				if (logger.isDebugEnabled()) {
 					logger.error("CheckIsActive And CheckNewLen And CheckPortionLen -> " + e);
 				}
-			} finally {
-				connectAgent.close();
 			}
 		}
 	}

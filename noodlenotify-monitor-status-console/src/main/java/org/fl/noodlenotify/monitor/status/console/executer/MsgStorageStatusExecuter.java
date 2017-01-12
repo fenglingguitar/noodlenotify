@@ -2,26 +2,23 @@ package org.fl.noodlenotify.monitor.status.console.executer;
 
 import java.util.List;
 
-import org.fl.noodle.common.connect.agent.ConnectAgent;
-import org.fl.noodle.common.connect.agent.ConnectAgentFactory;
 import org.fl.noodle.common.monitor.executer.AbstractExecuter;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.MsgStorageService;
 import org.fl.noodlenotify.console.vo.MsgStorageVo;
 import org.fl.noodlenotify.core.connect.db.DbStatusChecker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.fl.noodlenotify.core.status.StatusCheckerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class MsgStorageStatusExecuter extends AbstractExecuter {
 
-	private final static Logger logger = LoggerFactory.getLogger(MsgStorageStatusExecuter.class);
+	//private final static Logger logger = LoggerFactory.getLogger(MsgStorageStatusExecuter.class);
 	
 	@Autowired
 	private MsgStorageService msgStorageService;
 	
 	@Autowired
-	private ConnectAgentFactory dbConnectAgentFactory;
+	private StatusCheckerFactory mysqlDbStatusCheckerFactory;
 
 	@Override
 	public void execute() throws Exception {
@@ -31,17 +28,12 @@ public class MsgStorageStatusExecuter extends AbstractExecuter {
 		List<MsgStorageVo> msgStorageVoList = msgStorageService.queryMsgStorageList(msgStorageVoParam);
 		for (MsgStorageVo msgStorageVo : msgStorageVoList) {
 			byte currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_OFF_LINE;
-			ConnectAgent connectAgent = dbConnectAgentFactory.createConnectAgent(msgStorageVo.getMsgStorage_Id(), msgStorageVo.getIp(), msgStorageVo.getPort(), null);
+			DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbStatusCheckerFactory.createStatusChecker(msgStorageVo.getMsgStorage_Id(), msgStorageVo.getIp(), msgStorageVo.getPort(), null).getProxy();
 			try {
-				connectAgent.connect();
-				((DbStatusChecker) connectAgent).checkHealth();
+				dbStatusChecker.checkHealth();
 				currentSysTemStatus = ConsoleConstants.SYSTEM_STATUS_ON_LINE;
 			} catch (Exception e) {
-				if (logger.isDebugEnabled()) {
-					logger.error("execute -> " + e);
-				}
-			} finally {
-				connectAgent.close();
+				e.printStackTrace();
 			}
 			if (currentSysTemStatus != msgStorageVo.getSystem_Status()) {
 				MsgStorageVo currentmsgStorageVo = new MsgStorageVo();

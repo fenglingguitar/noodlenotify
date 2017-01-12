@@ -9,7 +9,6 @@ import org.fl.noodlenotify.core.connect.cache.AbstractCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgentConfParam;
-import org.fl.noodlenotify.core.connect.cache.body.BodyCacheStatusChecker;
 import org.fl.noodlenotify.core.connect.cache.redis.JedisTemplate;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
@@ -20,7 +19,7 @@ import redis.clients.jedis.Transaction;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 
-public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implements BodyCacheConnectAgent, BodyCacheStatusChecker {
+public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implements BodyCacheConnectAgent {
 
 	//private final static Logger logger = LoggerFactory.getLogger(RedisBodyCacheConnectAgent.class);
 
@@ -163,33 +162,7 @@ public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implem
 		removeBlockingQueue.offer(messageDm);
 	}
 	
-	@Override
-	public void checkHealth() throws Exception {
-		
-		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
-			
-			@Override
-			public Void doOperation(Jedis jedis) throws Exception {
-				jedis.exists("CheckHealth");
-				return null;
-			}
-		});
-	}
-	
-	@Override
-	public long checkSize() throws Exception {
-		
-		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Long>() {
-			
-			@Override
-			public Long doOperation(Jedis jedis) throws Exception {
-				return jedis.dbSize();
-			}
-		});
-	}
-	
-	public void setBodyCacheConnectAgentConfParam(
-			BodyCacheConnectAgentConfParam bodyCacheConnectAgentConfParam) {
+	public void setBodyCacheConnectAgentConfParam(BodyCacheConnectAgentConfParam bodyCacheConnectAgentConfParam) {
 		this.bodyCacheConnectAgentConfParam = bodyCacheConnectAgentConfParam;
 	}
 

@@ -15,7 +15,7 @@ import org.fl.noodle.common.connect.exception.ConnectTimeoutException;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.domain.message.MessageDm;
 
-public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implements DbConnectAgent, DbStatusChecker {
+public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implements DbConnectAgent {
 	
 	//private final static Logger logger = LoggerFactory.getLogger(AbstractDbConnectAgent.class);
 	

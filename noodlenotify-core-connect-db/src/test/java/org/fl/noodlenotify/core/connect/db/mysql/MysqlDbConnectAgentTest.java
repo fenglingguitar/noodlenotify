@@ -186,41 +186,6 @@ public class MysqlDbConnectAgentTest extends AbstractJUnit4SpringContextTests {
 	}
 	
 	@Test
-	public final void testGetDiffTime() throws Exception {
-		logger.info("DiffTime: " + mysqlDbConnectAgent.getDiffTime());
-	}
-	
-	@Test
-	public final void testGetAlive() throws Exception {
-		logger.info("GetAlive 1: " + mysqlDbConnectAgent.getAlive("TestQueue1", 1, 0, 2000));
-	}
-	
-	@Test
-	public final void testKeepAlive() throws Exception {
-		logger.info("Sleep 1000...");
-		Thread.sleep(1000);
-		logger.info("KeepAlive 1: " + mysqlDbConnectAgent.keepAlive("TestQueue1", 1, 0, 2000));
-		logger.info("Sleep 1000...");
-		Thread.sleep(1000);
-		logger.info("KeepAlive 2: " + mysqlDbConnectAgent.keepAlive("TestQueue1", 2, 0, 2000));
-		logger.info("GetAlive 2: " + mysqlDbConnectAgent.getAlive("TestQueue1", 2, 0, 2000));
-		logger.info("Sleep 1000...");
-		Thread.sleep(1000);
-		logger.info("GetAlive 2: " + mysqlDbConnectAgent.getAlive("TestQueue1", 2, 0, 2000));
-		logger.info("Sleep 1000...");
-		Thread.sleep(1000);
-		logger.info("KeepAlive 1: " + mysqlDbConnectAgent.keepAlive("TestQueue1", 1, 0, 2000));
-	}
-	
-	@Test
-	public final void testReleaseAlive() throws Exception {
-		logger.info("ReleaseAlive 1");
-		mysqlDbConnectAgent.releaseAlive("TestQueue1", 1);
-		logger.info("ReleaseAlive 2");
-		mysqlDbConnectAgent.releaseAlive("TestQueue1", 2);
-	}
-	
-	@Test
 	public final void testCheckHealth() throws Exception {
 		DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbConnectAgent;
 		dbStatusChecker.checkHealth();
