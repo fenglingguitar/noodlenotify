@@ -520,4 +520,12 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 		consumerVo.setBeat_Time(new Date());
 		consumerDao.updateConsumer(consumerVo);
 	}
+
+	@Override
+	public void saveExchangeBeat(Long exchangeId) throws Exception {
+		ExchangerVo exchangerVo = new ExchangerVo();
+		exchangerVo.setExchanger_Id(exchangeId);
+		exchangerVo.setBeat_Time(new Date());
+		exchangerDao.updateExchanger(exchangerVo);
+	}
 }

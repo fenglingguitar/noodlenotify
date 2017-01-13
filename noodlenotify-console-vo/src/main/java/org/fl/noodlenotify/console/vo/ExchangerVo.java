@@ -1,5 +1,7 @@
 package org.fl.noodlenotify.console.vo;
 
+import java.util.Date;
+
 public class ExchangerVo implements java.io.Serializable {
 
 	private static final long serialVersionUID = 4353744880800628439L;
@@ -14,6 +16,8 @@ public class ExchangerVo implements java.io.Serializable {
 	private Byte system_Status;
 	private Byte manual_Status;
 
+	private Date beat_Time;
+	
 	public Long getExchanger_Id() {
 		return this.exchanger_Id;
 	}
@@ -86,4 +90,11 @@ public class ExchangerVo implements java.io.Serializable {
 		this.manual_Status = manual_Status;
 	}
 
+	public Date getBeat_Time() {
+		return beat_Time;
+	}
+
+	public void setBeat_Time(Date beat_Time) {
+		this.beat_Time = beat_Time;
+	}
 }

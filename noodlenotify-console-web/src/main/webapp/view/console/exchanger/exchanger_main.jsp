@@ -68,7 +68,8 @@
 						'类型',
 						'监测PORT',
 						'系统状态',
-						'控制状态'
+						'控制状态',
+						'心跳时间'
 					],
 			   	colModel: [
 					{name:'exchanger_Id', index:'exchanger_Id', width:100, align: 'center'},
@@ -79,7 +80,8 @@
 					{name:'type', index:'type', width:100, align: 'center', formatter:'select', editoptions:{value:'NETTY:NETTY;HTTP:HTTP'}},
 					{name:'check_Port', index:'check_Port', width:100, align: 'center'},
 			   		{name:'system_Status', index:'system_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:在线;2:离线'}},
-			   		{name:'manual_Status', index:'manual_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:有效;2:无效'}}
+			   		{name:'manual_Status', index:'manual_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:有效;2:无效'}},
+			   		{name:'beat_Time', index:'beat_Time', width:200, align:'center', formatter:'date', formatoptions:{srcformat:'Y-m-d H:i:s', newformat:'Y-m-d H:i:s'}}
 			   	],
 			   	rowNum: 10,
 			   	rowList: [10,20,30,40,50,100],

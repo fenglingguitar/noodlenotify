@@ -1,9 +1,13 @@
 package org.fl.noodlenotify.console.domain;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+
 import static javax.persistence.GenerationType.IDENTITY;
+
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -22,6 +26,8 @@ public class ExchangerMd implements java.io.Serializable {
 	private Integer check_Port;
 	private Byte system_Status;
 	private Byte manual_Status;
+	
+	private Date beat_Time;
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
@@ -106,4 +112,12 @@ public class ExchangerMd implements java.io.Serializable {
 		this.manual_Status = manual_Status;
 	}
 
+	@Column(name = "BEAT_TIME", nullable = true)
+	public Date getBeat_Time() {
+		return beat_Time;
+	}
+
+	public void setBeat_Time(Date beat_Time) {
+		this.beat_Time = beat_Time;
+	}
 }

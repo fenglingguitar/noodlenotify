@@ -28,4 +28,7 @@ public interface ExchangerDao {
 	public void updateExchangerSystemStatus(ExchangerVo vo) throws Exception;
 
 	public boolean ifExchangerValid(long exchangerId) throws Exception;
+	
+	public List<ExchangerVo> queryExchangerToOnlineList(ExchangerVo vo) throws Exception;
+	public List<ExchangerVo> queryExchangerToOfflineList(ExchangerVo vo) throws Exception;
 }

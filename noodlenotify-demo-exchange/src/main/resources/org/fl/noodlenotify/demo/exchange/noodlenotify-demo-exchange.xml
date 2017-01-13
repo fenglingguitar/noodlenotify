@@ -16,6 +16,7 @@
 	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
 	
 	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/schedule/noodlenotify-monitor-status-beat-schedule-exchange.xml" />
 	
 	<import resource="classpath:org/fl/noodlenotify/core/exchange/manager/noodlenotify-core-manager-exchange-db.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/exchange/manager/noodlenotify-core-manager-exchange-cache-body.xml" />

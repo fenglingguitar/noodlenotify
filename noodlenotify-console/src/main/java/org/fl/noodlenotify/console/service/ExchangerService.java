@@ -2,8 +2,8 @@ package org.fl.noodlenotify.console.service;
 
 import java.util.List;
 
-import org.fl.noodlenotify.console.vo.ExchangerVo;
 import org.fl.noodle.common.mvc.vo.PageVo;
+import org.fl.noodlenotify.console.vo.ExchangerVo;
 
 public interface ExchangerService {
 
@@ -24,4 +24,7 @@ public interface ExchangerService {
 	public void deleteExchanger(ExchangerVo vo) throws Exception;
 
 	public void deletesExchanger(ExchangerVo[] vos) throws Exception;
+	
+	public List<ExchangerVo> queryExchangerToOnlineList(ExchangerVo vo) throws Exception;
+	public List<ExchangerVo> queryExchangerToOfflineList(ExchangerVo vo) throws Exception;
 }

@@ -11,7 +11,8 @@
 				type,
 				check_Port,
 				system_Status,
-				manual_Status
+				manual_Status,
+				beat_Time
 		FROM 	CSL_EXCHANGER
 		WHERE 	1=1
 		 		#if($exchanger_Id)
@@ -43,6 +44,48 @@
 				#end
 				
 		ORDER BY exchanger_Id desc
+	]]>
+	</query>
+	
+	<query name="exchanger-query-toonline-list">
+	<![CDATA[
+		SELECT 
+				exchanger_Id,
+				name,
+				ip,
+				port,
+				url,
+				type,
+				check_Port,
+				system_Status,
+				manual_Status,
+				beat_Time
+		FROM 	CSL_EXCHANGER
+		WHERE 	1=1
+				AND beat_Time >= :beat_Time 
+				AND system_Status = :system_Status
+		ORDER BY exchanger_Id
+	]]>
+	</query>
+	
+	<query name="exchanger-query-tooffline-list">
+	<![CDATA[
+		SELECT 
+				exchanger_Id,
+				name,
+				ip,
+				port,
+				url,
+				type,
+				check_Port,
+				system_Status,
+				manual_Status,
+				beat_Time
+		FROM 	CSL_EXCHANGER
+		WHERE 	1=1
+				AND (beat_Time < :beat_Time || beat_Time IS NULL) 
+				AND system_Status = :system_Status
+		ORDER BY exchanger_Id
 	]]>
 	</query>
 	

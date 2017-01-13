@@ -32,6 +32,12 @@
   		<artifactId>noodlenotify-core-exchange</artifactId>
   		<version>${noodlenotify.core.exchange.version}</version>
 	</dependency>
+	
+	<dependency>
+		<groupId>org.fl.noodlenotify.monitor.status.beat</groupId>
+  		<artifactId>noodlenotify-monitor-status-beat</artifactId>
+		<version>${noodlenotify.monitor.status.beat.version}</version>
+	</dependency>
     
 	<!-- spring framework -->
     <dependency>

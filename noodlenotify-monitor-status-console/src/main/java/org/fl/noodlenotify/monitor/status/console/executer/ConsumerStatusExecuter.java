@@ -42,7 +42,7 @@ public class ConsumerStatusExecuter extends AbstractExecuter {
 		}
 		if (consumerVoToOnlineList != null) {
 			for (ConsumerVo consumerVoToOnline : consumerVoToOnlineList) {
-				StatusCheckerFactory statusCheckerFactory = statusCheckerFactoryMap.get(consumerVoToOnline.getCheck_Type());
+				StatusCheckerFactory statusCheckerFactory = statusCheckerFactoryMap.get(consumerVoToOnline.getType());
 				if (statusCheckerFactory != null) {
 					NetStatusChecker netStatusChecker = (NetStatusChecker) statusCheckerFactory.createStatusChecker(consumerVoToOnline.getConsumer_Id(), consumerVoToOnline.getIp(), consumerVoToOnline.getPort(), consumerVoToOnline.getUrl()).getProxy();
 					try {
@@ -69,9 +69,9 @@ public class ConsumerStatusExecuter extends AbstractExecuter {
 		}
 		if (consumerVoToOfflineList != null) {
 			for (ConsumerVo consumerVoToOffline : consumerVoToOfflineList) {
-				StatusCheckerFactory statusCheckerFactory = statusCheckerFactoryMap.get(consumerVoToOffline.getCheck_Type());
+				StatusCheckerFactory statusCheckerFactory = statusCheckerFactoryMap.get(consumerVoToOffline.getType());
 				if (statusCheckerFactory != null) {
-					NetStatusChecker netStatusChecker = (NetStatusChecker) statusCheckerFactory.createStatusChecker(consumerVoToOffline.getConsumer_Id(), consumerVoToOffline.getIp(), consumerVoToOffline.getCheck_Port(), consumerVoToOffline.getUrl());
+					NetStatusChecker netStatusChecker = (NetStatusChecker) statusCheckerFactory.createStatusChecker(consumerVoToOffline.getConsumer_Id(), consumerVoToOffline.getIp(), consumerVoToOffline.getPort(), consumerVoToOffline.getUrl());
 					try {
 						netStatusChecker.checkHealth();
 					} catch (Exception e) {

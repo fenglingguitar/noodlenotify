@@ -4,15 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-
+import org.fl.noodle.common.dynamicsql.DynamicSqlTemplate;
+import org.fl.noodle.common.mvc.vo.PageVo;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.dao.ExchangerDao;
 import org.fl.noodlenotify.console.domain.ExchangerMd;
-import org.fl.noodle.common.dynamicsql.DynamicSqlTemplate;
 import org.fl.noodlenotify.console.vo.ExchangerVo;
-import org.fl.noodle.common.mvc.vo.PageVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 @Repository("exchangerDao")
 public class ExchangerDaoImpl implements ExchangerDao {
@@ -106,5 +105,21 @@ public class ExchangerDaoImpl implements ExchangerDao {
 			return false;
 		}
 		return queryExchangers.get(0).getManual_Status() == ConsoleConstants.MANUAL_STATUS_VALID;
+	}
+	
+	@Override
+	public List<ExchangerVo> queryExchangerToOnlineList(ExchangerVo vo) throws Exception {
+		Map<String, Object> paramsMap = new HashMap<String, Object>();
+		paramsMap.put("beat_Time", vo.getBeat_Time());
+		paramsMap.put("system_Status", ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
+		return dynamicSqlTemplate.queryList("exchanger-query-toonline-list", paramsMap, ExchangerVo.class);
+	}
+
+	@Override
+	public List<ExchangerVo> queryExchangerToOfflineList(ExchangerVo vo) throws Exception {
+		Map<String, Object> paramsMap = new HashMap<String, Object>();
+		paramsMap.put("beat_Time", vo.getBeat_Time());
+		paramsMap.put("system_Status", ConsoleConstants.SYSTEM_STATUS_ON_LINE);
+		return dynamicSqlTemplate.queryList("exchanger-query-tooffline-list", paramsMap, ExchangerVo.class);
 	}
 }

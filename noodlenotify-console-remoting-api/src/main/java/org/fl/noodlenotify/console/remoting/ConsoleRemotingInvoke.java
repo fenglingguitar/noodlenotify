@@ -52,4 +52,5 @@ public interface ConsoleRemotingInvoke {
 	
 	public void saveProducerBeat(Long producerId) throws Exception;
 	public void saveConsumerBeat(Long consumerId) throws Exception;
+	public void saveExchangeBeat(Long exchangeId) throws Exception;
 }

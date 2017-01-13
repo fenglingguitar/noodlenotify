@@ -72,4 +72,14 @@ public class ExchangerServiceImpl implements ExchangerService {
 			exchangerdao.deleteExchanger(vo);
 		}
 	}
+
+	@Override
+	public List<ExchangerVo> queryExchangerToOnlineList(ExchangerVo vo) throws Exception {
+		return exchangerdao.queryExchangerToOnlineList(vo);
+	}
+
+	@Override
+	public List<ExchangerVo> queryExchangerToOfflineList(ExchangerVo vo) throws Exception {
+		return exchangerdao.queryExchangerToOfflineList(vo);
+	}
 }

@@ -14,12 +14,11 @@ import org.fl.noodle.common.connect.exception.ConnectTimeoutException;
 import org.fl.noodle.common.net.socket.SocketConnect;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
-import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
 import org.fl.noodlenotify.core.connect.net.netty.client.exception.NettyConnectionException;
 import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.core.connect.net.pojo.MessageResult;
 
-public class NettyNetConnectAgent extends AbstractNetConnectAgent implements NetConnectAgent, NetStatusChecker  {
+public class NettyNetConnectAgent extends AbstractNetConnectAgent implements NetConnectAgent {
 
 	//private final static Logger logger = LoggerFactory.getLogger(NettyNetConnectAgent.class);
 
@@ -131,38 +130,6 @@ public class NettyNetConnectAgent extends AbstractNetConnectAgent implements Net
 		}
 		
 		return messageResult.getUuid();
-	}
-
-	@Override
-	public void checkHealth() throws Exception {
-		
-		SocketConnect socketConnect = getConnect();
-
-		try {
-			socketConnect.send("health", "CheckHealth", readTimeout);
-		} catch (NettyConnectionException e) { 
-			e.printStackTrace();
-			nettyNetConnectPool.returnBrokenResource(socketConnect);
-			throw new ConnectResetException("Connection reset for send by net netty connect agent");
-		} catch (java.net.SocketException e) { 
-			e.printStackTrace();
-			nettyNetConnectPool.returnBrokenResource(socketConnect);
-			throw new ConnectResetException("Connection reset for send by net netty connect agent");
-		} catch (java.net.SocketTimeoutException e) { 
-			e.printStackTrace();
-			nettyNetConnectPool.returnBrokenResource(socketConnect);
-			throw new ConnectTimeoutException("Connection timeout for send by net netty connect agent");
-		} catch (ConnectStopException e) { 
-			e.printStackTrace();
-			nettyNetConnectPool.returnBrokenResource(socketConnect);
-			throw new ConnectResetException("Connection reset for send by net netty connect agent");
-		} catch (Exception e) { 
-			e.printStackTrace();
-			nettyNetConnectPool.returnBrokenResource(socketConnect);
-			throw e;
-		}
-		
-		nettyNetConnectPool.returnResource(socketConnect);
 	}
 	
 	private SocketConnect getConnect() throws Exception {
