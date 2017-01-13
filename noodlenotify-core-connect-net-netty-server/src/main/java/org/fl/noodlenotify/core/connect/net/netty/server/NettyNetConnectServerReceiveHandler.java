@@ -35,6 +35,7 @@ public class NettyNetConnectServerReceiveHandler extends SimpleChannelHandler {
 					logger.error("MessageReceived -> JsonTranslator toString -> ReceiveException -> " + exception);
 				}
 			}
+			return;
 		}
 		
 		String uuid = null;

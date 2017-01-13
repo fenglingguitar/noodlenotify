@@ -12,15 +12,17 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-    <import resource="classpath:org/fl/noodlenotify/core/connect/net/jetty/server/noodlenotify-core-connect-net-server-jetty-check.xml" />
-    
-    <bean id="jettyNetConnectAgent" class="org.fl.noodlenotify.core.connect.net.jetty.client.JettyNetConnectAgent"
-		init-method="connect" destroy-method="close" >
-		<constructor-arg index="0" value="127.0.0.1" />
-		<constructor-arg index="1" value="20601" />
-		<constructor-arg index="2" value="/noodlenotify" />
-		<constructor-arg index="3" value="1" />
-		<constructor-arg index="4" value="10000" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/schedule/noodlenotify-monitor-status-beat-schedule-exchange.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/exchange/noodlenotify-core-exchange-manager-pool.xml" />
+	
+	<bean id="netConnectReceiver" class="org.fl.noodlenotify.core.exchange.Exchange" 
+			init-method="start" destroy-method="destroy"
+			parent="exchangeParam">
+		<property name="localIp" value="127.0.0.1" />
+		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
+		<property name="connectManagerPool" ref="connectManagerPool" />
+		<property name="connectServer" ref="netConnectServer" />
 	</bean>
     
 </beans>

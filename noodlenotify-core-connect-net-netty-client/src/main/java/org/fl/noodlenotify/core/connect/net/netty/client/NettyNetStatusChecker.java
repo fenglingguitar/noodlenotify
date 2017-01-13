@@ -48,7 +48,7 @@ public class NettyNetStatusChecker extends AbstractStatusChecker implements NetS
 	@Override
 	public void checkHealth() throws Exception {
 		try {
-			socketConnect.send("health", "CheckHealth", readTimeout);
+			socketConnect.send("/check/health", "CheckHealth", readTimeout);
 		} catch (NettyConnectionException e) { 
 			e.printStackTrace();
 			throw new ConnectResetException("Connection reset for send by net netty connect agent");

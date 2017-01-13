@@ -13,11 +13,9 @@
 	default-autowire="byName">
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/netty/server/noodlenotify-core-connect-net-server-netty-exchange.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/connect/net/jetty/server/noodlenotify-core-connect-net-server-jetty-check.xml" />
-	<bean id="checkParam" abstract="true">
-		<property name="port" value="20621"/>
-	</bean>
-	<import resource="classpath:org/fl/noodlenotify/demo/exchange/noodlenotify-demo-exchange.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/exchange/noodlenotify-core-exchange.xml" />
+	
 	<bean id="exchangeParam" abstract="true">
 		<property name="exchangeName" value="TestExchange-Netty" />
 		<property name="localPort" value="20101" />

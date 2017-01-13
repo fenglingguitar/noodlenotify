@@ -12,16 +12,12 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<bean id="jettyNetConnectServerCheckHandler" class="org.fl.noodlenotify.core.connect.net.jetty.server.JettyNetConnectServerCheckHandler" />
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/noodlenotify-core-distribute-config.xml" />
 	
-	<bean id="checkParam" abstract="true">
-		<property name="port" value="20601"/>
+	<bean id="distributePushFactory" class="org.fl.noodlenotify.core.distribute.DistributePushFactory">
+		<property name="queueCacheConnectManager" ref="distributeQueueCacheConnectManager" />
+		<property name="netConnectManager" ref="distributeNetConnectManager" />
+		<property name="distributeConfParam" ref="distributeConfParam" />
 	</bean>
 	
-	<bean id="jettyNetConnectCheckServer" class="org.fl.noodlenotify.core.connect.net.jetty.server.JettyNetConnectServer"
-			init-method="start" destroy-method="destroy" 
-			parent="checkParam">
-		<property name="servletHandler" ref="jettyNetConnectServerCheckHandler" />
-	</bean>
-    
 </beans>

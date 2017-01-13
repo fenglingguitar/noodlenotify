@@ -13,10 +13,6 @@
 	default-autowire="byName">
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/jetty/server/noodlenotify-core-connect-net-server-jetty-cclient.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/connect/net/jetty/server/noodlenotify-core-connect-net-server-jetty-check.xml" />
-	<bean id="checkParam" abstract="true">
-		<property name="port" value="20642"/>
-	</bean>	
 	
 	<import resource="classpath:org/fl/noodlenotify/demo/consumer/press/noodlenotify-demo-consumer-press.xml" />
 	<bean id="consumerClientParam" abstract="true">

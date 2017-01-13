@@ -12,10 +12,7 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
-	
 	<bean id="distributeConfParam" class="org.fl.noodlenotify.core.distribute.DistributeConfParam">
-	
 		<property name="setThreadPriorityFresh" value="10"/>
 		<property name="setThreadPriorityNew" value="10"/>
 		<property name="setThreadPriorityPortion" value="10"/>
@@ -66,40 +63,6 @@
 		<property name="executeBatchNum" value="10"/>
 		<property name="executeCapacityBatch" value="10000"/>
 		<property name="executeBatchWaitTime" value="1000"/>
-		
 	</bean>
 	
-	<bean id="distributePullFactory" class="org.fl.noodlenotify.core.distribute.DistributePullFactory">
-		<property name="dbConnectManager" ref="distributeDbConnectManager" />
-		<property name="queueCacheConnectManager" ref="distributeQueueCacheConnectManager" />
-		<property name="distributeConfParam" ref="distributeConfParam" />
-		<property name="distributeModuleRegister" ref="distributeModuleRegister" />
-	</bean>
-	
-	<bean id="distributePushFactory" class="org.fl.noodlenotify.core.distribute.DistributePushFactory">
-		<property name="queueCacheConnectManager" ref="distributeQueueCacheConnectManager" />
-		<property name="netConnectManager" ref="distributeNetConnectManager" />
-		<property name="distributeConfParam" ref="distributeConfParam" />
-	</bean>
-	
-	<bean id="connectManagerPool" class="org.fl.noodle.common.connect.manager.ConnectManagerPool">
-		<property name="connectManagerList">
-			<list>
-				<ref bean="distributeDbConnectManager" />
-				<ref bean="distributeQueueCacheConnectManager" />
-				<ref bean="distributeBodyCacheConnectManager" />
-				<ref bean="distributeNetConnectManager" />
-				<ref bean="distributeConnectManager" />
-			</list>
-		</property>
-	</bean>
-	
-	<bean id="distribute" class="org.fl.noodlenotify.core.distribute.Distribute" 
-			init-method="start" destroy-method="destroy"
-			parent="distributeParam">
-		<property name="localIp" value="127.0.0.1" />
-		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
-		<property name="connectManagerPool" ref="connectManagerPool" />
-	</bean>
-
 </beans>

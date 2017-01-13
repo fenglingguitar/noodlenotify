@@ -12,8 +12,9 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/noodlenotify-core-distribute-register.xml" />
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/netty/client/noodlenotify-core-connect-net-client-netty-factory.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/jetty/client/noodlenotify-core-connect-net-client-jetty-factory.xml" />
@@ -21,8 +22,6 @@
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/cluster/noodlenotify-core-connect-net-cluster-factory.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/connect/serialize/noodlenotify-core-connect-serialize-factory.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/connect/route/noodlenotify-core-connect-route-factory.xml" />
-	
-	<import resource="classpath:org/fl/noodlenotify/core/distribute/register/noodlenotify-core-distribute-register.xml" />
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/db/distinguish/noodlenotify-core-connect-db-distinguish.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/distinguish/noodlenotify-core-connect-net-distinguish.xml" />

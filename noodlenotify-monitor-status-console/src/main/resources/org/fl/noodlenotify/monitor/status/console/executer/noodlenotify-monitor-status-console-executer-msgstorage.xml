@@ -12,7 +12,6 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/bean/noodlenotify-console-bean.xml" />
 	
 	<bean id="mysqlDbStatusCheckerFactory" class="org.fl.noodlenotify.core.connect.db.mysql.MysqlDbStatusCheckerFactory">

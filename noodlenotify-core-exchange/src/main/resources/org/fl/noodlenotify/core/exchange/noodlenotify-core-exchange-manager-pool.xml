@@ -12,17 +12,13 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
-	
-	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/schedule/noodlenotify-monitor-status-beat-schedule-exchange.xml" />
-	
+		
 	<import resource="classpath:org/fl/noodlenotify/core/exchange/manager/noodlenotify-core-manager-exchange-db.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/exchange/manager/noodlenotify-core-manager-exchange-cache-body.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/exchange/manager/noodlenotify-core-manager-exchange.xml" />
 	
-	<bean id="connectManagerPool" class="org.fl.noodle.common.connect.manager.ConnectManagerPool">
+	<bean id="connectManagerPool" class="org.fl.noodle.common.connect.manager.ConnectManagerPool" parent="commonParam">
 		<property name="connectManagerList">
 			<list>
 				<ref bean="exchangeDbConnectManager" />
@@ -32,13 +28,5 @@
 		</property>
 	</bean>
 	
-	<bean id="netConnectReceiver" class="org.fl.noodlenotify.core.exchange.Exchange" 
-			init-method="start" destroy-method="destroy"
-			parent="exchangeParam">
-		<property name="localIp" value="127.0.0.1" />
-		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
-		<property name="connectManagerPool" ref="connectManagerPool" />
-		<property name="connectServer" ref="netConnectServer" />
-	</bean>
-    
+	
 </beans>

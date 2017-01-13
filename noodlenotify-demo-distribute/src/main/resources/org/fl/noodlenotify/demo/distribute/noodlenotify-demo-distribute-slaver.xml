@@ -12,21 +12,7 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
-	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
-	
-	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute-db.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute-cache-queue.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute-cache-body.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute-net.xml" />
-	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute.xml" />
-	
-	<import resource="classpath:org/fl/noodlenotify/demo/distribute/noodlenotify-demo-distribute.xml" />
-	
-	<import resource="classpath:org/fl/noodlenotify/core/connect/net/jetty/server/noodlenotify-core-connect-net-server-jetty-check.xml" />
-	<bean id="checkParam" abstract="true">
-		<property name="port" value="20632"/>
-	</bean>
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/noodlenotify-core-distribute.xml" />
 	
 	<bean id="distributeParam" abstract="true">
 		<property name="distributeName" value="TestDistribute-Slaver" />

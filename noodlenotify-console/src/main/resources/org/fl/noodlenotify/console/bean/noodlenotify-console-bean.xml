@@ -12,6 +12,8 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
+	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
+	
 	<context:component-scan base-package="org.fl.noodlenotify.console" use-default-filters="false" >
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository" />

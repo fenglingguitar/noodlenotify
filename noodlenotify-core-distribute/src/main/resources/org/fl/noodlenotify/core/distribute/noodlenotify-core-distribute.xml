@@ -12,17 +12,14 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<bean id="nettyNetConnectServerCheckHandler" class="org.fl.noodlenotify.core.connect.net.netty.server.NettyNetConnectServerCheckHandler" />
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/noodlenotify-core-distribute-manager-pool.xml" />
 	
-	<bean id="checkParam" abstract="true">
-		<property name="port" value="20601"/>
+	<bean id="distribute" class="org.fl.noodlenotify.core.distribute.Distribute" 
+			init-method="start" destroy-method="destroy"
+			parent="distributeParam">
+		<property name="localIp" value="127.0.0.1" />
+		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
+		<property name="connectManagerPool" ref="connectManagerPool" />
 	</bean>
-	
-	<bean id="nettyNetConnectCheckServer" class="org.fl.noodlenotify.core.connect.net.netty.server.NettyNetConnectServer"
-			init-method="start" destroy-method="destroy" 
-			parent="checkParam">
-		<property name="workerCount" value="1"/>
-		<property name="channelHandler" ref="nettyNetConnectServerCheckHandler" />
-	</bean>
-    
+
 </beans>

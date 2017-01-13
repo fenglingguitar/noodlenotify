@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
+	default-autowire="byName">
+	
+	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute-db.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute-cache-queue.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute-cache-body.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute-net.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/manager/noodlenotify-core-manager-distribute.xml" />
+	
+	<bean id="connectManagerPool" class="org.fl.noodle.common.connect.manager.ConnectManagerPool" parent="commonParam">
+		<property name="connectManagerList">
+			<list>
+				<ref bean="distributeDbConnectManager" />
+				<ref bean="distributeQueueCacheConnectManager" />
+				<ref bean="distributeBodyCacheConnectManager" />
+				<ref bean="distributeNetConnectManager" />
+				<ref bean="distributeConnectManager" />
+			</list>
+		</property>
+	</bean>
+	
+</beans>

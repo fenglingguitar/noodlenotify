@@ -12,18 +12,15 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
-	
-	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/noodlenotify-core-distribute-register.xml" />
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/queue/redis/noodlenotify-core-connect-cache-queue-factory.xml" />
 
 	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/queue/cluster/noodlenotify-core-connect-cache-queue-cluster-factory.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/connect/serialize/noodlenotify-core-connect-serialize-factory.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/connect/route/noodlenotify-core-connect-route-factory.xml" />
-	
-	<import resource="classpath:org/fl/noodlenotify/core/distribute/register/noodlenotify-core-distribute-register.xml" />
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/body/distinguish/noodlenotify-core-connect-cache-body-distinguish.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/queue/distinguish/noodlenotify-core-connect-cache-queue-distinguish.xml" />

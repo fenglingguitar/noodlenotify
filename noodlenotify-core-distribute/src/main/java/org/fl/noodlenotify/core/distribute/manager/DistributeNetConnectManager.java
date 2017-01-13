@@ -237,7 +237,7 @@ public class DistributeNetConnectManager extends AbstractConnectManagerTemplate 
 			for (long childId : addChildConnectMappingMap.get(name).keySet()) {
 				for (Object objectIt : addChildConnectMappingMap.get(name).get(childId)) {
 					ConnectAgent connectAgent = connectAgentMap.get(getId(objectIt));
-					if (connectAgent.isHealthyConnect()) {
+					if (connectAgent != null && connectAgent.isHealthyConnect()) {
 						connectNodeMap.get(name).getChildConnectNode(childId).addConnectAgent(connectAgent);
 					}
 				}

@@ -12,18 +12,15 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
-	
-	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
+	
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/noodlenotify-core-distribute-register.xml" />
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/db/mysql/noodlenotify-core-connect-db-mysql-factory.xml" />
 
 	<import resource="classpath:org/fl/noodlenotify/core/connect/db/cluster/noodlenotify-core-connect-db-cluster-factory.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/connect/serialize/noodlenotify-core-connect-serialize-factory.xml" />
 	<import resource="classpath:org/fl/noodlenotify/core/connect/route/noodlenotify-core-connect-route-factory.xml" />
-	
-	<import resource="classpath:org/fl/noodlenotify/core/distribute/register/noodlenotify-core-distribute-register.xml" />
 	
 	<bean id="distributeDbConnectManager" class="org.fl.noodlenotify.core.distribute.manager.DistributeDbConnectManager">
 		<property name="connectAgentFactoryMap">

@@ -12,27 +12,12 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
-	
-	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
 	
-	<import resource="classpath:org/fl/noodlenotify/core/distribute/register/noodlenotify-core-distribute-register.xml" />
-	
-	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/queue/distinguish/noodlenotify-core-connect-cache-queue-distinguish.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/noodlenotify-core-distribute-register.xml" />
 
-	<bean id="distributePullFactory" class="org.fl.noodlenotify.core.distribute.DistributePullFactory">
-		<property name="dbConnectManager" ref="distributeDbConnectManager" />
-		<property name="queueCacheConnectManager" ref="distributeQueueCacheConnectManager" />
-		<property name="distributeConfParam" ref="distributeConfParam" />
-		<property name="distributeModuleRegister" ref="distributeModuleRegister" />
-	</bean>
-	
-	<bean id="distributePushFactory" class="org.fl.noodlenotify.core.distribute.DistributePushFactory">
-		<property name="queueCacheConnectManager" ref="distributeQueueCacheConnectManager" />
-		<property name="netConnectManager" ref="distributeNetConnectManager" />
-		<property name="distributeConfParam" ref="distributeConfParam" />
-	</bean>
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/noodlenotify-core-distribute-pull-factory.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/noodlenotify-core-distribute-push-factory.xml" />
 
 	<bean id="distributeConnectManager" class="org.fl.noodlenotify.core.distribute.manager.DistributeConnectManager">
 		<property name="distributeModuleRegister" ref="distributeModuleRegister" />

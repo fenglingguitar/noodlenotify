@@ -22,6 +22,12 @@
   <dependencies>
   
   	<dependency>
+		<groupId>org.fl.noodlenotify.common</groupId>
+  		<artifactId>noodlenotify-common</artifactId>
+  		<version>${noodlenotify.common.version}</version>
+	</dependency>
+  
+  	<dependency>
 	  <groupId>org.fl.noodlenotify.core.client.producer</groupId>
 	  <artifactId>noodlenotify-core-client-producer</artifactId>
 	  <version>${noodlenotify.core.client.producer.version}</version>

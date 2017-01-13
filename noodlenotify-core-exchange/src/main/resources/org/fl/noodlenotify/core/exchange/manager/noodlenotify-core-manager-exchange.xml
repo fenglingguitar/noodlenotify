@@ -12,12 +12,9 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-common.xml" />
-	
-	<import resource="classpath:org/fl/noodlenotify/core/common/noodlenotify-core-common.xml" />
 	<import resource="classpath:org/fl/noodlenotify/console/remoting/noodlenotify-console-remoting-client.xml" />
 	
-	<import resource="classpath:org/fl/noodlenotify/core/exchange/register/noodlenotify-core-exchange-register.xml" />
+	<import resource="classpath:org/fl/noodlenotify/core/exchange/noodlenotify-core-exchange-register.xml" />
 
 	<bean id="exchangeConnectManager" class="org.fl.noodlenotify.core.exchange.manager.ExchangeConnectManager" >
 		<property name="updateLevel" value="20" />

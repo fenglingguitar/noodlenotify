@@ -21,6 +21,12 @@
   
   <dependencies>
   
+  	<dependency>
+		<groupId>org.fl.noodlenotify.common</groupId>
+  		<artifactId>noodlenotify-common</artifactId>
+  		<version>${noodlenotify.common.version}</version>
+	</dependency>
+  
 	<dependency>
 	  <groupId>org.fl.noodlenotify.core.client.consumer.jetty</groupId>
 	  <artifactId>noodlenotify-core-client-consumer-jetty</artifactId>

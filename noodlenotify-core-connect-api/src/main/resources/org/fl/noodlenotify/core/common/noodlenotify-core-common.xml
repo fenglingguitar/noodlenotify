@@ -14,7 +14,6 @@
 	
 	<bean id="commonParam" abstract="true">
 		<property name="suspendTime" value="10000"/>
-		<property name="moduleId" value="1"/>
 	</bean>
 	
 </beans>

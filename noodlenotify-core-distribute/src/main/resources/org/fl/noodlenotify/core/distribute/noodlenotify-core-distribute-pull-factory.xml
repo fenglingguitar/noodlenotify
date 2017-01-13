@@ -12,9 +12,13 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<bean id="consoleRemotingInvoke" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
-	    <property name="serviceUrl" value="http://localhost:8080/noodlenotify/remoting/ConsoleRemotingInvokeService"/>
-	    <property name="serviceInterface" value="org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke"/>
+	<import resource="classpath:org/fl/noodlenotify/core/distribute/noodlenotify-core-distribute-config.xml" />
+	
+	<bean id="distributePullFactory" class="org.fl.noodlenotify.core.distribute.DistributePullFactory">
+		<property name="dbConnectManager" ref="distributeDbConnectManager" />
+		<property name="queueCacheConnectManager" ref="distributeQueueCacheConnectManager" />
+		<property name="distributeConfParam" ref="distributeConfParam" />
+		<property name="distributeModuleRegister" ref="distributeModuleRegister" />
 	</bean>
 	
 </beans>
