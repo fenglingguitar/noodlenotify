@@ -50,7 +50,7 @@
 		       	dph_E_Rate_Hor,
 		       	dph_OD_Cnt_Mit,
 		       	dph_OD_Cnt_Hor
- 		FROM 	CSL_QUEUE cq LEFT JOIN CSL_QUEUE_MSG_STORAGE cqms ON cq.QUEUE_NM = cqms.QUEUE_NM 
+ 		FROM 	CSL_QUEUE cq LEFT JOIN CSL_QUEUE_DB cqms ON cq.QUEUE_NM = cqms.QUEUE_NM 
  		WHERE 	1=1
 		 		#if($queue_Nm)
 					AND cq.queue_Nm LIKE :queue_Nm

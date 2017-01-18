@@ -85,7 +85,7 @@
 			});
 			
 			$('#list_left').jqGrid({
-		   		url: '<%=request.getContextPath()%>/console/queue/msgstorage/queryincludepage',
+		   		url: '<%=request.getContextPath()%>/console/queue/db/queryincludepage',
 				datatype: 'json',
 				mtype: 'post',
 				postData:{'input': jsonToString(paramObject)}, 
@@ -100,7 +100,7 @@
 					],
 			   	colModel: [
 					{name:'queue_Nm', index:'queue_Nm', width:300, align: 'center'},
-					{name:'msgStorage_Id', index:'msgStorage_Id', width:100, align: 'center'},
+					{name:'db_Id', index:'db_Id', width:100, align: 'center'},
 					{name:'name', index:'name', width:300, align: 'center'},
 					{name:'ip', index:'ip', width:130, align: 'center'},
 					{name:'port', index:'port', width:100, align: 'center'},
@@ -130,7 +130,7 @@
 			$('#list_left').jqGrid('navGrid', '#pager_left', {search:false, edit:false, add:false, del:false});
 			
 			$('#list_right').jqGrid({
-		   		url: '<%=request.getContextPath()%>/console/queue/msgstorage/queryexcludepage',
+		   		url: '<%=request.getContextPath()%>/console/queue/db/queryexcludepage',
 				datatype: 'json',
 				mtype: 'post',
 				postData:{'input': jsonToString(paramObject)}, 
@@ -143,7 +143,7 @@
 						'控制状态'
 					],
 			   	colModel: [
-					{name:'msgStorage_Id', index:'msgStorage_Id', width:100, align: 'center'},
+					{name:'db_Id', index:'db_Id', width:100, align: 'center'},
 					{name:'name', index:'name', width:300, align: 'center'},
 					{name:'ip', index:'ip', width:130, align: 'center'},
 					{name:'port', index:'port', width:100, align: 'center'},
@@ -209,7 +209,7 @@
 			 });
 			
 			$('#list_left').jqGrid('setGridParam', {   
-				url: '<%=request.getContextPath()%>/console/queue/msgstorage/queryincludepage',
+				url: '<%=request.getContextPath()%>/console/queue/db/queryincludepage',
 				postData:{'input': jsonToString(vo)}, 
 		        page: 1   
 		    }).trigger('reloadGrid');
@@ -240,7 +240,7 @@
 			vo['queue_Nm'] = $('#queue_Nm').val();
 			
 			$('#list_right').jqGrid('setGridParam', {   
-				url: '<%=request.getContextPath()%>/console/queue/msgstorage/queryexcludepage',
+				url: '<%=request.getContextPath()%>/console/queue/db/queryexcludepage',
 				postData:{'input': jsonToString(vo)}, 
 		        page: 1   
 		    }).trigger('reloadGrid');
@@ -267,7 +267,7 @@
 			
 			transaction({
 				id: 'INSERTS',
-				url: '<%=request.getContextPath()%>/console/queue/msgstorage/inserts',
+				url: '<%=request.getContextPath()%>/console/queue/db/inserts',
 				jsonSet: jsonSet
 			});	
 		}
@@ -292,7 +292,7 @@
 			
 			transaction({
 				id: 'DELETES',
-				url: '<%=request.getContextPath()%>/console/queue/msgstorage/deletes',
+				url: '<%=request.getContextPath()%>/console/queue/db/deletes',
 				jsonSet: jsonSet
 			});	
 		}

@@ -12,7 +12,7 @@ import org.fl.noodle.common.connect.manager.AbstractConnectManager;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
-import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
+import org.fl.noodlenotify.console.vo.QueueDbVo;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.distribute.DistributePull;
 import org.fl.noodlenotify.core.distribute.DistributePullFactory;
@@ -35,7 +35,7 @@ public class DistributeConnectManager extends AbstractConnectManager {
 	
 	private ConcurrentMap<String, QueueCacheDistributeSetLocker> queueCacheDistributeSetLockerMap = new ConcurrentHashMap<String, QueueCacheDistributeSetLocker>();
 	
-	private Map<QueueDistributerVo, List<QueueMsgStorageVo>> queueDistributerInfoMap = null;
+	private Map<QueueDistributerVo, List<QueueDbVo>> queueDistributerInfoMap = null;
 	
 	private List<QueueDistributerVo> addPushList = null;
 	private Map<QueueDistributerVo, List<Long>> addPullMap = null;
@@ -156,12 +156,12 @@ public class DistributeConnectManager extends AbstractConnectManager {
 				distributePullDbMap = new ConcurrentHashMap<Long, DistributePull>();
 				distributePullMap.put(queueDistributerVoIt.getQueue_Nm(), distributePullDbMap);
 			}
-			for(QueueMsgStorageVo queueMsgStorageVoIt : queueDistributerInfoMap.get(queueDistributerVoIt)) {
-				if (!distributePullDbMap.containsKey(queueMsgStorageVoIt.getMsgStorage_Id())) {
+			for(QueueDbVo queueDbVoIt : queueDistributerInfoMap.get(queueDistributerVoIt)) {
+				if (!distributePullDbMap.containsKey(queueDbVoIt.getDb_Id())) {
 					if (!addPullMap.containsKey(queueDistributerVoIt)) {
 						addPullMap.put(queueDistributerVoIt, new ArrayList<Long>());
 					}
-					addPullMap.get(queueDistributerVoIt).add(queueMsgStorageVoIt.getMsgStorage_Id());
+					addPullMap.get(queueDistributerVoIt).add(queueDbVoIt.getDb_Id());
 				}
 			}
 		}
@@ -207,8 +207,8 @@ public class DistributeConnectManager extends AbstractConnectManager {
 				boolean isHave = false;
 				for (QueueDistributerVo queueDistributerVoIt : queueDistributerInfoMap.keySet()) {
 					if (name.equals(queueDistributerVoIt.getQueue_Nm())) {
-						for (QueueMsgStorageVo queueMsgStorageVoIt : queueDistributerInfoMap.get(queueDistributerVoIt)) {
-							if (id == queueMsgStorageVoIt.getMsgStorage_Id()) {
+						for (QueueDbVo queueDbVoIt : queueDistributerInfoMap.get(queueDistributerVoIt)) {
+							if (id == queueDbVoIt.getDb_Id()) {
 								isHave = true;
 								break;
 							}

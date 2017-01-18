@@ -8,7 +8,7 @@ import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgQueueCacheVo;
-import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
+import org.fl.noodlenotify.console.vo.QueueDbVo;
 
 public interface ConsoleRemotingInvoke {
 
@@ -32,15 +32,15 @@ public interface ConsoleRemotingInvoke {
 
 	public List<QueueExchangerVo> exchangerGetQueues(long exchangerId) throws Exception;
 
-	public Map<String, List<QueueMsgStorageVo>> exchangerGetMsgStorages(long exchangerId) throws Exception;
+	public Map<String, List<QueueDbVo>> exchangerGetDb(long exchangerId) throws Exception;
 
 	public Map<String, List<QueueMsgBodyCacheVo>> exchangerGetMsgBodyCaches(long exchangerId) throws Exception;
 
 	public Map<String, Long> exchangerGetQueueConsumerGroupNum(long exchangerId) throws Exception;
 
-	public Map<QueueDistributerVo, List<QueueMsgStorageVo>> distributerGetQueues(long distributerId) throws Exception;
+	public Map<QueueDistributerVo, List<QueueDbVo>> distributerGetQueues(long distributerId) throws Exception;
 
-	public Map<String, List<QueueMsgStorageVo>> distributerGetMsgStorages(long distributerId) throws Exception;
+	public Map<String, List<QueueDbVo>> distributerGetDb(long distributerId) throws Exception;
 
 	public Map<String, List<QueueMsgBodyCacheVo>> distributerGetMsgBodyCaches(long distributerId) throws Exception;
 

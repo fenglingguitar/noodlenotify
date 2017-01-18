@@ -21,8 +21,8 @@
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-status-console-executer-msgbodycache.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-status-console-executer-msgqueuecache-capacity.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-status-console-executer-msgqueuecache.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-status-console-executer-msgstorage-capacity.xml" />
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-status-console-executer-msgstorage.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-status-console-executer-db-capacity.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-status-console-executer-db.xml" />
 	<import resource="classpath:org/fl/noodlenotify/monitor/status/console/executer/noodlenotify-monitor-status-console-executer-producer.xml" />
 
 	<bean id="statusExecuterSchedule" class="org.fl.noodle.common.monitor.schedule.ExecuterSchedule"
@@ -38,8 +38,8 @@
 				<ref bean="msgBodyCacheStatusExecuter" />
 				<ref bean="msgQueueCacheCapacityStatusExecuter" />
 				<ref bean="msgQueueCacheStatusExecuter" />
-				<ref bean="msgStorageCapacityStatusExecuter" />
-				<ref bean="msgStorageStatusExecuter" />
+				<ref bean="dbCapacityStatusExecuter" />
+				<ref bean="dbStatusExecuter" />
 				<ref bean="producerStatusExecuter" />
 			</list>
 		</property>

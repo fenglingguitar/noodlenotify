@@ -1,22 +1,22 @@
 package org.fl.noodlenotify.console.vo;
 
-public class MsgStorageVo implements java.io.Serializable {
+public class DbVo implements java.io.Serializable {
 
 	private static final long serialVersionUID = 446701832363322175L;
 
-	private Long msgStorage_Id;
+	private Long db_Id;
 	private String name;
 	private String ip;
 	private Integer port;
 	private Byte system_Status;
 	private Byte manual_Status;
 
-	public Long getMsgStorage_Id() {
-		return this.msgStorage_Id;
+	public Long getDb_Id() {
+		return this.db_Id;
 	}
 
-	public void setMsgStorage_Id(Long msgStorage_Id) {
-		this.msgStorage_Id = msgStorage_Id;
+	public void setDb_Id(Long db_Id) {
+		this.db_Id = db_Id;
 	}
 
 	public String getName() {

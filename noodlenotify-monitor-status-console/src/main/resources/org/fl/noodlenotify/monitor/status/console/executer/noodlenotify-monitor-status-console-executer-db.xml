@@ -19,7 +19,7 @@
 		<property name="user" value="${noodlenotify.core.db.user}"/>
 		<property name="password" value="${noodlenotify.core.db.password}"/>
 	</bean>
-	
-	<bean id="msgStorageCapacityStatusExecuter" class="org.fl.noodlenotify.monitor.status.console.executer.MsgStorageCapacityStatusExecuter" />
+
+	<bean id="dbStatusExecuter" class="org.fl.noodlenotify.monitor.status.console.executer.DbStatusExecuter" />
 	
 </beans>

@@ -12,7 +12,7 @@ import org.fl.noodlenotify.console.dao.DistributerDao;
 import org.fl.noodlenotify.console.dao.ExchangerDao;
 import org.fl.noodlenotify.console.dao.MsgBodyCacheDao;
 import org.fl.noodlenotify.console.dao.MsgQueueCacheDao;
-import org.fl.noodlenotify.console.dao.MsgStorageDao;
+import org.fl.noodlenotify.console.dao.DbDao;
 import org.fl.noodlenotify.console.dao.ProducerDao;
 import org.fl.noodlenotify.console.dao.QueueConsumerDao;
 import org.fl.noodlenotify.console.dao.QueueConsumerGroupDao;
@@ -21,7 +21,7 @@ import org.fl.noodlenotify.console.dao.QueueDistributerDao;
 import org.fl.noodlenotify.console.dao.QueueExchangerDao;
 import org.fl.noodlenotify.console.dao.QueueMsgBodyCacheDao;
 import org.fl.noodlenotify.console.dao.QueueMsgQueueCacheDao;
-import org.fl.noodlenotify.console.dao.QueueMsgStorageDao;
+import org.fl.noodlenotify.console.dao.QueueDbDao;
 import org.fl.noodlenotify.console.domain.ConsumerMd;
 import org.fl.noodlenotify.console.domain.DistributerMd;
 import org.fl.noodlenotify.console.domain.ExchangerMd;
@@ -37,7 +37,7 @@ import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgQueueCacheVo;
-import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
+import org.fl.noodlenotify.console.vo.QueueDbVo;
 import org.fl.noodlenotify.console.vo.QueueVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,7 +67,7 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	private QueueExchangerDao queueExchangerDao;
 	
 	@Autowired
-	private QueueMsgStorageDao queueMsgStorageDao;
+	private QueueDbDao queueDbDao;
 	
 	@Autowired
 	private QueueMsgBodyCacheDao queueMsgBodyCacheDao;
@@ -82,7 +82,7 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	private QueueMsgQueueCacheDao queueMsgQueueCacheDao;
 	
 	@Autowired
-	private MsgStorageDao msgStorageDao;
+	private DbDao dbDao;
 	
 	@Autowired
 	private MsgBodyCacheDao msgBodyCacheDao;
@@ -244,12 +244,12 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	}
 
 	@Override
-	public Map<String, List<QueueMsgStorageVo>> exchangerGetMsgStorages(long exchangerId) throws Exception {
+	public Map<String, List<QueueDbVo>> exchangerGetDb(long exchangerId) throws Exception {
 		if (!exchangerDao.ifExchangerValid(exchangerId)) {
-			return new HashMap<String, List<QueueMsgStorageVo>>();
+			return new HashMap<String, List<QueueDbVo>>();
 		}
 
-		Map<String, List<QueueMsgStorageVo>> result = new HashMap<String, List<QueueMsgStorageVo>>();
+		Map<String, List<QueueDbVo>> result = new HashMap<String, List<QueueDbVo>>();
 		QueueExchangerVo queueExchangerVo = new QueueExchangerVo();
 		queueExchangerVo.setExchanger_Id(exchangerId);
 		queueExchangerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
@@ -257,14 +257,14 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 		if (queueExchangerList == null) {
 			return result;
 		}
-		QueueMsgStorageVo queueMsgStorageVo = new QueueMsgStorageVo();
-		queueMsgStorageVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
-		queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		QueueDbVo queueDbVo = new QueueDbVo();
+		queueDbVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
+		queueDbVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
 		for (QueueExchangerVo qe : queueExchangerList) {
 			String queueNm = qe.getQueue_Nm();
-			queueMsgStorageVo.setQueue_Nm(queueNm);
-			List<QueueMsgStorageVo> msgStorages = queueMsgStorageDao.queryMsgStoragesByQueue(queueMsgStorageVo);
-			result.put(queueNm, msgStorages);
+			queueDbVo.setQueue_Nm(queueNm);
+			List<QueueDbVo> db = queueDbDao.queryDbByQueue(queueDbVo);
+			result.put(queueNm, db);
 		}
 		return result;
 	}
@@ -324,12 +324,12 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	}
 
 	@Override
-	public Map<QueueDistributerVo, List<QueueMsgStorageVo>> distributerGetQueues(long distributerId) throws Exception {
+	public Map<QueueDistributerVo, List<QueueDbVo>> distributerGetQueues(long distributerId) throws Exception {
 		if (!distributerDao.ifDistributerValid(distributerId)) {
-			return new HashMap<QueueDistributerVo, List<QueueMsgStorageVo>>();
+			return new HashMap<QueueDistributerVo, List<QueueDbVo>>();
 		}
 		
-		Map<QueueDistributerVo, List<QueueMsgStorageVo>> result = new HashMap<QueueDistributerVo, List<QueueMsgStorageVo>>();
+		Map<QueueDistributerVo, List<QueueDbVo>> result = new HashMap<QueueDistributerVo, List<QueueDbVo>>();
 		QueueDistributerVo queueDistributerVo = new QueueDistributerVo();
 		queueDistributerVo.setDistributer_Id(distributerId);
 		queueDistributerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
@@ -338,23 +338,23 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 			return result;
 		}
 
-		QueueMsgStorageVo queueMsgStorageVo = new QueueMsgStorageVo();
-		queueMsgStorageVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
-		queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
+		QueueDbVo queueDbVo = new QueueDbVo();
+		queueDbVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
+		queueDbVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
 		for (QueueDistributerVo qd : queues) {
-			queueMsgStorageVo.setQueue_Nm(qd.getQueue_Nm());
-			List<QueueMsgStorageVo> msgStorages = queueMsgStorageDao.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
-			result.put(qd, msgStorages);
+			queueDbVo.setQueue_Nm(qd.getQueue_Nm());
+			List<QueueDbVo> db = queueDbDao.queryDbByQueueExclude(queueDbVo);
+			result.put(qd, db);
 		}
 		return result;
 	}
 
 	@Override
-	public Map<String, List<QueueMsgStorageVo>> distributerGetMsgStorages(long distributerId) throws Exception {
+	public Map<String, List<QueueDbVo>> distributerGetDb(long distributerId) throws Exception {
 		if (!distributerDao.ifDistributerValid(distributerId)) {
-			return new HashMap<String, List<QueueMsgStorageVo>>();
+			return new HashMap<String, List<QueueDbVo>>();
 		}
-		Map<String, List<QueueMsgStorageVo>> result = new HashMap<String, List<QueueMsgStorageVo>>();
+		Map<String, List<QueueDbVo>> result = new HashMap<String, List<QueueDbVo>>();
 		QueueDistributerVo queueDistributerVo = new QueueDistributerVo();
 		queueDistributerVo.setDistributer_Id(distributerId);
 		queueDistributerVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
@@ -363,14 +363,14 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 			return result;
 		}
 
-		QueueMsgStorageVo queueMsgStorageVo = new QueueMsgStorageVo();
-		queueMsgStorageVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
-		queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
+		QueueDbVo queueDbVo = new QueueDbVo();
+		queueDbVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
+		queueDbVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
 		for (QueueDistributerVo qd : queues) {
 			String queueNm = qd.getQueue_Nm();
-			queueMsgStorageVo.setQueue_Nm(queueNm);
-			List<QueueMsgStorageVo> msgStorages = queueMsgStorageDao.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
-			result.put(queueNm, msgStorages);
+			queueDbVo.setQueue_Nm(queueNm);
+			List<QueueDbVo> db = queueDbDao.queryDbByQueueExclude(queueDbVo);
+			result.put(queueNm, db);
 		}
 		return result;
 	}

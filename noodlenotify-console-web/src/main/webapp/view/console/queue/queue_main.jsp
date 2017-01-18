@@ -54,8 +54,8 @@
 			$('#distributer').button().click(function() {
 				setDistributer();
 			});
-			$('#msgstorage').button().click(function() {
-				setMsgstorage();
+			$('#db').button().click(function() {
+				setDb();
 			});
 			$('#msgqueuecache').button().click(function() {
 				setMsgqueuecache();
@@ -265,7 +265,7 @@
 			top.openDialog('设置分配中心', '<%=request.getContextPath()%>/view/console/queue/queue-distributer/queue_distributer_main.jsp', ret, 610, 1200, null);					
 		}
 		
-		function setMsgstorage() {
+		function setDb() {
 			
 			var index = jQuery('#list').jqGrid('getGridParam', 'selarrrow');
 			if (index.toString() == '') {
@@ -278,7 +278,7 @@
 				return;
 			}
 			var ret = jQuery('#list').jqGrid('getRowData', index);
-			top.openDialog('设置数据库', '<%=request.getContextPath()%>/view/console/queue/queue-msgstorage/queue_msgstorage_main.jsp', ret, 610, 1200, null);					
+			top.openDialog('设置数据库', '<%=request.getContextPath()%>/view/console/queue/queue-db/queue_db_main.jsp', ret, 610, 1200, null);					
 		}
 		
 		function setMsgqueuecache() {
@@ -370,7 +370,7 @@
 		<button id="deletes">删除</button>
 		<button id="exchange">设置交换中心</button>
 		<button id="distributer">设置分配中心</button>
-		<button id="msgstorage">设置数据库</button>
+		<button id="db">设置数据库</button>
 		<button id="msgqueuecache">设置队列缓存</button>
 		<button id="msgbodycache">设置消息体缓存</button>
 		<button id="consumergroup">设置消费者组</button>

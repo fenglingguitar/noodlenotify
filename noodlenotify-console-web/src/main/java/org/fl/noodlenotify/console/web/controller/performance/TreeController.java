@@ -15,24 +15,24 @@ import org.fl.noodlenotify.console.service.DistributerService;
 import org.fl.noodlenotify.console.service.ExchangerService;
 import org.fl.noodlenotify.console.service.MsgBodyCacheService;
 import org.fl.noodlenotify.console.service.MsgQueueCacheService;
-import org.fl.noodlenotify.console.service.MsgStorageService;
+import org.fl.noodlenotify.console.service.DbService;
 import org.fl.noodlenotify.console.service.QueueConsumerGroupService;
 import org.fl.noodlenotify.console.service.QueueDistributerService;
 import org.fl.noodlenotify.console.service.QueueExchangerService;
 import org.fl.noodlenotify.console.service.QueueMsgBodyCacheService;
 import org.fl.noodlenotify.console.service.QueueMsgQueueCacheService;
-import org.fl.noodlenotify.console.service.QueueMsgStorageService;
+import org.fl.noodlenotify.console.service.QueueDbService;
 import org.fl.noodlenotify.console.vo.DistributerVo;
 import org.fl.noodlenotify.console.vo.ExchangerVo;
 import org.fl.noodlenotify.console.vo.MsgBodyCacheVo;
 import org.fl.noodlenotify.console.vo.MsgQueueCacheVo;
-import org.fl.noodlenotify.console.vo.MsgStorageVo;
+import org.fl.noodlenotify.console.vo.DbVo;
 import org.fl.noodlenotify.console.vo.QueueConsumerGroupVo;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgQueueCacheVo;
-import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
+import org.fl.noodlenotify.console.vo.QueueDbVo;
 import org.fl.noodle.common.mvc.annotation.NoodleResponseBody;
 import org.fl.noodlenotify.console.web.vo.TreeVo;
 
@@ -47,7 +47,7 @@ public class TreeController {
 	private DistributerService distributerService;
 	
 	@Autowired
-	MsgStorageService msgStorageService;
+	DbService dbService;
 	
 	@Autowired
 	private MsgBodyCacheService msgBodyCacheService;
@@ -62,7 +62,7 @@ public class TreeController {
 	private QueueDistributerService queueDistributerService;
 	
 	@Autowired
-	private QueueMsgStorageService queueMsgStorageService;
+	private QueueDbService queueDbService;
 	
 	@Autowired
 	private QueueMsgQueueCacheService queueMsgQueueCacheService;
@@ -417,13 +417,13 @@ public class TreeController {
 		
 		TreeVo treeVo = null;
 		
-		MsgStorageVo msgStorageVoQuery = new MsgStorageVo();
-		msgStorageVoQuery.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		List<MsgStorageVo> msgStorageVoList = msgStorageService.queryMsgStorageList(msgStorageVoQuery);
-		for (MsgStorageVo msgStorageVo : msgStorageVoList) {
+		DbVo dbVoQuery = new DbVo();
+		dbVoQuery.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		List<DbVo> dbVoList = dbService.queryDbList(dbVoQuery);
+		for (DbVo dbVo : dbVoList) {
 			treeVo = new TreeVo();
-			treeVo.setId(String.valueOf(msgStorageVo.getMsgStorage_Id()));
-			treeVo.setLabel(msgStorageVo.getName());
+			treeVo.setId(String.valueOf(dbVo.getDb_Id()));
+			treeVo.setLabel(dbVo.getName());
 			treeVo.setPid(pid);
 			treeVo.setUrl("monitor/tree/queryexchangedistributebydb");
 			treeVoList.add(treeVo);
@@ -670,18 +670,18 @@ public class TreeController {
 		Map<String, TreeVo> treeVoMapByDb = new HashMap<String, TreeVo>();
 		Map<String, TreeVo> treeVoMapByExchange = new HashMap<String, TreeVo>();
 		
-		QueueMsgStorageVo queueMsgStorageVo = new QueueMsgStorageVo();
-		queueMsgStorageVo.setMsgStorage_Id(Long.valueOf(pppid));
-		queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		queueMsgStorageVo.setQueue_Nm(queue_Nm);
-		List<QueueMsgStorageVo> queueMsgStorageVoList = queueMsgStorageService.queryQueueByMsgstorageListTree(queueMsgStorageVo);
-		for (QueueMsgStorageVo queueMsgStorageVoResult : queueMsgStorageVoList) {
+		QueueDbVo queueDbVo = new QueueDbVo();
+		queueDbVo.setDb_Id(Long.valueOf(pppid));
+		queueDbVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		queueDbVo.setQueue_Nm(queue_Nm);
+		List<QueueDbVo> queueDbVoList = queueDbService.queryQueueByDbListTree(queueDbVo);
+		for (QueueDbVo queueDbVoResult : queueDbVoList) {
 			treeVo = new TreeVo();
-			treeVo.setId(String.valueOf(queueMsgStorageVoResult.getQueue_Nm()));
-			treeVo.setLabel(queueMsgStorageVoResult.getQueue_Nm());
+			treeVo.setId(String.valueOf(queueDbVoResult.getQueue_Nm()));
+			treeVo.setLabel(queueDbVoResult.getQueue_Nm());
 			treeVo.setPid(pid);
 			treeVo.setUrl("monitor/tree/querymonitorbydbexchange");
-			treeVoMapByDb.put(queueMsgStorageVoResult.getQueue_Nm(), treeVo);
+			treeVoMapByDb.put(queueDbVoResult.getQueue_Nm(), treeVo);
 		}
 		
 		QueueExchangerVo queueExchangerVo = new QueueExchangerVo();
@@ -769,18 +769,18 @@ public class TreeController {
 		Map<String, TreeVo> treeVoMapByDb = new HashMap<String, TreeVo>();
 		Map<String, TreeVo> treeVoMapByExchange = new HashMap<String, TreeVo>();
 		
-		QueueMsgStorageVo queueMsgStorageVo = new QueueMsgStorageVo();
-		queueMsgStorageVo.setMsgStorage_Id(Long.valueOf(pppid));
-		queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
-		queueMsgStorageVo.setQueue_Nm(queue_Nm);
-		List<QueueMsgStorageVo> queueMsgStorageVoList = queueMsgStorageService.queryQueueByMsgstorageListTree(queueMsgStorageVo);
-		for (QueueMsgStorageVo queueMsgStorageVoResult : queueMsgStorageVoList) {
+		QueueDbVo queueDbVo = new QueueDbVo();
+		queueDbVo.setDb_Id(Long.valueOf(pppid));
+		queueDbVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
+		queueDbVo.setQueue_Nm(queue_Nm);
+		List<QueueDbVo> queueDbVoList = queueDbService.queryQueueByDbListTree(queueDbVo);
+		for (QueueDbVo queueDbVoResult : queueDbVoList) {
 			treeVo = new TreeVo();
-			treeVo.setId(String.valueOf(queueMsgStorageVoResult.getQueue_Nm()));
-			treeVo.setLabel(queueMsgStorageVoResult.getQueue_Nm());
+			treeVo.setId(String.valueOf(queueDbVoResult.getQueue_Nm()));
+			treeVo.setLabel(queueDbVoResult.getQueue_Nm());
 			treeVo.setPid(pid);
 			treeVo.setUrl("monitor/tree/querymonitorbydbdistribute");
-			treeVoMapByDb.put(queueMsgStorageVoResult.getQueue_Nm(), treeVo);
+			treeVoMapByDb.put(queueDbVoResult.getQueue_Nm(), treeVo);
 		}
 		
 		QueueDistributerVo queueDistributerVo = new QueueDistributerVo();

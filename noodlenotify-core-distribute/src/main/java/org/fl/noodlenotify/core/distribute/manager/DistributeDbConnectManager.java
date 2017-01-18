@@ -8,7 +8,7 @@ import org.fl.noodle.common.connect.manager.AbstractConnectManagerTemplate;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.connect.route.ConnectRoute;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
-import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
+import org.fl.noodlenotify.console.vo.QueueDbVo;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
@@ -24,7 +24,7 @@ public class DistributeDbConnectManager extends AbstractConnectManagerTemplate {
 	@Override
 	protected void queryInfo() {
 		try {
-			getConnectAndNodeInfoMap(consoleRemotingInvoke.distributerGetMsgStorages(distributeModuleRegister.getModuleId()));
+			getConnectAndNodeInfoMap(consoleRemotingInvoke.distributerGetDb(distributeModuleRegister.getModuleId()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -49,17 +49,17 @@ public class DistributeDbConnectManager extends AbstractConnectManagerTemplate {
 	
 	@Override
 	protected String getIdName() {
-		return "MsgStorage_Id";
+		return "Db_Id";
 	}
 	
 	@Override
 	protected ConnectAgent createConnectAgent(Object object) {
-		return connectAgentFactoryMap.get("MYSQL").createConnectAgent(((QueueMsgStorageVo)object).getMsgStorage_Id(), ((QueueMsgStorageVo)object).getIp(), ((QueueMsgStorageVo)object).getPort(), null);
+		return connectAgentFactoryMap.get("MYSQL").createConnectAgent(((QueueDbVo)object).getDb_Id(), ((QueueDbVo)object).getIp(), ((QueueDbVo)object).getPort(), null);
 	}
 	
 	@Override
 	protected boolean isSameConnect(ConnectAgent connectAgent, Object object) {
-		return connectAgent.isSameConnect(((QueueMsgStorageVo)object).getIp(), ((QueueMsgStorageVo)object).getPort(), null, ConnectAgentType.DB.getCode());
+		return connectAgent.isSameConnect(((QueueDbVo)object).getIp(), ((QueueDbVo)object).getPort(), null, ConnectAgentType.DB.getCode());
 	}
 	
 	@Override

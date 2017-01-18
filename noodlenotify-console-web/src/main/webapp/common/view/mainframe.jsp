@@ -297,7 +297,7 @@
 	                    <li><a href="#" onclick="javascript:addTab('mainframe_1_2', '生产者', '<%=request.getContextPath()%>/view/console/producer/producer_main.jsp');">生产者</a></li>
 	                    <li><a href="#" onclick="javascript:addTab('mainframe_1_3', '交换中心', '<%=request.getContextPath()%>/view/console/exchanger/exchanger_main.jsp');">交换中心</a></li>
 	                    <li><a href="#" onclick="javascript:addTab('mainframe_1_4', '分配中心', '<%=request.getContextPath()%>/view/console/distributer/distributer_main.jsp');">分配中心</a></li>
-	                    <li><a href="#" onclick="javascript:addTab('mainframe_1_5', '数据库', '<%=request.getContextPath()%>/view/console/msgstorage/msgstorage_main.jsp');">数据库</a></li>
+	                    <li><a href="#" onclick="javascript:addTab('mainframe_1_5', '数据库', '<%=request.getContextPath()%>/view/console/db/db_main.jsp');">数据库</a></li>
 	                    <li><a href="#" onclick="javascript:addTab('mainframe_1_6', '队列缓存', '<%=request.getContextPath()%>/view/console/msgqueuecache/msgqueuecache_main.jsp');">队列缓存</a></li>
 	                    <li><a href="#" onclick="javascript:addTab('mainframe_1_7', '消息体缓存', '<%=request.getContextPath()%>/view/console/msgbodycache/msgbodycache_main.jsp');">消息体缓存</a></li>
 	                    <li><a href="#" onclick="javascript:addTab('mainframe_1_8', '消费者组', '<%=request.getContextPath()%>/view/console/consumergroup/consumergroup_main.jsp');">消费者组</a></li>

@@ -10,7 +10,7 @@ import org.fl.noodlenotify.console.dao.QueueDistributerDao;
 import org.fl.noodlenotify.console.dao.QueueExchangerDao;
 import org.fl.noodlenotify.console.dao.QueueMsgBodyCacheDao;
 import org.fl.noodlenotify.console.dao.QueueMsgQueueCacheDao;
-import org.fl.noodlenotify.console.dao.QueueMsgStorageDao;
+import org.fl.noodlenotify.console.dao.QueueDbDao;
 import org.fl.noodlenotify.console.service.QueueService;
 import org.fl.noodlenotify.console.vo.QueueConsumerGroupVo;
 import org.fl.noodlenotify.console.vo.QueueConsumerVo;
@@ -18,7 +18,7 @@ import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgQueueCacheVo;
-import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
+import org.fl.noodlenotify.console.vo.QueueDbVo;
 import org.fl.noodlenotify.console.vo.QueueVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,7 +48,7 @@ public class QueueServiceImpl implements QueueService {
 	private QueueMsgQueueCacheDao queueMsgQueueCacheDao;
 
 	@Autowired
-	private QueueMsgStorageDao queueMsgStorageDao;
+	private QueueDbDao queueDbDao;
 
 	@Override
 	public PageVo<QueueVo> queryQueuePage(QueueVo vo, int page, int rows) throws Exception {
@@ -94,9 +94,9 @@ public class QueueServiceImpl implements QueueService {
 		QueueDistributerVo queueDistributerVo = new QueueDistributerVo();
 		queueDistributerVo.setQueue_Nm(vo.getQueue_Nm());
 		queueDistributerDao.deleteQueueDistributerByQueueNm(queueDistributerVo);
-		QueueMsgStorageVo queueMsgStorageVo = new QueueMsgStorageVo();
-		queueMsgStorageVo.setQueue_Nm(vo.getQueue_Nm());
-		queueMsgStorageDao.deleteQueueMsgStorageByQueueNm(queueMsgStorageVo);
+		QueueDbVo queueDbVo = new QueueDbVo();
+		queueDbVo.setQueue_Nm(vo.getQueue_Nm());
+		queueDbDao.deleteQueueDbByQueueNm(queueDbVo);
 		QueueMsgBodyCacheVo queueMsgBodyCacheVo = new QueueMsgBodyCacheVo();
 		queueMsgBodyCacheVo.setQueue_Nm(vo.getQueue_Nm());
 		queueMsgBodyCacheDao.deleteQueueMsgBodyCacheByQueueNm(queueMsgBodyCacheVo);
@@ -121,9 +121,9 @@ public class QueueServiceImpl implements QueueService {
 			QueueDistributerVo queueDistributerVo = new QueueDistributerVo();
 			queueDistributerVo.setQueue_Nm(vo.getQueue_Nm());
 			queueDistributerDao.deleteQueueDistributerByQueueNm(queueDistributerVo);
-			QueueMsgStorageVo queueMsgStorageVo = new QueueMsgStorageVo();
-			queueMsgStorageVo.setQueue_Nm(vo.getQueue_Nm());
-			queueMsgStorageDao.deleteQueueMsgStorageByQueueNm(queueMsgStorageVo);
+			QueueDbVo queueDbVo = new QueueDbVo();
+			queueDbVo.setQueue_Nm(vo.getQueue_Nm());
+			queueDbDao.deleteQueueDbByQueueNm(queueDbVo);
 			QueueMsgBodyCacheVo queueMsgBodyCacheVo = new QueueMsgBodyCacheVo();
 			queueMsgBodyCacheVo.setQueue_Nm(vo.getQueue_Nm());
 			queueMsgBodyCacheDao.deleteQueueMsgBodyCacheByQueueNm(queueMsgBodyCacheVo);

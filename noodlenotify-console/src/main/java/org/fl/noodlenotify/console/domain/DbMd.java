@@ -8,12 +8,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "CSL_MSG_STORAGE")
-public class MsgStorageMd implements java.io.Serializable {
+@Table(name = "CSL_DB")
+public class DbMd implements java.io.Serializable {
 
 	private static final long serialVersionUID = 3659648346295525519L;
 
-	private Long msgStorage_Id;
+	private Long db_Id;
 	private String name;
 	private String ip;
 	private Integer port;
@@ -22,13 +22,13 @@ public class MsgStorageMd implements java.io.Serializable {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "MSGSTORAGE_ID", nullable = false)
-	public Long getMsgStorage_Id() {
-		return this.msgStorage_Id;
+	@Column(name = "DB_ID", nullable = false)
+	public Long getDb_Id() {
+		return this.db_Id;
 	}
 
-	public void setMsgStorage_Id(Long msgStorage_Id) {
-		this.msgStorage_Id = msgStorage_Id;
+	public void setDb_Id(Long db_Id) {
+		this.db_Id = db_Id;
 	}
 
 	@Column(name = "NAME", length = 32)

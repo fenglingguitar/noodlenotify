@@ -7,36 +7,36 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import org.fl.noodlenotify.console.dao.QueueMsgStorageDao;
-import org.fl.noodlenotify.console.domain.QueueMsgStorageMd;
+import org.fl.noodlenotify.console.dao.QueueDbDao;
+import org.fl.noodlenotify.console.domain.QueueDbMd;
 import org.fl.noodle.common.dynamicsql.DynamicSqlTemplate;
-import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
+import org.fl.noodlenotify.console.vo.QueueDbVo;
 import org.fl.noodle.common.mvc.vo.PageVo;
 
-@Repository("queueMsgStorageDao")
-public class QueueMsgStorageDaoImpl implements QueueMsgStorageDao {
+@Repository("queueDbDao")
+public class QueueDbDaoImpl implements QueueDbDao {
 
 	@Autowired
 	private DynamicSqlTemplate dynamicSqlTemplate;
 
 	@Override
-	public PageVo<QueueMsgStorageVo> queryQueueMsgStoragePage(QueueMsgStorageVo vo, int page, int rows) throws Exception {
+	public PageVo<QueueDbVo> queryQueueDbPage(QueueDbVo vo, int page, int rows) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("msgStorage_Id", vo.getMsgStorage_Id());
-		return dynamicSqlTemplate.queryPage("queue-msgstorage-query-list", paramsMap, page, rows, QueueMsgStorageVo.class);
+		paramsMap.put("db_Id", vo.getDb_Id());
+		return dynamicSqlTemplate.queryPage("queue-db-query-list", paramsMap, page, rows, QueueDbVo.class);
 	}
 	
 	@Override
-	public List<QueueMsgStorageVo> queryQueueMsgStorageList(QueueMsgStorageVo vo) throws Exception {
+	public List<QueueDbVo> queryQueueDbList(QueueDbVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
-		paramsMap.put("msgStorage_Id", vo.getMsgStorage_Id());
-		return dynamicSqlTemplate.queryList("queue-msgstorage-query-list", paramsMap, QueueMsgStorageVo.class);
+		paramsMap.put("db_Id", vo.getDb_Id());
+		return dynamicSqlTemplate.queryList("queue-db-query-list", paramsMap, QueueDbVo.class);
 	}
 	
 	@Override
-	public PageVo<QueueMsgStorageVo> queryQueueMsgStorageIncludePage(QueueMsgStorageVo vo, int page, int rows) throws Exception {
+	public PageVo<QueueDbVo> queryQueueDbIncludePage(QueueDbVo vo, int page, int rows) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
@@ -44,11 +44,11 @@ public class QueueMsgStorageDaoImpl implements QueueMsgStorageDao {
 		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
-		return dynamicSqlTemplate.queryPage("queue-msgstorage-query-includepage", paramsMap, page, rows, QueueMsgStorageVo.class);
+		return dynamicSqlTemplate.queryPage("queue-db-query-includepage", paramsMap, page, rows, QueueDbVo.class);
 	}
 
 	@Override
-	public PageVo<QueueMsgStorageVo> queryQueueMsgStorageExcludePage(QueueMsgStorageVo vo, int page, int rows) throws Exception {
+	public PageVo<QueueDbVo> queryQueueDbExcludePage(QueueDbVo vo, int page, int rows) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
@@ -56,11 +56,11 @@ public class QueueMsgStorageDaoImpl implements QueueMsgStorageDao {
 		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
-		return dynamicSqlTemplate.queryPage("queue-msgstorage-query-excludepage", paramsMap, page, rows, QueueMsgStorageVo.class);
+		return dynamicSqlTemplate.queryPage("queue-db-query-excludepage", paramsMap, page, rows, QueueDbVo.class);
 	}
 	
 	@Override
-	public List<QueueMsgStorageVo> queryQueueMsgStorageIncludeList(QueueMsgStorageVo vo) throws Exception {
+	public List<QueueDbVo> queryQueueDbIncludeList(QueueDbVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm() != null ? vo.getQueue_Nm() : null);
 		paramsMap.put("name", vo.getName() != null ? vo.getName() : null);
@@ -68,88 +68,88 @@ public class QueueMsgStorageDaoImpl implements QueueMsgStorageDao {
 		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
-		return dynamicSqlTemplate.queryList("queue-msgstorage-query-includelist", paramsMap, QueueMsgStorageVo.class);
+		return dynamicSqlTemplate.queryList("queue-db-query-includelist", paramsMap, QueueDbVo.class);
 	}
 	
 	@Override
-	public List<QueueMsgStorageVo> queryQueueByMsgstorageListTree(QueueMsgStorageVo vo) throws Exception {
+	public List<QueueDbVo> queryQueueByDbListTree(QueueDbVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
-		paramsMap.put("msgStorage_Id", vo.getMsgStorage_Id());
+		paramsMap.put("db_Id", vo.getDb_Id());
 		paramsMap.put("queue_Nm",  vo.getQueue_Nm() != null ? (new StringBuilder().append("%").append(vo.getQueue_Nm()).append("%")).toString() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
-		return dynamicSqlTemplate.queryList("queue-msgstorage-query-queue-tree", paramsMap, QueueMsgStorageVo.class);
+		return dynamicSqlTemplate.queryList("queue-db-query-queue-tree", paramsMap, QueueDbVo.class);
 	}
 	
 	@Override
-	public List<QueueMsgStorageVo> queryMsgStoragesByQueue(QueueMsgStorageVo vo) throws Exception {
+	public List<QueueDbVo> queryDbByQueue(QueueDbVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
-		return dynamicSqlTemplate.queryList("queue-msgstorage-query-msgstorage", paramsMap, QueueMsgStorageVo.class);
+		return dynamicSqlTemplate.queryList("queue-db-query-db", paramsMap, QueueDbVo.class);
 	}
 	
 	@Override
-	public List<QueueMsgStorageVo> queryMsgStoragesByQueueExclude(QueueMsgStorageVo vo) throws Exception {
+	public List<QueueDbVo> queryDbByQueueExclude(QueueDbVo vo) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
-		return dynamicSqlTemplate.queryList("queue-msgstorage-query-msgstorage-exclude", paramsMap, QueueMsgStorageVo.class);
+		return dynamicSqlTemplate.queryList("queue-db-query-db-exclude", paramsMap, QueueDbVo.class);
 	}
 
 	@Override
-	public PageVo<QueueMsgStorageVo> queryQueueByMsgstorage(QueueMsgStorageVo vo, int page, int rows) throws Exception {
+	public PageVo<QueueDbVo> queryQueueByDb(QueueDbVo vo, int page, int rows) throws Exception {
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
-		paramsMap.put("msgStorage_Id", vo.getMsgStorage_Id());
+		paramsMap.put("db_Id", vo.getDb_Id());
 		paramsMap.put("queue_Nm", vo.getQueue_Nm());
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
-		return dynamicSqlTemplate.queryPage("queue-msgstorage-query-msgstorage", paramsMap, page, rows, QueueMsgStorageVo.class);
+		return dynamicSqlTemplate.queryPage("queue-db-query-db", paramsMap, page, rows, QueueDbVo.class);
 	}
 
 	@Override
-	public void insertQueueMsgStorage(QueueMsgStorageVo vo) throws Exception {
-		dynamicSqlTemplate.insert(vo, QueueMsgStorageMd.class);
+	public void insertQueueDb(QueueDbVo vo) throws Exception {
+		dynamicSqlTemplate.insert(vo, QueueDbMd.class);
 	}
 
 	@Override
-	public void insertsQueueMsgStorage(QueueMsgStorageVo[] vos) throws Exception {
-		for (QueueMsgStorageVo vo : vos) {
-			dynamicSqlTemplate.insert(vo, QueueMsgStorageMd.class);
+	public void insertsQueueDb(QueueDbVo[] vos) throws Exception {
+		for (QueueDbVo vo : vos) {
+			dynamicSqlTemplate.insert(vo, QueueDbMd.class);
 		}
 	}
 
 	@Override
-	public void updateQueueMsgStorage(QueueMsgStorageVo vo) throws Exception {
-		dynamicSqlTemplate.updateNonull(vo, QueueMsgStorageMd.class);
+	public void updateQueueDb(QueueDbVo vo) throws Exception {
+		dynamicSqlTemplate.updateNonull(vo, QueueDbMd.class);
 	}
 
 	@Override
-	public void updatesQueueMsgStorage(QueueMsgStorageVo[] vos) throws Exception {
-		for (QueueMsgStorageVo vo : vos) {
-			dynamicSqlTemplate.updateNonull(vo, QueueMsgStorageMd.class);
+	public void updatesQueueDb(QueueDbVo[] vos) throws Exception {
+		for (QueueDbVo vo : vos) {
+			dynamicSqlTemplate.updateNonull(vo, QueueDbMd.class);
 		}
 	}
 
 	@Override
-	public void deleteQueueMsgStorage(QueueMsgStorageVo vo) throws Exception {
-		dynamicSqlTemplate.delete(vo, QueueMsgStorageMd.class);
+	public void deleteQueueDb(QueueDbVo vo) throws Exception {
+		dynamicSqlTemplate.delete(vo, QueueDbMd.class);
 	}
 
 	@Override
-	public void deletesQueueMsgStorage(QueueMsgStorageVo[] vos) throws Exception {
-		for (QueueMsgStorageVo vo : vos) {
-			dynamicSqlTemplate.delete(vo, QueueMsgStorageMd.class);
+	public void deletesQueueDb(QueueDbVo[] vos) throws Exception {
+		for (QueueDbVo vo : vos) {
+			dynamicSqlTemplate.delete(vo, QueueDbMd.class);
 		}
 	}
 
 	@Override
-	public void deleteQueueMsgStorageByMsgStorageId(QueueMsgStorageVo vo) throws Exception {
-		dynamicSqlTemplate.deleteNoById(vo, QueueMsgStorageMd.class, new String[] { "msgStorage_Id" });
+	public void deleteQueueDbByDbId(QueueDbVo vo) throws Exception {
+		dynamicSqlTemplate.deleteNoById(vo, QueueDbMd.class, new String[] { "db_Id" });
 	}
 
 	@Override
-	public void deleteQueueMsgStorageByQueueNm(QueueMsgStorageVo vo) throws Exception {
-		dynamicSqlTemplate.deleteNoById(vo, QueueMsgStorageMd.class, new String[] { "queue_Nm" });
+	public void deleteQueueDbByQueueNm(QueueDbVo vo) throws Exception {
+		dynamicSqlTemplate.deleteNoById(vo, QueueDbMd.class, new String[] { "queue_Nm" });
 	}
 }

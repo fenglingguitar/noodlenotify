@@ -111,7 +111,7 @@
 				vo['system_Status'] = '2';
 				transaction({
 					id: 'INSERT',
-					url: '<%=request.getContextPath()%>/console/msgstorage/insert',
+					url: '<%=request.getContextPath()%>/console/db/insert',
 					jsonSet: jsonSet
 				});
 			} else {
@@ -120,7 +120,7 @@
 				}
 				transaction({
 					id: 'UPDATE',
-					url: '<%=request.getContextPath()%>/console/msgstorage/update',
+					url: '<%=request.getContextPath()%>/console/db/update',
 					jsonSet: jsonSet
 				});				
 			}
@@ -136,7 +136,7 @@
 	</div>
 	<div>
 		<div id="form" style="width: auto;">
-			<input type="hidden" id="msgStorage_Id"/>
+			<input type="hidden" id="db_Id"/>
 			<input type="hidden" id="system_Status"/>
 			<table width="100%" border="1" cellspacing="0" cellpadding="0" class="s_layout_input">
 				<colgroup>

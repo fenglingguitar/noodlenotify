@@ -9,13 +9,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "CSL_QUEUE_MSG_STORAGE")
-public class QueueMsgStorageMd implements java.io.Serializable {
+@Table(name = "CSL_QUEUE_DB")
+public class QueueDbMd implements java.io.Serializable {
 
 	private static final long serialVersionUID = 7086025680232873235L;
 
 	private QueueMd queueMd;
-	private MsgStorageMd msgStorageMd;
+	private DbMd dbMd;
 	private Long new_Len;
 	private Long portion_Len;
 
@@ -32,13 +32,13 @@ public class QueueMsgStorageMd implements java.io.Serializable {
 
 	@Id
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "MSGSTORAGE_ID", nullable = false)
-	public MsgStorageMd getMsgStorageMd() {
-		return msgStorageMd;
+	@JoinColumn(name = "DB_ID", nullable = false)
+	public DbMd getDbMd() {
+		return dbMd;
 	}
 
-	public void setMsgStorageMd(MsgStorageMd msgStorageMd) {
-		this.msgStorageMd = msgStorageMd;
+	public void setDbMd(DbMd dbMd) {
+		this.dbMd = dbMd;
 	}
 
 	@Column(name = "NEW_LEN")

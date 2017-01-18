@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dynamic-hibernate>
-	<query name="queue-msgstorage-query-list">
+	<query name="queue-db-query-list">
 	<![CDATA[
 		SELECT 
 				queue_Nm,
-				msgStorage_Id
-		FROM 	CSL_QUEUE_MSG_STORAGE
+				db_Id
+		FROM 	CSL_QUEUE_DB
 		WHERE 	1=1
 		 		#if($queue_Nm)
 					AND queue_Nm = :queue_Nm
 				#end
-		 		#if($msgStorage_Id)
-					AND msgStorage_Id = :msgStorage_Id
+		 		#if($db_Id)
+					AND db_Id = :db_Id
 				#end
-		ORDER BY msgStorage_Id DESC
+		ORDER BY db_Id DESC
 	]]>
 	</query>
 
-	<query name="queue-msgstorage-query-includepage">
+	<query name="queue-db-query-includepage">
 	<![CDATA[
 		SELECT 
 				qms.queue_Nm,
-				ms.msgStorage_Id,
+				ms.db_Id,
 				ms.name,
 				ms.ip,
 				ms.port,
 				ms.system_Status,
 				ms.manual_Status
-		FROM    CSL_MSG_STORAGE ms, CSL_QUEUE_MSG_STORAGE qms
+		FROM    CSL_DB ms, CSL_QUEUE_DB qms
 		WHERE 	1=1
 		 		#if($queue_Nm)
 					AND qms.queue_Nm = :queue_Nm
@@ -47,21 +47,21 @@
 		 		#if($manual_Status)
 					AND ms.manual_Status = :manual_Status
 				#end
-				AND ms.msgStorage_Id = qms.msgStorage_Id
-		ORDER BY ms.msgStorage_Id DESC
+				AND ms.db_Id = qms.db_Id
+		ORDER BY ms.db_Id DESC
 	]]>
 	</query>
 
-	<query name="queue-msgstorage-query-excludepage">
+	<query name="queue-db-query-excludepage">
 	<![CDATA[
 		SELECT 
-				ms.msgStorage_Id,
+				ms.db_Id,
 				ms.name,
 				ms.ip,
 				ms.port,
 				ms.system_Status,
 				ms.manual_Status
-		FROM    CSL_MSG_STORAGE ms
+		FROM    CSL_DB ms
 		WHERE 	1=1
 				#if($name)
 					AND ms.name LIKE :name
@@ -78,22 +78,22 @@
 		 		#if($manual_Status)
 					AND ms.manual_Status = :manual_Status
 				#end
-				AND ms.msgStorage_Id NOT IN (SELECT msgStorage_Id FROM CSL_QUEUE_MSG_STORAGE  WHERE queue_Nm = :queue_Nm)
-		ORDER BY ms.msgStorage_Id DESC
+				AND ms.db_Id NOT IN (SELECT db_Id FROM CSL_QUEUE_DB  WHERE queue_Nm = :queue_Nm)
+		ORDER BY ms.db_Id DESC
 	]]>
 	</query>
 	
-	<query name="queue-msgstorage-query-includelist">
+	<query name="queue-db-query-includelist">
 	<![CDATA[
 		SELECT 
 				qms.queue_Nm,
-				ms.msgStorage_Id,
+				ms.db_Id,
 				ms.name,
 				ms.ip,
 				ms.port,
 				ms.system_Status,
 				ms.manual_Status
-		FROM    CSL_MSG_STORAGE ms, CSL_QUEUE_MSG_STORAGE qms
+		FROM    CSL_DB ms, CSL_QUEUE_DB qms
 		WHERE 	1=1
 		 		#if($queue_Nm)
 					AND qms.queue_Nm = :queue_Nm
@@ -113,25 +113,25 @@
 		 		#if($manual_Status)
 					AND ms.manual_Status = :manual_Status
 				#end
-				AND ms.msgStorage_Id = qms.msgStorage_Id
-		ORDER BY ms.msgStorage_Id DESC
+				AND ms.db_Id = qms.db_Id
+		ORDER BY ms.db_Id DESC
 	]]>
 	</query>
 
-	<query name="queue-msgstorage-query-queue-tree">
+	<query name="queue-db-query-queue-tree">
 	<![CDATA[
 		SELECT 
 				q.queue_Nm,
 				q.manual_Status,
 				q.is_Repeat,
 				q.expire_Time,
-                qms.msgStorage_Id,
+                qms.db_Id,
                 qms.new_Len,
                 qms.portion_Len
-        FROM    CSL_QUEUE q, CSL_QUEUE_MSG_STORAGE qms
+        FROM    CSL_QUEUE q, CSL_QUEUE_DB qms
 		WHERE 	1=1
-				#if($msgStorage_Id)
-					AND qms.msgStorage_Id = :msgStorage_Id
+				#if($db_Id)
+					AND qms.db_Id = :db_Id
 				#end
 		 		#if($queue_Nm)
 					AND q.queue_Nm LIKE :queue_Nm
@@ -142,17 +142,17 @@
 				AND q.queue_Nm = qms.queue_Nm
 	]]>
 	</query>	
-	<query name="queue-msgstorage-query-msgstorage">
+	<query name="queue-db-query-db">
 	<![CDATA[
 		SELECT 
-				ms.msgStorage_Id,
+				ms.db_Id,
 				ms.name,
 				ms.ip,
 				ms.port,
 				ms.system_Status,
 				ms.manual_Status,
                 qms.queue_Nm
-        FROM    CSL_MSG_STORAGE ms, CSL_QUEUE_MSG_STORAGE qms
+        FROM    CSL_DB ms, CSL_QUEUE_DB qms
 		WHERE 	1=1
 		 		#if($queue_Nm)
 					AND qms.queue_Nm = :queue_Nm
@@ -163,21 +163,21 @@
 		 		#if($manual_Status)
 					AND ms.manual_Status = :manual_Status
 				#end
-				AND ms.msgStorage_Id = qms.msgStorage_Id
+				AND ms.db_Id = qms.db_Id
 	]]>
 	</query>
 	
-	<query name="queue-msgstorage-query-msgstorage-exclude">
+	<query name="queue-db-query-db-exclude">
 	<![CDATA[
 		SELECT 
-				ms.msgStorage_Id,
+				ms.db_Id,
 				ms.name,
 				ms.ip,
 				ms.port,
 				ms.system_Status,
 				ms.manual_Status,
                 qms.queue_Nm
-        FROM    CSL_MSG_STORAGE ms, CSL_QUEUE_MSG_STORAGE qms
+        FROM    CSL_DB ms, CSL_QUEUE_DB qms
 		WHERE 	1=1
 		 		#if($queue_Nm)
 					AND qms.queue_Nm = :queue_Nm
@@ -188,7 +188,7 @@
 		 		#if($manual_Status)
 					AND ms.manual_Status <> :manual_Status
 				#end
-				AND ms.msgStorage_Id = qms.msgStorage_Id
+				AND ms.db_Id = qms.db_Id
 	]]>
 	</query>
 </dynamic-hibernate>

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dynamic-hibernate>
-	<query name="msg-storage-query-list">
+	<query name="db-query-list">
 	<![CDATA[
 		SELECT 
-				msgStorage_Id,
+				db_Id,
 				name,
 				ip,
 				port,
 				system_Status,
 				manual_Status
-		FROM 	CSL_MSG_STORAGE
+		FROM 	CSL_DB
 		WHERE 	1=1
-		 		#if($msgStorage_Id)
-					AND msgStorage_Id = :msgStorage_Id
+		 		#if($db_Id)
+					AND db_Id = :db_Id
 				#end
 		 		#if($name)
 					AND name LIKE :name
@@ -30,23 +30,23 @@
 					AND manual_Status = :manual_Status
 				#end
 				
-		ORDER BY msgStorage_Id desc
+		ORDER BY db_Id desc
 	]]>
 	</query>
 	
-	<query name="msg-storage-query-list-exclude">
+	<query name="db-query-list-exclude">
 	<![CDATA[
 		SELECT 
-				msgStorage_Id,
+				db_Id,
 				name,
 				ip,
 				port,
 				system_Status,
 				manual_Status
-		FROM 	CSL_MSG_STORAGE
+		FROM 	CSL_DB
 		WHERE 	1=1
-		 		#if($msgStorage_Id)
-					AND msgStorage_Id = :msgStorage_Id
+		 		#if($db_Id)
+					AND db_Id = :db_Id
 				#end
 		 		#if($name)
 					AND name LIKE :name
@@ -64,7 +64,7 @@
 					AND manual_Status <> :manual_Status
 				#end
 				
-		ORDER BY msgStorage_Id desc
+		ORDER BY db_Id desc
 	]]>
 	</query>
 

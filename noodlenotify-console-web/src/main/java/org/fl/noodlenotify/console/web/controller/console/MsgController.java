@@ -7,8 +7,8 @@ import org.fl.noodle.common.mvc.annotation.NoodleRequestParam;
 import org.fl.noodle.common.mvc.annotation.NoodleResponseBody;
 import org.fl.noodle.common.mvc.vo.VoidVo;
 import org.fl.noodlenotify.console.constant.ConsoleConstants;
-import org.fl.noodlenotify.console.service.QueueMsgStorageService;
-import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
+import org.fl.noodlenotify.console.service.QueueDbService;
+import org.fl.noodlenotify.console.vo.QueueDbVo;
 import org.fl.noodlenotify.core.connect.db.DbStatusChecker;
 import org.fl.noodlenotify.core.connect.db.mysql.MysqlDbStatusCheckerFactory;
 import org.fl.noodlenotify.core.domain.message.MessageVo;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MsgController {
 	
 	@Autowired
-	private QueueMsgStorageService queueMsgStorageService;
+	private QueueDbService queueDbService;
 
 	@Autowired(required = false)
 	private MysqlDbStatusCheckerFactory mysqlDbStatusCheckerFactory;
@@ -35,14 +35,14 @@ public class MsgController {
 		
 		List<MessageVo> result = new ArrayList<MessageVo>();
 		
-		QueueMsgStorageVo queueMsgStorageVo = new QueueMsgStorageVo();
-		queueMsgStorageVo.setQueue_Nm(vo.getQueueName());
-		queueMsgStorageVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
-		queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
-		List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
-		for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
-			DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbStatusCheckerFactory.createStatusChecker(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
-			result.addAll(dbStatusChecker.queryPortionMessage(queueMsgStorage.getQueue_Nm(), vo.getUuid(), vo.getRegion(), vo.getContent(), pageInt * rowsInt, rowsInt));
+		QueueDbVo queueDbVo = new QueueDbVo();
+		queueDbVo.setQueue_Nm(vo.getQueueName());
+		queueDbVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
+		queueDbVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
+		List<QueueDbVo> queueDbVoList = queueDbService.queryDbByQueueExclude(queueDbVo);
+		for (QueueDbVo queueDbVoIt : queueDbVoList) {
+			DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbStatusCheckerFactory.createStatusChecker(queueDbVoIt.getDb_Id(), queueDbVoIt.getIp(), queueDbVoIt.getPort(), null);
+			result.addAll(dbStatusChecker.queryPortionMessage(queueDbVoIt.getQueue_Nm(), vo.getUuid(), vo.getRegion(), vo.getContent(), pageInt * rowsInt, rowsInt));
 		}
 		
 		return result;
@@ -52,15 +52,15 @@ public class MsgController {
 	@NoodleResponseBody
 	public VoidVo savePortionMessage(@NoodleRequestParam MessageVo vo) throws Exception {
 		
-		QueueMsgStorageVo queueMsgStorageVo = new QueueMsgStorageVo();
-		queueMsgStorageVo.setQueue_Nm(vo.getQueueName());
-		queueMsgStorageVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
-		queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
-		List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
-		for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
-			if (queueMsgStorage.getMsgStorage_Id() == vo.getDb()) {
-				DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbStatusCheckerFactory.createStatusChecker(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
-				dbStatusChecker.savePortionMessage(queueMsgStorage.getQueue_Nm(), vo.getContentId(), vo.getContent());
+		QueueDbVo queueDbVo = new QueueDbVo();
+		queueDbVo.setQueue_Nm(vo.getQueueName());
+		queueDbVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
+		queueDbVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
+		List<QueueDbVo> queueDbVoList = queueDbService.queryDbByQueueExclude(queueDbVo);
+		for (QueueDbVo queueDbVoIt : queueDbVoList) {
+			if (queueDbVoIt.getDb_Id() == vo.getDb()) {
+				DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbStatusCheckerFactory.createStatusChecker(queueDbVoIt.getDb_Id(), queueDbVoIt.getIp(), queueDbVoIt.getPort(), null);
+				dbStatusChecker.savePortionMessage(queueDbVoIt.getQueue_Nm(), vo.getContentId(), vo.getContent());
 			}
 		}
 		return VoidVo.VOID;
@@ -71,15 +71,15 @@ public class MsgController {
 	public VoidVo deletesPortionMessage(@NoodleRequestParam MessageVo[] vos) throws Exception {
 		
 		for (MessageVo vo : vos) {
-			QueueMsgStorageVo queueMsgStorageVo = new QueueMsgStorageVo();
-			queueMsgStorageVo.setQueue_Nm(vo.getQueueName());
-			queueMsgStorageVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
-			queueMsgStorageVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
-			List<QueueMsgStorageVo> queueMsgStorages = queueMsgStorageService.queryMsgStoragesByQueueExclude(queueMsgStorageVo);
-			for (QueueMsgStorageVo queueMsgStorage : queueMsgStorages) {
-				if (queueMsgStorage.getMsgStorage_Id() == vo.getDb()) {
-					DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbStatusCheckerFactory.createStatusChecker(queueMsgStorage.getMsgStorage_Id(), queueMsgStorage.getIp(), queueMsgStorage.getPort(), null);
-					dbStatusChecker.deletePortionMessage(queueMsgStorage.getQueue_Nm(), vo.getId());
+			QueueDbVo queueDbVo = new QueueDbVo();
+			queueDbVo.setQueue_Nm(vo.getQueueName());
+			queueDbVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_ON_LINE);
+			queueDbVo.setManual_Status(ConsoleConstants.MANUAL_STATUS_INVALID);
+			List<QueueDbVo> queueDbVoList = queueDbService.queryDbByQueueExclude(queueDbVo);
+			for (QueueDbVo queueDbVoIt : queueDbVoList) {
+				if (queueDbVoIt.getDb_Id() == vo.getDb()) {
+					DbStatusChecker dbStatusChecker = (DbStatusChecker) mysqlDbStatusCheckerFactory.createStatusChecker(queueDbVoIt.getDb_Id(), queueDbVoIt.getIp(), queueDbVoIt.getPort(), null);
+					dbStatusChecker.deletePortionMessage(queueDbVoIt.getQueue_Nm(), vo.getId());
 				}
 			}
 		}

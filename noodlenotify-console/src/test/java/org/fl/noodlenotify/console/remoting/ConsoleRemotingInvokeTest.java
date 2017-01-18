@@ -9,7 +9,7 @@ import org.fl.noodlenotify.console.vo.QueueConsumerVo;
 import org.fl.noodlenotify.console.vo.QueueExchangerVo;
 import org.fl.noodlenotify.console.vo.QueueMsgBodyCacheVo;
 import org.fl.noodlenotify.console.vo.QueueMsgQueueCacheVo;
-import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
+import org.fl.noodlenotify.console.vo.QueueDbVo;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,14 +138,14 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 	}
 
 	@Test
-	public void testExchangerGetMsgStorages() throws Exception {
+	public void testExchangerGetDb() throws Exception {
 		long exchangerId = 3;
-		Map<String, List<QueueMsgStorageVo>> map = remotingInvoke.exchangerGetMsgStorages(exchangerId);
+		Map<String, List<QueueDbVo>> map = remotingInvoke.exchangerGetDb(exchangerId);
 		Set<String> set = map.keySet();
 		for (String queueName : set) {
-			List<QueueMsgStorageVo> list = map.get(queueName);
-			for (QueueMsgStorageVo queueMsgStorageVo : list) {
-				logger.info("QueueName: " + queueName + ", MsgStorageId: " + queueMsgStorageVo.getMsgStorage_Id());
+			List<QueueDbVo> list = map.get(queueName);
+			for (QueueDbVo queueDbVo : list) {
+				logger.info("QueueName: " + queueName + ", DbId: " + queueDbVo.getDb_Id());
 			}
 		}
 	}
@@ -169,14 +169,14 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 	}
 
 	@Test
-	public void testDistributerGetMsgStorages() throws Exception {
+	public void testDistributerGetDb() throws Exception {
 		long distributerId = 4;
-		Map<String, List<QueueMsgStorageVo>> map = remotingInvoke.distributerGetMsgStorages(distributerId);
+		Map<String, List<QueueDbVo>> map = remotingInvoke.distributerGetDb(distributerId);
 		Set<String> set = map.keySet();
 		for (String queueName : set) {
-			List<QueueMsgStorageVo> list = map.get(queueName);
-			for (QueueMsgStorageVo queueMsgStorageVo : list) {
-				logger.info("QueueName: " + queueName + ", MsgStorageId: " + queueMsgStorageVo.getMsgStorage_Id());
+			List<QueueDbVo> list = map.get(queueName);
+			for (QueueDbVo queueDbVo : list) {
+				logger.info("QueueName: " + queueName + ", DbId: " + queueDbVo.getDb_Id());
 			}
 		}
 	}

@@ -57,7 +57,7 @@
 			});
 			
 			$('#list').jqGrid({
-		   		url: '<%=request.getContextPath()%>/console/msgstorage/querypage',
+		   		url: '<%=request.getContextPath()%>/console/db/querypage',
 				datatype: 'json',
 				mtype: 'post',
 			   	colNames: [
@@ -69,7 +69,7 @@
 						'控制状态'
 					],
 			   	colModel: [
-					{name:'msgStorage_Id', index:'msgStorage_Id', width:100, align: 'center'},
+					{name:'db_Id', index:'db_Id', width:100, align: 'center'},
 					{name:'name', index:'name', width:300, align: 'center'},
 					{name:'ip', index:'ip', width:130, align: 'center'},
 					{name:'port', index:'port', width:100, align: 'center'},
@@ -98,9 +98,9 @@
 					$("#" + subgrid_id).html("<table id='" + subgrid_table_id + "' class='scroll'></table><div id='" + pager_id + "' class='scroll'></div>");
 					var ret = jQuery('#list').jqGrid('getRowData', row_id);
 					var vo = new Object();
-					vo['msgStorage_Id'] = ret['msgStorage_Id'];
+					vo['db_Id'] = ret['db_Id'];
 					jQuery("#"+subgrid_table_id).jqGrid({
-						url:'<%=request.getContextPath()%>/console/queue/msgstorage/queryqueue',
+						url:'<%=request.getContextPath()%>/console/queue/db/queryqueue',
 						datatype: "json",
 						mtype: 'post',
 						postData:{'input': jsonToString(vo)}, 
@@ -166,14 +166,14 @@
 			jsonSet.put('input', vo);
 			
 			$('#list').jqGrid('setGridParam', {   
-				url: '<%=request.getContextPath()%>/console/msgstorage/querypage',
+				url: '<%=request.getContextPath()%>/console/db/querypage',
 				postData:{'input': jsonToString(vo)}, 
 		        page: 1   
 		    }).trigger('reloadGrid');
 		}
 		
 		function insert() {
-			top.openDialog('数据库新增', '<%=request.getContextPath()%>/view/console/msgstorage/msgstorage_edit.jsp', null, 260, 700, query);
+			top.openDialog('数据库新增', '<%=request.getContextPath()%>/view/console/db/db_edit.jsp', null, 260, 700, query);
 		}
 		
 		function update() {
@@ -191,7 +191,7 @@
 			}
 			
 			var ret = jQuery('#list').jqGrid('getRowData', index);
-			top.openDialog('数据库修改', '<%=request.getContextPath()%>/view/console/msgstorage/msgstorage_edit.jsp', ret, 260, 700, query);					
+			top.openDialog('数据库修改', '<%=request.getContextPath()%>/view/console/db/db_edit.jsp', ret, 260, 700, query);					
 		}
 		
 		function deletes() {
@@ -216,7 +216,7 @@
 			
 			transaction({
 				id: 'DELETES',
-				url: '<%=request.getContextPath()%>/console/msgstorage/deletes',
+				url: '<%=request.getContextPath()%>/console/db/deletes',
 				jsonSet: jsonSet
 			});	
 		}
@@ -247,7 +247,7 @@
 				</colgroup>					
 			    <tr>
 			    	<th><label>编号</label></th>
-			    	<td><input type="text" id="msgStorage_Id" maxlength="20" onkeyup="this.value=this.value.replace(/\D/g,'')"/></td>
+			    	<td><input type="text" id="db_Id" maxlength="20" onkeyup="this.value=this.value.replace(/\D/g,'')"/></td>
 			    	<th><label>数据库名称</label></th>
 			    	<td><input type="text" id="name" maxlength="32"/></td>
 			    	<th><label>系统状态</label></th>
