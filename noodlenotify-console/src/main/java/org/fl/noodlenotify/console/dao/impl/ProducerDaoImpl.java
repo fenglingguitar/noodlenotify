@@ -25,8 +25,6 @@ public class ProducerDaoImpl implements ProducerDao {
 		paramsMap.put("producer_Id", vo.getProducer_Id() != null ? vo.getProducer_Id() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
-		paramsMap.put("check_Type", vo.getCheck_Type() != null ? vo.getCheck_Type() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("producer-query-list", paramsMap, page, rows, ProducerVo.class);
@@ -38,8 +36,6 @@ public class ProducerDaoImpl implements ProducerDao {
 		paramsMap.put("producer_Id", vo.getProducer_Id() != null ? vo.getProducer_Id() : null);
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? vo.getIp() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
-		paramsMap.put("check_Type", vo.getCheck_Type() != null ? vo.getCheck_Type() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("producer-query-list", paramsMap, ProducerVo.class);

@@ -30,8 +30,6 @@
 		<property name="consumerGroupName" value="TestConsumerGroup1" />
 		<property name="consumerClientName" value="TestConsumerClient1" />
 		<property name="localIp" value="127.0.0.1" />
-		<!-- <property name="localPort" value="20501" />
-		<property name="checkPort" value="20641" /> -->
 		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
 		<property name="consumerReceiverMap">
 			<map>

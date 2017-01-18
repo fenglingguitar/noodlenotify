@@ -41,8 +41,6 @@ public class ConsumerGroupDaoImpl implements ConsumerGroupDao {
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
 		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
-		paramsMap.put("check_Type", vo.getCheck_Type() != null ? vo.getCheck_Type() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		paramsMap.put("consumerGroup_Nm", vo.getConsumerGroup_Nm() != null ?  vo.getConsumerGroup_Nm(): null);
@@ -56,8 +54,6 @@ public class ConsumerGroupDaoImpl implements ConsumerGroupDao {
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
 		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
-		paramsMap.put("check_Type", vo.getCheck_Type() != null ? vo.getCheck_Type() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("consumergroup-query-excludelist", paramsMap, page, rows, ConsumerVo.class);

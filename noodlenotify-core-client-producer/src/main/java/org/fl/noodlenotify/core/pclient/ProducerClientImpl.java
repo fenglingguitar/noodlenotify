@@ -18,9 +18,6 @@ public class ProducerClientImpl implements ProducerClient {
 	private String producerClientName;
 	private long moduleId;
 	private String localIp;
-	private int checkPort;
-	private String checkUrl;
-	private String checkType;
 	
 	protected ModuleRegister producerModuleRegister;
 	
@@ -33,7 +30,7 @@ public class ProducerClientImpl implements ProducerClient {
 			producerClientName = NetAddressUtil.getLocalHostName();
 		}
 		localIp = localIp == null ? NetAddressUtil.getLocalIp() : localIp;
-		moduleId = consoleRemotingInvoke.saveProducerRegister(localIp, checkPort, checkUrl, checkType, producerClientName);		
+		moduleId = consoleRemotingInvoke.saveProducerRegister(localIp, producerClientName);		
 
 		producerModuleRegister.setModuleId(moduleId);
 
@@ -71,18 +68,6 @@ public class ProducerClientImpl implements ProducerClient {
 
 	public void setLocalIp(String localIp) {
 		this.localIp = localIp;
-	}
-
-	public void setCheckPort(int checkPort) {
-		this.checkPort = checkPort;
-	}
-
-	public void setCheckUrl(String checkUrl) {
-		this.checkUrl = checkUrl;
-	}
-
-	public void setCheckType(String checkType) {
-		this.checkType = checkType;
 	}
 	
 	public void setModuleId(long moduleId) {

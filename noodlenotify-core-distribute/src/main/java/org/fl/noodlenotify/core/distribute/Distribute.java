@@ -18,7 +18,6 @@ public class Distribute {
 	private String distributeName;
 	private long moduleId;
 	private String localIp;
-	private int checkPort;
 	
 	private ModuleRegister distributeModuleRegister;
 	
@@ -31,7 +30,7 @@ public class Distribute {
 		}
 		localIp = localIp == null ? NetAddressUtil.getLocalIp(): localIp;
 		
-		moduleId = consoleRemotingInvoke.saveDistributerRegister(localIp, checkPort, distributeName);
+		moduleId = consoleRemotingInvoke.saveDistributerRegister(localIp, distributeName);
 		distributeModuleRegister.setModuleId(moduleId);
 
 		connectManagerPool.start();
@@ -52,10 +51,6 @@ public class Distribute {
 
 	public void setLocalIp(String localIp) {
 		this.localIp = localIp;
-	}
-	
-	public void setCheckPort(int checkPort) {
-		this.checkPort = checkPort;
 	}
 	
 	public void setModuleId(long moduleId) {

@@ -65,9 +65,7 @@
 			var notNullArray = [
 			                    'name', 
 			                    'manual_Status', 
-			                    'ip'//,
-			                    //'check_Port',
-			                    //'check_Type'
+			                    'ip'
 			                    ];
 			
 			for (var i=0; i<notNullArray.length; i++) {
@@ -86,16 +84,6 @@
 					return false;
 				}
 			}
-			
-			/* if($("#check_Port").val() !== '' && isNaN($("#check_Port").val())){
-				alert('请输入正确的监测PORT');
-				return false;
-			}
-			
-			if($("#check_Type").val() !== '' && $("#check_Type").val() == 'HTTP' && $("#check_Url").val() == ''){
-				alert('请输入监测Url');
-				return false;
-			} */
 			
 			return true;
 		}
@@ -169,20 +157,8 @@
 				<tr>
 			    	<th><label id="ip_Label">IP</label></th>
 			    	<td><input type="text" id="ip" maxlength="64"/></td>
-					<th><label style="display:none" id="check_Port_Label">监测PORT</label></th>
-			    	<td><input type="hidden" id="check_Port" maxlength="11"/></td>
-				</tr>
-				<tr  style="display:none" >
-			    	<th><label id="check_Url_Label">监测URL</label></th>
-			    	<td><input type="text" id="check_Url" maxlength="32"/></td>
-			    	<th><label id="check_Type_Label">监测类型</label></th>
-			    	<td>
-			    		<select id="check_Type">
-			    			<option value="">--select--</option>
-			    			<option value="NETTY">NETTY</option>
-			    			<option value="HTTP" selected="selected">HTTP</option>
-			    		</select>
-			    	</td>
+					<th><label>&nbsp;</label></th>
+			    	<td>&nbsp;</td>
 				</tr>
 			</table>
 		</div>

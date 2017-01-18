@@ -23,7 +23,6 @@ public class ExchangerMd implements java.io.Serializable {
 	private Integer port;
 	private String url;
 	private String type;
-	private Integer check_Port;
 	private Byte system_Status;
 	private Byte manual_Status;
 	
@@ -83,15 +82,6 @@ public class ExchangerMd implements java.io.Serializable {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-	
-	@Column(name = "CHECK_PORT", nullable = false, length = 8)
-	public Integer getCheck_Port() {
-		return check_Port;
-	}
-
-	public void setCheck_Port(Integer check_Port) {
-		this.check_Port = check_Port;
 	}
 
 	@Column(name = "SYSTEM_STATUS", nullable = false, length = 1)

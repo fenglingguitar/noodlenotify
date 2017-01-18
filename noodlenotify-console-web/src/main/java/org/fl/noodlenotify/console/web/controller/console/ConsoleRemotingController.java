@@ -19,8 +19,8 @@ public class ConsoleRemotingController {
 
 	@RequestMapping(value = "/producerregister")
 	@NoodleResponseBody
-	public long producerRegister(String ip, int checkPort, String checkUrl, String checkType, String name) throws Exception {
-		return consoleRemotingInvoke.saveProducerRegister(ip, checkPort, checkUrl, checkType, name);
+	public long producerRegister(String ip, String name) throws Exception {
+		return consoleRemotingInvoke.saveProducerRegister(ip, name);
 	}
 	
 	@RequestMapping(value = "/producergetexchangers")

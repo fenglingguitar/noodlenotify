@@ -27,7 +27,6 @@
 				e.port,
 				e.url,
 				e.type,
-				e.check_Port,
 				e.system_Status,
 				e.manual_Status
 		FROM 	CSL_EXCHANGER e, CSL_QUEUE_EXCHANGER qe
@@ -46,9 +45,6 @@
 				#end
 				#if($type)
 					AND type = :type
-				#end
-		 		#if($check_Port)
-					AND e.check_Port = :check_Port
 				#end
 		 		#if($system_Status)
 					AND e.system_Status = :system_Status
@@ -70,7 +66,6 @@
 				e.port,
 				e.url,
 				e.type,
-				e.check_Port,
 				e.system_Status,
 				e.manual_Status
 		FROM 	CSL_EXCHANGER e 
@@ -86,9 +81,6 @@
 				#end
 				#if($type)
 					AND type = :type
-				#end
-		 		#if($check_Port)
-					AND e.check_Port = :check_Port
 				#end
 		 		#if($system_Status)
 					AND e.system_Status = :system_Status

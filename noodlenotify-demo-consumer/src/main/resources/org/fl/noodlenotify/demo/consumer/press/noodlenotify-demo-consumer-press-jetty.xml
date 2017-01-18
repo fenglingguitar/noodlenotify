@@ -17,11 +17,8 @@
 	<import resource="classpath:org/fl/noodlenotify/demo/consumer/press/noodlenotify-demo-consumer-press.xml" />
 	<bean id="consumerClientParam" abstract="true">
 		<property name="localPort" value="20502" />
-		<property name="checkPort" value="20642" />
 		<property name="type" value="HTTP"/>
 		<property name="url" value="/noodlenotify"/>
-		<property name="checkType" value="HTTP"/>
-		<property name="checkUrl" value="/noodlenotify"/>
 	</bean>
 	
 </beans>

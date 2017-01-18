@@ -27,8 +27,6 @@ public class ConsumerDaoImpl implements ConsumerDao {
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
 		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
-		paramsMap.put("check_Type", vo.getCheck_Type() != null ? vo.getCheck_Type() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		paramsMap.put("consumerGroup_Nm", vo.getConsumerGroup_Nm() != null ? (new StringBuilder().append("%").append(vo.getConsumerGroup_Nm()).append("%")).toString() : null);
@@ -44,8 +42,6 @@ public class ConsumerDaoImpl implements ConsumerDao {
 		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
 		paramsMap.put("url", vo.getUrl() != null ? vo.getUrl() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
-		paramsMap.put("check_Type", vo.getCheck_Type() != null ? vo.getCheck_Type() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		paramsMap.put("consumerGroup_Nm", vo.getConsumerGroup_Nm());
@@ -61,8 +57,6 @@ public class ConsumerDaoImpl implements ConsumerDao {
 		paramsMap.put("port", vo.getPort() != null? vo.getPort() : null);
 		paramsMap.put("url", vo.getUrl() != null ? vo.getUrl() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
-		paramsMap.put("check_Type", vo.getCheck_Type() != null ? vo.getCheck_Type() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null? vo.getManual_Status() : null);
 		paramsMap.put("consumerGroup_Nm", vo.getConsumerGroup_Nm() != null ? (new StringBuilder().append("%").append(vo.getConsumerGroup_Nm()).append("%")).toString() : null);

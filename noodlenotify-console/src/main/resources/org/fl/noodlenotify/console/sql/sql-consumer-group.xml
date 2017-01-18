@@ -25,9 +25,6 @@
 				c.port,
 				c.url,
 				c.type,
-				c.check_Port,
-				c.check_Url,
-				c.check_Type,
 				c.system_Status,
 				c.manual_Status,
 				c.consumerGroup_Nm
@@ -44,12 +41,6 @@
 				#end
 				#if($type)
 					AND c.type = :type
-				#end
-		 		#if($check_Port)
-					AND c.check_Port = :check_Port
-				#end
-				#if($check_Type)
-					AND c.check_Type = :check_Type
 				#end
 		 		#if($system_Status)
 					AND c.system_Status = :system_Status
@@ -73,9 +64,6 @@
 				c.port,
 				c.url,
 				c.type,
-				c.check_Port,
-				c.check_Url,
-				c.check_Type,
 				c.system_Status,
 				c.manual_Status,
 				c.consumerGroup_Nm
@@ -92,12 +80,6 @@
 				#end
 				#if($type)
 					AND c.type = :type
-				#end
-		 		#if($check_Port)
-					AND c.check_Port = :check_Port
-				#end
-				#if($check_Type)
-					AND c.check_Type = :check_Type
 				#end
 		 		#if($system_Status)
 					AND c.system_Status = :system_Status

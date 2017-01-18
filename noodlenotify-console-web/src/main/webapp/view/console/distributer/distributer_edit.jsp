@@ -65,8 +65,7 @@
 			var notNullArray = [
 			                    'name', 
 			                    'manual_Status', 
-			                    'ip',
-			                    'check_Port'
+			                    'ip'
 			                    ];
 			for (var i=0; i<notNullArray.length; i++) {
 				var id = notNullArray[i];
@@ -83,11 +82,6 @@
 					alert('请输入正确的IP');
 					return false;
 				}
-			}
-			
-			if($("#check_Port").val() !== '' && isNaN($("#check_Port").val())){
-				alert('请输入正确的监测PORT');
-				return false;
 			}
 			
 			return true;
@@ -161,8 +155,8 @@
 				<tr>
 			    	<th><label id="ip_Label">IP</label></th>
 			    	<td><input type="text" id="ip" maxlength="64"/></td>
-			    	<th><label id="check_Port_Label">监测PORT</label></th>
-			    	<td><input type="text" id="check_Port" maxlength="11"/></td>
+			    	<th><label>&nbsp;</label></th>
+			    	<td>&nbsp;</td>
 				</tr>
 			</table>
 		</div>

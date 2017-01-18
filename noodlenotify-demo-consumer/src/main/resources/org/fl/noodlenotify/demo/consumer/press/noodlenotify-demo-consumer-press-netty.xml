@@ -17,9 +17,7 @@
 	<import resource="classpath:org/fl/noodlenotify/demo/consumer/press/noodlenotify-demo-consumer-press.xml" />
 	<bean id="consumerClientParam" abstract="true">
 		<property name="localPort" value="20501" />
-		<property name="checkPort" value="20641" />
 		<property name="type" value="NETTY"/>
-		<property name="checkType" value="NETTY"/>
 	</bean>
 	
 </beans>

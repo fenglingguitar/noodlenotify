@@ -63,9 +63,6 @@
 			   	        '编号',
 						'生产者名称', 
 						'IP',
-						'监测PORT',
-						'监测URL',
-						'监测类型',
 						'系统状态',
 						'控制状态',
 						'心跳时间'
@@ -74,9 +71,6 @@
 					{name:'producer_Id', index:'producer_Id', width:100, align: 'center'},
 					{name:'name', index:'name', width:300, align: 'center'},
 					{name:'ip', index:'ip', width:130, align: 'center'},
-					{name:'check_Port', hidden:true, index:'check_Port', width:100, align: 'center'},
-					{name:'check_Url', hidden:true, index:'check_Url', width:200, align: 'left'},
-					{name:'check_Type', hidden:true, index:'check_Type', width:100, align:'center', formatter:'select', editoptions:{value:'NETTY:NETTY;HTTP:HTTP'}},
 			   		{name:'system_Status', index:'system_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:在线;2:离线'}},
 			   		{name:'manual_Status', index:'manual_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:有效;2:无效'}},
 			   		{name:'beat_Time', index:'beat_Time', width:200, align:'center', formatter:'date', formatoptions:{srcformat:'Y-m-d H:i:s', newformat:'Y-m-d H:i:s'}}
@@ -119,11 +113,6 @@
 				}
 			}
 			
-			if($("#check_Port").val() !== '' && isNaN($("#check_Port").val())){
-				alert('请输入正确的监测PORT');
-				return;
-			}
-			
 			var vo = new Object();
 			$('#form :input').each(function(i){
 				if ($(this).val() != '') {					
@@ -142,7 +131,7 @@
 		}
 		
 		function insert() {
-			top.openDialog('生产者新增', '<%=request.getContextPath()%>/view/console/producer/producer_edit.jsp', null, 260, 700, query);
+			top.openDialog('生产者新增', '<%=request.getContextPath()%>/view/console/producer/producer_edit.jsp', null, 230, 700, query);
 		}
 		
 		function update() {
@@ -160,7 +149,7 @@
 			}
 			
 			var ret = jQuery('#list').jqGrid('getRowData', index);
-			top.openDialog('生产者修改', '<%=request.getContextPath()%>/view/console/producer/producer_edit.jsp', ret, 260, 700, query);					
+			top.openDialog('生产者修改', '<%=request.getContextPath()%>/view/console/producer/producer_edit.jsp', ret, 230, 700, query);					
 		}
 		
 		function deletes() {
@@ -241,16 +230,10 @@
 			    <tr>
 			    	<th><label>IP</label></th>
 			    	<td><input type="text" id="ip" maxlength="64"/></td>
-			    	<th><label style="display:none">监测PORT</label></th>
-			    	<td><input type="hidden" id="check_Port" maxlength="11" /></td>
-			    	<th><label style="display:none">监测类型</label></th>
-			    	<td>
-			    		<select style="display:none" id="check_Type">
-			    			<option value="">--all--</option>
-			    			<option value="NETTY">NETTY</option>
-			    			<option value="HTTP">HTTP</option>
-			    		</select>
-			    	</td>
+			    	<th><label>&nbsp;</label></th>
+			    	<td>&nbsp;</td>
+			    	<th><label>&nbsp;</label></th>
+			    	<td>&nbsp;</td>
 			    	<th><label>&nbsp;</label></th>
 			    	<td>&nbsp;</td>
 			    </tr>

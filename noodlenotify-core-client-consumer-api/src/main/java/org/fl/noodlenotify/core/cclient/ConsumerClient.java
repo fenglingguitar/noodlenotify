@@ -27,9 +27,6 @@ public class ConsumerClient implements NetConnectReceiver {
 	private int localPort;
 	private String url;
 	private String type;
-	private int checkPort;
-	private String checkUrl;
-	private String checkType;
 	
 	private ModuleRegister consumerModuleRegister;
 	
@@ -45,9 +42,7 @@ public class ConsumerClient implements NetConnectReceiver {
 		
 		connectServer.start();
 		
-		moduleId = consoleRemotingInvoke.saveConsumerRegister(localIp, localPort, url, type, checkPort,
-					checkUrl, checkType, consumerClientName, consumerGroupName, 
-					new ArrayList<String>(consumerReceiverMap.keySet()));
+		moduleId = consoleRemotingInvoke.saveConsumerRegister(localIp, localPort, url, type, consumerClientName, consumerGroupName, new ArrayList<String>(consumerReceiverMap.keySet()));
 		consumerModuleRegister.setModuleId(moduleId);
 	}
 	
@@ -98,18 +93,6 @@ public class ConsumerClient implements NetConnectReceiver {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	public void setCheckPort(int checkPort) {
-		this.checkPort = checkPort;
-	}
-	
-	public void setCheckUrl(String checkUrl) {
-		this.checkUrl = checkUrl;
-	}
-
-	public void setCheckType(String checkType) {
-		this.checkType = checkType;
 	}
 
 	public void setModuleId(long moduleId) {

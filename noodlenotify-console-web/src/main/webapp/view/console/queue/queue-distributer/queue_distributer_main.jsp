@@ -94,7 +94,6 @@
 					'分配中心编号',
 					'分配中心名称', 
 					'IP',
-					'监测PORT',
 					'系统状态',
 					'控制状态'
 					],
@@ -103,7 +102,6 @@
 					{name:'distributer_Id', index:'distributer_Id', width:100, align: 'center'},
 					{name:'name', index:'name', width:300, align: 'center'},
 					{name:'ip', index:'ip', width:130, align: 'center'},
-					{name:'check_Port', index:'check_Port', width:100, align: 'center'},
 			   		{name:'system_Status', index:'system_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:在线;2:离线'}},
 			   		{name:'manual_Status', index:'manual_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:有效;2:无效'}}
 			   	],
@@ -138,7 +136,6 @@
 						'分配中心编号',
 						'分配中心名称', 
 						'IP',
-						'监测PORT',
 						'系统状态',
 						'控制状态'
 					],
@@ -146,7 +143,6 @@
 					{name:'distributer_Id', index:'distributer_Id', width:100, align: 'center'},
 					{name:'name', index:'name', width:300, align: 'center'},
 					{name:'ip', index:'ip', width:130, align: 'center'},
-					{name:'check_Port', index:'check_Port', width:100, align: 'center'},
 			   		{name:'system_Status', index:'system_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:在线;2:离线'}},
 			   		{name:'manual_Status', index:'manual_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:有效;2:无效'}}
 			   	],
@@ -197,11 +193,6 @@
 				}
 			}
 			
-			if($("#check_Port_left").val() !== '' && isNaN($("#check_Port_left").val())){
-				alert('左侧请输入正确的监测PORT');
-				return;
-			}
-			
 			var vo = new Object();
 			$('#form_left :input').each(function(i){
 				if ($(this).val() != '') {					
@@ -225,11 +216,6 @@
 					alert('右侧请输入正确的IP');
 					return;
 				}
-			}
-			
-			if($("#check_Port").val() !== '' && isNaN($("#check_Port").val())){
-				alert('右侧请输入正确的监测PORT');
-				return;
 			}
 			
 			vo = new Object();
@@ -353,8 +339,8 @@
 							    <tr>
 							    	<th><label>IP</label></th>
 							    	<td><input type="text" id="ip_left" maxlength="64"/></td>
-							    	<th><label>监测PORT</label></th>
-							    	<td><input type="text" id="check_Port_left" maxlength="11"/></td>
+							    	<th><label>&nbsp;</label></th>
+			    					<td>&nbsp;</td>
 								</tr>
 							</table>
 						</div>
@@ -411,12 +397,6 @@
 							    	</td>
 							    	<th><label>IP</label></th>
 							    	<td><input type="text" id="ip" maxlength="64"/></td>
-								</tr>
-							    <tr>
-							    	<th><label>监测PORT</label></th>
-							    	<td><input type="text" id="check_Port" maxlength="11"/></td>
-							    	<th><label>&nbsp;</label></th>
-							    	<td>&nbsp;</td>
 								</tr>
 							</table>
 						</div>

@@ -28,8 +28,7 @@ public class Exchange implements NetConnectReceiver {
 	private String localIp;
 	private int localPort;
 	private String url;
-	private String type; 
-	private int checkPort;
+	private String type;
 	
 	private long sizeLimit = 8192;
 	
@@ -49,7 +48,7 @@ public class Exchange implements NetConnectReceiver {
 		
 		connectServer.start();
 		
-		moduleId = consoleRemotingInvoke.saveExchangerRegister(localIp, localPort, url, type, checkPort, exchangeName);
+		moduleId = consoleRemotingInvoke.saveExchangerRegister(localIp, localPort, url, type, exchangeName);
 		exchangeModuleRegister.setModuleId(moduleId);
 
 		connectManagerPool.start();
@@ -120,10 +119,6 @@ public class Exchange implements NetConnectReceiver {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-	
-	public void setCheckPort(int checkPort) {
-		this.checkPort = checkPort;
 	}
 	
 	public void setModuleId(long moduleId) {

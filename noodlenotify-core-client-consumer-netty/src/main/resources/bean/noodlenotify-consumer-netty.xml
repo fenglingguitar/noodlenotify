@@ -39,7 +39,6 @@
 	
 	<bean id="consumerClientPortCommonAbstract" abstract="true" parent="consumerClientAbstract" >
 		<property name="localPort" value="${noodlenotify.consumer.local.port}" />
-		<property name="checkPort" value="${noodlenotify.consumer.check.port}" />
 	</bean>
 	
 	<bean id="consumerClientPortAbstract" abstract="true" parent="consumerClientPortCommonAbstract" />
@@ -49,7 +48,6 @@
 			depends-on="consumerNettyNetConnectReceiveServer"
 			parent="consumerClientPortAbstract">
 		<property name="type" value="NETTY"/>
-		<property name="checkType" value="NETTY"/>
 		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
 	</bean>
     

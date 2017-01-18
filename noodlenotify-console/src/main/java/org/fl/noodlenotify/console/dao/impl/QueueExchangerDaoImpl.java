@@ -42,7 +42,6 @@ public class QueueExchangerDaoImpl implements QueueExchangerDao {
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
 		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
@@ -56,7 +55,6 @@ public class QueueExchangerDaoImpl implements QueueExchangerDao {
 		paramsMap.put("name", vo.getName() != null ? (new StringBuilder().append("%").append(vo.getName()).append("%")).toString() : null);
 		paramsMap.put("ip", vo.getIp() != null ? (new StringBuilder().append("%").append(vo.getIp()).append("%")).toString() : null);
 		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);

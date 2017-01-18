@@ -19,7 +19,6 @@
 	<bean id="exchangeParam" abstract="true">
 		<property name="exchangeName" value="TestExchange-Netty" />
 		<property name="localPort" value="20101" />
-		<property name="checkPort" value="20621" />
 		<property name="type" value="NETTY"/>
 	</bean>
 

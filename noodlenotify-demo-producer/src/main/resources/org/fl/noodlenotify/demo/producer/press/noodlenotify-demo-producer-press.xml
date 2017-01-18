@@ -26,9 +26,6 @@
 	<bean id="producerClient" class="org.fl.noodlenotify.core.pclient.ProducerClientImpl"
 			init-method="start" destroy-method="destroy" >
 		<property name="localIp" value="127.0.0.1" />
-		<property name="checkPort" value="20611" />
-		<property name="checkUrl" value="/noodlenotify"/>
-		<property name="checkType" value="HTTP"/>
 		<property name="producerClientName" value="TestProducerClient1" />
 		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
 		<property name="connectManagerPool" ref="connectManagerPool" />

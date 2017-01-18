@@ -66,8 +66,7 @@
 			                    'name', 
 			                    'manual_Status', 
 			                    'ip',
-			                    'port',
-			                    'check_Port'
+			                    'port'
 			                    ];
 			for (var i=0; i<notNullArray.length; i++) {
 				var id = notNullArray[i];
@@ -91,10 +90,6 @@
 				return false;
 			}
 			
-			if($("#check_Port").val() !== '' && isNaN($("#check_Port").val())){
-				alert('请输入正确的监测PORT');
-				return false;
-			}
 			return true;
 		}
 		
@@ -181,12 +176,6 @@
 			    			<option value="HTTP">HTTP</option>
 			    		</select>
 			    	</td>
-				</tr>
-				<tr>
-			    	<th><label id="check_Port_Label">监测PORT</label></th>
-			    	<td><input type="text" id="check_Port" maxlength="11"/></td>
-			    	<th>&nbsp;</th>
-					<td>&nbsp;</td>
 				</tr>
 			</table>
 		</div>

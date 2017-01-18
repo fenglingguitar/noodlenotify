@@ -25,9 +25,6 @@ public class ConsumerMd implements java.io.Serializable {
 	private Integer port;
 	private String url;
 	private String type;
-	private Integer check_Port;
-	private String check_Url;
-	private String check_Type;
 	private Byte system_Status;
 	private Byte manual_Status;
 	private ConsumerGroupMd consumerGroupMd;
@@ -88,33 +85,6 @@ public class ConsumerMd implements java.io.Serializable {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	@Column(name = "CHECK_PORT", nullable = false, length = 8)
-	public Integer getCheck_Port() {
-		return check_Port;
-	}
-
-	public void setCheck_Port(Integer check_Port) {
-		this.check_Port = check_Port;
-	}
-
-	@Column(name = "CHECK_URL", nullable = true, length = 512)
-	public String getCheck_Url() {
-		return check_Url;
-	}
-
-	public void setCheck_Url(String check_Url) {
-		this.check_Url = check_Url;
-	}
-
-	@Column(name = "CHECK_TYPE", nullable = false, length = 32)
-	public String getCheck_Type() {
-		return check_Type;
-	}
-
-	public void setCheck_Type(String check_Type) {
-		this.check_Type = check_Type;
 	}
 
 	@Column(name = "SYSTEM_STATUS", nullable = false, length = 1)

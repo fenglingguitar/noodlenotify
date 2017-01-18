@@ -28,7 +28,6 @@ public class ExchangerDaoImpl implements ExchangerDao {
 		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
 		paramsMap.put("url", vo.getUrl() != null ? vo.getUrl() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryPage("exchanger-query-list", paramsMap, page, rows, ExchangerVo.class);
@@ -43,7 +42,6 @@ public class ExchangerDaoImpl implements ExchangerDao {
 		paramsMap.put("port", vo.getPort() != null ? vo.getPort() : null);
 		paramsMap.put("url", vo.getUrl() != null ? vo.getUrl() : null);
 		paramsMap.put("type", vo.getType() != null ? vo.getType() : null);
-		paramsMap.put("check_Port", vo.getCheck_Port() != null ? vo.getCheck_Port() : null);
 		paramsMap.put("system_Status", vo.getSystem_Status() != null ? vo.getSystem_Status() : null);
 		paramsMap.put("manual_Status", vo.getManual_Status() != null ? vo.getManual_Status() : null);
 		return dynamicSqlTemplate.queryList("exchanger-query-list", paramsMap, ExchangerVo.class);

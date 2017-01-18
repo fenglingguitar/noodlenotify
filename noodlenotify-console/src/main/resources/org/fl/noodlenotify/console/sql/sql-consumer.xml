@@ -9,9 +9,6 @@
 				port,
 				url,
 				type,
-				check_Port,
-				check_Url,
-				check_Type,
 				system_Status,
 				manual_Status,
 				consumerGroup_Nm,
@@ -35,12 +32,6 @@
 				#end
 				#if($url)
 					AND url = :url
-				#end
-		 		#if($check_Port)
-					AND check_Port = :check_Port
-				#end
-				#if($check_Type)
-					AND check_Type = :check_Type
 				#end
 		 		#if($system_Status)
 					AND system_Status = :system_Status
@@ -67,9 +58,6 @@
 				port,
 				url,
 				type,
-				check_Port,
-				check_Url,
-				check_Type,
 				system_Status,
 				manual_Status,
 				consumerGroup_Nm,
@@ -90,12 +78,6 @@
 				#end
 				#if($type)
 					AND type = :type
-				#end
-		 		#if($check_Port)
-					AND check_Port = :check_Port
-				#end
-				#if($check_Type)
-					AND check_Type = :check_Type
 				#end
 		 		#if($system_Status)
 					AND system_Status = :system_Status
@@ -132,9 +114,6 @@
 				port,
 				url,
 				type,
-				check_Port,
-				check_Url,
-				check_Type,
 				system_Status,
 				manual_Status,
 				consumerGroup_Nm,
@@ -156,9 +135,6 @@
 				port,
 				url,
 				type,
-				check_Port,
-				check_Url,
-				check_Type,
 				system_Status,
 				manual_Status,
 				consumerGroup_Nm,

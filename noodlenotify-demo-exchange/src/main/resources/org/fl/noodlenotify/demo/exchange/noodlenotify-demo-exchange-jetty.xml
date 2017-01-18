@@ -19,7 +19,6 @@
 	<bean id="exchangeParam" abstract="true">
 		<property name="exchangeName" value="TestExchange-Jetty" />
 		<property name="localPort" value="20102" />
-		<property name="checkPort" value="20622" />
 		<property name="url" value="/noodlenotify"/>
 		<property name="type" value="HTTP"/>
 	</bean>

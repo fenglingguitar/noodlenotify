@@ -31,21 +31,15 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 	@Test
 	public void testSaveProducerRegist() throws Exception {
 		String ip = "127.0.0.1";
-		int checkPort = 123;
-		String checkUrl = "test/test";
-		String checkType = "NETTY";
 		String name = "生产者-注册-test";
-		remotingInvoke.saveProducerRegister(ip, checkPort, checkUrl, checkType, name);
+		remotingInvoke.saveProducerRegister(ip, name);
 	}
 
 	@Test
 	public void testSaveProducerCancel() throws Exception {
 		String ip = "127.0.0.1";
-		int checkPort = 123;
-		String checkUrl = "test/test";
-		String checkType = "NETTY";
 		String name = "生产者-注册-test";
-		remotingInvoke.saveProducerCancel(remotingInvoke.saveProducerRegister(ip, checkPort, checkUrl, checkType, name));
+		remotingInvoke.saveProducerCancel(remotingInvoke.saveProducerRegister(ip, name));
 	}
 
 	@Test
@@ -54,9 +48,8 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 		int port = 123453;
 		String url = "test/test";
 		String type = "NETTY";
-		int checkPort = 123;
 		String name = "交换器-注册-test";
-		remotingInvoke.saveExchangerRegister(ip, port, url, type, checkPort, name);
+		remotingInvoke.saveExchangerRegister(ip, port, url, type, name);
 	}
 
 	@Test
@@ -65,25 +58,22 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 		int port = 123453;
 		String url = "test/test";
 		String type = "NETTY";
-		int checkPort = 123;
 		String name = "交换器-注册-test";
-		remotingInvoke.saveExchangerCancel(remotingInvoke.saveExchangerRegister(ip, port, url, type, checkPort, name));
+		remotingInvoke.saveExchangerCancel(remotingInvoke.saveExchangerRegister(ip, port, url, type, name));
 	}
 
 	@Test
 	public void testSaveDistributerRegist() throws Exception {
 		String ip = "127.0.0.1";
-		int checkPort = 123;
 		String name = "分配器-注册-test";
-		remotingInvoke.saveDistributerRegister(ip, checkPort, name);
+		remotingInvoke.saveDistributerRegister(ip, name);
 	}
 
 	@Test
 	public void testSaveDistributerCancel() throws Exception {
 		String ip = "127.0.0.1";
-		int checkPort = 123;
 		String name = "分配器-注册-test";
-		remotingInvoke.saveDistributerCancel(remotingInvoke.saveDistributerRegister(ip, checkPort, name));
+		remotingInvoke.saveDistributerCancel(remotingInvoke.saveDistributerRegister(ip, name));
 	}
 
 	@Test
@@ -92,14 +82,11 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 		int port = 12345;
 		String url = "test/test";
 		String type = "NETTY";
-		int checkPort = 123;
-		String checkUrl = "test/test";
-		String checkType = "NETTY";
 		String name = "消费者-注册-test";
 		String consumerGroupName = "TestConsumerGroup1";
 		List<String> queueNameList = new ArrayList<String>();
 		queueNameList.add("TestQueue1");
-		remotingInvoke.saveConsumerRegister(ip, port, url, type, checkPort, checkUrl, checkType, name, consumerGroupName, queueNameList);
+		remotingInvoke.saveConsumerRegister(ip, port, url, type, name, consumerGroupName, queueNameList);
 	}
 
 	@Test
@@ -108,14 +95,11 @@ public class ConsoleRemotingInvokeTest extends AbstractJUnit4SpringContextTests 
 		int port = 12345;
 		String url = "test/test";
 		String type = "NETTY";
-		int checkPort = 123;
-		String checkUrl = "test/test";
-		String checkType = "NETTY";
 		String name = "消费者-注册-test";
 		String consumerGroupName = "TestConsumerGroup1";
 		List<String> queueNameList = new ArrayList<String>();
 		queueNameList.add("TestQueue1");
-		remotingInvoke.saveConsumerCancel(remotingInvoke.saveConsumerRegister(ip, port, url, type, checkPort, checkUrl, checkType, name, consumerGroupName, queueNameList));
+		remotingInvoke.saveConsumerCancel(remotingInvoke.saveConsumerRegister(ip, port, url, type, name, consumerGroupName, queueNameList));
 	}
 
 	@Test

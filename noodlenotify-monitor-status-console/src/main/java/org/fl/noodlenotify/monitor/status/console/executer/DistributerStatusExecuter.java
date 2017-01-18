@@ -1,13 +1,9 @@
 package org.fl.noodlenotify.monitor.status.console.executer;
 
-import java.util.List;
 import java.util.Map;
 
 import org.fl.noodle.common.monitor.executer.AbstractExecuter;
-import org.fl.noodlenotify.console.constant.ConsoleConstants;
 import org.fl.noodlenotify.console.service.DistributerService;
-import org.fl.noodlenotify.console.vo.DistributerVo;
-import org.fl.noodlenotify.core.connect.net.NetStatusChecker;
 import org.fl.noodlenotify.core.status.StatusCheckerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,7 +20,7 @@ public class DistributerStatusExecuter extends AbstractExecuter {
 	@Override
 	public void execute() throws Exception {
 
-		DistributerVo distributerVoParam = new DistributerVo();
+		/*DistributerVo distributerVoParam = new DistributerVo();
 		distributerVoParam.setManual_Status(ConsoleConstants.MANUAL_STATUS_VALID);
 		List<DistributerVo> distributerVoList = distributerService.queryDistributerList(distributerVoParam);
 		for (DistributerVo distributerVo : distributerVoList) {
@@ -46,7 +42,7 @@ public class DistributerStatusExecuter extends AbstractExecuter {
 					distributerService.updateDistributerSystemStatus(currentDistributerVo);
 				}
 			}
-		}
+		}*/
 	}
 	
 	public void setStatusCheckerFactoryMap(Map<String, StatusCheckerFactory> statusCheckerFactoryMap) {

@@ -12,9 +12,6 @@ public class ConsumerVo implements java.io.Serializable {
 	private Integer port;
 	private String url;
 	private String type;
-	private Integer check_Port;
-	private String check_Url;
-	private String check_Type;
 	private Byte system_Status;
 	private Byte manual_Status;
 	private String consumerGroup_Nm;
@@ -67,30 +64,6 @@ public class ConsumerVo implements java.io.Serializable {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	public Integer getCheck_Port() {
-		return check_Port;
-	}
-
-	public void setCheck_Port(Integer check_Port) {
-		this.check_Port = check_Port;
-	}
-
-	public String getCheck_Url() {
-		return check_Url;
-	}
-
-	public void setCheck_Url(String check_Url) {
-		this.check_Url = check_Url;
-	}
-
-	public String getCheck_Type() {
-		return check_Type;
-	}
-
-	public void setCheck_Type(String check_Type) {
-		this.check_Type = check_Type;
 	}
 
 	public Byte getSystem_Status() {

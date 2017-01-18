@@ -91,11 +91,10 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	private MsgQueueCacheDao msgQueueCacheDao;
 	
 	@Override
-	public long saveProducerRegister(String ip, int checkPort, String checkUrl, String checkType, String name) throws Exception {
+	public long saveProducerRegister(String ip, String name) throws Exception {
 		
 		ProducerVo producerVo = new ProducerVo();
 		producerVo.setIp(ip);
-		producerVo.setCheck_Port(checkPort);
 		List<ProducerVo> producerList = producerDao.queryProducerList(producerVo);
 		if (producerList == null || producerList.size() == 0) {
 			producerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
@@ -104,8 +103,6 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 			producerVo = producerList.get(0);
 		}
 		producerVo.setName(name);
-		producerVo.setCheck_Url(checkUrl);
-		producerVo.setCheck_Type(checkType);
 		ProducerMd producerMd = producerDao.insertOrUpdate(producerVo);
 
 		return producerMd.getProducer_Id();
@@ -120,10 +117,11 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	}
 
 	@Override
-	public long saveExchangerRegister(String ip, int port, String url, String type, int checkPort, String name) throws Exception {
+	public long saveExchangerRegister(String ip, int port, String url, String type, String name) throws Exception {
 		ExchangerVo exchangerVo = new ExchangerVo();
 		exchangerVo.setIp(ip);
-		exchangerVo.setCheck_Port(checkPort);
+		exchangerVo.setPort(port);
+		exchangerVo.setUrl(url);
 		List<ExchangerVo> exchangerList = exchangerDao.queryExchangerList(exchangerVo);
 		if (exchangerList == null || exchangerList.size() == 0) {
 			exchangerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
@@ -131,8 +129,6 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 		} else {
 			exchangerVo = exchangerList.get(0);
 		}
-		exchangerVo.setPort(port);
-		exchangerVo.setUrl(url);
 		exchangerVo.setType(type);
 		exchangerVo.setName(name);
 		ExchangerMd exchangerMd = exchangerDao.insertOrUpdate(exchangerVo);
@@ -149,10 +145,10 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	}
 
 	@Override
-	public long saveDistributerRegister(String ip, int checkPort, String name) throws Exception {
+	public long saveDistributerRegister(String ip, String name) throws Exception {
 		DistributerVo distributerVo = new DistributerVo();
 		distributerVo.setIp(ip);
-		distributerVo.setCheck_Port(checkPort);
+		distributerVo.setName(name);
 		List<DistributerVo> distributerList = distributerDao.queryDistributerList(distributerVo);
 		if (distributerList == null || distributerList.size() == 0) {
 			distributerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
@@ -160,7 +156,6 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 		} else {
 			distributerVo = distributerList.get(0);
 		}
-		distributerVo.setName(name);
 		DistributerMd distributerMd = distributerDao.insertOrUpdate(distributerVo);
 
 		return distributerMd.getDistributer_Id();
@@ -175,10 +170,11 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 	}
 
 	@Override
-	public long saveConsumerRegister(String ip, int port, String url, String type, int checkPort, String checkUrl, String checkType, String name, String consumerGroupName, List<String> queueNameList) throws Exception {
+	public long saveConsumerRegister(String ip, int port, String url, String type, String name, String consumerGroupName, List<String> queueNameList) throws Exception {
 		ConsumerVo consumerVo = new ConsumerVo();
 		consumerVo.setIp(ip);
-		consumerVo.setCheck_Port(checkPort);
+		consumerVo.setPort(port);
+		consumerVo.setUrl(url);
 		List<ConsumerVo> exchangerList = consumerDao.queryConsumerList(consumerVo);
 		if (exchangerList == null || exchangerList.size() == 0) {
 			consumerVo.setSystem_Status(ConsoleConstants.SYSTEM_STATUS_OFF_LINE);
@@ -187,11 +183,7 @@ public class ConsoleRemotingInvokeServiceImpl implements ConsoleRemotingInvoke {
 			consumerVo = exchangerList.get(0);
 		}
 		consumerVo.setName(name);
-		consumerVo.setPort(port);
-		consumerVo.setUrl(url);
 		consumerVo.setType(type);
-		consumerVo.setCheck_Url(checkUrl);
-		consumerVo.setCheck_Type(checkType);
 		consumerVo.setConsumerGroup_Nm(consumerGroupName);
 		ConsumerMd consumerMd = consumerDao.insertOrUpdate(consumerVo);
 		QueueConsumerVo queueConsumerDeleteVo = new QueueConsumerVo();

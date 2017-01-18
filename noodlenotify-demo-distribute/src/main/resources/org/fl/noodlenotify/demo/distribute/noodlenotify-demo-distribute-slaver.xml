@@ -16,7 +16,6 @@
 	
 	<bean id="distributeParam" abstract="true">
 		<property name="distributeName" value="TestDistribute-Slaver" />
-		<property name="checkPort" value="20632" />
 	</bean>
 
 </beans>

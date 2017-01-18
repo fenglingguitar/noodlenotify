@@ -9,7 +9,6 @@ public class QueueDistributerVo implements java.io.Serializable {
 	private String name;
 	private String ip;
 	private Integer port;
-	private Integer check_Port;
 	private Byte system_Status;
 	private Byte manual_Status;
 	private Byte is_Repeat;
@@ -61,15 +60,7 @@ public class QueueDistributerVo implements java.io.Serializable {
 	public void setPort(Integer port) {
 		this.port = port;
 	}
-
-	public Integer getCheck_Port() {
-		return check_Port;
-	}
-
-	public void setCheck_Port(Integer check_Port) {
-		this.check_Port = check_Port;
-	}
-
+	
 	public Byte getSystem_Status() {
 		return system_Status;
 	}

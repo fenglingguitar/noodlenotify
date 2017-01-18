@@ -67,9 +67,7 @@
 			                    'manual_Status', 
 			                    'ip',
 			                    'port',
-			                    'check_Port',
-			                    'type',
-			                    'check_Type'
+			                    'type'
 			                    ];
 			
 			for (var i=0; i<notNullArray.length; i++) {
@@ -94,11 +92,6 @@
 				return false;
 			}
 			
-			if($("#check_Port").val() !== '' && isNaN($("#check_Port").val())){
-				alert('请输入正确的监测PORT');
-				return false;
-			}
-			
 			if($("#consumerGroup_Nm").val() !== ''){
 				var reg = /^(\d|[a-z|A-Z])+$/;
 				var r = $("#consumerGroup_Nm").val().match(reg); 
@@ -110,11 +103,6 @@
 			
 			if($("#type").val() !== '' && $("#type").val() == 'HTTP' && $("#url").val() == ''){
 				alert('请输入URL');
-				return false;
-			}
-			
-			if($("#check_Type").val() !== '' && $("#check_Type").val() == 'HTTP' && $("#check_Url").val() == ''){
-				alert('请输入监测Url');
 				return false;
 			}
 			
@@ -204,22 +192,10 @@
 			    	</td>
 				</tr>
 				<tr>
-					<th><label id="check_Port_Label">监测PORT</label></th>
-				    <td><input type="text" id="check_Port" maxlength="11"/></td>
-			    	<th><label id="check_Url_Label">监测URL</label></th>
-			    	<td><input type="text" id="check_Url" maxlength="512"/></td>
-				</tr>
-				<tr>
-					<th><label id="check_Type_Label">监测类型</label></th>
-			    	<td>
-			    		<select id="check_Type">
-			    			<option value="">--select--</option>
-			    			<option value="NETTY">NETTY</option>
-			    			<option value="HTTP">HTTP</option>
-			    		</select>
-			    	</td>
 			    	<th><label id="consumerGroup_Nm_Label">消费组名称</label></th>
 			    	<td><input type="text" id="consumerGroup_Nm" maxlength="32"/></td>
+			    	<th><label>&nbsp;</label></th>
+			    	<td>&nbsp;</td>
 				</tr>
 			</table>
 		</div>

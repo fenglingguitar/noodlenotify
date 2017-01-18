@@ -60,8 +60,6 @@
 	
 	<bean id="producerClient" class="org.fl.noodlenotify.core.pclient.ProducerClientImpl"
 			init-method="start" destroy-method="destroy">
-		<property name="checkUrl" value="/noodlenotify"/>
-		<property name="checkType" value="HTTP"/>
 		<property name="netConnectManager" ref="netConnectManager" />
 		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
     </bean>

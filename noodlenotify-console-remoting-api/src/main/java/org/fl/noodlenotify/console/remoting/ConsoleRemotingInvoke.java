@@ -12,19 +12,19 @@ import org.fl.noodlenotify.console.vo.QueueMsgStorageVo;
 
 public interface ConsoleRemotingInvoke {
 
-	public long saveProducerRegister(String ip, int checkPort, String checkUrl, String checkType, String name) throws Exception;
+	public long saveProducerRegister(String ip, String name) throws Exception;
 
 	public void saveProducerCancel(long producerId) throws Exception;
 
-	public long saveExchangerRegister(String ip, int port, String url, String type, int checkPort, String name) throws Exception;
+	public long saveExchangerRegister(String ip, int port, String url, String type, String name) throws Exception;
 
 	public void saveExchangerCancel(long exchangerId) throws Exception;
 
-	public long saveDistributerRegister(String ip, int checkPort, String name) throws Exception;
+	public long saveDistributerRegister(String ip, String name) throws Exception;
 
 	public void saveDistributerCancel(long distributerId) throws Exception;
 
-	public long saveConsumerRegister(String ip, int port, String url, String type, int checkPort, String check_Url, String check_Type, String name, String consumerGroupName, List<String> queueNameList) throws Exception;
+	public long saveConsumerRegister(String ip, int port, String url, String type, String name, String consumerGroupName, List<String> queueNameList) throws Exception;
 
 	public void saveConsumerCancel(long consumerId) throws Exception;
 

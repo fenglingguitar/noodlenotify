@@ -7,7 +7,6 @@
 				name,
 				ip,
 				port,
-				check_Port,
 				system_Status,
 				manual_Status
 		FROM 	CSL_DISTRIBUTER
@@ -23,9 +22,6 @@
 				#end
 		 		#if($port)
 					AND port = :port
-				#end
-		 		#if($check_Port)
-					AND check_Port = :check_Port
 				#end
 		 		#if($system_Status)
 					AND system_Status = :system_Status

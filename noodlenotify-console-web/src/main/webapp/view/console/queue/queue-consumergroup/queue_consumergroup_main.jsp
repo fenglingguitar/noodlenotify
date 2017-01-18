@@ -137,9 +137,6 @@
 									'PORT',
 									'URL',
 									'类型',
-									'监测PORT',
-									'监测URL',
-									'监测类型',
 									'系统状态',
 									'控制状态',
 									'消费组名称'
@@ -151,9 +148,6 @@
 								{name:'port', index:'port', width:100, align: 'center'},
 								{name:'url', index:'url', width:200, align: 'left'},
 								{name:'type', index:'type', width:100, align: 'center', formatter:'select', editoptions:{value:'NETTY:NETTY;HTTP:HTTP'}},
-								{name:'check_Port', index:'check_Port', width:100, align: 'center'},
-								{name:'check_Url', index:'check_Url', width:200, align: 'left'},
-								{name:'check_Type', index:'check_Type', width:100, align:'center', formatter:'select', editoptions:{value:'NETTY:NETTY;HTTP:HTTP'}},
 						   		{name:'system_Status', index:'system_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:在线;2:离线'}},
 						   		{name:'manual_Status', index:'manual_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:有效;2:无效'}},
 						   		{name:'consumerGroup_Nm', index:'consumerGroup_Nm', width:400, align: 'center'}
@@ -226,9 +220,6 @@
 									'PORT',
 									'URL',
 									'类型',
-									'监测PORT',
-									'监测URL',
-									'监测类型',
 									'系统状态',
 									'控制状态',
 									'消费组名称'
@@ -240,9 +231,6 @@
 								{name:'port', index:'port', width:100, align: 'center'},
 								{name:'url', index:'url', width:200, align: 'left'},
 								{name:'type', index:'type', width:100, align: 'center', formatter:'select', editoptions:{value:'NETTY:NETTY;HTTP:HTTP'}},
-								{name:'check_Port', index:'check_Port', width:100, align: 'center'},
-								{name:'check_Url', index:'check_Url', width:200, align: 'left'},
-								{name:'check_Type', index:'check_Type', width:100, align:'center', formatter:'select', editoptions:{value:'NETTY:NETTY;HTTP:HTTP'}},
 						   		{name:'system_Status', index:'system_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:在线;2:离线'}},
 						   		{name:'manual_Status', index:'manual_Status', width:100, align:'center', formatter:'select', editoptions:{value:'1:有效;2:无效'}},
 						   		{name:'consumerGroup_Nm', index:'consumerGroup_Nm', width:400, align: 'center'}
