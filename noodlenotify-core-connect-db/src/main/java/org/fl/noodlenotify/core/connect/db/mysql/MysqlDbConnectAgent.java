@@ -179,22 +179,12 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 		sqLockTableStringBuilder.append("	`IP` char(16) NULL,");
 		sqLockTableStringBuilder.append("	PRIMARY KEY (`ID`)");
 		sqLockTableStringBuilder.append(") ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;");
-		
-		/*StringBuilder sqLocklInsertTableStringBuilder = new StringBuilder();
-		sqLocklInsertTableStringBuilder.append("INSERT INTO MSG_");
-		sqLocklInsertTableStringBuilder.append(queueName.toUpperCase().replace(".", "_"));
-		sqLocklInsertTableStringBuilder.append("_LK ");
-		sqLocklInsertTableStringBuilder.append("SELECT 1 AS ID, 0 AS OVERTIME, 0 AS SET_ID FROM DUAL ");
-		sqLocklInsertTableStringBuilder.append("WHERE (SELECT COUNT(*) FROM MSG_");
-		sqLocklInsertTableStringBuilder.append(queueName.toUpperCase().replace(".", "_"));
-		sqLocklInsertTableStringBuilder.append("_LK) = 0");*/
 				
 		try {
 			jdbcTemplate.update(sqlContentTableStringBuilder.toString());
 			jdbcTemplate.update(sqlTableStringBuilder.toString());
 			jdbcTemplate.update(sqlBackupTableStringBuilder.toString());
 			jdbcTemplate.update(sqLockTableStringBuilder.toString());
-			//jdbcTemplate.update(sqLocklInsertTableStringBuilder.toString());
 		} catch (RecoverableDataAccessException e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("CreateTable -> " 
@@ -514,9 +504,9 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 		}
 		final String sqlFinal = sql;
 		
-		long count = 0;
+		Long count;
 		try {
-			count = jdbcTemplate.queryForLong(sqlFinal, new Object[] {
+			count = jdbcTemplate.queryForObject(sqlFinal, Long.class, new Object[] {
 					start,
 					end,
 					status
@@ -540,7 +530,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			}
 			throw e;
 		}
-		return count;
+		return count != null ? count : 0;
 	}
 	
 	@Override
@@ -659,9 +649,9 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			maxIdSqlMap.putIfAbsent(queueName, sql);
 		}
 		final String sqlFinal = sql;
-		long maxId = 0;
+		Long maxId;
 		try {
-			maxId = jdbcTemplate.queryForLong(sqlFinal);
+			maxId = jdbcTemplate.queryForObject(sqlFinal, Long.class);
 		} catch (RecoverableDataAccessException e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("MaxId -> " 
@@ -681,7 +671,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			}
 			throw e;
 		}
-		return maxId;
+		return maxId != null ? maxId : 0;
 	}
 	
 	@Override
@@ -693,9 +683,9 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			maxIdDelaySqlMap.putIfAbsent(queueName, sql);
 		}
 		final String sqlFinal = sql;
-		long maxId = 0;
+		Long maxId;
 		try {
-			maxId = jdbcTemplate.queryForLong(sqlFinal, delay);
+			maxId = jdbcTemplate.queryForObject(sqlFinal, Long.class, delay);
 		} catch (RecoverableDataAccessException e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("MaxIdDelay -> " 
@@ -715,7 +705,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			}
 			throw e;
 		}
-		return maxId;
+		return maxId != null ? maxId : 0;
 	}
 
 	@Override
@@ -727,9 +717,9 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			minIdSqlMap.putIfAbsent(queueName, sql);
 		}
 		final String sqlFinal = sql;
-		long minId = 0;
+		Long minId;
 		try {
-			minId = jdbcTemplate.queryForLong(sqlFinal);
+			minId = jdbcTemplate.queryForObject(sqlFinal, Long.class);
 		} catch (RecoverableDataAccessException e) {	
 			if (logger.isErrorEnabled()) {
 				logger.error("MinId -> " 
@@ -749,7 +739,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			}
 			throw e;
 		} 
-		return minId;
+		return minId != null ? minId : 0;
 	}
 	
 	@Override
@@ -761,9 +751,9 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			minUnFinishIdSqlMap.putIfAbsent(queueName, sql);
 		}
 		final String sqlFinal = sql;
-		long minUnFinishId = 0;
+		Long minUnFinishId;
 		try {
-			minUnFinishId = jdbcTemplate.queryForLong(sqlFinal, new Object[] {
+			minUnFinishId = jdbcTemplate.queryForObject(sqlFinal, Long.class, new Object[] {
 					MessageConstant.MESSAGE_STATUS_FINISH
 			});
 		} catch (RecoverableDataAccessException e) {	
@@ -785,7 +775,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			}
 			throw e;
 		}
-		return minUnFinishId;
+		return minUnFinishId != null ? minUnFinishId : 0;
 	}
 	
 	@Override
@@ -797,9 +787,9 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			minIdByStatusSqlMap.putIfAbsent(queueName, sql);
 		}
 		final String sqlFinal = sql;
-		long minId = 0;
+		Long minId;
 		try {
-			minId = jdbcTemplate.queryForLong(sqlFinal, new Object[] {
+			minId = jdbcTemplate.queryForObject(sqlFinal, Long.class, new Object[] {
 					status
 			});
 		} catch (RecoverableDataAccessException e) {	
@@ -823,7 +813,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			}
 			throw e;
 		}
-		return minId;
+		return minId != null ? minId : 0;
 	}
 	
 	public void setDbDataSourceFactory(DbDataSourceFactory dbDataSourceFactory) {

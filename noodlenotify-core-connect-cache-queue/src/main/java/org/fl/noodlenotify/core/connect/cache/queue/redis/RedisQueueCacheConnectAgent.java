@@ -89,7 +89,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 	
 	@Override
-	public boolean push(MessageDm messageDm) throws Exception {
+	public boolean push(final MessageDm messageDm) throws Exception {
 		
 		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Boolean>() {
 			
@@ -158,7 +158,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 
 	@Override
-	public MessageDm pop(String queueName, boolean queueType) throws Exception {
+	public MessageDm pop(final String queueName, final boolean queueType) throws Exception {
 		
 		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<MessageDm>() {
 			
@@ -207,7 +207,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 
 	@Override
-	public boolean havePop(MessageDm messageDm) throws Exception {
+	public boolean havePop(final MessageDm messageDm) throws Exception {
 		
 		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Boolean>() {
 			
@@ -219,7 +219,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 	
 	@Override
-	public void setPop(MessageDm messageDm) throws Exception {
+	public void setPop(final MessageDm messageDm) throws Exception {
 		
 		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
 			
@@ -236,7 +236,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 	
 	@Override
-	public void removePop(MessageDm messageDm) throws Exception {
+	public void removePop(final MessageDm messageDm) throws Exception {
 		
 		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
 			
@@ -258,7 +258,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 
 	@Override
-	public void setActive(String queueName, boolean bool) throws Exception {
+	public void setActive(final String queueName, final boolean bool) throws Exception {
 		
 		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
 			
@@ -289,7 +289,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 
 	@Override
-	public boolean isActive(String queueName) throws Exception {
+	public boolean isActive(final String queueName) throws Exception {
 		
 		Boolean isActive = queueIsActiveMap.get(queueName);
 		if (isActive != null && isActive.equals(true)) {
@@ -310,7 +310,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 	
 	@Override
-	public long len(String queueName, boolean queueType) throws Exception {
+	public long len(final String queueName, final boolean queueType) throws Exception {
 		
 		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Long>() {
 			
@@ -350,7 +350,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 
 	@Override
-	public boolean getAlive(String queueName, long id, long diffTime, long intervalTime) throws Exception {
+	public boolean getAlive(final String queueName, final long id, final long diffTime, final long intervalTime) throws Exception {
 		
 		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Boolean>() {
 			
@@ -373,7 +373,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 
 	@Override
-	public boolean keepAlive(String queueName, long id, long diffTime, long intervalTime) throws Exception {
+	public boolean keepAlive(final String queueName, final long id, final long diffTime, final long intervalTime) throws Exception {
 		
 		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Boolean>() {
 			
@@ -399,7 +399,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 
 	@Override
-	public void releaseAlive(String queueName, long id) throws Exception {
+	public void releaseAlive(final String queueName, final long id) throws Exception {
 		
 		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
 			

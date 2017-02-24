@@ -35,6 +35,11 @@
 		<groupId>org.fl.noodle.common.connect</groupId>
 		<artifactId>noodlecommon-connect-api</artifactId>
 	</dependency>
+	
+	<dependency>
+		<groupId>org.fl.noodle.common.log</groupId>
+		<artifactId>noodlecommon-log</artifactId>
+	</dependency>  
   
   	<dependency>
 		<groupId>org.fl.noodlenotify.core.connect.net.api</groupId>

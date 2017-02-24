@@ -61,7 +61,7 @@ public class RedisQueueCacheStatusChecker extends AbstractStatusChecker implemen
 	}
 	
 	@Override
-	public boolean checkIsActive(String queueName) throws Exception {
+	public boolean checkIsActive(final String queueName) throws Exception {
 		
 		return JedisTemplate.execute(jedis, new JedisTemplate.JedisOperation<Boolean>() {
 			
@@ -73,7 +73,7 @@ public class RedisQueueCacheStatusChecker extends AbstractStatusChecker implemen
 	}
 
 	@Override
-	public long checkNewLen(String queueName) throws Exception {
+	public long checkNewLen(final String queueName) throws Exception {
 		
 		return JedisTemplate.execute(jedis, new JedisTemplate.JedisOperation<Long>() {
 			
@@ -88,7 +88,7 @@ public class RedisQueueCacheStatusChecker extends AbstractStatusChecker implemen
 	}
 
 	@Override
-	public long checkPortionLen(String queueName) throws Exception {
+	public long checkPortionLen(final String queueName) throws Exception {
 		
 		return JedisTemplate.execute(jedis, new JedisTemplate.JedisOperation<Long>() {
 			

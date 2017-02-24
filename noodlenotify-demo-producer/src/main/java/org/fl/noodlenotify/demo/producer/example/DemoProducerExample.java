@@ -44,5 +44,6 @@ public class DemoProducerExample {
     	}
 		
 		applicationContext.destroy();
+		applicationContext.close();
     }
 }

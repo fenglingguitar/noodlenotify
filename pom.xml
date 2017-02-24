@@ -47,6 +47,9 @@
 	<noodlenotify.common.version>2.0.0-SNAPSHOT</noodlenotify.common.version>
   	  	
   	<noodlenotify.assembly.version>2.0.0-SNAPSHOT</noodlenotify.assembly.version>
+	
+	<noodle.common.version>2.0.1-SNAPSHOT</noodle.common.version>
+	<springframework.version>4.1.6.RELEASE</springframework.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -90,67 +93,79 @@
 		<dependency>
 			<groupId>org.fl.noodle.common.net</groupId>
 			<artifactId>noodlecommon-net</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>${noodle.common.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.util</groupId>
 			<artifactId>noodlecommon-util</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>${noodle.common.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.test</groupId>
 			<artifactId>noodlecommon-test</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>${noodle.common.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.mvc</groupId>
 			<artifactId>noodlecommon-mvc</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>${noodle.common.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.mvc.vo</groupId>
 			<artifactId>noodlecommon-mvc-vo</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>${noodle.common.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.dynamicsql</groupId>
 			<artifactId>noodlecommon-dynamicsql</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>${noodle.common.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.dbseparate</groupId>
 			<artifactId>noodlecommon-dbseparate</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>${noodle.common.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.connect</groupId>
 			<artifactId>noodlecommon-connect-api</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>${noodle.common.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.monitor</groupId>
 			<artifactId>noodlecommon-monitor-api</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>${noodle.common.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.monitor.performance</groupId>
 			<artifactId>noodlecommon-monitor-performance</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>${noodle.common.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.fl.noodle.common.distributedlock.db</groupId>
 			<artifactId>noodlecommon-distributedlock-db</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
+			<version>${noodle.common.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.fl.noodle.common.trace</groupId>
+			<artifactId>noodlecommon-trace</artifactId>
+			<version>${noodle.common.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.fl.noodle.common.log</groupId>
+			<artifactId>noodlecommon-log</artifactId>
+			<version>${noodle.common.version}</version>
 		</dependency>
 		
 	    <dependency>
@@ -164,32 +179,32 @@
 	    <dependency>
 	    	<groupId>org.springframework</groupId>
 	    	<artifactId>spring-context</artifactId>
-	    	<version>3.1.0.RELEASE</version>
+	    	<version>${springframework.version}</version>
 	    </dependency>
 	    <dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-context-support</artifactId>
-				<version>3.1.0.RELEASE</version>
+				<version>${springframework.version}</version>
 			</dependency>
 	    <dependency>
 	    	<groupId>org.springframework</groupId>
 	    	<artifactId>spring-orm</artifactId>
-	    	<version>3.1.0.RELEASE</version>
+	    	<version>${springframework.version}</version>
 	    </dependency>
 	    <dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-webmvc</artifactId>
-				<version>3.1.0.RELEASE</version>
+				<version>${springframework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-web</artifactId>
-				<version>3.1.0.RELEASE</version>
+				<version>${springframework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-test</artifactId>
-				<version>3.1.0.RELEASE</version>
+				<version>${springframework.version}</version>
 				<scope>test</scope>
 			</dependency>
 			
@@ -267,7 +282,7 @@
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-orm</artifactId>
-				<version>3.1.0.RELEASE</version>
+				<version>${springframework.version}</version>
 			</dependency>
 			
 			<!-- DynamicSqlTemplate -->
@@ -316,12 +331,12 @@
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-webmvc</artifactId>
-				<version>3.1.0.RELEASE</version>
+				<version>${springframework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-web</artifactId>
-				<version>3.1.0.RELEASE</version>
+				<version>${springframework.version}</version>
 			</dependency>
 			
 			<!-- jetty -->

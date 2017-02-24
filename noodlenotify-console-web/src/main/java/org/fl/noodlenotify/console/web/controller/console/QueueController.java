@@ -23,7 +23,7 @@ public class QueueController {
 	@Autowired
 	private QueueService queueService;
 	
-	@Autowired
+	@Autowired(required = false)
 	private ProducerClientImpl producerClient;
 	
 	@RequestMapping(value = "/querypage")

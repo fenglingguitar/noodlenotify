@@ -21,5 +21,6 @@ public class DemoProducerPress {
 		producerClient.send("TestQueue1", new String(content));
 
 		applicationContext.destroy();
+		applicationContext.close();
     }
 }

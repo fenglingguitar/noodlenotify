@@ -13,10 +13,16 @@
 	default-autowire="byName">
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/distinguish/noodlenotify-core-connect-net-distinguish.xml" />
+	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-trace.xml" />
 	
 	<bean id="connectAgentFactoryJetty" class="org.fl.noodlenotify.core.connect.net.jetty.client.JettyNetConnectAgentFactory">
 		<property name="connectDistinguish" ref="netConnectDistinguish" />
 		<property name="readTimeout" value="10000"/>
+		<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
 	</bean>
     
 </beans>

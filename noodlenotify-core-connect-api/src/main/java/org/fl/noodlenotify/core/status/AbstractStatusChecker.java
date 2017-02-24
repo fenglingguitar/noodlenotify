@@ -5,8 +5,6 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ProxyFactory;
 
 public abstract class AbstractStatusChecker implements StatusChecker, MethodInterceptor {
-
-	//private final static Logger logger = LoggerFactory.getLogger(AbstractStatusChecker.class);
 	
 	protected long connectId;
 
@@ -49,7 +47,7 @@ public abstract class AbstractStatusChecker implements StatusChecker, MethodInte
 	}
 	
 	@Override
-	public Object invoke(MethodInvocation invocation) throws Throwable {
+	public synchronized Object invoke(MethodInvocation invocation) throws Throwable {
 		connect();
 		try {
 			return invocation.proceed();

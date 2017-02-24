@@ -74,7 +74,7 @@ public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implem
 	}
 	
 	@Override
-	protected void setActual(List<MessageDm> messageDmList) {
+	protected void setActual(final List<MessageDm> messageDmList) {
 		try {
 			JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
 				
@@ -109,7 +109,7 @@ public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implem
 	}
 
 	@Override
-	protected void removeActual(List<MessageDm> messageDmList) {
+	protected void removeActual(final List<MessageDm> messageDmList) {
 		try {
 			JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
 				
@@ -140,7 +140,7 @@ public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implem
 	}
 	
 	@Override
-	public MessageDm get(MessageDm messageDm) throws Exception {
+	public MessageDm get(final MessageDm messageDm) throws Exception {
 		
 		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<MessageDm>() {
 			

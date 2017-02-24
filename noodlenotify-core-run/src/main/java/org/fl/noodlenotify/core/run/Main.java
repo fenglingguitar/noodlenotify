@@ -107,6 +107,7 @@ public class Main {
 			public void handle(Signal signal) {
 				System.out.println("Signal INT And Over");
 				applicationContext.destroy();
+				applicationContext.close();
 				System.exit(0);
 			}
         });
@@ -115,6 +116,7 @@ public class Main {
 			public void handle(Signal signal) {
 				System.out.println("Signal TERM And Over");
 				applicationContext.destroy();
+				applicationContext.close();
 				System.exit(0);
 			}
         });
