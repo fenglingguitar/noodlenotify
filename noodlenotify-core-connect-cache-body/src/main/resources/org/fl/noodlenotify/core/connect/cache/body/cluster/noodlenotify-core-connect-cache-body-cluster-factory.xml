@@ -15,24 +15,54 @@
 
     <bean id="cacheBodyFailoverConnectClusterFactory" class="org.fl.noodle.common.connect.cluster.FailoverConnectClusterFactory">
     	<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
+    	<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
     </bean>
     <bean id="cacheBodyOnceConnectClusterFactory" class="org.fl.noodle.common.connect.cluster.OnceConnectClusterFactory">
     	<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
+    	<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
 	</bean>
     <bean id="cacheBodyAllConnectClusterFactory" class="org.fl.noodle.common.connect.cluster.AllConnectClusterFactory">
     	<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
+    	<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
 	</bean>
 	
 	<bean id="cacheBodyPartConnectClusterFactory" class="org.fl.noodlenotify.core.connect.cache.body.cluster.PartConnectClusterFactory">
     	<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
+    	<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
 	</bean>
 	
 	<bean id="cacheBodyEitherConnectClusterFactory" class="org.fl.noodlenotify.core.connect.cache.body.cluster.EitherConnectClusterFactory">
     	<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
+    	<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
 	</bean>
 	
 	<bean id="cacheBodyPartAllConnectClusterFactory" class="org.fl.noodlenotify.core.connect.cache.body.cluster.PartAllConnectClusterFactory">
     	<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
+    	<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
 	</bean>
 	
 </beans>

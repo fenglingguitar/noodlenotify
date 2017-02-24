@@ -14,12 +14,44 @@
 		<target>System.err</target>  
 	</appender>
 	
+	<appender name="NOODLENOTIFY-TRACE-METHOD-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">    
+		<file>D:/logs/noodlenotify/noodlenotify/noodlenotify-trace-method-logfile.log</file>    
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+	      <level>INFO</level>
+	  	</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">      
+			<fileNamePattern>D:/logs/noodlenotify/noodlenotify/noodlenotify-trace-method-logfile.log.%d{yyyyMMdd}</fileNamePattern>        
+			<maxHistory>3</maxHistory>    
+		</rollingPolicy>    
+		<encoder charset="UTF-8">      
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n</pattern> 
+		</encoder>  
+	</appender>
+	
+	<appender name="NOODLENOTIFY-TRACE-PERFORMANCE-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">    
+		<file>D:/logs/noodlenotify/noodlenotify/noodlenotify-trace-performance-logfile.log</file>    
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+	      <level>INFO</level>
+	  	</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">      
+			<fileNamePattern>D:/logs/noodlenotify/noodlenotify/noodlenotify-trace-performance-logfile.log.%d{yyyyMMdd}</fileNamePattern>        
+			<maxHistory>3</maxHistory>    
+		</rollingPolicy>    
+		<encoder charset="UTF-8">      
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n</pattern> 
+		</encoder>  
+	</appender>
+	
 	<logger name="org.fl" level="DEBUG" additivity="false">    
 		<appender-ref ref="STDOUT-APPENDER" /> 
 	</logger>
 	
-	<logger name="trace" level="DEBUG" additivity="false">    
-		<appender-ref ref="STDOUT-APPENDER" /> 
+	<logger name="trace.method" level="DEBUG" additivity="false">    
+		<appender-ref ref="NOODLENOTIFY-TRACE-METHOD-APPENDER" /> 
+	</logger>
+	
+	<logger name="trace.performance" level="DEBUG" additivity="false">    
+		<appender-ref ref="NOODLENOTIFY-TRACE-PERFORMANCE-APPENDER" /> 
 	</logger>
 	
 	<root level="INFO">    

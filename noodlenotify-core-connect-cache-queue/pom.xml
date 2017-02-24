@@ -26,6 +26,12 @@
 		<artifactId>noodlecommon-util</artifactId>
 	</dependency>
 	
+	<dependency>
+		<groupId>org.fl.noodlenotify.common</groupId>
+  		<artifactId>noodlenotify-common</artifactId>
+  		<version>${noodlenotify.common.version}</version>
+	</dependency>
+	
     <dependency>
 		<groupId>org.fl.noodlenotify.core.connect.cache.api</groupId>
 		<artifactId>noodlenotify-core-connect-cache-api</artifactId>

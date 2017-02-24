@@ -13,6 +13,7 @@
 	default-autowire="byName">
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/body/distinguish/noodlenotify-core-connect-cache-body-distinguish.xml" />
+	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-trace.xml" />
 	
 	<bean id="cacheConnectAgentConfParam" class="org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam">
 		<property name="setThreadCount" value="30"/>
@@ -36,6 +37,11 @@
 		<property name="cacheConnectAgentConfParam" ref="cacheConnectAgentConfParam" />
 		<property name="bodyCacheConnectAgentConfParam" ref="bodyCacheConnectAgentConfParam" />
 		<property name="connectDistinguish" ref="bodyCacheConnectDistinguish" />
+		<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
 	</bean>
     
 </beans>

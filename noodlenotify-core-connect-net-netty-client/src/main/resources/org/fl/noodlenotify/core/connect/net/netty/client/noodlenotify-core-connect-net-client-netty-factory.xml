@@ -13,6 +13,7 @@
 	default-autowire="byName">
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/net/distinguish/noodlenotify-core-connect-net-distinguish.xml" />
+	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-trace.xml" />
 	
     <bean id="nettyNetConnectPoolConfParam" class="org.fl.noodlenotify.core.connect.net.netty.client.NettyNetConnectPoolConfParam">
 		<property name="maxActive" value="3000"/>
@@ -27,6 +28,11 @@
 		<property name="connectDistinguish" ref="netConnectDistinguish" />
 		<property name="nettyNetConnectPoolConfParam" ref="nettyNetConnectPoolConfParam"/>
 		<property name="readTimeout" value="10000"/>
+		<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
 	</bean>
     
 </beans>

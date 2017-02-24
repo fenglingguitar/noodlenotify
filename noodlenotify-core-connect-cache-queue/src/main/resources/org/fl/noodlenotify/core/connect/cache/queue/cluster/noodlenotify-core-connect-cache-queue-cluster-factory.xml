@@ -12,15 +12,31 @@
 	default-autowire="byName">
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/cache/queue/distinguish/noodlenotify-core-connect-cache-queue-distinguish.xml" />
+	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-trace.xml" />
 
     <bean id="cacheQueueFailoverConnectClusterFactory" class="org.fl.noodle.common.connect.cluster.FailoverConnectClusterFactory">
     	<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
+    	<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
     </bean>
     <bean id="cacheQueueOnceConnectClusterFactory" class="org.fl.noodle.common.connect.cluster.OnceConnectClusterFactory">
     	<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
+    	<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
 	</bean>
     <bean id="cacheQueueAllConnectClusterFactory" class="org.fl.noodle.common.connect.cluster.AllConnectClusterFactory">
     	<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
+    	<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
 	</bean>
 	
 </beans>

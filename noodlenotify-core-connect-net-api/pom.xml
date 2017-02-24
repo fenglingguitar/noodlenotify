@@ -32,6 +32,12 @@
 	</dependency>
   
   	<dependency>
+		<groupId>org.fl.noodlenotify.common</groupId>
+  		<artifactId>noodlenotify-common</artifactId>
+  		<version>${noodlenotify.common.version}</version>
+	</dependency>
+  
+  	<dependency>
 		<groupId>org.fl.noodlenotify.core.connect.api</groupId>
 		<artifactId>noodlenotify-core-connect-api</artifactId>
 		<version>${noodlenotify.core.connect.api.version}</version>

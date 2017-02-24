@@ -13,6 +13,7 @@
 	default-autowire="byName">
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/db/distinguish/noodlenotify-core-connect-db-distinguish.xml" />
+	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-trace.xml" />
 	
 	<import resource="classpath:org/fl/noodlenotify/core/connect/db/mysql/noodlenotify-core-connect-db-datasource.xml" />
 	
@@ -40,6 +41,11 @@
 		<property name="dbDataSourceFactory" ref="dbDataSourceFactory" />
 		<property name="dbConnectAgentConfParam" ref="mysqlDbConnectAgentConfParam" />
 		<property name="connectDistinguish" ref="dbConnectDistinguish" />
+		<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
 	</bean>
     
 </beans>
