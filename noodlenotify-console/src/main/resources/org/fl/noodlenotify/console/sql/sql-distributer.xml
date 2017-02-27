@@ -6,7 +6,6 @@
 				distributer_Id,
 				name,
 				ip,
-				port,
 				system_Status,
 				manual_Status
 		FROM 	CSL_DISTRIBUTER
@@ -19,9 +18,6 @@
 				#end
 		 		#if($ip)
 					AND ip LIKE :ip
-				#end
-		 		#if($port)
-					AND port = :port
 				#end
 		 		#if($system_Status)
 					AND system_Status = :system_Status

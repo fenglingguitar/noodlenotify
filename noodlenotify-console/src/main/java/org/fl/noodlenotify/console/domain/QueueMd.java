@@ -134,7 +134,7 @@ public class QueueMd implements java.io.Serializable {
 		this.create_Tm = create_Tm;
 	}
 
-	@Column(name = "REV_T_CNT_MIT", nullable = false, length = 16)
+	@Column(name = "REV_T_CNT_MIT", length = 16)
 	public Long getRev_T_Cnt_Mit() {
 		return rev_T_Cnt_Mit;
 	}
@@ -143,7 +143,7 @@ public class QueueMd implements java.io.Serializable {
 		this.rev_T_Cnt_Mit = rev_T_Cnt_Mit;
 	}
 
-	@Column(name = "REV_T_CNT_HOR", nullable = false, length = 16)
+	@Column(name = "REV_T_CNT_HOR", length = 16)
 	public Long getRev_T_Cnt_Hor() {
 		return rev_T_Cnt_Hor;
 	}
@@ -152,7 +152,7 @@ public class QueueMd implements java.io.Serializable {
 		this.rev_T_Cnt_Hor = rev_T_Cnt_Hor;
 	}
 
-	@Column(name = "REV_O_RATE_MIT", nullable = false, length = 16)
+	@Column(name = "REV_O_RATE_MIT", length = 16)
 	public Double getRev_O_Rate_Mit() {
 		return rev_O_Rate_Mit;
 	}
@@ -161,7 +161,7 @@ public class QueueMd implements java.io.Serializable {
 		this.rev_O_Rate_Mit = rev_O_Rate_Mit;
 	}
 
-	@Column(name = "REV_O_RATE_HOR", nullable = false, length = 16)
+	@Column(name = "REV_O_RATE_HOR", length = 16)
 	public Double getRev_O_Rate_Hor() {
 		return rev_O_Rate_Hor;
 	}
@@ -170,7 +170,7 @@ public class QueueMd implements java.io.Serializable {
 		this.rev_O_Rate_Hor = rev_O_Rate_Hor;
 	}
 
-	@Column(name = "REV_E_RATE_MIT", nullable = false, length = 16)
+	@Column(name = "REV_E_RATE_MIT", length = 16)
 	public Double getRev_E_Rate_Mit() {
 		return rev_E_Rate_Mit;
 	}
@@ -179,7 +179,7 @@ public class QueueMd implements java.io.Serializable {
 		this.rev_E_Rate_Mit = rev_E_Rate_Mit;
 	}
 
-	@Column(name = "REV_E_RATE_HOR", nullable = false, length = 16)
+	@Column(name = "REV_E_RATE_HOR", length = 16)
 	public Double getRev_E_Rate_Hor() {
 		return rev_E_Rate_Hor;
 	}
@@ -188,7 +188,7 @@ public class QueueMd implements java.io.Serializable {
 		this.rev_E_Rate_Hor = rev_E_Rate_Hor;
 	}
 
-	@Column(name = "DPH_T_CNT_MIT", nullable = false, length = 16)
+	@Column(name = "DPH_T_CNT_MIT", length = 16)
 	public Long getDph_T_Cnt_Mit() {
 		return dph_T_Cnt_Mit;
 	}
@@ -197,7 +197,7 @@ public class QueueMd implements java.io.Serializable {
 		this.dph_T_Cnt_Mit = dph_T_Cnt_Mit;
 	}
 
-	@Column(name = "DPH_T_CNT_HOR", nullable = false, length = 16)
+	@Column(name = "DPH_T_CNT_HOR", length = 16)
 	public Long getDph_T_Cnt_Hor() {
 		return dph_T_Cnt_Hor;
 	}
@@ -206,7 +206,7 @@ public class QueueMd implements java.io.Serializable {
 		this.dph_T_Cnt_Hor = dph_T_Cnt_Hor;
 	}
 
-	@Column(name = "DPH_O_RATE_MIT", nullable = false, length = 16)
+	@Column(name = "DPH_O_RATE_MIT", length = 16)
 	public Double getDph_O_Rate_Mit() {
 		return dph_O_Rate_Mit;
 	}
@@ -215,7 +215,7 @@ public class QueueMd implements java.io.Serializable {
 		this.dph_O_Rate_Mit = dph_O_Rate_Mit;
 	}
 
-	@Column(name = "DPH_O_RATE_HOR", nullable = false, length = 16)
+	@Column(name = "DPH_O_RATE_HOR", length = 16)
 	public Double getDph_O_Rate_Hor() {
 		return dph_O_Rate_Hor;
 	}
@@ -224,7 +224,7 @@ public class QueueMd implements java.io.Serializable {
 		this.dph_O_Rate_Hor = dph_O_Rate_Hor;
 	}
 
-	@Column(name = "DPH_E_RATE_MIT", nullable = false, length = 16)
+	@Column(name = "DPH_E_RATE_MIT", length = 16)
 	public Double getDph_E_Rate_Mit() {
 		return dph_E_Rate_Mit;
 	}
@@ -233,7 +233,7 @@ public class QueueMd implements java.io.Serializable {
 		this.dph_E_Rate_Mit = dph_E_Rate_Mit;
 	}
 
-	@Column(name = "DPH_E_RATE_HOR", nullable = false, length = 16)
+	@Column(name = "DPH_E_RATE_HOR", length = 16)
 	public Double getDph_E_Rate_Hor() {
 		return dph_E_Rate_Hor;
 	}
@@ -242,7 +242,7 @@ public class QueueMd implements java.io.Serializable {
 		this.dph_E_Rate_Hor = dph_E_Rate_Hor;
 	}
 	
-	@Column(name = "DPH_DELAY_TIME", nullable = false, length = 16)
+	@Column(name = "DPH_DELAY_TIME", length = 16)
 	public Long getDph_Delay_Time() {
 		return dph_Delay_Time;
 	}
@@ -251,7 +251,7 @@ public class QueueMd implements java.io.Serializable {
 		this.dph_Delay_Time = dph_Delay_Time;
 	}
 	
-	@Column(name = "DPH_TIMEOUT", nullable = false, length = 16)
+	@Column(name = "DPH_TIMEOUT", length = 16)
 	public Long getDph_Timeout() {
 		return dph_Timeout;
 	}
@@ -260,7 +260,7 @@ public class QueueMd implements java.io.Serializable {
 		this.dph_Timeout = dph_Timeout;
 	}
 	
-	@Column(name = "DPH_OD_CNT_MIT", nullable = false, length = 16)
+	@Column(name = "DPH_OD_CNT_MIT", length = 16)
 	public Long getDph_OD_Cnt_Mit() {
 		return dph_OD_Cnt_Mit;
 	}
@@ -269,7 +269,7 @@ public class QueueMd implements java.io.Serializable {
 		this.dph_OD_Cnt_Mit = dph_OD_Cnt_Mit;
 	}
 	
-	@Column(name = "DPH_OD_CNT_HOR", nullable = false, length = 16)
+	@Column(name = "DPH_OD_CNT_HOR", length = 16)
 	public Long getDph_OD_Cnt_Hor() {
 		return dph_OD_Cnt_Hor;
 	}

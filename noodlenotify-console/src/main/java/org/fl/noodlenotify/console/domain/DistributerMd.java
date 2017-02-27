@@ -16,7 +16,6 @@ public class DistributerMd implements java.io.Serializable {
 	private Long distributer_Id;
 	private String name;
 	private String ip;
-	private Integer port;
 	private Byte system_Status;
 	private Byte manual_Status;
 
@@ -47,15 +46,6 @@ public class DistributerMd implements java.io.Serializable {
 
 	public void setIp(String ip) {
 		this.ip = ip;
-	}
-
-	@Column(name = "PORT", nullable = false, length = 8)
-	public Integer getPort() {
-		return this.port;
-	}
-
-	public void setPort(Integer port) {
-		this.port = port;
 	}
 	
 	@Column(name = "SYSTEM_STATUS", nullable = false, length = 1)

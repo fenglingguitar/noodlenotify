@@ -24,7 +24,6 @@
 				d.distributer_Id,
 				d.name,
 				d.ip,
-				d.port,
 				d.system_Status,
 				d.manual_Status
 		FROM 	CSL_DISTRIBUTER d, CSL_QUEUE_DISTRIBUTER qd
@@ -37,9 +36,6 @@
 				#end
 		 		#if($ip)
 					AND d.ip LIKE :ip
-				#end
-		 		#if($port)
-					AND d.port = :port
 				#end
 		 		#if($system_Status)
 					AND d.system_Status = :system_Status
@@ -58,7 +54,6 @@
 				d.distributer_Id,
 				d.name,
 				d.ip,
-				d.port,
 				d.system_Status,
 				d.manual_Status
 		FROM 	CSL_DISTRIBUTER d
@@ -68,9 +63,6 @@
 				#end
 		 		#if($ip)
 					AND d.ip LIKE :ip
-				#end
-		 		#if($port)
-					AND d.port = :port
 				#end
 		 		#if($system_Status)
 					AND d.system_Status = :system_Status
@@ -147,7 +139,6 @@
 				d.distributer_Id,
 				d.name,
 				d.ip,
-				d.port,
 				d.system_Status,
 				d.manual_Status
                 qd.queue_Nm
@@ -161,9 +152,6 @@
 				#end
 		 		#if($ip)
 					AND d.ip LIKE :ip
-				#end
-		 		#if($port)
-					AND d.port = :port
 				#end
 		 		#if($system_Status)
 					AND d.system_Status = :system_Status

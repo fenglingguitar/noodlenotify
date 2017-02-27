@@ -71,7 +71,7 @@ public class ExchangerStatusExecuter extends AbstractExecuter {
 			for (ExchangerVo exchangerVoToOffline : exchangerVoToOfflineList) {
 				StatusCheckerFactory statusCheckerFactory = statusCheckerFactoryMap.get(exchangerVoToOffline.getType());
 				if (statusCheckerFactory != null) {
-					NetStatusChecker netStatusChecker = (NetStatusChecker) statusCheckerFactory.createStatusChecker(exchangerVoToOffline.getExchanger_Id(), exchangerVoToOffline.getIp(), exchangerVoToOffline.getPort(), exchangerVoToOffline.getUrl());
+					NetStatusChecker netStatusChecker = (NetStatusChecker) statusCheckerFactory.createStatusChecker(exchangerVoToOffline.getExchanger_Id(), exchangerVoToOffline.getIp(), exchangerVoToOffline.getPort(), exchangerVoToOffline.getUrl()).getProxy();
 					try {
 						netStatusChecker.checkHealth();
 					} catch (Exception e) {
