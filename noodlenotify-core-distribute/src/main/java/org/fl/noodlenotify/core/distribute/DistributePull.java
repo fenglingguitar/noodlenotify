@@ -105,7 +105,7 @@ public class DistributePull implements LockChangeHandler {
 		dbDistributedLock = new DbDistributedLock();
 		dbDistributedLock.setJdbcTemplate(((MysqlDbConnectAgent)dbConnectManager.getConnectAgent(dbId)).getJdbcTemplate());
 		dbDistributedLock.setLockId(moduleId);
-		dbDistributedLock.setTableName("MSG_" + queueName + "_LK");
+		dbDistributedLock.setTableName("MSG_" + queueName.toUpperCase() + "_LK");
 		dbDistributedLock.setLockChangeHandler(this);
 		try {
 			dbDistributedLock.start();
