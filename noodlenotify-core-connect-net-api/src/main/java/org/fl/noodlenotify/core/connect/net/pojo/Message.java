@@ -9,6 +9,9 @@ public class Message implements Serializable {
 	private String uuid;
 	private String queueName;
 	private String content;
+	private String traceKey;
+	private String parentInvoke;
+	private String parentStackKey;
 	
 	public Message() {
 	}
@@ -45,5 +48,29 @@ public class Message implements Serializable {
 	
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public String getTraceKey() {
+		return traceKey;
+	}
+
+	public void setTraceKey(String traceKey) {
+		this.traceKey = traceKey;
+	}
+
+	public String getParentInvoke() {
+		return parentInvoke;
+	}
+
+	public void setParentInvoke(String parentInvoke) {
+		this.parentInvoke = parentInvoke;
+	}
+
+	public String getParentStackKey() {
+		return parentStackKey;
+	}
+
+	public void setParentStackKey(String parentStackKey) {
+		this.parentStackKey = parentStackKey;
 	}
 }

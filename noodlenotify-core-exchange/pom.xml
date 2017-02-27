@@ -20,6 +20,11 @@
   </properties>
   
   <dependencies>
+  
+  	<dependency>
+		<groupId>org.fl.noodle.common.log</groupId>
+  		<artifactId>noodlecommon-log</artifactId>
+	</dependency>
 	
 	<dependency>
 		<groupId>org.fl.noodlenotify.common</groupId>

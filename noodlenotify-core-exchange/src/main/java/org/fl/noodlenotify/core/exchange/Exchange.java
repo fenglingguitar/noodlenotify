@@ -1,11 +1,16 @@
 package org.fl.noodlenotify.core.exchange;
 
+import java.util.UUID;
+
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.exception.ConnectInvokeException;
 import org.fl.noodle.common.connect.manager.ConnectManagerPool;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.connect.server.ConnectServer;
+import org.fl.noodle.common.log.Logger;
+import org.fl.noodle.common.log.LoggerFactory;
+import org.fl.noodle.common.trace.TraceInterceptor;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
@@ -20,6 +25,7 @@ import org.fl.noodlenotify.core.exchange.manager.ExchangeConnectManager;
 public class Exchange implements NetConnectReceiver {
 
 	//private final static Logger logger = LoggerFactory.getLogger(Exchange.class);
+	private final static Logger logger = LoggerFactory.getLogger("trace.method");
 	
 	private ConsoleRemotingInvoke consoleRemotingInvoke;
 	
@@ -63,10 +69,22 @@ public class Exchange implements NetConnectReceiver {
 	@Override
 	public void receive(Message message) throws Exception {
 		
+		if (message.getTraceKey() == null || message.getTraceKey().isEmpty()) {
+			TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
+		} else {
+			TraceInterceptor.setTraceKey(message.getTraceKey());
+		}
+		TraceInterceptor.setInvoke(message.getParentInvoke());
+		TraceInterceptor.setInvoke("Exchange.receive");
+		TraceInterceptor.setStackKey(message.getParentStackKey());
+		TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
+		logger.printEnter(message);
+		
 		MessageDm messageDm = new MessageDm(
 				message.getQueueName(), 
 				message.getUuid(), 
-				message.getContent().getBytes("UTF-8")
+				message.getContent().getBytes("UTF-8"),
+				TraceInterceptor.getTraceKey()
 				);
 		
 		if (messageDm.getContent().length > sizeLimit) {

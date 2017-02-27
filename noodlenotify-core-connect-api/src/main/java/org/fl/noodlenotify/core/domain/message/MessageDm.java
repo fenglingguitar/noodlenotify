@@ -27,6 +27,8 @@ public class MessageDm implements Serializable {
 	private long delayTime;
 	private boolean bool;
 	
+	private String traceKey;
+	
 	private List<MessageCallback> messageCallbackList = new ArrayList<MessageCallback>();
 	
 	public MessageDm() {
@@ -35,11 +37,13 @@ public class MessageDm implements Serializable {
 	public MessageDm(
 			String queueName,
 			String uuid,
-			byte[] content
+			byte[] content,
+			String traceKey
 			) {
 		this.queueName = queueName;
 		this.uuid = uuid;
 		this.content = content;
+		this.traceKey = traceKey;
 	}
 	
 	public String getUuid() {
@@ -186,6 +190,14 @@ public class MessageDm implements Serializable {
 		this.bool = bool;
 	}
 	
+	public String getTraceKey() {
+		return traceKey;
+	}
+
+	public void setTraceKey(String traceKey) {
+		this.traceKey = traceKey;
+	}
+
 	public void addMessageCallback(MessageCallback messageCallback) {
 		this.messageCallbackList.add(messageCallback);
 	}
