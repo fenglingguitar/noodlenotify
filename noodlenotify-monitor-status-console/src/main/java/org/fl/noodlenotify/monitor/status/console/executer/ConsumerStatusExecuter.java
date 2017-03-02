@@ -71,7 +71,7 @@ public class ConsumerStatusExecuter extends AbstractExecuter {
 			for (ConsumerVo consumerVoToOffline : consumerVoToOfflineList) {
 				StatusCheckerFactory statusCheckerFactory = statusCheckerFactoryMap.get(consumerVoToOffline.getType());
 				if (statusCheckerFactory != null) {
-					NetStatusChecker netStatusChecker = (NetStatusChecker) statusCheckerFactory.createStatusChecker(consumerVoToOffline.getConsumer_Id(), consumerVoToOffline.getIp(), consumerVoToOffline.getPort(), consumerVoToOffline.getUrl());
+					NetStatusChecker netStatusChecker = (NetStatusChecker) statusCheckerFactory.createStatusChecker(consumerVoToOffline.getConsumer_Id(), consumerVoToOffline.getIp(), consumerVoToOffline.getPort(), consumerVoToOffline.getUrl()).getProxy();
 					try {
 						netStatusChecker.checkHealth();
 					} catch (Exception e) {

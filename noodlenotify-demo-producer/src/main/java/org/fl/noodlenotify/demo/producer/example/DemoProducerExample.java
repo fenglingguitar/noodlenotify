@@ -2,11 +2,9 @@ package org.fl.noodlenotify.demo.producer.example;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.UUID;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.fl.noodle.common.trace.TraceInterceptor;
 import org.fl.noodlenotify.core.pclient.ProducerClient;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class DemoProducerExample {
 	
@@ -36,7 +34,6 @@ public class DemoProducerExample {
     		} 
     		System.out.println("Input Message Content: " + content);
     		
-    		TraceInterceptor.setInvoke(UUID.randomUUID().toString().replaceAll("-", ""));
     		try {
     			producerClient.send(queueName, new String(content));
     		} catch (Exception e) {

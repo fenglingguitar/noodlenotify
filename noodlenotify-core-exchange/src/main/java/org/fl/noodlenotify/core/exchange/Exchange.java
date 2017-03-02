@@ -11,6 +11,7 @@ import org.fl.noodle.common.connect.server.ConnectServer;
 import org.fl.noodle.common.log.Logger;
 import org.fl.noodle.common.log.LoggerFactory;
 import org.fl.noodle.common.trace.TraceInterceptor;
+import org.fl.noodle.common.trace.operation.performance.TracePerformancePrint;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
@@ -71,14 +72,18 @@ public class Exchange implements NetConnectReceiver {
 		
 		if (message.getTraceKey() == null || message.getTraceKey().isEmpty()) {
 			TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
+			TraceInterceptor.setInvoke("Root");
+			TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
 		} else {
 			TraceInterceptor.setTraceKey(message.getTraceKey());
+			TraceInterceptor.setInvoke(message.getParentInvoke());
+			TraceInterceptor.setStackKey(message.getParentStackKey());
 		}
-		TraceInterceptor.setInvoke(message.getParentInvoke());
+		
 		TraceInterceptor.setInvoke("Exchange.receive");
-		TraceInterceptor.setStackKey(message.getParentStackKey());
 		TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
 		logger.printEnter(message);
+		TracePerformancePrint.printTraceLog(TraceInterceptor.getInvoke(), message.getParentInvoke(), 0, 0, true, TraceInterceptor.getStackKey(), TraceInterceptor.getParentStackKey());
 		
 		MessageDm messageDm = new MessageDm(
 				message.getQueueName(), 

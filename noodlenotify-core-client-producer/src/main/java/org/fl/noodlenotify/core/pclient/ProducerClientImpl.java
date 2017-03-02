@@ -54,6 +54,8 @@ public class ProducerClientImpl implements ProducerClient {
 		
 		if (TraceInterceptor.getTraceKey().isEmpty()) {
 			TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
+			TraceInterceptor.setInvoke("Root");
+			TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
 		}
 		TraceInterceptor.setInvoke("ProducerClientImpl.send");
 		TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
@@ -73,7 +75,9 @@ public class ProducerClientImpl implements ProducerClient {
 		try {
 			return netConnectAgent.send(message);
 		} finally {
-			TracePerformancePrint.printTraceLog(TraceInterceptor.getInvoke(), 0, 0, false);
+			TracePerformancePrint.printTraceLog(TraceInterceptor.getInvoke(), TraceInterceptor.getParentInvoke(), 0, 0, true, TraceInterceptor.getStackKey(), TraceInterceptor.getParentStackKey());
+			TraceInterceptor.popInvoke();
+			TraceInterceptor.popStackKey();
 		}
 	}
 
