@@ -4,8 +4,8 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.manager.ConnectManager;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.distribute.callback.CheckResultMessageCallback;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 
 public class SetCallbackMethodInterceptor implements MethodInterceptor {
 
@@ -26,8 +26,8 @@ public class SetCallbackMethodInterceptor implements MethodInterceptor {
 			throw e;
 		} finally {
 			if (invocation.getMethod().getName().equals("pop") && object != null) {
-				MessageDm messageDm = (MessageDm)object;
-				messageDm.addMessageCallback(new CheckResultMessageCallback(messageDm, queueCacheConnectManager, bodyCacheConnectManager));
+				MessageDb messageDb = (MessageDb)object;
+				messageDb.addMessageCallback(new CheckResultMessageCallback(messageDb, queueCacheConnectManager, bodyCacheConnectManager));
 			}
 		}
 		

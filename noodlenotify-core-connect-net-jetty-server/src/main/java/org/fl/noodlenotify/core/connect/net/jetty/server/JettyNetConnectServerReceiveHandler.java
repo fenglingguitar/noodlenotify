@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.fl.noodle.common.util.json.JsonTranslator;
+import org.fl.noodlenotify.common.pojo.net.MessageRequest;
+import org.fl.noodlenotify.common.pojo.net.MessageResult;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
-import org.fl.noodlenotify.core.connect.net.pojo.Message;
-import org.fl.noodlenotify.core.connect.net.pojo.MessageResult;
 
 public class JettyNetConnectServerReceiveHandler extends AbstractHandler {
 	
@@ -53,14 +53,14 @@ public class JettyNetConnectServerReceiveHandler extends AbstractHandler {
 		
 		if (json != null) {
 			try {
-				Message message = JsonTranslator.fromString(json, Message.class);
-				if (message.getUuid() == null) {
+				MessageRequest messageRequest = JsonTranslator.fromString(json, MessageRequest.class);
+				if (messageRequest.getUuid() == null) {
 					uuid = UUID.randomUUID().toString().replaceAll("-", ""); 
-					message.setUuid(uuid);
+					messageRequest.setUuid(uuid);
 				} else {
-					uuid = message.getUuid();
+					uuid = messageRequest.getUuid();
 				}
-				netConnectReceiver.receive(message);
+				netConnectReceiver.receive(messageRequest);
 				response.getWriter().print(JsonTranslator.toString(new MessageResult(true, uuid)));
 			} catch (Exception receiveException) {
 				if (logger.isErrorEnabled()) {

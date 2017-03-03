@@ -11,10 +11,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.fl.noodle.common.connect.exception.ConnectRefusedException;
+import org.fl.noodlenotify.common.pojo.console.MessageVo;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.connect.db.DbStatusChecker;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
-import org.fl.noodlenotify.core.domain.message.MessageVo;
 import org.fl.noodlenotify.core.status.AbstractStatusChecker;
 
 public class MysqlDbStatusChecker extends AbstractStatusChecker implements DbStatusChecker {
@@ -120,7 +120,7 @@ public class MysqlDbStatusChecker extends AbstractStatusChecker implements DbSta
 	@Override
 	public List<MessageVo> queryPortionMessage(String queueName, String uuid, Long region, String content, Integer page, Integer rows) throws Exception {
 		
-		List<MessageVo> messageDmList = new ArrayList<MessageVo>();
+		List<MessageVo> messageDbList = new ArrayList<MessageVo>();
 		
 		if (isHaveTable(queueName)) {
 			
@@ -169,10 +169,10 @@ public class MysqlDbStatusChecker extends AbstractStatusChecker implements DbSta
 				messageVo.setBeginTime(new Date(rs.getLong("BEGIN_TIME")));
 				messageVo.setFinishTime(new Date(rs.getLong("FINISH_TIME")));
 				messageVo.setContent(rs.getString("CONTENT"));
-				messageDmList.add(messageVo);
+				messageDbList.add(messageVo);
 			}
 		}
-		return messageDmList;
+		return messageDbList;
 	}
 	
 	@Override

@@ -12,8 +12,8 @@ import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.exception.ConnectNoAliveException;
 import org.fl.noodle.common.connect.node.ConnectNode;
 import org.fl.noodle.common.connect.route.ConnectRoute;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
@@ -43,7 +43,7 @@ public class PartConnectCluster extends AbstractConnectCluster {
 		Throwable resultThrowable = null;
 		int successNum = 0;
 		
-		MessageDm messageDm = (MessageDm) ConnectThreadLocalStorage.get(LocalStorageType.MESSAGE_DM.getCode());
+		MessageDb messageDb = (MessageDb) ConnectThreadLocalStorage.get(LocalStorageType.MESSAGE_DM.getCode());
 		
 		List<ConnectAgent> connectAgentListSelected = new LinkedList<ConnectAgent>();
 		ConnectAgent connectAgent = null;		
@@ -60,9 +60,9 @@ public class PartConnectCluster extends AbstractConnectCluster {
 				}
 				successNum++;
 				if (successNum == 1) {
-					messageDm.setRedisOne(connectAgent.getConnectId());
+					messageDb.setRedisOne(connectAgent.getConnectId());
 				} else {
-					messageDm.setRedisTwo(connectAgent.getConnectId());
+					messageDb.setRedisTwo(connectAgent.getConnectId());
 				}
 				
 			} 

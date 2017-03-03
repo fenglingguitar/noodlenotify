@@ -9,11 +9,11 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+import org.fl.noodlenotify.common.pojo.console.MessageVo;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.connect.db.DbStatusChecker;
 import org.fl.noodlenotify.core.connect.db.mysql.MysqlDbConnectAgent;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
-import org.fl.noodlenotify.core.domain.message.MessageVo;
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.util.json.JsonTranslator;
 
@@ -28,10 +28,10 @@ public class MysqlDbConnectAgentTest extends AbstractJUnit4SpringContextTests {
 	@Autowired
 	MysqlDbConnectAgent mysqlDbConnectAgent;
 	
-	public static MessageDm messageDm1;
-	public static MessageDm messageDm2;
-	public static MessageDm messageDm3;
-	public static MessageDm messageDm4;
+	public static MessageDb messageDb1;
+	public static MessageDb messageDb2;
+	public static MessageDb messageDb3;
+	public static MessageDb messageDb4;
 	
 	@Test
 	public final void testCreateTable() throws Exception {
@@ -45,53 +45,53 @@ public class MysqlDbConnectAgentTest extends AbstractJUnit4SpringContextTests {
 	public final void testInsert() throws Exception {	
 		
 		String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-		messageDm1 = new MessageDm();
-		messageDm1.setQueueName("TestQueue1");
-		messageDm1.setUuid(uuid);
-		messageDm1.setContent(JsonTranslator.toByteArray("Hello"));
-		messageDm1.setExecuteQueue(10);
-		messageDm1.setResultQueue(0);
-		messageDm1.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
+		messageDb1 = new MessageDb();
+		messageDb1.setQueueName("TestQueue1");
+		messageDb1.setUuid(uuid);
+		messageDb1.setContent(JsonTranslator.toByteArray("Hello"));
+		messageDb1.setExecuteQueue(10);
+		messageDb1.setResultQueue(0);
+		messageDb1.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
 		logger.info("MessageDm insert 1 uuid: " + uuid);
-		mysqlDbConnectAgent.insert(messageDm1);
-		logger.info("Insert 1 id:" + messageDm1.getId());
+		mysqlDbConnectAgent.insert(messageDb1);
+		logger.info("Insert 1 id:" + messageDb1.getId());
 		
 		uuid = UUID.randomUUID().toString().replaceAll("-", "");
-		messageDm2 = new MessageDm();
-		messageDm2.setQueueName("TestQueue1");
-		messageDm2.setUuid(uuid);
-		messageDm2.setContent(JsonTranslator.toByteArray("Hello"));
-		messageDm2.setExecuteQueue(10);
-		messageDm2.setResultQueue(0);
-		messageDm2.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
+		messageDb2 = new MessageDb();
+		messageDb2.setQueueName("TestQueue1");
+		messageDb2.setUuid(uuid);
+		messageDb2.setContent(JsonTranslator.toByteArray("Hello"));
+		messageDb2.setExecuteQueue(10);
+		messageDb2.setResultQueue(0);
+		messageDb2.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
 		logger.info("MessageDm insert 2 uuid: " + uuid);
-		mysqlDbConnectAgent.insert(messageDm2);
-		logger.info("Insert 2 id:" + messageDm2.getId());
+		mysqlDbConnectAgent.insert(messageDb2);
+		logger.info("Insert 2 id:" + messageDb2.getId());
 		Thread.sleep(100);
 		
 		uuid = UUID.randomUUID().toString().replaceAll("-", "");
-		messageDm3 = new MessageDm();
-		messageDm3.setQueueName("TestQueue1");
-		messageDm3.setUuid(uuid);
-		messageDm3.setContent(JsonTranslator.toByteArray("Hello"));
-		messageDm3.setExecuteQueue(10);
-		messageDm3.setResultQueue(0);
-		messageDm3.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
+		messageDb3 = new MessageDb();
+		messageDb3.setQueueName("TestQueue1");
+		messageDb3.setUuid(uuid);
+		messageDb3.setContent(JsonTranslator.toByteArray("Hello"));
+		messageDb3.setExecuteQueue(10);
+		messageDb3.setResultQueue(0);
+		messageDb3.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
 		logger.info("MessageDm insert 3 uuid: " + uuid);
-		mysqlDbConnectAgent.insert(messageDm3);
-		logger.info("Insert 3 id:" + messageDm3.getId());
+		mysqlDbConnectAgent.insert(messageDb3);
+		logger.info("Insert 3 id:" + messageDb3.getId());
 		
 		uuid = UUID.randomUUID().toString().replaceAll("-", "");
-		messageDm4 = new MessageDm();
-		messageDm4.setQueueName("TestQueue1");
-		messageDm4.setUuid(uuid);
-		messageDm4.setContent(JsonTranslator.toByteArray("Hello"));
-		messageDm4.setExecuteQueue(10);
-		messageDm4.setResultQueue(0);
-		messageDm4.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
+		messageDb4 = new MessageDb();
+		messageDb4.setQueueName("TestQueue1");
+		messageDb4.setUuid(uuid);
+		messageDb4.setContent(JsonTranslator.toByteArray("Hello"));
+		messageDb4.setExecuteQueue(10);
+		messageDb4.setResultQueue(0);
+		messageDb4.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
 		logger.info("MessageDm insert 4 uuid: " + uuid);
-		mysqlDbConnectAgent.insert(messageDm4);
-		logger.info("Insert 4 id:" + messageDm4.getId());
+		mysqlDbConnectAgent.insert(messageDb4);
+		logger.info("Insert 4 id:" + messageDb4.getId());
 		
 		Thread.sleep(100);
 	}
@@ -99,20 +99,20 @@ public class MysqlDbConnectAgentTest extends AbstractJUnit4SpringContextTests {
 	@Test
 	public final void testUpdate() throws Exception {
 		
-		messageDm2.setResultQueue(5);
-		messageDm2.setStatus(MessageConstant.MESSAGE_STATUS_PORTION);
-		mysqlDbConnectAgent.update(messageDm2);
-		logger.info("update 2 status:" + messageDm2.getStatus());
+		messageDb2.setResultQueue(5);
+		messageDb2.setStatus(MessageConstant.MESSAGE_STATUS_PORTION);
+		mysqlDbConnectAgent.update(messageDb2);
+		logger.info("update 2 status:" + messageDb2.getStatus());
 		
-		messageDm3.setResultQueue(10);
-		messageDm3.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);		
-		mysqlDbConnectAgent.update(messageDm3);
-		logger.info("update 3 status:" + messageDm3.getStatus());
+		messageDb3.setResultQueue(10);
+		messageDb3.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);		
+		mysqlDbConnectAgent.update(messageDb3);
+		logger.info("update 3 status:" + messageDb3.getStatus());
 		
-		messageDm4.setResultQueue(10);
-		messageDm4.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);		
-		mysqlDbConnectAgent.update(messageDm4);
-		logger.info("update 4 status:" + messageDm4.getStatus());
+		messageDb4.setResultQueue(10);
+		messageDb4.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);		
+		mysqlDbConnectAgent.update(messageDb4);
+		logger.info("update 4 status:" + messageDb4.getStatus());
 		
 		Thread.sleep(100);
 	}
@@ -120,42 +120,42 @@ public class MysqlDbConnectAgentTest extends AbstractJUnit4SpringContextTests {
 	@Test
 	public final void testDelete() throws Exception {
 		
-		mysqlDbConnectAgent.delete(messageDm4);
-		logger.info("delete 4 id:" + messageDm4.getId());
+		mysqlDbConnectAgent.delete(messageDb4);
+		logger.info("delete 4 id:" + messageDb4.getId());
 		Thread.sleep(100);
 	}
 	
 	@Test
 	public final void testSelect() throws Exception {
 		
-		List<MessageDm> messageDmListNew = mysqlDbConnectAgent.select("TestQueue1", 0, 1000, MessageConstant.MESSAGE_STATUS_NEW);
-		for (MessageDm messageDm : messageDmListNew) {
-			logger.info("Select MESSAGE_STATUS_NEW:" + messageDm.getId() + "," + messageDm.getUuid());
+		List<MessageDb> messageDbListNew = mysqlDbConnectAgent.select("TestQueue1", 0, 1000, MessageConstant.MESSAGE_STATUS_NEW);
+		for (MessageDb messageDb : messageDbListNew) {
+			logger.info("Select MESSAGE_STATUS_NEW:" + messageDb.getId() + "," + messageDb.getUuid());
 		}
-		List<MessageDm> messageDmListPortion = mysqlDbConnectAgent.select("TestQueue1", 0, 1000, MessageConstant.MESSAGE_STATUS_PORTION);
-		for (MessageDm messageDm : messageDmListPortion) {
-			logger.info("Select MESSAGE_STATUS_PORTION:" + messageDm.getId() + "," + messageDm.getUuid());
+		List<MessageDb> messageDbListPortion = mysqlDbConnectAgent.select("TestQueue1", 0, 1000, MessageConstant.MESSAGE_STATUS_PORTION);
+		for (MessageDb messageDb : messageDbListPortion) {
+			logger.info("Select MESSAGE_STATUS_PORTION:" + messageDb.getId() + "," + messageDb.getUuid());
 		}
-		List<MessageDm> messageDmListFinish = mysqlDbConnectAgent.select("TestQueue1", 0, 1000, MessageConstant.MESSAGE_STATUS_FINISH);
-		for (MessageDm messageDm : messageDmListFinish) {
-			logger.info("Select MESSAGE_STATUS_FINISH:" + messageDm.getId() + "," + messageDm.getUuid());
+		List<MessageDb> messageDbListFinish = mysqlDbConnectAgent.select("TestQueue1", 0, 1000, MessageConstant.MESSAGE_STATUS_FINISH);
+		for (MessageDb messageDb : messageDbListFinish) {
+			logger.info("Select MESSAGE_STATUS_FINISH:" + messageDb.getId() + "," + messageDb.getUuid());
 		}
 	}
 	
 	@Test
 	public final void testSelectTimeout() throws Exception {
-		List<MessageDm> messageDmListFinish = mysqlDbConnectAgent.selectTimeout("TestQueue1", 0, 1000, MessageConstant.MESSAGE_STATUS_FINISH, System.currentTimeMillis() - 150);
-		for (MessageDm messageDm : messageDmListFinish) {
-			logger.info("Select MESSAGE_STATUS_FINISH Timeout:" + messageDm.getId() + "," + messageDm.getUuid());
+		List<MessageDb> messageDbListFinish = mysqlDbConnectAgent.selectTimeout("TestQueue1", 0, 1000, MessageConstant.MESSAGE_STATUS_FINISH, System.currentTimeMillis() - 150);
+		for (MessageDb messageDb : messageDbListFinish) {
+			logger.info("Select MESSAGE_STATUS_FINISH Timeout:" + messageDb.getId() + "," + messageDb.getUuid());
 		}
 	}
 	
 	@Test
 	public final void testSelectById() throws Exception {
 		
-		MessageDm messageDmTemp = mysqlDbConnectAgent.selectById("TestQueue1", messageDm3.getContentId());
-		if (messageDmTemp != null) {	
-			logger.info("Select by id:" + JsonTranslator.fromByteArray(messageDmTemp.getContent(), Object.class));
+		MessageDb messageDbTemp = mysqlDbConnectAgent.selectById("TestQueue1", messageDb3.getContentId());
+		if (messageDbTemp != null) {	
+			logger.info("Select by id:" + JsonTranslator.fromByteArray(messageDbTemp.getContent(), Object.class));
 		}
 	}
 	

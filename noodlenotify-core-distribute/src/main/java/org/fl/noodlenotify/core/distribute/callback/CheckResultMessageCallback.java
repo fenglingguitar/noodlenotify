@@ -3,12 +3,12 @@ package org.fl.noodlenotify.core.distribute.callback;
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.manager.ConnectManager;
+import org.fl.noodlenotify.common.pojo.db.AbstractMessageCallback;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
-import org.fl.noodlenotify.core.domain.message.AbstractMessageCallback;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 
 public class CheckResultMessageCallback extends AbstractMessageCallback {
 
@@ -16,11 +16,11 @@ public class CheckResultMessageCallback extends AbstractMessageCallback {
 	private ConnectManager bodyCacheConnectManager;
 	
 	public CheckResultMessageCallback(
-			MessageDm messageDm,
+			MessageDb messageDb,
 			ConnectManager queueCacheConnectManager,
 			ConnectManager bodyCacheConnectManager
 			) {
-		this.messageDm = messageDm;
+		this.messageDb = messageDb;
 		this.bodyCacheConnectManager = bodyCacheConnectManager;
 		this.queueCacheConnectManager = queueCacheConnectManager;
 	}
@@ -32,10 +32,10 @@ public class CheckResultMessageCallback extends AbstractMessageCallback {
 	}
 	
 	private void checkUpdateResult() {
-		if (messageDm.getResult() == false) {
+		if (messageDb.getResult() == false) {
 			removeQueue();
 		}
-		if (messageDm.getStatus() == MessageConstant.MESSAGE_STATUS_FINISH) {
+		if (messageDb.getStatus() == MessageConstant.MESSAGE_STATUS_FINISH) {
 			removeBody();
 		} else {
 			removeQueue();
@@ -46,7 +46,7 @@ public class CheckResultMessageCallback extends AbstractMessageCallback {
 		ConnectCluster queueConnectCluster = queueCacheConnectManager.getConnectCluster("ALL");
 		QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent)queueConnectCluster.getProxy();
 		try {
-			queueCacheConnectAgent.removePop(messageDm);
+			queueCacheConnectAgent.removePop(messageDb);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -56,9 +56,9 @@ public class CheckResultMessageCallback extends AbstractMessageCallback {
 	private void removeBody() {
 		ConnectCluster bodyConnectCluster = bodyCacheConnectManager.getConnectCluster("PARTALL");
 		BodyCacheConnectAgent bodyCacheConnectAgentOne = (BodyCacheConnectAgent) bodyConnectCluster.getProxy();
-		ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
+		ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDb);
 		try {
-			bodyCacheConnectAgentOne.remove(messageDm);
+			bodyCacheConnectAgentOne.remove(messageDb);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

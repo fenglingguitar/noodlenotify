@@ -13,13 +13,13 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.exception.ConnectRefusedException;
 import org.fl.noodle.common.connect.exception.ConnectResetException;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.connect.db.AbstractDbConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.db.datasource.DbDataSource;
 import org.fl.noodlenotify.core.connect.db.datasource.DbDataSourceFactory;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.RecoverableDataAccessException;
@@ -207,7 +207,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 	}
 
 	@Override
-	public void insertActual(final List<MessageDm> messageDmList) {
+	public void insertActual(final List<MessageDb> messageDbList) {
 		
 		try {
 			transactionTemplate.execute(new TransactionCallbackWithoutResult() {
@@ -217,9 +217,9 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 					
 					KeyHolder keyHolder = new GeneratedKeyHolder();  
 					
-					for (final MessageDm messageDm : messageDmList) {
+					for (final MessageDb messageDb : messageDbList) {
 						
-						String queueName =  messageDm.getQueueName();
+						String queueName =  messageDb.getQueueName();
 						String contentsql = insertContentSqlMap.get(queueName);
 						if (contentsql == null) {
 							contentsql = "INSERT INTO MSG_" + queueName.toUpperCase().replace(".", "_") 
@@ -233,7 +233,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 										throws SQLException {
 						             			PreparedStatement preparedStatement = 
 						                        		connection.prepareStatement(contentsqlFinal, Statement.RETURN_GENERATED_KEYS);
-						                        preparedStatement.setBytes(1, messageDm.getContent());
+						                        preparedStatement.setBytes(1, messageDb.getContent());
 						                        return preparedStatement;
 						                  	}
 						            	}, keyHolder);
@@ -243,11 +243,11 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 										+ "DB: " + connectId
 										+ ", Ip: " + ip
 										+ ", Port: " + port
-										+ ", UUID: " + messageDm.getUuid()
+										+ ", UUID: " + messageDb.getUuid()
 										+ ", Insert Message Content -> " + e);
 							}
-							messageDm.setResult(false);
-							messageDm.setException(e);
+							messageDb.setResult(false);
+							messageDb.setException(e);
 							continue;
 						}
 						
@@ -266,34 +266,34 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 										throws SQLException {
 						             			PreparedStatement preparedStatement = 
 						                        		connection.prepareStatement(sqlFinal, Statement.RETURN_GENERATED_KEYS);
-						             			preparedStatement.setString(1, messageDm.getUuid());
-						             			preparedStatement.setString(2, messageDm.getQueueName());
+						             			preparedStatement.setString(1, messageDb.getUuid());
+						             			preparedStatement.setString(2, messageDb.getQueueName());
 						                        preparedStatement.setLong(3, contentKey);
-						                        preparedStatement.setLong(4, messageDm.getExecuteQueue());
-						                        preparedStatement.setLong(5, messageDm.getResultQueue());
-						                        preparedStatement.setLong(6, messageDm.getStatus());
-						                        preparedStatement.setLong(7, messageDm.getRedisOne());
-						                        preparedStatement.setLong(8, messageDm.getRedisTwo());
-						                        preparedStatement.setLong(9, messageDm.getBeginTime());
-						                        preparedStatement.setLong(10, messageDm.getFinishTime());
+						                        preparedStatement.setLong(4, messageDb.getExecuteQueue());
+						                        preparedStatement.setLong(5, messageDb.getResultQueue());
+						                        preparedStatement.setLong(6, messageDb.getStatus());
+						                        preparedStatement.setLong(7, messageDb.getRedisOne());
+						                        preparedStatement.setLong(8, messageDb.getRedisTwo());
+						                        preparedStatement.setLong(9, messageDb.getBeginTime());
+						                        preparedStatement.setLong(10, messageDb.getFinishTime());
 						                        return preparedStatement;
 						                  	}
 						            	}, keyHolder);
-							messageDm.setResult(true);
-							messageDm.setDb(connectId);
-							messageDm.setId(keyHolder.getKey().longValue());
-							messageDm.setContentId(contentKey);
+							messageDb.setResult(true);
+							messageDb.setDb(connectId);
+							messageDb.setId(keyHolder.getKey().longValue());
+							messageDb.setContentId(contentKey);
 						} catch (Exception e) {
 							if (logger.isErrorEnabled()) {
 								logger.error("InsertActual -> " 
 										+ "DB: " + connectId
 										+ ", Ip: " + ip
 										+ ", Port: " + port
-										+ ", UUID: " + messageDm.getUuid()
+										+ ", UUID: " + messageDb.getUuid()
 										+ ", Insert Message Info-> " + e);
 							}
-							messageDm.setResult(false);
-							messageDm.setException(e);
+							messageDb.setResult(false);
+							messageDb.setException(e);
 						}
 					}
 				}
@@ -306,22 +306,22 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 						+ ", Port: " + port
 						+ ", Transaction -> " + e);
 			}
-			for (MessageDm messageDm : messageDmList) {
-				messageDm.setResult(false);
-				messageDm.setException(new ConnectResetException("Connection reset for insert by db connect agent"));
+			for (MessageDb messageDb : messageDbList) {
+				messageDb.setResult(false);
+				messageDb.setException(new ConnectResetException("Connection reset for insert by db connect agent"));
 			}
 		}
 	}
 
 	@Override
-	public void updateActual(final List<MessageDm> messageDmList) {
+	public void updateActual(final List<MessageDb> messageDbList) {
 		
 		try {
 			transactionTemplate.execute(new TransactionCallbackWithoutResult() {
 				@Override
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
-					for (final MessageDm messageDm : messageDmList) {						
-						String queueName =  messageDm.getQueueName();
+					for (final MessageDb messageDb : messageDbList) {						
+						String queueName =  messageDb.getQueueName();
 						String sql = updateSqlMap.get(queueName);
 						if (sql == null) {
 							sql = "UPDATE MSG_" + queueName.toUpperCase().replace(".", "_") + "_IF SET EXECUTE_QUEUE = ?, RESULT_QUEUE = ?, STATUS = ?, FINISH_TIME = ? WHERE ID = ?";
@@ -331,24 +331,24 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 						try {
 							
 							jdbcTemplate.update(sqlFinal, new Object[] {
-									messageDm.getExecuteQueue(),
-									messageDm.getResultQueue(),
-									messageDm.getStatus(),
-									messageDm.getFinishTime(),
-									messageDm.getId()
+									messageDb.getExecuteQueue(),
+									messageDb.getResultQueue(),
+									messageDb.getStatus(),
+									messageDb.getFinishTime(),
+									messageDb.getId()
 							});
-							messageDm.setResult(true);
+							messageDb.setResult(true);
 						} catch (Exception e) {
 							if (logger.isErrorEnabled()) {
 								logger.error("UpdateActual -> " 
 										+ "DB: " + connectId
 										+ ", Ip: " + ip
 										+ ", Port: " + port
-										+ ", UUID: " + messageDm.getUuid()
+										+ ", UUID: " + messageDb.getUuid()
 										+ ", Update Message -> " + e);
 							}
-							messageDm.setResult(false);
-							messageDm.setException(e);
+							messageDb.setResult(false);
+							messageDb.setException(e);
 						}
 					}
 				}
@@ -361,22 +361,22 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 						+ ", Port: " + port
 						+ ", Transaction -> " + e);
 			}
-			for (MessageDm messageDm : messageDmList) {
-				messageDm.setResult(false);
-				messageDm.setException(new ConnectResetException("Connection reset for update by db connect agent"));
+			for (MessageDb messageDb : messageDbList) {
+				messageDb.setResult(false);
+				messageDb.setException(new ConnectResetException("Connection reset for update by db connect agent"));
 			}
 		}
 	}
 	
 	@Override
-	protected void deleteActual(final List<MessageDm> messageDmList) {
+	protected void deleteActual(final List<MessageDb> messageDbList) {
 		
 		try {
 			transactionTemplate.execute(new TransactionCallbackWithoutResult() {
 				@Override
 				protected void doInTransactionWithoutResult(TransactionStatus status) {
-					for (final MessageDm messageDm : messageDmList) {
-						String queueName =  messageDm.getQueueName();
+					for (final MessageDb messageDb : messageDbList) {
+						String queueName =  messageDb.getQueueName();
 						String sqlBackup = backupSqlMap.get(queueName);
 						if (sqlBackup == null) {
 							sqlBackup = "INSERT INTO MSG_" + queueName.toUpperCase().replace(".", "_") 
@@ -388,7 +388,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 						final String sqlBackupFinal = sqlBackup;
 						try {
 							jdbcTemplate.update(sqlBackupFinal, new Object[] {
-									messageDm.getId()
+									messageDb.getId()
 							});
 						} catch (Exception e) {	
 							if (logger.isErrorEnabled()) {
@@ -396,7 +396,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 										+ "DB: " + connectId
 										+ ", Ip: " + ip
 										+ ", Port: " + port
-										+ ", UUID: " + messageDm.getUuid()
+										+ ", UUID: " + messageDb.getUuid()
 										+ ", Backup Message -> " + e);
 							}
 						}
@@ -408,7 +408,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 						final String sqlDeleteFinal = sqlDelete;
 						try {
 							jdbcTemplate.update(sqlDeleteFinal, new Object[] {
-									messageDm.getId()
+									messageDb.getId()
 							});
 						} catch (Exception e) {	
 							if (logger.isErrorEnabled()) {
@@ -416,7 +416,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 										+ "DB: " + connectId
 										+ ", Ip: " + ip
 										+ ", Port: " + port
-										+ ", UUID: " + messageDm.getUuid()
+										+ ", UUID: " + messageDb.getUuid()
 										+ ", Delete Message -> " + e);
 							}
 						}
@@ -435,7 +435,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 	}
 	
 	@Override
-	public List<MessageDm> select(String queueName, long start, long end, byte status) throws Exception {
+	public List<MessageDb> select(String queueName, long start, long end, byte status) throws Exception {
 		
 		String sql = selectSqlMap.get(queueName);
 		if (sql == null) {
@@ -445,30 +445,30 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 		}
 		final String sqlFinal = sql;
 		
-		List<MessageDm> messageDmList = null;
+		List<MessageDb> messageDbList = null;
 		try {
-			messageDmList = jdbcTemplate.query(sqlFinal, new Object[] {
+			messageDbList = jdbcTemplate.query(sqlFinal, new Object[] {
 					start,
 					end,
 					status
-			}, new RowMapper<MessageDm>() {
+			}, new RowMapper<MessageDb>() {
 				@Override
-				public MessageDm mapRow(ResultSet resultSet, int index)
+				public MessageDb mapRow(ResultSet resultSet, int index)
 						throws SQLException {
-					MessageDm messageDm = new MessageDm();
-					messageDm.setId(resultSet.getLong("ID"));
-					messageDm.setUuid(resultSet.getString("UUID"));
-					messageDm.setQueueName(resultSet.getString("QUEUE_NAME"));
-					messageDm.setContentId(resultSet.getLong("CONTENT_ID"));
-					messageDm.setExecuteQueue(resultSet.getLong("EXECUTE_QUEUE"));
-					messageDm.setResultQueue(resultSet.getLong("RESULT_QUEUE"));
-					messageDm.setStatus(resultSet.getByte("STATUS"));
-					messageDm.setDb(connectId);
-					messageDm.setRedisOne(resultSet.getLong("REDIS_ONE"));
-					messageDm.setRedisTwo(resultSet.getLong("REDIS_TWO"));
-					messageDm.setBeginTime(resultSet.getLong("BEGIN_TIME"));
-					messageDm.setFinishTime(resultSet.getLong("FINISH_TIME"));
-					return messageDm;
+					MessageDb messageDb = new MessageDb();
+					messageDb.setId(resultSet.getLong("ID"));
+					messageDb.setUuid(resultSet.getString("UUID"));
+					messageDb.setQueueName(resultSet.getString("QUEUE_NAME"));
+					messageDb.setContentId(resultSet.getLong("CONTENT_ID"));
+					messageDb.setExecuteQueue(resultSet.getLong("EXECUTE_QUEUE"));
+					messageDb.setResultQueue(resultSet.getLong("RESULT_QUEUE"));
+					messageDb.setStatus(resultSet.getByte("STATUS"));
+					messageDb.setDb(connectId);
+					messageDb.setRedisOne(resultSet.getLong("REDIS_ONE"));
+					messageDb.setRedisTwo(resultSet.getLong("REDIS_TWO"));
+					messageDb.setBeginTime(resultSet.getLong("BEGIN_TIME"));
+					messageDb.setFinishTime(resultSet.getLong("FINISH_TIME"));
+					return messageDb;
 				}
 			});
 		} catch (RecoverableDataAccessException e) {	
@@ -490,7 +490,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			}
 			throw e;
 		}
-		return messageDmList;
+		return messageDbList;
 	}
 	
 	@Override
@@ -534,7 +534,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 	}
 	
 	@Override
-	public List<MessageDm> selectTimeout(String queueName, long start, long end, byte status, long timeout) throws Exception {
+	public List<MessageDb> selectTimeout(String queueName, long start, long end, byte status, long timeout) throws Exception {
 		
 		String sql = selectFinishTimeoutSqlMap.get(queueName);
 		if (sql == null) {
@@ -544,31 +544,31 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 		}
 		final String sqlFinal = sql;
 		
-		List<MessageDm> messageDmList = null;
+		List<MessageDb> messageDbList = null;
 		try {
-			messageDmList = jdbcTemplate.query(sqlFinal, new Object[] {
+			messageDbList = jdbcTemplate.query(sqlFinal, new Object[] {
 					start,
 					end,
 					status,
 					timeout
-			}, new RowMapper<MessageDm>() {
+			}, new RowMapper<MessageDb>() {
 				@Override
-				public MessageDm mapRow(ResultSet resultSet, int index)
+				public MessageDb mapRow(ResultSet resultSet, int index)
 						throws SQLException {
-					MessageDm messageDm = new MessageDm();
-					messageDm.setId(resultSet.getLong("ID"));
-					messageDm.setUuid(resultSet.getString("UUID"));
-					messageDm.setQueueName(resultSet.getString("QUEUE_NAME"));
-					messageDm.setContentId(resultSet.getLong("CONTENT_ID"));
-					messageDm.setExecuteQueue(resultSet.getLong("EXECUTE_QUEUE"));
-					messageDm.setResultQueue(resultSet.getLong("RESULT_QUEUE"));
-					messageDm.setStatus(resultSet.getByte("STATUS"));
-					messageDm.setDb(connectId);
-					messageDm.setRedisOne(resultSet.getLong("REDIS_ONE"));
-					messageDm.setRedisTwo(resultSet.getLong("REDIS_TWO"));
-					messageDm.setBeginTime(resultSet.getLong("BEGIN_TIME"));
-					messageDm.setFinishTime(resultSet.getLong("FINISH_TIME"));
-					return messageDm;
+					MessageDb messageDb = new MessageDb();
+					messageDb.setId(resultSet.getLong("ID"));
+					messageDb.setUuid(resultSet.getString("UUID"));
+					messageDb.setQueueName(resultSet.getString("QUEUE_NAME"));
+					messageDb.setContentId(resultSet.getLong("CONTENT_ID"));
+					messageDb.setExecuteQueue(resultSet.getLong("EXECUTE_QUEUE"));
+					messageDb.setResultQueue(resultSet.getLong("RESULT_QUEUE"));
+					messageDb.setStatus(resultSet.getByte("STATUS"));
+					messageDb.setDb(connectId);
+					messageDb.setRedisOne(resultSet.getLong("REDIS_ONE"));
+					messageDb.setRedisTwo(resultSet.getLong("REDIS_TWO"));
+					messageDb.setBeginTime(resultSet.getLong("BEGIN_TIME"));
+					messageDb.setFinishTime(resultSet.getLong("FINISH_TIME"));
+					return messageDb;
 				}
 			});
 		} catch (RecoverableDataAccessException e) {	
@@ -590,11 +590,11 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			}
 			throw e;
 		}
-		return messageDmList;
+		return messageDbList;
 	}
 
 	@Override
-	public MessageDm selectById(String queueName, long id) throws Exception {
+	public MessageDb selectById(String queueName, long id) throws Exception {
 		
 		String sql = selectByIdSqlMap.get(queueName);
 		if (sql == null) {
@@ -602,17 +602,17 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			selectByIdSqlMap.putIfAbsent(queueName, sql);
 		}
 		final String sqlFinal = sql;
-		List<MessageDm> messageDmList = null;
+		List<MessageDb> messageDbList = null;
 		try {
-			messageDmList = jdbcTemplate.query(sqlFinal, new Object[] {
+			messageDbList = jdbcTemplate.query(sqlFinal, new Object[] {
 					id
-			}, new RowMapper<MessageDm>() {
+			}, new RowMapper<MessageDb>() {
 				@Override
-				public MessageDm mapRow(ResultSet resultSet, int index)
+				public MessageDb mapRow(ResultSet resultSet, int index)
 						throws SQLException {
-					MessageDm messageDm = new MessageDm();
-					messageDm.setContent(resultSet.getBytes("CONTENT"));
-					return messageDm;
+					MessageDb messageDb = new MessageDb();
+					messageDb.setContent(resultSet.getBytes("CONTENT"));
+					return messageDb;
 				}
 			});
 		} catch (RecoverableDataAccessException e) {	
@@ -634,8 +634,8 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 			}
 			throw e;
 		}
-		if (messageDmList != null && messageDmList.size() > 0) {
-			return messageDmList.get(0);
+		if (messageDbList != null && messageDbList.size() > 0) {
+			return messageDbList.get(0);
 		}
 		return null;
 	}

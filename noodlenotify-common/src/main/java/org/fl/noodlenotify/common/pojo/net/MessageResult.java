@@ -1,4 +1,4 @@
-package org.fl.noodlenotify.core.connect.net.pojo;
+package org.fl.noodlenotify.common.pojo.net;
 
 import java.io.Serializable;
 

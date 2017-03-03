@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.agent.AbstractConnectAgent;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 
 public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 	
@@ -19,8 +19,8 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 	
 	protected CacheConnectAgentConfParam cacheConnectAgentConfParam;
 	
-	protected BlockingQueue<MessageDm> setBlockingQueue;
-	protected BlockingQueue<MessageDm> removeBlockingQueue;
+	protected BlockingQueue<MessageDb> setBlockingQueue;
+	protected BlockingQueue<MessageDb> removeBlockingQueue;
 	
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	
@@ -45,8 +45,8 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 		
 		connectCacheActual();
 		
-		setBlockingQueue = new LinkedBlockingQueue<MessageDm>(cacheConnectAgentConfParam.getSetCapacity());			
-		removeBlockingQueue = new LinkedBlockingQueue<MessageDm>(cacheConnectAgentConfParam.getRemoveCapacity());
+		setBlockingQueue = new LinkedBlockingQueue<MessageDb>(cacheConnectAgentConfParam.getSetCapacity());			
+		removeBlockingQueue = new LinkedBlockingQueue<MessageDb>(cacheConnectAgentConfParam.getRemoveCapacity());
 		
 		for (int i=0; i<cacheConnectAgentConfParam.getSetThreadCount(); i++) {
 			
@@ -54,18 +54,18 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 				
 				@Override
 				public void run() {
-					List<MessageDm> messageDmList = new ArrayList<MessageDm>(cacheConnectAgentConfParam.getSetBatchSize());
+					List<MessageDb> messageDbList = new ArrayList<MessageDb>(cacheConnectAgentConfParam.getSetBatchSize());
 					while (true) {
 						while (true) {
 							try {
-								MessageDm messageDm = setBlockingQueue.poll(cacheConnectAgentConfParam.getSetWaitTime(), TimeUnit.MILLISECONDS);
-								if (messageDm != null) {
-									messageDmList.add(messageDm);
-									if (messageDmList.size() == cacheConnectAgentConfParam.getSetBatchSize()) {
+								MessageDb messageDb = setBlockingQueue.poll(cacheConnectAgentConfParam.getSetWaitTime(), TimeUnit.MILLISECONDS);
+								if (messageDb != null) {
+									messageDbList.add(messageDb);
+									if (messageDbList.size() == cacheConnectAgentConfParam.getSetBatchSize()) {
 										break;
 									}
 								} else {
-									if (messageDmList.size() > 0) {
+									if (messageDbList.size() > 0) {
 										break;
 									} else {
 										if (stopSign) {
@@ -77,11 +77,11 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 								e.printStackTrace();
 							}
 						}
-						setActual(messageDmList);
-						for (MessageDm messageDm : messageDmList) {
-							messageDm.executeMessageCallback();
+						setActual(messageDbList);
+						for (MessageDb messageDb : messageDbList) {
+							messageDb.executeMessageCallback();
 						}
-						messageDmList.clear();
+						messageDbList.clear();
 					}
 				}
 			});
@@ -93,18 +93,18 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 				
 				@Override
 				public void run() {
-					List<MessageDm> messageDmList = new ArrayList<MessageDm>(cacheConnectAgentConfParam.getRemoveBatchSize());
+					List<MessageDb> messageDbList = new ArrayList<MessageDb>(cacheConnectAgentConfParam.getRemoveBatchSize());
 					while (true) {
 						while (true) {
 							try {
-								MessageDm messageDm = removeBlockingQueue.poll(cacheConnectAgentConfParam.getRemoveWaitTime(), TimeUnit.MILLISECONDS);
-								if (messageDm != null) {
-									messageDmList.add(messageDm);
-									if (messageDmList.size() == cacheConnectAgentConfParam.getRemoveBatchSize()) {
+								MessageDb messageDb = removeBlockingQueue.poll(cacheConnectAgentConfParam.getRemoveWaitTime(), TimeUnit.MILLISECONDS);
+								if (messageDb != null) {
+									messageDbList.add(messageDb);
+									if (messageDbList.size() == cacheConnectAgentConfParam.getRemoveBatchSize()) {
 										break;
 									}
 								} else {
-									if (messageDmList.size() > 0) {
+									if (messageDbList.size() > 0) {
 										break;
 									} else {
 										if (stopSign) {
@@ -121,11 +121,11 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						removeActual(messageDmList);
-						for (MessageDm messageDm : messageDmList) {
-							messageDm.executeMessageCallback();
+						removeActual(messageDbList);
+						for (MessageDb messageDb : messageDbList) {
+							messageDb.executeMessageCallback();
 						}
-						messageDmList.clear();
+						messageDbList.clear();
 					}
 				}
 			});
@@ -155,8 +155,8 @@ public abstract class AbstractCacheConnectAgent extends AbstractConnectAgent {
 	protected abstract void reconnectCacheActual() throws Exception;
 	protected abstract void closeCacheActual();
 	
-	protected abstract void setActual(List<MessageDm> messageDmList);
-	protected abstract void removeActual(List<MessageDm> messageDmList);
+	protected abstract void setActual(List<MessageDb> messageDbList);
+	protected abstract void removeActual(List<MessageDb> messageDbList);
 	
 	public void setCacheConnectAgentConfParam(CacheConnectAgentConfParam cacheConnectAgentConfParam) {
 		this.cacheConnectAgentConfParam = cacheConnectAgentConfParam;

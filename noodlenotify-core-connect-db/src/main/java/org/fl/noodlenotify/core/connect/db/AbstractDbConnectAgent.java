@@ -12,8 +12,8 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.agent.AbstractConnectAgent;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.exception.ConnectTimeoutException;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 
 public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implements DbConnectAgent {
 	
@@ -21,9 +21,9 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 	
 	protected DbConnectAgentConfParam dbConnectAgentConfParam;
 
-	private BlockingQueue<MessageDm> insertBlockingQueue;
-	private BlockingQueue<MessageDm> updateBlockingQueue;
-	private BlockingQueue<MessageDm> deleteBlockingQueue;
+	private BlockingQueue<MessageDb> insertBlockingQueue;
+	private BlockingQueue<MessageDb> updateBlockingQueue;
+	private BlockingQueue<MessageDb> deleteBlockingQueue;
 	
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	
@@ -48,9 +48,9 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 		
 		connectDbActual();
 		
-		insertBlockingQueue = new LinkedBlockingQueue<MessageDm>(dbConnectAgentConfParam.getInsertCapacity());
-		updateBlockingQueue = new LinkedBlockingQueue<MessageDm>(dbConnectAgentConfParam.getUpdateCapacity());
-		deleteBlockingQueue = new LinkedBlockingQueue<MessageDm>(dbConnectAgentConfParam.getDeleteCapacity());
+		insertBlockingQueue = new LinkedBlockingQueue<MessageDb>(dbConnectAgentConfParam.getInsertCapacity());
+		updateBlockingQueue = new LinkedBlockingQueue<MessageDb>(dbConnectAgentConfParam.getUpdateCapacity());
+		deleteBlockingQueue = new LinkedBlockingQueue<MessageDb>(dbConnectAgentConfParam.getDeleteCapacity());
 
 		for (int i=0; i<dbConnectAgentConfParam.getInsertThreadCount(); i++) {
 			
@@ -58,18 +58,18 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 				
 				@Override
 				public void run() {
-					List<MessageDm> messageDmList = new ArrayList<MessageDm>(dbConnectAgentConfParam.getInsertBatchSize());
+					List<MessageDb> messageDbList = new ArrayList<MessageDb>(dbConnectAgentConfParam.getInsertBatchSize());
 					while (true) {
 						while (true) {
 							try {
-								MessageDm messageDm = insertBlockingQueue.poll(dbConnectAgentConfParam.getInsertWaitTime(), TimeUnit.MILLISECONDS);
-								if (messageDm != null) {
-									messageDmList.add(messageDm);
-									if (messageDmList.size() == dbConnectAgentConfParam.getInsertBatchSize()) {
+								MessageDb messageDb = insertBlockingQueue.poll(dbConnectAgentConfParam.getInsertWaitTime(), TimeUnit.MILLISECONDS);
+								if (messageDb != null) {
+									messageDbList.add(messageDb);
+									if (messageDbList.size() == dbConnectAgentConfParam.getInsertBatchSize()) {
 										break;
 									}
 								} else {
-									if (messageDmList.size() > 0) {
+									if (messageDbList.size() > 0) {
 										break;
 									} else {
 										if (stopSign && insertBlockingQueue.size() == 0) {
@@ -81,13 +81,13 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 								e.printStackTrace();
 							}
 						}
-						insertActual(messageDmList);
-						for (MessageDm messageDm : messageDmList) {
-							synchronized(messageDm) {								
-								messageDm.notifyAll();
+						insertActual(messageDbList);
+						for (MessageDb messageDb : messageDbList) {
+							synchronized(messageDb) {								
+								messageDb.notifyAll();
 							}
 						}
-						messageDmList.clear();
+						messageDbList.clear();
 					}
 				}
 			});
@@ -102,18 +102,18 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 				
 				@Override
 				public void run() {
-					List<MessageDm> messageDmList = new ArrayList<MessageDm>(dbConnectAgentConfParam.getUpdateBatchSize());
+					List<MessageDb> messageDbList = new ArrayList<MessageDb>(dbConnectAgentConfParam.getUpdateBatchSize());
 					while (true) {
 						while (true) {
 							try {
-								MessageDm messageDm = updateBlockingQueue.poll(dbConnectAgentConfParam.getUpdateWaitTime(), TimeUnit.MILLISECONDS);
-								if (messageDm != null) {
-									messageDmList.add(messageDm);
-									if (messageDmList.size() == dbConnectAgentConfParam.getUpdateBatchSize()) {
+								MessageDb messageDb = updateBlockingQueue.poll(dbConnectAgentConfParam.getUpdateWaitTime(), TimeUnit.MILLISECONDS);
+								if (messageDb != null) {
+									messageDbList.add(messageDb);
+									if (messageDbList.size() == dbConnectAgentConfParam.getUpdateBatchSize()) {
 										break;
 									}
 								} else {
-									if (messageDmList.size() > 0) {
+									if (messageDbList.size() > 0) {
 										break;
 									} else {
 										if (stopSign && updateBlockingQueue.size() == 0) {
@@ -125,11 +125,11 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 								e.printStackTrace();
 							}
 						}
-						updateActual(messageDmList);
-						for (MessageDm messageDm : messageDmList) {
-							messageDm.executeMessageCallback();
+						updateActual(messageDbList);
+						for (MessageDb messageDb : messageDbList) {
+							messageDb.executeMessageCallback();
 						}
-						messageDmList.clear();
+						messageDbList.clear();
 					}
 				}
 			});
@@ -145,19 +145,19 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 				@Override
 				public void run() {
 					
-					List<MessageDm> messageDmList = new ArrayList<MessageDm>(dbConnectAgentConfParam.getDeleteBatchSize());
+					List<MessageDb> messageDbList = new ArrayList<MessageDb>(dbConnectAgentConfParam.getDeleteBatchSize());
 					
 					while (true) {
 						while (true) {
 							try {
-								MessageDm messageDm = deleteBlockingQueue.poll(dbConnectAgentConfParam.getDeleteWaitTime(), TimeUnit.MILLISECONDS);
-								if (messageDm != null) {
-									messageDmList.add(messageDm);
-									if (messageDmList.size() == dbConnectAgentConfParam.getDeleteBatchSize()) {
+								MessageDb messageDb = deleteBlockingQueue.poll(dbConnectAgentConfParam.getDeleteWaitTime(), TimeUnit.MILLISECONDS);
+								if (messageDb != null) {
+									messageDbList.add(messageDb);
+									if (messageDbList.size() == dbConnectAgentConfParam.getDeleteBatchSize()) {
 										break;
 									}
 								} else {
-									if (messageDmList.size() > 0) {
+									if (messageDbList.size() > 0) {
 										break;
 									} else {
 										if (stopSign && deleteBlockingQueue.size() == 0) {
@@ -170,11 +170,11 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 							}
 						}
 						
-						deleteActual(messageDmList);
-						for (MessageDm messageDm : messageDmList) {
-							messageDm.executeMessageCallback();
+						deleteActual(messageDbList);
+						for (MessageDb messageDb : messageDbList) {
+							messageDb.executeMessageCallback();
 						}
-						messageDmList.clear();
+						messageDbList.clear();
 					}
 				}
 			});
@@ -208,13 +208,13 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 	protected abstract void closeDbActual();
 	
 	@Override
-	public void insert(MessageDm messageDm) throws Exception {
+	public void insert(MessageDb messageDb) throws Exception {
 		
-		synchronized(messageDm) {
-			messageDm.setResult(false);
-			if (insertBlockingQueue.offer(messageDm, dbConnectAgentConfParam.getInsertTimeout(), TimeUnit.MILLISECONDS)) {
+		synchronized(messageDb) {
+			messageDb.setResult(false);
+			if (insertBlockingQueue.offer(messageDb, dbConnectAgentConfParam.getInsertTimeout(), TimeUnit.MILLISECONDS)) {
 				try {
-					messageDm.wait();
+					messageDb.wait();
 				} catch (java.lang.InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -223,28 +223,28 @@ public abstract class AbstractDbConnectAgent extends AbstractConnectAgent implem
 			}
 		}
 		
-		if (messageDm.getResult() == false) {
-			throw messageDm.getException();
+		if (messageDb.getResult() == false) {
+			throw messageDb.getException();
 		}
 	}
 
 	@Override
-	public void update(MessageDm messageDm) throws Exception {
-		if (!updateBlockingQueue.offer(messageDm, dbConnectAgentConfParam.getUpdateTimeout(), TimeUnit.MILLISECONDS)) {				
+	public void update(MessageDb messageDb) throws Exception {
+		if (!updateBlockingQueue.offer(messageDb, dbConnectAgentConfParam.getUpdateTimeout(), TimeUnit.MILLISECONDS)) {				
 			throw new ConnectTimeoutException("Db connect agent update timeout");
 		}
 	}
 	
 	@Override
-	public void delete(MessageDm messageDm) throws Exception {
-		if (!deleteBlockingQueue.offer(messageDm, dbConnectAgentConfParam.getDeleteTimeout(), TimeUnit.MILLISECONDS)) {
+	public void delete(MessageDb messageDb) throws Exception {
+		if (!deleteBlockingQueue.offer(messageDb, dbConnectAgentConfParam.getDeleteTimeout(), TimeUnit.MILLISECONDS)) {
 			throw new ConnectTimeoutException("Db connect agent update timeout");
 		}
 	}
 	
-	protected abstract void insertActual(List<MessageDm> messageDmList);
-	protected abstract void updateActual(List<MessageDm> messageDmList);
-	protected abstract void deleteActual(List<MessageDm> messageDmList);
+	protected abstract void insertActual(List<MessageDb> messageDbList);
+	protected abstract void updateActual(List<MessageDb> messageDbList);
+	protected abstract void deleteActual(List<MessageDb> messageDbList);
 
 	public void setDbConnectAgentConfParam(DbConnectAgentConfParam dbConnectAgentConfParam) {
 		this.dbConnectAgentConfParam = dbConnectAgentConfParam;

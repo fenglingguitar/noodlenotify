@@ -11,6 +11,7 @@ import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.distributedlock.api.LockChangeHandler;
 import org.fl.noodle.common.distributedlock.db.DbDistributedLock;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
@@ -18,7 +19,6 @@ import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.db.mysql.MysqlDbConnectAgent;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
 import org.fl.noodlenotify.core.distribute.callback.RemovePopMessageCallback;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 
 public class DistributePull implements LockChangeHandler {
 	
@@ -149,18 +149,18 @@ public class DistributePull implements LockChangeHandler {
 							break;
 						}
 						
-						List<MessageDm> messageDmList = select(queueName, start, end, MessageConstant.MESSAGE_STATUS_NEW);
+						List<MessageDb> messageDbList = select(queueName, start, end, MessageConstant.MESSAGE_STATUS_NEW);
 						
-						if (messageDmList != null && messageDmList.size() > 0) {
-							for (MessageDm messageDm : messageDmList) {
+						if (messageDbList != null && messageDbList.size() > 0) {
+							for (MessageDb messageDb : messageDbList) {
 								try {
-									if (!pushNew(messageDm)) {
+									if (!pushNew(messageDb)) {
 									}
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
 							}
-							messageDmList.clear();
+							messageDbList.clear();
 						}
 						middleIdFresh.set(end); 					
 					}
@@ -204,18 +204,18 @@ public class DistributePull implements LockChangeHandler {
 							break;
 						}
 						
-						List<MessageDm> messageDmList = select(queueName, start, end, MessageConstant.MESSAGE_STATUS_NEW);
+						List<MessageDb> messageDbList = select(queueName, start, end, MessageConstant.MESSAGE_STATUS_NEW);
 						
-						if (messageDmList != null && messageDmList.size() > 0) {
-							for (MessageDm messageDm : messageDmList) {
+						if (messageDbList != null && messageDbList.size() > 0) {
+							for (MessageDb messageDb : messageDbList) {
 								try {
-									if (!pushNew(messageDm)) {
+									if (!pushNew(messageDb)) {
 									}
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
 							}
-							messageDmList.clear();
+							messageDbList.clear();
 						}
 					}
 					
@@ -258,18 +258,18 @@ public class DistributePull implements LockChangeHandler {
 							break;
 						}
 
-						List<MessageDm> messageDmList = selectTimeout(queueName, start, end, MessageConstant.MESSAGE_STATUS_PORTION, System.currentTimeMillis() - queueDistributerVo.getInterval_Time());
+						List<MessageDb> messageDbList = selectTimeout(queueName, start, end, MessageConstant.MESSAGE_STATUS_PORTION, System.currentTimeMillis() - queueDistributerVo.getInterval_Time());
 						
-						if (messageDmList != null && messageDmList.size() > 0) {
-							for (MessageDm messageDm : messageDmList) {
+						if (messageDbList != null && messageDbList.size() > 0) {
+							for (MessageDb messageDb : messageDbList) {
 								try {
-									if (!pushPortion(messageDm)) {
+									if (!pushPortion(messageDb)) {
 									}
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
 							}
-							messageDmList.clear();
+							messageDbList.clear();
 						}		
 					}
 					
@@ -308,18 +308,18 @@ public class DistributePull implements LockChangeHandler {
 						long start = index;
 						long end = index + distributeConfParam.getSelectByIdIntervalDeleteTimeout() <= max ? index + distributeConfParam.getSelectByIdIntervalDeleteTimeout() : max;
 						
-						List<MessageDm> messageDmList = selectTimeout(queueName, start, end, MessageConstant.MESSAGE_STATUS_FINISH, System.currentTimeMillis() - distributeConfParam.getSelectDeleteTimeout());
+						List<MessageDb> messageDbList = selectTimeout(queueName, start, end, MessageConstant.MESSAGE_STATUS_FINISH, System.currentTimeMillis() - distributeConfParam.getSelectDeleteTimeout());
 						
-						if (messageDmList != null && messageDmList.size() > 0) {
-							for (MessageDm messageDm : messageDmList) {
-								messageDm.addMessageCallback(new RemovePopMessageCallback(messageDm, queueCacheConnectManager));
+						if (messageDbList != null && messageDbList.size() > 0) {
+							for (MessageDb messageDb : messageDbList) {
+								messageDb.addMessageCallback(new RemovePopMessageCallback(messageDb, queueCacheConnectManager));
 								try {
-									delete(messageDm);
+									delete(messageDb);
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
 							}
-							messageDmList.clear();
+							messageDbList.clear();
 						}
 					}
 					
@@ -382,7 +382,7 @@ public class DistributePull implements LockChangeHandler {
 		}
 	}
 	
-	private List<MessageDm> select(String queueName, long start, long end, byte status) throws Exception {
+	private List<MessageDb> select(String queueName, long start, long end, byte status) throws Exception {
 		ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
 		DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
 		ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
@@ -393,18 +393,18 @@ public class DistributePull implements LockChangeHandler {
 		}
 	}
 	
-	private boolean pushNew(MessageDm messageDm) throws Exception {
-		messageDm.setBool(true);
+	private boolean pushNew(MessageDb messageDb) throws Exception {
+		messageDb.setBool(true);
 		ConnectCluster pushConnectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
 		QueueCacheConnectAgent pushQueueCacheConnectAgent = (QueueCacheConnectAgent) pushConnectCluster.getProxy();
-		return pushQueueCacheConnectAgent.push(messageDm);
+		return pushQueueCacheConnectAgent.push(messageDb);
 	}
 	
-	private boolean pushPortion(MessageDm messageDm) throws Exception {
-		messageDm.setBool(false);
+	private boolean pushPortion(MessageDb messageDb) throws Exception {
+		messageDb.setBool(false);
 		ConnectCluster pushConnectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
 		QueueCacheConnectAgent pushQueueCacheConnectAgent = (QueueCacheConnectAgent) pushConnectCluster.getProxy();
-		return pushQueueCacheConnectAgent.push(messageDm);
+		return pushQueueCacheConnectAgent.push(messageDb);
 	}
 	
 	private long minIdByStatus(String queueName, byte status) throws Exception {
@@ -418,7 +418,7 @@ public class DistributePull implements LockChangeHandler {
 		}
 	}
 	
-	private List<MessageDm> selectTimeout(String queueName, long start, long end, byte status, long timeout) throws Exception {
+	private List<MessageDb> selectTimeout(String queueName, long start, long end, byte status, long timeout) throws Exception {
 		ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
 		DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
 		ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
@@ -429,12 +429,12 @@ public class DistributePull implements LockChangeHandler {
 		}
 	}
 	
-	private void delete(MessageDm messageDm) throws Exception {
+	private void delete(MessageDb messageDb) throws Exception {
 		ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
 		DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
 		ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), dbId);
 		try {
-			dbConnectAgent.delete(messageDm);
+			dbConnectAgent.delete(messageDb);
 		} finally {
 			ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());
 		}

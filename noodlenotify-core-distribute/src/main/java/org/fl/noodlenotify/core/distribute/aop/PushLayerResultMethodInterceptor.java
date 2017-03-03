@@ -6,11 +6,11 @@ import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.manager.ConnectManager;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 
 public class PushLayerResultMethodInterceptor implements MethodInterceptor {
 	
@@ -26,32 +26,32 @@ public class PushLayerResultMethodInterceptor implements MethodInterceptor {
 		} catch (Throwable e) {
 			throw e;
 		} finally {
-			MessageDm messageDm = (MessageDm) ConnectThreadLocalStorage.get(LocalStorageType.MESSAGE_DM.getCode());
+			MessageDb messageDb = (MessageDb) ConnectThreadLocalStorage.get(LocalStorageType.MESSAGE_DM.getCode());
 			QueueDistributerVo queueDistributerVo = (QueueDistributerVo) ConnectThreadLocalStorage.get(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode());
 			
-			if (messageDm.getResultQueue() == messageDm.getExecuteQueue()) {
-				messageDm.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
+			if (messageDb.getResultQueue() == messageDb.getExecuteQueue()) {
+				messageDb.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
 			} else {
 				if (queueDistributerVo.getIs_Repeat() == MessageConstant.MESSAGE_IS_REPEAT_NO) {
-					messageDm.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
+					messageDb.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
 				} else {
 					if (queueDistributerVo.getExpire_Time() > 0 
-							&& System.currentTimeMillis() - messageDm.getBeginTime() > queueDistributerVo.getExpire_Time()) {
-						messageDm.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
+							&& System.currentTimeMillis() - messageDb.getBeginTime() > queueDistributerVo.getExpire_Time()) {
+						messageDb.setStatus(MessageConstant.MESSAGE_STATUS_FINISH);
 					} else {
-						messageDm.setStatus(MessageConstant.MESSAGE_STATUS_PORTION);
-						messageDm.setDelayTime(queueDistributerVo.getInterval_Time());
+						messageDb.setStatus(MessageConstant.MESSAGE_STATUS_PORTION);
+						messageDb.setDelayTime(queueDistributerVo.getInterval_Time());
 					}
 				}
 			}
-			messageDm.setFinishTime(System.currentTimeMillis());
+			messageDb.setFinishTime(System.currentTimeMillis());
 			
 			ConnectManager dbConnectManager = connectDistinguish.getConnectManager();
 			ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
 			DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
-			ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), messageDm.getDb());
+			ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), messageDb.getDb());
 			try {
-				dbConnectAgent.update(messageDm);
+				dbConnectAgent.update(messageDb);
 			} catch (Exception e) {
 				throw e;
 			} finally {

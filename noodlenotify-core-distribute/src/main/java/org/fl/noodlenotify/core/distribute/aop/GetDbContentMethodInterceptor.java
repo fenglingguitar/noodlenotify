@@ -6,9 +6,9 @@ import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.manager.ConnectManager;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 
 public class GetDbContentMethodInterceptor implements MethodInterceptor {
 
@@ -28,23 +28,23 @@ public class GetDbContentMethodInterceptor implements MethodInterceptor {
 		} finally {
 			if (invocation.getMethod().getName().equals("pop") && object != null) {
 				
-				MessageDm messageDm = (MessageDm)object;
+				MessageDb messageDb = (MessageDb)object;
 				
-				if (messageDm.getContent() == null) {
+				if (messageDb.getContent() == null) {
 					ConnectCluster dbConnectCluster = dbConnectManager.getConnectCluster("ID");
 					DbConnectAgent dbConnectAgent = (DbConnectAgent) dbConnectCluster.getProxy();
 					
-					ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), messageDm.getDb());
+					ConnectThreadLocalStorage.put(LocalStorageType.CONNECT_ID.getCode(), messageDb.getDb());
 					try {
-						MessageDm messageDmTemp = dbConnectAgent.selectById(messageDm.getQueueName(), messageDm.getContentId());
-						if (messageDmTemp == null) {
+						MessageDb messageDbTemp = dbConnectAgent.selectById(messageDb.getQueueName(), messageDb.getContentId());
+						if (messageDbTemp == null) {
 							throw new Exception("can not get the message content");
 						}
-						messageDm.setContent(messageDmTemp.getContent());
+						messageDb.setContent(messageDbTemp.getContent());
 					} catch (Exception e) {
 						e.printStackTrace();
-						messageDm.setResult(false);
-						messageDm.executeMessageCallback();
+						messageDb.setResult(false);
+						messageDb.executeMessageCallback();
 						throw e;
 					} finally {
 						ConnectThreadLocalStorage.remove(LocalStorageType.CONNECT_ID.getCode());

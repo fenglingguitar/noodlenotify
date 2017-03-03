@@ -1,14 +1,14 @@
-package org.fl.noodlenotify.core.domain.message;
+package org.fl.noodlenotify.common.pojo.console;
 
 import java.io.Serializable;
 import java.util.Date;
 
-public class MessageVo implements Serializable {
+import org.fl.noodlenotify.common.pojo.MessageBase;
+
+public class MessageVo extends MessageBase implements Serializable {
 	
 	private static final long serialVersionUID = 643801698855169490L;
 	
-	private String uuid;
-	private String queueName;
 	private String content;
 	private Long contentId;
 	private Long db;
@@ -20,22 +20,6 @@ public class MessageVo implements Serializable {
 	private Date finishTime;
 	
 	private Long region;
-	
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-	
-	public String getQueueName() {
-		return queueName;
-	}
-
-	public void setQueueName(String queueName) {
-		this.queueName = queueName;
-	}
 
 	public String getContent() {
 		return content;

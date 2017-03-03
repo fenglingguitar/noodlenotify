@@ -1,13 +1,13 @@
-package org.fl.noodlenotify.core.domain.message;
+package org.fl.noodlenotify.common.pojo.cache;
 
 import java.io.Serializable;
 
-public class MessageQueueDm implements Serializable {
+import org.fl.noodlenotify.common.pojo.MessageBase;
+
+public class MessageCache extends MessageBase implements Serializable {
 	
 	private static final long serialVersionUID = -4505550212935402048L;
 	
-	private String uuid = "";
-	private String queueName = "";
 	private long contentId;
 	private long db;
 	private long id;
@@ -19,22 +19,6 @@ public class MessageQueueDm implements Serializable {
 	private long beginTime;
 	private long finishTime;
 	private long cacheTimestamp;
-	
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-	
-	public String getQueueName() {
-		return queueName;
-	}
-
-	public void setQueueName(String queueName) {
-		this.queueName = queueName;
-	}
 
 	public long getContentId() {
 		return contentId;

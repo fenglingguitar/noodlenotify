@@ -6,9 +6,8 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
-
 import org.fl.noodle.common.util.json.JsonTranslator;
-import org.fl.noodlenotify.core.connect.net.pojo.MessageResult;
+import org.fl.noodlenotify.common.pojo.net.MessageResult;
 
 public class NettyNetConnectServerCheckHandler extends SimpleChannelHandler {
 	

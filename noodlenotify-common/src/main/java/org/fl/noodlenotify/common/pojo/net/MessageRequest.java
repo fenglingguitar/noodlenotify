@@ -1,8 +1,10 @@
-package org.fl.noodlenotify.core.connect.net.pojo;
+package org.fl.noodlenotify.common.pojo.net;
 
 import java.io.Serializable;
 
-public class Message implements Serializable {
+import org.fl.noodlenotify.common.pojo.MessageBase;
+
+public class MessageRequest extends MessageBase implements Serializable {
 	
 	private static final long serialVersionUID = 643801698855169490L;
 	
@@ -13,10 +15,10 @@ public class Message implements Serializable {
 	private String parentInvoke;
 	private String parentStackKey;
 	
-	public Message() {
+	public MessageRequest() {
 	}
 	
-	public Message(
+	public MessageRequest(
 			String queueName,
 			String uuid,
 			String content

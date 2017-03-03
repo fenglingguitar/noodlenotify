@@ -1,32 +1,32 @@
 package org.fl.noodlenotify.core.exchange;
 
+import java.util.List;
 import java.util.UUID;
 
+import org.aopalliance.aop.Advice;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.exception.ConnectInvokeException;
 import org.fl.noodle.common.connect.manager.ConnectManagerPool;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.connect.server.ConnectServer;
-import org.fl.noodle.common.log.Logger;
-import org.fl.noodle.common.log.LoggerFactory;
 import org.fl.noodle.common.trace.TraceInterceptor;
-import org.fl.noodle.common.trace.operation.performance.TracePerformancePrint;
 import org.fl.noodle.common.util.net.NetAddressUtil;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
+import org.fl.noodlenotify.common.pojo.net.MessageRequest;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.db.DbConnectAgent;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
-import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.core.constant.message.MessageConstant;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.fl.noodlenotify.core.exchange.manager.ExchangeConnectManager;
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.factory.FactoryBean;
 
-public class Exchange implements NetConnectReceiver {
-
-	//private final static Logger logger = LoggerFactory.getLogger(Exchange.class);
-	private final static Logger logger = LoggerFactory.getLogger("trace.method");
+public class Exchange implements NetConnectReceiver, FactoryBean<Object>, MethodInterceptor {
 	
 	private ConsoleRemotingInvoke consoleRemotingInvoke;
 	
@@ -45,6 +45,9 @@ public class Exchange implements NetConnectReceiver {
 	
 	private ConnectServer connectServer;
 	
+	private Object serviceProxy;	
+	private List<MethodInterceptor> methodInterceptorList;
+	
 	public void start() throws Exception {
 		
 		if (exchangeName == null || 
@@ -59,6 +62,15 @@ public class Exchange implements NetConnectReceiver {
 		exchangeModuleRegister.setModuleId(moduleId);
 
 		connectManagerPool.start();
+		
+		ProxyFactory proxyFactory = new ProxyFactory(NetConnectReceiver.class, this);
+		if (methodInterceptorList != null && methodInterceptorList.size() > 0) {
+			for (Object object : methodInterceptorList) {
+				proxyFactory.addAdvice((Advice)object);
+			}
+		}
+		proxyFactory.setTarget(this);
+		this.serviceProxy = proxyFactory.getProxy();
 	}
 	
 	public void destroy() throws Exception {
@@ -68,38 +80,57 @@ public class Exchange implements NetConnectReceiver {
 	}
 	
 	@Override
-	public void receive(Message message) throws Exception {
+	public Object invoke(MethodInvocation invocation) throws Throwable {
 		
-		if (message.getTraceKey() == null || message.getTraceKey().isEmpty()) {
-			TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
-			TraceInterceptor.setInvoke("Root");
-			TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
-		} else {
-			TraceInterceptor.setTraceKey(message.getTraceKey());
-			TraceInterceptor.setInvoke(message.getParentInvoke());
-			TraceInterceptor.setStackKey(message.getParentStackKey());
+		if (invocation.getArguments().length > 0 && invocation.getArguments()[0] instanceof MessageRequest) {
+			MessageRequest messageRequest = (MessageRequest)invocation.getArguments()[0];
+			if (messageRequest.getTraceKey() == null || messageRequest.getTraceKey().isEmpty()) {
+				TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
+				TraceInterceptor.setInvoke("Root");
+				TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
+			} else {
+				TraceInterceptor.setTraceKey(messageRequest.getTraceKey());
+				TraceInterceptor.setInvoke(messageRequest.getParentInvoke());
+				TraceInterceptor.setStackKey(messageRequest.getParentStackKey());
+			}
 		}
 		
-		TraceInterceptor.setInvoke("Exchange.receive");
-		TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
-		logger.printEnter(message);
-		TracePerformancePrint.printTraceLog(TraceInterceptor.getInvoke(), message.getParentInvoke(), 0, 0, true, TraceInterceptor.getStackKey(), TraceInterceptor.getParentStackKey());
-		
-		MessageDm messageDm = new MessageDm(
+		return invocation.proceed();
+	}
+
+	@Override
+	public Object getObject() throws Exception {
+		return this.serviceProxy;
+	}
+
+	@Override
+	public Class<?> getObjectType() {
+		return NetConnectReceiver.class;
+	}
+
+	@Override
+	public boolean isSingleton() {
+		return true;
+	}
+	
+	@Override
+	public void receive(MessageRequest message) throws Exception {
+				
+		MessageDb messageDb = new MessageDb(
 				message.getQueueName(), 
 				message.getUuid(), 
 				message.getContent().getBytes("UTF-8"),
 				TraceInterceptor.getTraceKey()
 				);
 		
-		if (messageDm.getContent().length > sizeLimit) {
+		if (messageDb.getContent().length > sizeLimit) {
 			throw new ConnectInvokeException("Message body bigger then max limit: " + sizeLimit);
 		}
 		
-		Long queueConsumerGroupNum = ((ExchangeConnectManager) connectManagerPool.getConnectManager(ConnectManagerType.EXCHANGE.getCode())).getQueueConsumerGroupNumMap().get(messageDm.getQueueName());
+		Long queueConsumerGroupNum = ((ExchangeConnectManager) connectManagerPool.getConnectManager(ConnectManagerType.EXCHANGE.getCode())).getQueueConsumerGroupNumMap().get(messageDb.getQueueName());
 		if (queueConsumerGroupNum != null) {
-			messageDm.setExecuteQueue(queueConsumerGroupNum);
-			messageDm.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
+			messageDb.setExecuteQueue(queueConsumerGroupNum);
+			messageDb.setStatus(MessageConstant.MESSAGE_STATUS_NEW);
 		} else {
 			connectManagerPool.getConnectManager(ConnectManagerType.EXCHANGE.getCode()).runUpdate();
 			throw new ConnectInvokeException("Set execute queue error, can not get queue consumer group num");
@@ -108,10 +139,10 @@ public class Exchange implements NetConnectReceiver {
 		ConnectCluster connectCluster = connectManagerPool.getConnectManager(ConnectManagerType.DB.getCode()).getConnectCluster("DEFALT");
 		DbConnectAgent dbConnectAgent = (DbConnectAgent) connectCluster.getProxy();
 		
-		messageDm.setBeginTime(System.currentTimeMillis());
-		ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
+		messageDb.setBeginTime(System.currentTimeMillis());
+		ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDb);
 		try {
-			dbConnectAgent.insert(messageDm);
+			dbConnectAgent.insert(messageDb);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -162,5 +193,13 @@ public class Exchange implements NetConnectReceiver {
 
 	public void setConnectServer(ConnectServer connectServer) {
 		this.connectServer = connectServer;
+	}
+
+	public List<MethodInterceptor> getMethodInterceptorList() {
+		return methodInterceptorList;
+	}
+
+	public void setMethodInterceptorList(List<MethodInterceptor> methodInterceptorList) {
+		this.methodInterceptorList = methodInterceptorList;
 	}
 }

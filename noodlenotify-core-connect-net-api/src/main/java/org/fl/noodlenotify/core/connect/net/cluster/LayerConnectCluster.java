@@ -9,8 +9,8 @@ import org.fl.noodle.common.connect.cluster.AbstractConnectCluster;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.node.ConnectNode;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.springframework.aop.support.AopUtils;
 
 public class LayerConnectCluster extends AbstractConnectCluster {
@@ -28,10 +28,10 @@ public class LayerConnectCluster extends AbstractConnectCluster {
 		
 		ConnectNode connectNode = getConnectNode(args);
 		
-		MessageDm messageDm = (MessageDm) ConnectThreadLocalStorage.get(LocalStorageType.MESSAGE_DM.getCode());
+		MessageDb messageDb = (MessageDb) ConnectThreadLocalStorage.get(LocalStorageType.MESSAGE_DM.getCode());
 		
-		long executeQueue = messageDm.getExecuteQueue();
-		long resultQueue = messageDm.getResultQueue();
+		long executeQueue = messageDb.getExecuteQueue();
+		long resultQueue = messageDb.getResultQueue();
 		long executeQueueNum = 1;
 		while (executeQueue > 0) {
 			if ((executeQueue & 1) > 0 && (resultQueue & 1) == 0) {
@@ -49,7 +49,7 @@ public class LayerConnectCluster extends AbstractConnectCluster {
 					} finally {
 						ConnectThreadLocalStorage.remove(LocalStorageType.LAYER_CONNECT_CLUSTER.getCode());
 					}
-					messageDm.setResultQueue(messageDm.getResultQueue() | executeQueueNum);
+					messageDb.setResultQueue(messageDb.getResultQueue() | executeQueueNum);
 				}
 			}
 			executeQueue >>= 1;

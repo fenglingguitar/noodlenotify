@@ -5,14 +5,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.fl.noodle.common.mvc.vo.PageVo;
+import org.fl.noodlenotify.common.pojo.net.MessageRequest;
 import org.fl.noodlenotify.console.service.QueueService;
 import org.fl.noodlenotify.console.vo.QueueVo;
 import org.fl.noodle.common.mvc.annotation.NoodleRequestParam;
 import org.fl.noodle.common.mvc.annotation.NoodleResponseBody;
 import org.fl.noodle.common.mvc.vo.VoidVo;
-import org.fl.noodlenotify.core.connect.net.pojo.Message;
 import org.fl.noodlenotify.core.pclient.ProducerClientImpl;
 
 
@@ -92,7 +91,7 @@ public class QueueController {
 	
 	@RequestMapping(value = "/send")
 	@NoodleResponseBody
-	public Message send(@NoodleRequestParam Message message, String content) throws Exception {
-		return new Message(message.getQueueName(), producerClient.send(message.getQueueName(), message.getContent()), null);
+	public MessageRequest send(@NoodleRequestParam MessageRequest message, String content) throws Exception {
+		return new MessageRequest(message.getQueueName(), producerClient.send(message.getQueueName(), message.getContent()), null);
 	}
 }

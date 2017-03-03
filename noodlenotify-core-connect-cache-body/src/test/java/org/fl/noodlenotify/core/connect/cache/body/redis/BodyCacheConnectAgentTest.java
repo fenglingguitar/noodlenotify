@@ -10,9 +10,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.util.json.JsonTranslator;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheStatusChecker;
 import org.fl.noodlenotify.core.connect.cache.body.redis.RedisBodyCacheConnectAgent;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 
 @ContextConfiguration(locations = {
 		"classpath:org/fl/noodlenotify/core/connect/cache/body/redis/noodlenotify-core-connect-cache-body-redis.xml"
@@ -25,19 +25,19 @@ public class BodyCacheConnectAgentTest extends AbstractJUnit4SpringContextTests 
 	@Autowired
 	RedisBodyCacheConnectAgent redisBodyCacheConnectAgent;
 	
-	public static MessageDm messageDm;
+	public static MessageDb messageDb;
 	
 	@Test
 	public final void testSet() throws Exception {
 		
 		String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-		messageDm = new MessageDm();
-		messageDm.setQueueName("testQueue1");
-		messageDm.setUuid(uuid);
-		messageDm.setContent(JsonTranslator.toByteArray("Hello"));
+		messageDb = new MessageDb();
+		messageDb.setQueueName("testQueue1");
+		messageDb.setUuid(uuid);
+		messageDb.setContent(JsonTranslator.toByteArray("Hello"));
 		
 		logger.info("MessageDm uuid: " + uuid);
-		redisBodyCacheConnectAgent.set(messageDm);
+		redisBodyCacheConnectAgent.set(messageDb);
 		logger.info("set...");
 		Thread.sleep(100);
 		logger.info("Sleep: " + 100);
@@ -45,41 +45,41 @@ public class BodyCacheConnectAgentTest extends AbstractJUnit4SpringContextTests 
 
 	@Test
 	public final void testGet() throws Exception {
-		MessageDm messageDmTemp = new MessageDm();
-		messageDmTemp.setUuid(messageDm.getUuid());
+		MessageDb messageDbTemp = new MessageDb();
+		messageDbTemp.setUuid(messageDb.getUuid());
 		
-		messageDmTemp = redisBodyCacheConnectAgent.get(messageDmTemp);
-		logger.info("get uuid: " + (messageDmTemp.getContent() != null ? messageDmTemp.getUuid() : "NULL"));
+		messageDbTemp = redisBodyCacheConnectAgent.get(messageDbTemp);
+		logger.info("get uuid: " + (messageDbTemp.getContent() != null ? messageDbTemp.getUuid() : "NULL"));
 		
 		Thread.sleep(1000);
 		logger.info("Sleep: " + 1000);
-		messageDmTemp = redisBodyCacheConnectAgent.get(messageDmTemp);
-		logger.info("get uuid: " + (messageDmTemp.getContent() != null ? messageDmTemp.getUuid() : "NULL"));
+		messageDbTemp = redisBodyCacheConnectAgent.get(messageDbTemp);
+		logger.info("get uuid: " + (messageDbTemp.getContent() != null ? messageDbTemp.getUuid() : "NULL"));
 		
 		Thread.sleep(1001);
 		logger.info("Sleep: " + 1001);
-		messageDmTemp = redisBodyCacheConnectAgent.get(messageDmTemp);
-		logger.info("get uuid: " + (messageDmTemp.getContent() != null ? messageDmTemp.getUuid() : "NULL"));
+		messageDbTemp = redisBodyCacheConnectAgent.get(messageDbTemp);
+		logger.info("get uuid: " + (messageDbTemp.getContent() != null ? messageDbTemp.getUuid() : "NULL"));
 	}
 
 	@Test
 	public final void testRemove() throws Exception {
-		redisBodyCacheConnectAgent.set(messageDm);
+		redisBodyCacheConnectAgent.set(messageDb);
 		logger.info("set...");
 		Thread.sleep(100);
 		logger.info("Sleep: " + 100);
 		
-		MessageDm messageDmTemp = new MessageDm();
-		messageDmTemp.setUuid(messageDm.getUuid());
+		MessageDb messageDbTemp = new MessageDb();
+		messageDbTemp.setUuid(messageDb.getUuid());
 		
-		messageDmTemp = redisBodyCacheConnectAgent.get(messageDmTemp);
-		logger.info("get uuid: " + (messageDmTemp.getContent() != null ? messageDmTemp.getUuid() : "NULL"));
+		messageDbTemp = redisBodyCacheConnectAgent.get(messageDbTemp);
+		logger.info("get uuid: " + (messageDbTemp.getContent() != null ? messageDbTemp.getUuid() : "NULL"));
 		
-		redisBodyCacheConnectAgent.remove(messageDm);
+		redisBodyCacheConnectAgent.remove(messageDb);
 		logger.info("remove...");
 		
-		messageDmTemp = redisBodyCacheConnectAgent.get(messageDmTemp);
-		logger.info("get uuid: " + (messageDmTemp.getContent() != null ? messageDmTemp.getUuid() : "NULL"));
+		messageDbTemp = redisBodyCacheConnectAgent.get(messageDbTemp);
+		logger.info("get uuid: " + (messageDbTemp.getContent() != null ? messageDbTemp.getUuid() : "NULL"));
 	}
 	
 	@Test

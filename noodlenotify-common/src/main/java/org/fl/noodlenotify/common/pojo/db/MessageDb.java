@@ -1,15 +1,15 @@
-package org.fl.noodlenotify.core.domain.message;
+package org.fl.noodlenotify.common.pojo.db;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MessageDm implements Serializable {
+import org.fl.noodlenotify.common.pojo.MessageBase;
+
+public class MessageDb extends MessageBase implements Serializable {
 	
 	private static final long serialVersionUID = 643801698855169490L;
 	
-	private String uuid;
-	private String queueName;
 	private byte[] content;
 	private long contentId;
 	private long db;
@@ -31,35 +31,19 @@ public class MessageDm implements Serializable {
 	
 	private List<MessageCallback> messageCallbackList = new ArrayList<MessageCallback>();
 	
-	public MessageDm() {
+	public MessageDb() {
 	}
 	
-	public MessageDm(
+	public MessageDb(
 			String queueName,
 			String uuid,
 			byte[] content,
 			String traceKey
 			) {
-		this.queueName = queueName;
-		this.uuid = uuid;
+		super.queueName = queueName;
+		super.uuid = uuid;
 		this.content = content;
 		this.traceKey = traceKey;
-	}
-	
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-	
-	public String getQueueName() {
-		return queueName;
-	}
-
-	public void setQueueName(String queueName) {
-		this.queueName = queueName;
 	}
 
 	public byte[] getContent() {

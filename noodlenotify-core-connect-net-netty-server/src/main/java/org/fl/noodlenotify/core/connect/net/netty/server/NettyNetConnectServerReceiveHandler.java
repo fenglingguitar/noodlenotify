@@ -9,9 +9,9 @@ import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.fl.noodle.common.util.json.JsonTranslator;
+import org.fl.noodlenotify.common.pojo.net.MessageRequest;
+import org.fl.noodlenotify.common.pojo.net.MessageResult;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
-import org.fl.noodlenotify.core.connect.net.pojo.Message;
-import org.fl.noodlenotify.core.connect.net.pojo.MessageResult;
 
 public class NettyNetConnectServerReceiveHandler extends SimpleChannelHandler {
 	
@@ -41,14 +41,14 @@ public class NettyNetConnectServerReceiveHandler extends SimpleChannelHandler {
 		String uuid = null;
 		
 		try {
-			Message message = JsonTranslator.fromString(nettyNetConnectServerModel.getData(), Message.class);
-			if (message.getUuid() == null) {
+			MessageRequest messageRequest = JsonTranslator.fromString(nettyNetConnectServerModel.getData(), MessageRequest.class);
+			if (messageRequest.getUuid() == null) {
 				uuid = UUID.randomUUID().toString().replaceAll("-", ""); 
-				message.setUuid(uuid);
+				messageRequest.setUuid(uuid);
 			} else {
-				uuid = message.getUuid();
+				uuid = messageRequest.getUuid();
 			}
-			netConnectReceiver.receive(message);
+			netConnectReceiver.receive(messageRequest);
 			ctx.getChannel().write(JsonTranslator.toString(new MessageResult(true, uuid)));
 		} catch (Exception receiveException) {
 			if (logger.isErrorEnabled()) {

@@ -12,11 +12,11 @@ import org.fl.noodle.common.connect.exception.ConnectSerializeException;
 import org.fl.noodle.common.connect.exception.ConnectStopException;
 import org.fl.noodle.common.connect.exception.ConnectTimeoutException;
 import org.fl.noodle.common.net.socket.SocketConnect;
+import org.fl.noodlenotify.common.pojo.net.MessageRequest;
+import org.fl.noodlenotify.common.pojo.net.MessageResult;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
 import org.fl.noodlenotify.core.connect.net.netty.client.exception.NettyConnectionException;
-import org.fl.noodlenotify.core.connect.net.pojo.Message;
-import org.fl.noodlenotify.core.connect.net.pojo.MessageResult;
 
 public class NettyNetConnectAgent extends AbstractNetConnectAgent implements NetConnectAgent {
 
@@ -73,12 +73,12 @@ public class NettyNetConnectAgent extends AbstractNetConnectAgent implements Net
 	}
 
 	@Override
-	public String send(Message message) throws Exception {
+	public String send(MessageRequest message) throws Exception {
 		return send(message, readTimeout);
 	}
 	
 	@Override
-	public String send(Message message, int readTimeout) throws Exception {
+	public String send(MessageRequest message, int readTimeout) throws Exception {
 
 		String serializationString = null;
 		try {

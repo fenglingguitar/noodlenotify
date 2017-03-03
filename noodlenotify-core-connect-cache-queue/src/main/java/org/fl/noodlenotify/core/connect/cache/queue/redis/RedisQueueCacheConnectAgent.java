@@ -8,6 +8,8 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.exception.ConnectRefusedException;
 import org.fl.noodle.common.util.json.JsonTranslator;
+import org.fl.noodlenotify.common.pojo.cache.MessageCache;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.connect.cache.AbstractCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.CachePostfix;
@@ -15,8 +17,6 @@ import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.redis.JedisTemplate;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
-import org.fl.noodlenotify.core.domain.message.MessageQueueDm;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -81,76 +81,76 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 		jedisPool.destroy();
 	}
 	
-	protected void setActual(List<MessageDm> messageDmList) {
+	protected void setActual(List<MessageDb> messageDbList) {
 	}
 	
 	@Override
-	protected void removeActual(List<MessageDm> messageDmList) {
+	protected void removeActual(List<MessageDb> messageDbList) {
 	}
 	
 	@Override
-	public boolean push(final MessageDm messageDm) throws Exception {
+	public boolean push(final MessageDb messageDb) throws Exception {
 		
 		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Boolean>() {
 			
 			@Override
 			public Boolean doOperation(Jedis jedis) throws Exception {
 				
-				MessageQueueDm messageQueueDm = new MessageQueueDm();
+				MessageCache messageCache = new MessageCache();
 
 				String queueFullName = null;
 				String hashFullName = null;
 				
-				if (messageDm.getBool()) {				
-					queueFullName = CachePostfix.getKey(messageDm.getQueueName(), CachePostfix.KeyPostfix.QUEUE_NEW);
-					hashFullName = CachePostfix.getKey(messageDm.getQueueName(), CachePostfix.KeyPostfix.QUEUE_HASH_NEW);
+				if (messageDb.getBool()) {				
+					queueFullName = CachePostfix.getKey(messageDb.getQueueName(), CachePostfix.KeyPostfix.QUEUE_NEW);
+					hashFullName = CachePostfix.getKey(messageDb.getQueueName(), CachePostfix.KeyPostfix.QUEUE_HASH_NEW);
 					
 				} else {
-					queueFullName = CachePostfix.getKey(messageDm.getQueueName(), CachePostfix.KeyPostfix.QUEUE_PORTION);
-					hashFullName = CachePostfix.getKey(messageDm.getQueueName(), CachePostfix.KeyPostfix.QUEUE_HASH_PORTION);
+					queueFullName = CachePostfix.getKey(messageDb.getQueueName(), CachePostfix.KeyPostfix.QUEUE_PORTION);
+					hashFullName = CachePostfix.getKey(messageDb.getQueueName(), CachePostfix.KeyPostfix.QUEUE_HASH_PORTION);
 				}
-				String activeFullName = CachePostfix.getKey(messageDm.getQueueName(), CachePostfix.KeyPostfix.QUEUE_ACTIVE);
+				String activeFullName = CachePostfix.getKey(messageDb.getQueueName(), CachePostfix.KeyPostfix.QUEUE_ACTIVE);
 				
 				if (!jedis.exists(activeFullName)) {
-					queueIsActiveMap.put(messageDm.getQueueName(), false);
+					queueIsActiveMap.put(messageDb.getQueueName(), false);
 					return false;
 				}
 				
-				if (jedis.exists(messageDm.getUuid())) {
+				if (jedis.exists(messageDb.getUuid())) {
 					return false;
 				}
 				
 				long nowTime = System.currentTimeMillis();
-				messageQueueDm.setCacheTimestamp(nowTime);
-				if (jedis.hsetnx(hashFullName, messageDm.getUuid(), String.valueOf(nowTime)) == 0) {
-					String value = jedis.hget(hashFullName, messageDm.getUuid());
+				messageCache.setCacheTimestamp(nowTime);
+				if (jedis.hsetnx(hashFullName, messageDb.getUuid(), String.valueOf(nowTime)) == 0) {
+					String value = jedis.hget(hashFullName, messageDb.getUuid());
 					if (value != null) {
 						if (System.currentTimeMillis() - Long.valueOf(value) >= queueCacheConnectAgentConfParam.getHashExpire()) {
-							jedis.hdel(hashFullName, messageDm.getUuid());
+							jedis.hdel(hashFullName, messageDb.getUuid());
 						}
 					}
 					return false;
 				}
 				
-				if (jedis.exists(messageDm.getUuid())) {
-					jedis.hdel(hashFullName, messageDm.getUuid());
+				if (jedis.exists(messageDb.getUuid())) {
+					jedis.hdel(hashFullName, messageDb.getUuid());
 					return false;
 				}
 				
-				messageQueueDm.setQueueName(messageDm.getQueueName());
-				messageQueueDm.setUuid(messageDm.getUuid());
-				messageQueueDm.setContentId(messageDm.getContentId());
-				messageQueueDm.setDb(messageDm.getDb());
-				messageQueueDm.setId(messageDm.getId());
-				messageQueueDm.setExecuteQueue(messageDm.getExecuteQueue());
-				messageQueueDm.setResultQueue(messageDm.getResultQueue());
-				messageQueueDm.setStatus(messageDm.getStatus());
-				messageQueueDm.setRedisOne(messageDm.getRedisOne());
-				messageQueueDm.setRedisTwo(messageDm.getRedisTwo());
-				messageQueueDm.setBeginTime(messageDm.getBeginTime());
-				messageQueueDm.setFinishTime(messageDm.getFinishTime());
+				messageCache.setQueueName(messageDb.getQueueName());
+				messageCache.setUuid(messageDb.getUuid());
+				messageCache.setContentId(messageDb.getContentId());
+				messageCache.setDb(messageDb.getDb());
+				messageCache.setId(messageDb.getId());
+				messageCache.setExecuteQueue(messageDb.getExecuteQueue());
+				messageCache.setResultQueue(messageDb.getResultQueue());
+				messageCache.setStatus(messageDb.getStatus());
+				messageCache.setRedisOne(messageDb.getRedisOne());
+				messageCache.setRedisTwo(messageDb.getRedisTwo());
+				messageCache.setBeginTime(messageDb.getBeginTime());
+				messageCache.setFinishTime(messageDb.getFinishTime());
 				
-				jedis.rpush(queueFullName, JsonTranslator.toString(messageQueueDm));
+				jedis.rpush(queueFullName, JsonTranslator.toString(messageCache));
 				
 				return true;
 			}
@@ -158,12 +158,12 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 
 	@Override
-	public MessageDm pop(final String queueName, final boolean queueType) throws Exception {
+	public MessageDb pop(final String queueName, final boolean queueType) throws Exception {
 		
-		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<MessageDm>() {
+		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<MessageDb>() {
 			
 			@Override
-			public MessageDm doOperation(Jedis jedis) throws Exception {
+			public MessageDb doOperation(Jedis jedis) throws Exception {
 				
 				String queueFullName = null;
 				String hashFullName = null;
@@ -182,22 +182,22 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 					return null;
 				}
 				
-				List<String> messageDmStrList = jedis.blpop(queueCacheConnectAgentConfParam.getPopTimeout(), queueFullName);
-				if (messageDmStrList != null && messageDmStrList.size() >= 2) {
+				List<String> messageDbStrList = jedis.blpop(queueCacheConnectAgentConfParam.getPopTimeout(), queueFullName);
+				if (messageDbStrList != null && messageDbStrList.size() >= 2) {
 					
-					MessageDm messageDm = (MessageDm) JsonTranslator.fromString(messageDmStrList.get(1), MessageDm.class);
+					MessageDb messageDb = (MessageDb) JsonTranslator.fromString(messageDbStrList.get(1), MessageDb.class);
 					
-					String value = jedis.hget(hashFullName, messageDm.getUuid());
-					if (value != null && Long.valueOf(value) == messageDm.getCacheTimestamp()) {
+					String value = jedis.hget(hashFullName, messageDb.getUuid());
+					if (value != null && Long.valueOf(value) == messageDb.getCacheTimestamp()) {
 						
 						jedis.multi();
 						Transaction transaction = new Transaction(jedis.getClient());
-						transaction.set(messageDm.getUuid(), "");
-						transaction.expire(messageDm.getUuid(), queueCacheConnectAgentConfParam.getExpire());
-						transaction.hdel(hashFullName, messageDm.getUuid());
+						transaction.set(messageDb.getUuid(), "");
+						transaction.expire(messageDb.getUuid(), queueCacheConnectAgentConfParam.getExpire());
+						transaction.hdel(hashFullName, messageDb.getUuid());
 						transaction.exec();
 						
-						return messageDm;
+						return messageDb;
 					}
 				}
 				
@@ -207,19 +207,19 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 
 	@Override
-	public boolean havePop(final MessageDm messageDm) throws Exception {
+	public boolean havePop(final MessageDb messageDb) throws Exception {
 		
 		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Boolean>() {
 			
 			@Override
 			public Boolean doOperation(Jedis jedis) throws Exception {
-				return jedis.exists(messageDm.getUuid());
+				return jedis.exists(messageDb.getUuid());
 			}
 		});
 	}
 	
 	@Override
-	public void setPop(final MessageDm messageDm) throws Exception {
+	public void setPop(final MessageDb messageDb) throws Exception {
 		
 		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
 			
@@ -227,8 +227,8 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 			public Void doOperation(Jedis jedis) throws Exception {
 				jedis.multi();
 				Transaction transaction = new Transaction(jedis.getClient());
-				transaction.set(messageDm.getUuid(), "");
-				transaction.expire(messageDm.getUuid(), queueCacheConnectAgentConfParam.getExpire());
+				transaction.set(messageDb.getUuid(), "");
+				transaction.expire(messageDb.getUuid(), queueCacheConnectAgentConfParam.getExpire());
 				transaction.exec();
 				return null;
 			}
@@ -236,21 +236,21 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 	}
 	
 	@Override
-	public void removePop(final MessageDm messageDm) throws Exception {
+	public void removePop(final MessageDb messageDb) throws Exception {
 		
 		JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
 			
 			@Override
 			public Void doOperation(Jedis jedis) throws Exception {
-				if (messageDm.getDelayTime() > 0) {
-					long extendTime = System.currentTimeMillis() - messageDm.getFinishTime();
-					if (messageDm.getDelayTime() - extendTime > 1000) {
-						jedis.expire(messageDm.getUuid(), (int)((messageDm.getDelayTime() - extendTime) / 1000));						
+				if (messageDb.getDelayTime() > 0) {
+					long extendTime = System.currentTimeMillis() - messageDb.getFinishTime();
+					if (messageDb.getDelayTime() - extendTime > 1000) {
+						jedis.expire(messageDb.getUuid(), (int)((messageDb.getDelayTime() - extendTime) / 1000));						
 					} else {
-						jedis.del(messageDm.getUuid());
+						jedis.del(messageDb.getUuid());
 					}
 				} else {					
-					jedis.del(messageDm.getUuid());
+					jedis.del(messageDb.getUuid());
 				}
 				return null;
 			}

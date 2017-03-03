@@ -5,13 +5,13 @@ import java.util.List;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.exception.ConnectRefusedException;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.connect.cache.AbstractCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.CacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgentConfParam;
 import org.fl.noodlenotify.core.connect.cache.redis.JedisTemplate;
 import org.fl.noodlenotify.core.connect.constent.ConnectAgentType;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -74,22 +74,22 @@ public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implem
 	}
 	
 	@Override
-	protected void setActual(final List<MessageDm> messageDmList) {
+	protected void setActual(final List<MessageDb> messageDbList) {
 		try {
 			JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
 				
 				@Override
 				public Void doOperation(Jedis jedis) throws Exception {
 					
-					for (MessageDm messageDm : messageDmList) {
+					for (MessageDb messageDb : messageDbList) {
 						try {
-							if (messageDm.getContent() != null) {
+							if (messageDb.getContent() != null) {
 								long dbSize = jedis.dbSize();
 								if (dbSize < bodyCacheConnectAgentConfParam.getCapacity()) {
 									jedis.multi();
 									Transaction transaction = new Transaction(jedis.getClient());
-									transaction.setnx(messageDm.getUuid(), new String(messageDm.getContent()));
-									transaction.expire(messageDm.getUuid(), bodyCacheConnectAgentConfParam.getExpire());
+									transaction.setnx(messageDb.getUuid(), new String(messageDb.getContent()));
+									transaction.expire(messageDb.getUuid(), bodyCacheConnectAgentConfParam.getExpire());
 									transaction.exec();
 								}
 							}
@@ -109,16 +109,16 @@ public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implem
 	}
 
 	@Override
-	protected void removeActual(final List<MessageDm> messageDmList) {
+	protected void removeActual(final List<MessageDb> messageDbList) {
 		try {
 			JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<Void>() {
 				
 				@Override
 				public Void doOperation(Jedis jedis) throws Exception {
 					
-					for (MessageDm messageDm : messageDmList) {
+					for (MessageDb messageDb : messageDbList) {
 						try {
-							jedis.del(messageDm.getUuid());
+							jedis.del(messageDb.getUuid());
 						} catch (JedisConnectionException e) {
 							e.printStackTrace();
 							break;
@@ -135,31 +135,31 @@ public class RedisBodyCacheConnectAgent extends AbstractCacheConnectAgent implem
 	}
 	
 	@Override
-	public void set(MessageDm messageDm) throws Exception {
-		setBlockingQueue.offer(messageDm);
+	public void set(MessageDb messageDb) throws Exception {
+		setBlockingQueue.offer(messageDb);
 	}
 	
 	@Override
-	public MessageDm get(final MessageDm messageDm) throws Exception {
+	public MessageDb get(final MessageDb messageDb) throws Exception {
 		
-		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<MessageDm>() {
+		return JedisTemplate.execute(jedisPool, new JedisTemplate.JedisOperation<MessageDb>() {
 			
 			@Override
-			public MessageDm doOperation(Jedis jedis) throws Exception {
-				String messageDmContentStr = jedis.get(messageDm.getUuid());
-				if (messageDmContentStr == null) {
-					messageDm.setContent(null);
+			public MessageDb doOperation(Jedis jedis) throws Exception {
+				String messageDbContentStr = jedis.get(messageDb.getUuid());
+				if (messageDbContentStr == null) {
+					messageDb.setContent(null);
 				} else {
-					messageDm.setContent(messageDmContentStr.getBytes());
+					messageDb.setContent(messageDbContentStr.getBytes());
 				}
-				return messageDm;
+				return messageDb;
 			}
 		});
 	}
 
 	@Override
-	public void remove(MessageDm messageDm) throws Exception {
-		removeBlockingQueue.offer(messageDm);
+	public void remove(MessageDb messageDb) throws Exception {
+		removeBlockingQueue.offer(messageDb);
 	}
 	
 	public void setBodyCacheConnectAgentConfParam(BodyCacheConnectAgentConfParam bodyCacheConnectAgentConfParam) {

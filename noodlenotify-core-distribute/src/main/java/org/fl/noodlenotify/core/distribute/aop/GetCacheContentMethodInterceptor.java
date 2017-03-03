@@ -6,9 +6,9 @@ import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.manager.ConnectManager;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 
 public class GetCacheContentMethodInterceptor implements MethodInterceptor {
 
@@ -28,14 +28,14 @@ public class GetCacheContentMethodInterceptor implements MethodInterceptor {
 		} finally {
 			if (invocation.getMethod().getName().equals("pop") && object != null) {
 				
-				MessageDm messageDm = (MessageDm)object;
+				MessageDb messageDb = (MessageDb)object;
 				
 				ConnectCluster bodyConnectCluster = bodyCacheConnectManager.getConnectCluster("EITHER");
 				BodyCacheConnectAgent bodyCacheConnectAgentOne = (BodyCacheConnectAgent) bodyConnectCluster.getProxy();
 				
-				ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDm);
+				ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDb);
 				try {
-					bodyCacheConnectAgentOne.get(messageDm);
+					bodyCacheConnectAgentOne.get(messageDb);
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {

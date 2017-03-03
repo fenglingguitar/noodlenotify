@@ -6,9 +6,9 @@ import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.distinguish.ConnectDistinguish;
 import org.fl.noodle.common.connect.manager.ConnectManager;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.cache.body.BodyCacheConnectAgent;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 
 public class SetBodyMethodInterceptor implements MethodInterceptor {
 
@@ -26,8 +26,8 @@ public class SetBodyMethodInterceptor implements MethodInterceptor {
 				try {
 					ConnectCluster bodyCacheConnectCluster = bodyCacheConnectManager.getConnectCluster("DEFALT");		
 					BodyCacheConnectAgent bodyCacheConnectAgent = (BodyCacheConnectAgent) bodyCacheConnectCluster.getProxy();
-					MessageDm messageDm = (MessageDm) ConnectThreadLocalStorage.get(LocalStorageType.MESSAGE_DM.getCode());
-					bodyCacheConnectAgent.set(messageDm);
+					MessageDb messageDb = (MessageDb) ConnectThreadLocalStorage.get(LocalStorageType.MESSAGE_DM.getCode());
+					bodyCacheConnectAgent.set(messageDb);
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {

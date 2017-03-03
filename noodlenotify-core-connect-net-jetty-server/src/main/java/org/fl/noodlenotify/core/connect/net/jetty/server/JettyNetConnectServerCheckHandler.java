@@ -10,9 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-
 import org.fl.noodle.common.util.json.JsonTranslator;
-import org.fl.noodlenotify.core.connect.net.pojo.MessageResult;
+import org.fl.noodlenotify.common.pojo.net.MessageResult;
 
 public class JettyNetConnectServerCheckHandler extends AbstractHandler {
 	

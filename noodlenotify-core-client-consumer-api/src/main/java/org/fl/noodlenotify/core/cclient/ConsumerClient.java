@@ -8,9 +8,9 @@ import org.fl.noodle.common.connect.exception.ConnectInvokeException;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.connect.server.ConnectServer;
 import org.fl.noodle.common.util.net.NetAddressUtil;
+import org.fl.noodlenotify.common.pojo.net.MessageRequest;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.core.connect.net.NetConnectReceiver;
-import org.fl.noodlenotify.core.connect.net.pojo.Message;
 
 public class ConsumerClient implements NetConnectReceiver {
 	
@@ -52,7 +52,7 @@ public class ConsumerClient implements NetConnectReceiver {
 	}
 	
 	@Override
-	public void receive(Message message) throws Exception {
+	public void receive(MessageRequest message) throws Exception {
 		ConsumerReceiver consumerReceiver = consumerReceiverMap.get(message.getQueueName());
 		if (consumerReceiver != null) {
 			if(!consumerReceiver.receive(message)) {

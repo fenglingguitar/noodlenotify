@@ -2,7 +2,7 @@ package org.fl.noodlenotify.core.connect.db;
 
 import java.util.List;
 
-import org.fl.noodlenotify.core.domain.message.MessageVo;
+import org.fl.noodlenotify.common.pojo.console.MessageVo;
 
 public interface DbStatusChecker {
 	public void checkHealth() throws Exception;

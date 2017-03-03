@@ -8,9 +8,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheStatusChecker;
 import org.fl.noodlenotify.core.connect.cache.queue.redis.RedisQueueCacheConnectAgent;
-import org.fl.noodlenotify.core.domain.message.MessageDm;
 import org.fl.noodle.common.connect.agent.ConnectAgent;
 import org.fl.noodle.common.util.json.JsonTranslator;
 
@@ -25,7 +25,7 @@ public class QueueCacheConnectAgentTest extends AbstractJUnit4SpringContextTests
 	@Autowired
 	RedisQueueCacheConnectAgentFactory redisQueueCacheConnectAgentFactory;
 	
-	public static MessageDm messageDm;
+	public static MessageDb messageDb;
 	
 	@Test
 	public final void testSetActive() throws Exception {
@@ -41,18 +41,18 @@ public class QueueCacheConnectAgentTest extends AbstractJUnit4SpringContextTests
 		RedisQueueCacheConnectAgent redisQueueCacheConnectAgent = (RedisQueueCacheConnectAgent) redisQueueCacheConnectAgentFactory.createConnectAgent(1, "127.0.0.1", 2301, null);
 		redisQueueCacheConnectAgent.connect();
 		String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-		messageDm = new MessageDm();
-		messageDm.setQueueName("testQueue1");
-		messageDm.setUuid(uuid);
-		messageDm.setContent(JsonTranslator.toByteArray("Hello"));
+		messageDb = new MessageDb();
+		messageDb.setQueueName("testQueue1");
+		messageDb.setUuid(uuid);
+		messageDb.setContent(JsonTranslator.toByteArray("Hello"));
 		logger.info("MessageDm uuid: " + uuid);
-		messageDm.setBool(true);
-		redisQueueCacheConnectAgent.push(messageDm);
+		messageDb.setBool(true);
+		redisQueueCacheConnectAgent.push(messageDb);
 		logger.info("Push New...");
 		Thread.sleep(1000);
 		logger.info("Sleep: " + 1000);
-		messageDm.setBool(false);
-		redisQueueCacheConnectAgent.push(messageDm);
+		messageDb.setBool(false);
+		redisQueueCacheConnectAgent.push(messageDb);
 		logger.info("Push Portion...");
 		Thread.sleep(1000);
 		logger.info("Sleep: " + 1000);
@@ -63,10 +63,10 @@ public class QueueCacheConnectAgentTest extends AbstractJUnit4SpringContextTests
 	public final void testPop() throws Exception {
 		RedisQueueCacheConnectAgent redisQueueCacheConnectAgent = (RedisQueueCacheConnectAgent) redisQueueCacheConnectAgentFactory.createConnectAgent(1, "127.0.0.1", 2301, null);
 		redisQueueCacheConnectAgent.connect();
-		messageDm = redisQueueCacheConnectAgent.pop("testQueue1", true);
-		logger.info("Pop New uuid: " + messageDm.getUuid());
-		messageDm = redisQueueCacheConnectAgent.pop("testQueue1", false);
-		logger.info("Pop Portion uuid: " + messageDm.getUuid());
+		messageDb = redisQueueCacheConnectAgent.pop("testQueue1", true);
+		logger.info("Pop New uuid: " + messageDb.getUuid());
+		messageDb = redisQueueCacheConnectAgent.pop("testQueue1", false);
+		logger.info("Pop Portion uuid: " + messageDb.getUuid());
 		redisQueueCacheConnectAgent.close();
 	}
 
@@ -74,13 +74,13 @@ public class QueueCacheConnectAgentTest extends AbstractJUnit4SpringContextTests
 	public final void testHavePop() throws Exception {
 		RedisQueueCacheConnectAgent redisQueueCacheConnectAgent = (RedisQueueCacheConnectAgent) redisQueueCacheConnectAgentFactory.createConnectAgent(1, "127.0.0.1", 2301, null);
 		redisQueueCacheConnectAgent.connect();
-		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDm));
+		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDb));
 		Thread.sleep(1000);
 		logger.info("Sleep: " + 1000);
-		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDm));
+		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDb));
 		Thread.sleep(1001);
 		logger.info("Sleep: " + 1001);
-		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDm));
+		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDb));
 		redisQueueCacheConnectAgent.close();
 	}
 
@@ -88,15 +88,15 @@ public class QueueCacheConnectAgentTest extends AbstractJUnit4SpringContextTests
 	public final void testSetPop() throws Exception {
 		RedisQueueCacheConnectAgent redisQueueCacheConnectAgent = (RedisQueueCacheConnectAgent) redisQueueCacheConnectAgentFactory.createConnectAgent(1, "127.0.0.1", 2301, null);
 		redisQueueCacheConnectAgent.connect();
-		redisQueueCacheConnectAgent.setPop(messageDm);
+		redisQueueCacheConnectAgent.setPop(messageDb);
 		logger.info("SetPop...");
-		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDm));
+		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDb));
 		Thread.sleep(1000);
 		logger.info("Sleep: " + 1000);
-		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDm));
+		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDb));
 		Thread.sleep(1001);
 		logger.info("Sleep: " + 1001);
-		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDm));
+		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDb));
 		redisQueueCacheConnectAgent.close();
 	}
 
@@ -104,12 +104,12 @@ public class QueueCacheConnectAgentTest extends AbstractJUnit4SpringContextTests
 	public final void testRemovePop() throws Exception {
 		RedisQueueCacheConnectAgent redisQueueCacheConnectAgent = (RedisQueueCacheConnectAgent) redisQueueCacheConnectAgentFactory.createConnectAgent(1, "127.0.0.1", 2301, null);
 		redisQueueCacheConnectAgent.connect();
-		redisQueueCacheConnectAgent.setPop(messageDm);
+		redisQueueCacheConnectAgent.setPop(messageDb);
 		logger.info("SetPop...");
-		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDm));
-		redisQueueCacheConnectAgent.removePop(messageDm);
+		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDb));
+		redisQueueCacheConnectAgent.removePop(messageDb);
 		logger.info("RemovePop...");
-		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDm));
+		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDb));
 		redisQueueCacheConnectAgent.close();
 	}
 	
@@ -195,13 +195,13 @@ public class QueueCacheConnectAgentTest extends AbstractJUnit4SpringContextTests
 		redisQueueCacheConnectAgent.connect();
 		redisQueueCacheConnectAgent.setActive("testQueue1", true);
 		logger.info("SetActive true...");
-		messageDm.setBool(true);
-		redisQueueCacheConnectAgent.push(messageDm);
+		messageDb.setBool(true);
+		redisQueueCacheConnectAgent.push(messageDb);
 		logger.info("Push New...");
 		Thread.sleep(1000);
 		logger.info("Sleep: " + 1000);
-		messageDm.setBool(false);
-		redisQueueCacheConnectAgent.push(messageDm);
+		messageDb.setBool(false);
+		redisQueueCacheConnectAgent.push(messageDb);
 		logger.info("Push Portion...");
 		Thread.sleep(1000);
 		logger.info("Sleep: " + 1000);
@@ -234,17 +234,17 @@ public class QueueCacheConnectAgentTest extends AbstractJUnit4SpringContextTests
 	public final void testRemovePopDelay() throws Exception {
 		RedisQueueCacheConnectAgent redisQueueCacheConnectAgent = (RedisQueueCacheConnectAgent) redisQueueCacheConnectAgentFactory.createConnectAgent(1, "127.0.0.1", 2301, null);
 		redisQueueCacheConnectAgent.connect();
-		redisQueueCacheConnectAgent.setPop(messageDm);
+		redisQueueCacheConnectAgent.setPop(messageDb);
 		logger.info("SetPop...");
-		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDm));
-		messageDm.setFinishTime(System.currentTimeMillis());
-		messageDm.setDelayTime(5000);
-		redisQueueCacheConnectAgent.removePop(messageDm);
+		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDb));
+		messageDb.setFinishTime(System.currentTimeMillis());
+		messageDb.setDelayTime(5000);
+		redisQueueCacheConnectAgent.removePop(messageDb);
 		logger.info("RemovePop Delay...");
-		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDm));
+		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDb));
 		Thread.sleep(5000);
 		logger.info("Sleep: " + 5000);
-		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDm));
+		logger.info("HavePop: " + redisQueueCacheConnectAgent.havePop(messageDb));
 		redisQueueCacheConnectAgent.close();
 	}
 	

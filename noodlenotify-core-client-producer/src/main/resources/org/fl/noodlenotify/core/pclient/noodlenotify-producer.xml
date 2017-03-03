@@ -12,24 +12,29 @@
 			http://activemq.apache.org/schema/core	http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd"
 	default-autowire="byName">
 	
-	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/schedule/noodlenotify-monitor-status-beat-schedule-exchange.xml" />
-	
-	<import resource="classpath:org/fl/noodlenotify/core/exchange/noodlenotify-core-exchange-manager-pool.xml" />
-	
+	<import resource="classpath:org/fl/noodlenotify/core/connect/net/manager/noodlenotify-core-connect-net-manager-producer.xml" />
+	<import resource="classpath:org/fl/noodlenotify/monitor/status/beat/schedule/noodlenotify-monitor-status-beat-schedule-producer.xml" />
 	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-trace.xml" />
 	
-	<bean id="netConnectReceiver" class="org.fl.noodlenotify.core.exchange.Exchange" 
-			init-method="start" destroy-method="destroy"
-			parent="exchangeParam">
+	<bean id="connectManagerPool" class="org.fl.noodle.common.connect.manager.ConnectManagerPool">
+		<property name="connectManagerList">
+			<list>
+				<ref bean="producerNetConnectManager" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="producerClient" class="org.fl.noodlenotify.core.pclient.ProducerClientImpl"
+			init-method="start" destroy-method="destroy" >
 		<property name="localIp" value="127.0.0.1" />
+		<property name="producerClientName" value="TestProducerClient1" />
 		<property name="consoleRemotingInvoke" ref="consoleRemotingInvoke" />
 		<property name="connectManagerPool" ref="connectManagerPool" />
-		<property name="connectServer" ref="netConnectServer" />
 		<property name="methodInterceptorList">
 			<list>
                 <ref bean="traceInterceptorApp"/>
             </list>
 		</property> 
-	</bean>
-    
+    </bean>
+
 </beans>
