@@ -13,12 +13,18 @@
 	default-autowire="byName">
 	
 	<import resource="classpath:org/fl/noodlenotify/core/distribute/noodlenotify-core-distribute-config.xml" />
+	<import resource="classpath:org/fl/noodlenotify/common/noodlenotify-trace.xml" />
 	
 	<bean id="distributePullFactory" class="org.fl.noodlenotify.core.distribute.DistributePullFactory">
 		<property name="dbConnectManager" ref="distributeDbConnectManager" />
 		<property name="queueCacheConnectManager" ref="distributeQueueCacheConnectManager" />
 		<property name="distributeConfParam" ref="distributeConfParam" />
 		<property name="distributeModuleRegister" ref="distributeModuleRegister" />
+		<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
 	</bean>
 	
 </beans>

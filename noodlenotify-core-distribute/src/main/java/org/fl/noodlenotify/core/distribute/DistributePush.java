@@ -1,6 +1,8 @@
 package org.fl.noodlenotify.core.distribute;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -8,15 +10,20 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.aopalliance.aop.Advice;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.manager.ConnectManager;
+import org.fl.noodle.common.trace.TraceInterceptor;
 import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.common.pojo.net.MessageRequest;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
+import org.springframework.aop.framework.ProxyFactory;
 
 public class DistributePush {
 	
@@ -38,6 +45,8 @@ public class DistributePush {
 	private volatile boolean stopSign = false;
 	
 	private AtomicInteger  stopCount;
+	
+	private List<MethodInterceptor> methodInterceptorList;
 	
 	public DistributePush(ConnectManager queueCacheConnectManager,
 							ConnectManager netConnectManager,
@@ -78,6 +87,7 @@ public class DistributePush {
 	}
 	
 	public void destroy() {
+		
 		stopSign = true;
 		executorService.shutdownNow();
 		try {
@@ -106,107 +116,129 @@ public class DistributePush {
 		}
 	}
 	
-	private class DistributeGetRunnable implements Runnable {
+	private interface PushGetRunnable {
+		public void doRun() throws Exception;
+	}
+	
+	private abstract class AbstractPushRunnable implements Runnable, MethodInterceptor, PushGetRunnable {
+
+		private PushGetRunnable pushGetRunnable;
 		
-		private BlockingQueue<MessageDb> executeBlockingQueue;
-		private boolean queueType;
+		protected BlockingQueue<MessageDb> executeBlockingQueue;
+		protected boolean queueType;
 		
-		public DistributeGetRunnable(BlockingQueue<MessageDb> executeBlockingQueue, boolean queueType) {
+		public AbstractPushRunnable(BlockingQueue<MessageDb> executeBlockingQueue, boolean queueType) {
+			
 			this.executeBlockingQueue = executeBlockingQueue;
 			this.queueType = queueType;
+			
+			ProxyFactory proxyFactory = new ProxyFactory(PushGetRunnable.class, this);
+			if (methodInterceptorList != null && methodInterceptorList.size() > 0) {
+				for (Object object : methodInterceptorList) {
+					proxyFactory.addAdvice((Advice)object);
+				}
+			}
+			proxyFactory.setTarget(this);
+			pushGetRunnable = (PushGetRunnable) proxyFactory.getProxy();
 		}
 		
 		@Override
 		public void run() {
-			
 			while (true) {
-				
-				if (stopSign) {
-					stopCount.decrementAndGet();
-					break;
-				}
-				
-				MessageDb messageDb = null;
-				ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
-				QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
 				try {
-					messageDb = queueCacheConnectAgent.pop(queueName, queueType);
+					if (stopSign) {
+						stopCount.decrementAndGet();
+						break;
+					}
+					TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
+					TraceInterceptor.setInvoke("Root");
+					TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
+					pushGetRunnable.doRun();
 				} catch (Exception e) {
 					e.printStackTrace();
-					continue;
+				} finally {
+					TraceInterceptor.getTraceStack().pop();
+					TraceInterceptor.getTraceKeyStack().pop();
 				}
-				
-				if (messageDb == null) {
-					continue;
-				}
-				
-				try {
-					if (!executeBlockingQueue.offer(messageDb, 60000, TimeUnit.MILLISECONDS)) {
-						messageDb.setResult(false);
-						messageDb.executeMessageCallback();
-					}
-				} catch (InterruptedException e) {
+			}
+		}
+		
+		@Override
+		public Object invoke(MethodInvocation invocation) throws Throwable {
+			return invocation.proceed();
+		}
+	}
+	
+	private class DistributeGetRunnable extends AbstractPushRunnable {
+		
+		public DistributeGetRunnable(BlockingQueue<MessageDb> executeBlockingQueue, boolean queueType) {
+			super(executeBlockingQueue, queueType);
+		}
+
+		@Override
+		public void doRun() throws Exception {
+			
+			ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
+			QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+			MessageDb messageDb = queueCacheConnectAgent.pop(queueName, queueType);
+			
+			if (messageDb == null) {
+				return;
+			}
+			
+			try {
+				if (!executeBlockingQueue.offer(messageDb, 60000, TimeUnit.MILLISECONDS)) {
 					messageDb.setResult(false);
 					messageDb.executeMessageCallback();
-					e.printStackTrace();
 				}
+			} catch (InterruptedException e) {
+				messageDb.setResult(false);
+				messageDb.executeMessageCallback();
+				e.printStackTrace();
 			}
 		}
 	}
 	
-	private class DistributeExecuteRunnable implements Runnable {
-		
-		private BlockingQueue<MessageDb> executeBlockingQueue;
-		private boolean queueType;
+	private class DistributeExecuteRunnable extends AbstractPushRunnable {
 		
 		public DistributeExecuteRunnable(BlockingQueue<MessageDb> executeBlockingQueue, boolean queueType) {
-			this.executeBlockingQueue = executeBlockingQueue;
-			this.queueType = queueType;
+			super(executeBlockingQueue, queueType);
 		}
 		
 		@Override
-		public void run() {
+		public void doRun() throws Exception {
 			
-			while (true) {
-				
-				if (stopSign) {
-					stopCount.decrementAndGet();
-					break;
-				}			
-				
-				MessageDb messageDb = null;
-				try {
-					messageDb = executeBlockingQueue.poll(1000, TimeUnit.MILLISECONDS);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					continue;
-				}
-				if (messageDb == null) {
-					continue;
-				}			
-				
+			MessageDb messageDb = executeBlockingQueue.poll(1000, TimeUnit.MILLISECONDS);
+			
+			if (messageDb == null) {
+				return;
+			}	
+			
+			TraceInterceptor.setTraceKey(messageDb.getTraceKey());
+			TraceInterceptor.setInvoke("Root");
+			TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
+			
+			messageDb.setResult(false);
+			messageDb.setBool(queueType);
+			
+			ConnectCluster connectCluster = netConnectManager.getConnectCluster("DEFALT");
+			NetConnectAgent netConnectAgent = (NetConnectAgent) connectCluster.getProxy();
+			
+			ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDb);
+			ConnectThreadLocalStorage.put(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode(), queueDistributerVo);
+			try {
+				netConnectAgent.send(new MessageRequest(
+						messageDb.getQueueName(), 
+						messageDb.getUuid(), 
+						new String(messageDb.getContent(), "UTF-8")
+						));
+			} catch (Exception e) {
+				e.printStackTrace();
 				messageDb.setResult(false);
-				messageDb.setBool(queueType);
-				
-				ConnectCluster connectCluster = netConnectManager.getConnectCluster("DEFALT");
-				NetConnectAgent netConnectAgent = (NetConnectAgent) connectCluster.getProxy();
-				
-				ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDb);
-				ConnectThreadLocalStorage.put(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode(), queueDistributerVo);
-				try {
-					netConnectAgent.send(new MessageRequest(
-							messageDb.getQueueName(), 
-							messageDb.getUuid(), 
-							new String(messageDb.getContent(), "UTF-8")
-							));
-				} catch (Exception e) {
-					e.printStackTrace();
-					messageDb.setResult(false);
-					messageDb.executeMessageCallback();
-				} finally {
-					ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
-					ConnectThreadLocalStorage.remove(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode());
-				}
+				messageDb.executeMessageCallback();
+			} finally {
+				ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
+				ConnectThreadLocalStorage.remove(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode());
 			}
 		}
 	}

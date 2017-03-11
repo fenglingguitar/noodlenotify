@@ -82,20 +82,24 @@ public class Exchange implements NetConnectReceiver, FactoryBean<Object>, Method
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		
-		if (invocation.getArguments().length > 0 && invocation.getArguments()[0] instanceof MessageRequest) {
-			MessageRequest messageRequest = (MessageRequest)invocation.getArguments()[0];
-			if (messageRequest.getTraceKey() == null || messageRequest.getTraceKey().isEmpty()) {
-				TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
-				TraceInterceptor.setInvoke("Root");
-				TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
-			} else {
-				TraceInterceptor.setTraceKey(messageRequest.getTraceKey());
-				TraceInterceptor.setInvoke(messageRequest.getParentInvoke());
-				TraceInterceptor.setStackKey(messageRequest.getParentStackKey());
+		try {
+			if (invocation.getArguments().length > 0 && invocation.getArguments()[0] instanceof MessageRequest) {
+				MessageRequest messageRequest = (MessageRequest)invocation.getArguments()[0];
+				if (messageRequest.getTraceKey() == null || messageRequest.getTraceKey().isEmpty()) {
+					TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
+					TraceInterceptor.setInvoke("Root");
+					TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
+				} else {
+					TraceInterceptor.setTraceKey(messageRequest.getTraceKey());
+					TraceInterceptor.setInvoke(messageRequest.getParentInvoke());
+					TraceInterceptor.setStackKey(messageRequest.getParentStackKey());
+				}
 			}
+			return invocation.proceed();
+		} finally {
+			TraceInterceptor.getTraceStack().pop();
+			TraceInterceptor.getTraceKeyStack().pop();
 		}
-		
-		return invocation.proceed();
 	}
 
 	@Override

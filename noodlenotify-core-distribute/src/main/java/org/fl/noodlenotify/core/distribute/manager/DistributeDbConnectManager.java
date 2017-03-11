@@ -84,4 +84,21 @@ public class DistributeDbConnectManager extends AbstractConnectManagerTemplate {
 	public ConnectRoute getConnectRoute(String routeName) {
 		return connectRouteMap.get("DEFALT");
 	}
+	
+	@Override
+	protected void addConnectMapping() {
+		for (String name : addConnectMappingMap.keySet()) {
+			for (Object objectIt : addConnectMappingMap.get(name)) {
+				ConnectAgent connectAgent = connectAgentMap.get(getId(objectIt));
+				if (connectAgent != null && connectAgent.isHealthyConnect()) {
+					connectNodeMap.get(name).addConnectAgent(connectAgent);
+					try {
+						((DbConnectAgent)connectAgent).createTable(name);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
 }

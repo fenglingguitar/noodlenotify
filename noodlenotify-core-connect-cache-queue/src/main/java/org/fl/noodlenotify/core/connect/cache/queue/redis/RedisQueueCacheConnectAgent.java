@@ -149,6 +149,7 @@ public class RedisQueueCacheConnectAgent extends AbstractCacheConnectAgent imple
 				messageCache.setRedisTwo(messageDb.getRedisTwo());
 				messageCache.setBeginTime(messageDb.getBeginTime());
 				messageCache.setFinishTime(messageDb.getFinishTime());
+				messageCache.setTraceKey(messageDb.getTraceKey());
 				
 				jedis.rpush(queueFullName, JsonTranslator.toString(messageCache));
 				

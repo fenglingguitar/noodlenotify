@@ -38,6 +38,11 @@
 		<property name="cacheConnectAgentConfParam" ref="cacheConnectAgentConfParamQueue" />
 		<property name="queueCacheConnectAgentConfParam" ref="queueCacheConnectAgentConfParam" />
 		<property name="connectDistinguish" ref="queueCacheConnectDistinguish" />
+		<property name="methodInterceptorList">
+			<list>
+                <ref bean="traceInterceptorApp"/>
+            </list>
+		</property> 
 	</bean>
     
 </beans>

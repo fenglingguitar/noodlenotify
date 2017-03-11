@@ -1,5 +1,8 @@
 package org.fl.noodlenotify.core.distribute;
 
+import java.util.List;
+
+import org.aopalliance.intercept.MethodInterceptor;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
@@ -12,6 +15,8 @@ public class DistributePullFactory {
 	private ConnectManager queueCacheConnectManager;
 	private DistributeConfParam distributeConfParam;
 	
+	private List<MethodInterceptor> methodInterceptorList;
+	
 	public DistributePull createDistributePull(QueueDistributerVo queueDistributerVo, long dbId) {
 		return new DistributePull(
 				distributeModuleRegister.getModuleId(),
@@ -19,7 +24,8 @@ public class DistributePullFactory {
 				queueCacheConnectManager,
 				distributeConfParam,
 				queueDistributerVo,
-				dbId);
+				dbId,
+				methodInterceptorList);
 	}
 
 	public void setDistributeModuleRegister(ModuleRegister distributeModuleRegister) {
@@ -36,5 +42,9 @@ public class DistributePullFactory {
 
 	public void setDistributeConfParam(DistributeConfParam distributeConfParam) {
 		this.distributeConfParam = distributeConfParam;
+	}
+
+	public void setMethodInterceptorList(List<MethodInterceptor> methodInterceptorList) {
+		this.methodInterceptorList = methodInterceptorList;
 	}
 }

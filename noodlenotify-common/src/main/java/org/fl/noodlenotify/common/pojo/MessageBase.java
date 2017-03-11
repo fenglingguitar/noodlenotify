@@ -1,10 +1,8 @@
 package org.fl.noodlenotify.common.pojo;
 
-import java.io.Serializable;
+import org.fl.noodle.common.trace.operation.method.TraceParamToString;
 
-public class MessageBase implements Serializable {
-	
-	private static final long serialVersionUID = 5553747257631976006L;
+public abstract class MessageBase implements TraceParamToString {
 	
 	protected String uuid;
 	protected String queueName;
@@ -21,5 +19,13 @@ public class MessageBase implements Serializable {
 	}
 	public void setQueueName(String queueName) {
 		this.queueName = queueName;
+	}
+	
+	@Override
+	public String toString() {
+		return new StringBuilder()
+		.append(uuid)
+		.append(",").append(queueName)
+		.toString();
 	}
 }
