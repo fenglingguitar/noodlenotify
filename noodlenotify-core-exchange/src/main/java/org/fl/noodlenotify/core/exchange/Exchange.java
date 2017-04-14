@@ -90,7 +90,7 @@ public class Exchange implements NetConnectReceiver, FactoryBean<Object>, Method
 					TraceInterceptor.setInvoke("Root");
 					TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
 				} else {
-					TraceInterceptor.setTraceKey(messageRequest.getTraceKey());
+					TraceInterceptor.setTraceKey(messageRequest.getUuid());
 					TraceInterceptor.setInvoke(messageRequest.getParentInvoke());
 					TraceInterceptor.setStackKey(messageRequest.getParentStackKey());
 				}
@@ -124,7 +124,7 @@ public class Exchange implements NetConnectReceiver, FactoryBean<Object>, Method
 				message.getQueueName(), 
 				message.getUuid(), 
 				message.getContent().getBytes("UTF-8"),
-				TraceInterceptor.getTraceKey()
+				message.getTraceKey()
 				);
 		
 		if (messageDb.getContent().length > sizeLimit) {

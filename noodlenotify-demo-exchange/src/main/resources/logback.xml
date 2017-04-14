@@ -15,12 +15,12 @@
 	</appender>
 	
 	<appender name="NOODLENOTIFY-TRACE-METHOD-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">    
-		<file>D:/logs/noodlenotify/noodlenotify/noodlenotify-trace-method-logfile.log</file>    
+		<file>D:/logs/noodlenotify/noodlenotify/noodlenotify-trace-method-exchange-logfile.log</file>    
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 	      <level>INFO</level>
 	  	</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">      
-			<fileNamePattern>D:/logs/noodlenotify/noodlenotify/noodlenotify-trace-method-logfile.log.%d{yyyyMMdd}</fileNamePattern>        
+			<fileNamePattern>D:/logs/noodlenotify/noodlenotify/noodlenotify-trace-method-exchange-logfile.log.%d{yyyyMMdd}</fileNamePattern>        
 			<maxHistory>3</maxHistory>    
 		</rollingPolicy>    
 		<encoder charset="UTF-8">      
@@ -29,12 +29,12 @@
 	</appender>
 	
 	<appender name="NOODLENOTIFY-TRACE-PERFORMANCE-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">    
-		<file>D:/logs/noodlenotify/noodlenotify/noodlenotify-trace-performance-logfile.log</file>    
+		<file>D:/logs/noodlenotify/noodlenotify/noodlenotify-trace-performance-exchange-logfile.log</file>    
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 	      <level>INFO</level>
 	  	</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">      
-			<fileNamePattern>D:/logs/noodlenotify/noodlenotify/noodlenotify-trace-performance-logfile.log.%d{yyyyMMdd}</fileNamePattern>        
+			<fileNamePattern>D:/logs/noodlenotify/noodlenotify/noodlenotify-trace-performance-exchange-logfile.log.%d{yyyyMMdd}</fileNamePattern>        
 			<maxHistory>3</maxHistory>    
 		</rollingPolicy>    
 		<encoder charset="UTF-8">      

@@ -10,6 +10,7 @@ import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.manager.ConnectManagerPool;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.trace.TraceInterceptor;
+import org.fl.noodle.common.trace.util.Postman;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.common.pojo.net.MessageRequest;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
@@ -32,6 +33,9 @@ public class ProducerClientImpl implements ProducerClient, FactoryBean<Object>, 
 	
 	private Object serviceProxy;	
 	private List<MethodInterceptor> methodInterceptorList;
+	
+	public final static String TRACE_KEY_NOTIFY = "trace_key_notify";
+	public final static String MESSAGE_KEY_NOTIFY = "message_key_notify";
 	
 	public void start() throws Exception {
 		
@@ -64,7 +68,20 @@ public class ProducerClientImpl implements ProducerClient, FactoryBean<Object>, 
 	
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		return invocation.proceed();
+		
+		if (TraceInterceptor.getTraceKey().isEmpty()) {
+			TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
+		}
+		
+		Postman.putParam(TRACE_KEY_NOTIFY, TraceInterceptor.getTraceKey());
+		Postman.putParam(MESSAGE_KEY_NOTIFY, UUID.randomUUID().toString().replaceAll("-", ""));
+		
+		try {
+			TraceInterceptor.setTraceKey((String)Postman.getParam(MESSAGE_KEY_NOTIFY));
+			return invocation.proceed();
+		} finally {
+			TraceInterceptor.setTraceKey((String)Postman.getParam(TRACE_KEY_NOTIFY));
+		}
 	}
 
 	@Override
@@ -87,9 +104,9 @@ public class ProducerClientImpl implements ProducerClient, FactoryBean<Object>, 
 		
 		MessageRequest messageRequest = new MessageRequest();
 		messageRequest.setQueueName(queueName);
-		messageRequest.setUuid(UUID.randomUUID().toString().replaceAll("-", ""));
+		messageRequest.setUuid((String)Postman.getParam(MESSAGE_KEY_NOTIFY));
 		messageRequest.setContent(content);
-		messageRequest.setTraceKey(TraceInterceptor.getTraceKey());
+		messageRequest.setTraceKey((String)Postman.getParam(TRACE_KEY_NOTIFY));
 		messageRequest.setParentInvoke(TraceInterceptor.getInvoke());
 		messageRequest.setParentStackKey(TraceInterceptor.getStackKey());
 		
