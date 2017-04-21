@@ -30,7 +30,7 @@
 		<property name="removeThreadPriority" value="5"/>
 	</bean>
 	<bean id="queueCacheConnectAgentConfParam" class="org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgentConfParam">
-		<property name="popTimeout" value="5"/>
+		<!-- <property name="popTimeout" value="5"/> -->
 		<property name="hashExpire" value="7200000"/>
 		<property name="expire" value="1800"/>
 	</bean>

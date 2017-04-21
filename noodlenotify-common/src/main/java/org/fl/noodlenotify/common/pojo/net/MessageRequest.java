@@ -8,8 +8,6 @@ public class MessageRequest extends MessageBase implements Serializable {
 	
 	private static final long serialVersionUID = 643801698855169490L;
 	
-	private String uuid;
-	private String queueName;
 	private String content;
 	private String traceKey;
 	private String parentInvoke;
@@ -26,22 +24,6 @@ public class MessageRequest extends MessageBase implements Serializable {
 		this.queueName = queueName;
 		this.uuid = uuid;
 		this.content = content;
-	}
-	
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-	
-	public String getQueueName() {
-		return queueName;
-	}
-
-	public void setQueueName(String queueName) {
-		this.queueName = queueName;
 	}
 
 	public String getContent() {

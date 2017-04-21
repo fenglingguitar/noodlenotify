@@ -2,7 +2,7 @@ package org.fl.noodlenotify.core.connect.cache.queue;
 
 public class QueueCacheConnectAgentConfParam {
 	
-	private int popTimeout = 5;
+	private int popTimeout = Integer.MAX_VALUE;
 	private long hashExpire = 1200000;
 	private int expire = 600;
 	

@@ -21,6 +21,7 @@ public class MessageCache extends MessageBase implements Serializable {
 	private long cacheTimestamp;
 	
 	private String traceKey;
+	private String parentKey;
 
 	public long getContentId() {
 		return contentId;
@@ -116,5 +117,13 @@ public class MessageCache extends MessageBase implements Serializable {
 
 	public void setTraceKey(String traceKey) {
 		this.traceKey = traceKey;
+	}
+
+	public String getParentKey() {
+		return parentKey;
+	}
+
+	public void setParentKey(String parentKey) {
+		this.parentKey = parentKey;
 	}
 }

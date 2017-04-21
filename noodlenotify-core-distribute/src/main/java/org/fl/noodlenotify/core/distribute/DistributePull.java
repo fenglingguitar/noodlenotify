@@ -16,6 +16,8 @@ import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.distributedlock.api.LockChangeHandler;
 import org.fl.noodle.common.distributedlock.db.DbDistributedLock;
 import org.fl.noodle.common.trace.TraceInterceptor;
+import org.fl.noodle.common.trace.operation.performance.TracePerformancePrint;
+import org.fl.noodle.common.trace.util.TimeSynchron;
 import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
@@ -130,6 +132,7 @@ public class DistributePull implements LockChangeHandler {
 	
 	private interface PullRunnable {
 		public void doRun() throws Exception;
+		public void interval() throws Exception;
 	}
 	
 	private abstract class AbstractPullRunnable implements Runnable, MethodInterceptor, PullRunnable {
@@ -153,14 +156,12 @@ public class DistributePull implements LockChangeHandler {
 				try {
 					if (stopSign) { break; }
 					TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
-					TraceInterceptor.setInvoke("Root");
-					TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
 					pullRunnable.doRun();
+					pullRunnable.interval();
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {
-					TraceInterceptor.getTraceStack().pop();
-					TraceInterceptor.getTraceKeyStack().pop();
+					TraceInterceptor.setTraceKey(null);
 				}
 			}
 		}
@@ -169,6 +170,25 @@ public class DistributePull implements LockChangeHandler {
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 			return invocation.proceed();
 		}
+		
+		protected boolean push(MessageDb messageDb) throws Exception {
+			String traceKey = TraceInterceptor.getTraceKey();
+			long startTime = TimeSynchron.currentTimeMillis();
+			String stackKey = UUID.randomUUID().toString().replaceAll("-", "");
+			try {
+				TraceInterceptor.setTraceKey(messageDb.getUuid());
+				TraceInterceptor.setInvoke("DistributePull.push");
+				TraceInterceptor.setStackKey(stackKey);
+				return doPush(messageDb);
+			} finally {
+				TraceInterceptor.popInvoke();
+				TraceInterceptor.popStackKey();
+				TracePerformancePrint.printTraceLog("DistributePull.push", "Exchange.receive", startTime, TimeSynchron.currentTimeMillis(), false, stackKey, messageDb.getParentKey());
+				TraceInterceptor.setTraceKey(traceKey);
+			}
+		}
+		
+		protected abstract boolean doPush(MessageDb messageDb) throws Exception;
 	}
 	
 	private class DistributeSetFreshRunnable extends AbstractPullRunnable {
@@ -199,7 +219,7 @@ public class DistributePull implements LockChangeHandler {
 				if (messageDbList != null && messageDbList.size() > 0) {
 					for (MessageDb messageDb : messageDbList) {
 						try {
-							if (!pushNew(messageDb)) {
+							if (!push(messageDb)) {
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -209,8 +229,16 @@ public class DistributePull implements LockChangeHandler {
 				}
 				middleIdFresh.set(end); 					
 			}
-			
+		}
+
+		@Override
+		public void interval() throws Exception {
 			Thread.sleep(distributeConfParam.getSelectTimeIntervalFresh());
+		}
+
+		@Override
+		protected boolean doPush(MessageDb messageDb) throws Exception {
+			return pushNew(messageDb);
 		}
 	}
 	
@@ -236,7 +264,7 @@ public class DistributePull implements LockChangeHandler {
 				if (messageDbList != null && messageDbList.size() > 0) {
 					for (MessageDb messageDb : messageDbList) {
 						try {
-							if (!pushNew(messageDb)) {
+							if (!push(messageDb)) {
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -245,8 +273,16 @@ public class DistributePull implements LockChangeHandler {
 					messageDbList.clear();
 				}
 			}
-			
+		}
+
+		@Override
+		public void interval() throws Exception {
 			Thread.sleep(10000);
+		}
+
+		@Override
+		protected boolean doPush(MessageDb messageDb) throws Exception {
+			return pushNew(messageDb);
 		}
 	}
 	
@@ -281,8 +317,16 @@ public class DistributePull implements LockChangeHandler {
 					messageDbList.clear();
 				}		
 			}
-			
+		}
+
+		@Override
+		public void interval() throws Exception {
 			Thread.sleep(10000);
+		}
+
+		@Override
+		protected boolean doPush(MessageDb messageDb) throws Exception {
+			return pushPortion(messageDb);
 		}
 	}
 	
@@ -305,7 +349,7 @@ public class DistributePull implements LockChangeHandler {
 					for (MessageDb messageDb : messageDbList) {
 						messageDb.addMessageCallback(new RemovePopMessageCallback(messageDb, queueCacheConnectManager));
 						try {
-							delete(messageDb);
+							push(messageDb);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -313,8 +357,17 @@ public class DistributePull implements LockChangeHandler {
 					messageDbList.clear();
 				}
 			}
-			
+		}
+
+		@Override
+		public void interval() throws Exception {
 			Thread.sleep(distributeConfParam.getSelectEmptyTimeIntervalDeleteTimeout());
+		}
+
+		@Override
+		protected boolean doPush(MessageDb messageDb) throws Exception {
+			delete(messageDb);
+			return false;
 		}
 	}
 	

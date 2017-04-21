@@ -51,12 +51,14 @@ public class DistributePush {
 	public DistributePush(ConnectManager queueCacheConnectManager,
 							ConnectManager netConnectManager,
 							DistributeConfParam distributeConfParam,
-							QueueDistributerVo queueDistributerVo) {
+							QueueDistributerVo queueDistributerVo,
+							List<MethodInterceptor> methodInterceptorList) {
 		this.queueName = queueDistributerVo.getQueue_Nm();
 		this.queueCacheConnectManager = queueCacheConnectManager;
 		this.netConnectManager = netConnectManager;
 		this.distributeConfParam = distributeConfParam;
 		this.queueDistributerVo = queueDistributerVo;
+		this.methodInterceptorList = methodInterceptorList;
 	}
 	
 	public void start() {
@@ -159,6 +161,7 @@ public class DistributePush {
 				} finally {
 					TraceInterceptor.getTraceStack().pop();
 					TraceInterceptor.getTraceKeyStack().pop();
+					TraceInterceptor.setTraceKey(null);
 				}
 			}
 		}
@@ -208,7 +211,7 @@ public class DistributePush {
 		@Override
 		public void doRun() throws Exception {
 			
-			MessageDb messageDb = executeBlockingQueue.poll(1000, TimeUnit.MILLISECONDS);
+			MessageDb messageDb = executeBlockingQueue.poll(Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
 			
 			if (messageDb == null) {
 				return;

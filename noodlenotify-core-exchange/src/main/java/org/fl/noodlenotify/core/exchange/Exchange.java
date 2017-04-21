@@ -87,8 +87,6 @@ public class Exchange implements NetConnectReceiver, FactoryBean<Object>, Method
 				MessageRequest messageRequest = (MessageRequest)invocation.getArguments()[0];
 				if (messageRequest.getTraceKey() == null || messageRequest.getTraceKey().isEmpty()) {
 					TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
-					TraceInterceptor.setInvoke("Root");
-					TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
 				} else {
 					TraceInterceptor.setTraceKey(messageRequest.getUuid());
 					TraceInterceptor.setInvoke(messageRequest.getParentInvoke());
@@ -97,8 +95,7 @@ public class Exchange implements NetConnectReceiver, FactoryBean<Object>, Method
 			}
 			return invocation.proceed();
 		} finally {
-			TraceInterceptor.getTraceStack().pop();
-			TraceInterceptor.getTraceKeyStack().pop();
+			TraceInterceptor.setTraceKey(null);
 		}
 	}
 
@@ -124,7 +121,8 @@ public class Exchange implements NetConnectReceiver, FactoryBean<Object>, Method
 				message.getQueueName(), 
 				message.getUuid(), 
 				message.getContent().getBytes("UTF-8"),
-				message.getTraceKey()
+				message.getTraceKey(),
+				message.getParentStackKey()
 				);
 		
 		if (messageDb.getContent().length > sizeLimit) {

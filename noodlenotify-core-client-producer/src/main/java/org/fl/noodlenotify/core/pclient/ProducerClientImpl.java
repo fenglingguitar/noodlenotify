@@ -69,8 +69,11 @@ public class ProducerClientImpl implements ProducerClient, FactoryBean<Object>, 
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		
+		boolean isNewTraceKey = false;
+		
 		if (TraceInterceptor.getTraceKey().isEmpty()) {
 			TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
+			isNewTraceKey = true;
 		}
 		
 		Postman.putParam(TRACE_KEY_NOTIFY, TraceInterceptor.getTraceKey());
@@ -80,7 +83,11 @@ public class ProducerClientImpl implements ProducerClient, FactoryBean<Object>, 
 			TraceInterceptor.setTraceKey((String)Postman.getParam(MESSAGE_KEY_NOTIFY));
 			return invocation.proceed();
 		} finally {
-			TraceInterceptor.setTraceKey((String)Postman.getParam(TRACE_KEY_NOTIFY));
+			if (!isNewTraceKey) {
+				TraceInterceptor.setTraceKey((String)Postman.getParam(TRACE_KEY_NOTIFY));
+			} else {
+				TraceInterceptor.setTraceKey(null);
+			}
 		}
 	}
 

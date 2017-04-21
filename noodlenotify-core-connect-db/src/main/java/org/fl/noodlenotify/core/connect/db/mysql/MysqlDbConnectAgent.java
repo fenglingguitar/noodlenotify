@@ -151,6 +151,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 		sqlTableStringBuilder.append("	`BEGIN_TIME` bigint(16) NOT NULL,");
 		sqlTableStringBuilder.append("	`FINISH_TIME` bigint(16) NOT NULL,");
 		sqlTableStringBuilder.append("	`TRACE_KAY` char(32) NOT NULL,");
+		sqlTableStringBuilder.append("	`PARENT_KAY` char(32) NOT NULL,");
 		sqlTableStringBuilder.append("	PRIMARY KEY (`ID`)");
 		sqlTableStringBuilder.append(") ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;");
 		
@@ -168,6 +169,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 		sqlBackupTableStringBuilder.append("	`BEGIN_TIME` bigint(16) NOT NULL,");
 		sqlBackupTableStringBuilder.append("	`FINISH_TIME` bigint(16) NOT NULL,");
 		sqlBackupTableStringBuilder.append("	`TRACE_KAY` char(32) NOT NULL,");
+		sqlBackupTableStringBuilder.append("	`PARENT_KAY` char(32) NOT NULL,");
 		sqlBackupTableStringBuilder.append("	PRIMARY KEY (`ID`)");
 		sqlBackupTableStringBuilder.append(") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
 		
@@ -258,7 +260,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 						String sql = insertSqlMap.get(queueName);
 						if (sql == null) {
 							sql = "INSERT INTO MSG_" + queueName.toUpperCase().replace(".", "_") 
-									+ "_IF (UUID, QUEUE_NAME, CONTENT_ID, EXECUTE_QUEUE, RESULT_QUEUE, STATUS, REDIS_ONE, REDIS_TWO, BEGIN_TIME, FINISH_TIME, TRACE_KAY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+									+ "_IF (UUID, QUEUE_NAME, CONTENT_ID, EXECUTE_QUEUE, RESULT_QUEUE, STATUS, REDIS_ONE, REDIS_TWO, BEGIN_TIME, FINISH_TIME, TRACE_KAY, PARENT_KAY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 							insertSqlMap.putIfAbsent(queueName, sql);
 						}
 						final String sqlFinal = sql;
@@ -279,6 +281,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 						                        preparedStatement.setLong(9, messageDb.getBeginTime());
 						                        preparedStatement.setLong(10, messageDb.getFinishTime());
 						                        preparedStatement.setString(11, messageDb.getTraceKey());
+						                        preparedStatement.setString(12, messageDb.getParentKey());
 						                        return preparedStatement;
 						                  	}
 						            	}, keyHolder);
@@ -383,7 +386,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 						String sqlBackup = backupSqlMap.get(queueName);
 						if (sqlBackup == null) {
 							sqlBackup = "INSERT INTO MSG_" + queueName.toUpperCase().replace(".", "_") 
-											+ "_BU SELECT ID, UUID, QUEUE_NAME, CONTENT_ID, EXECUTE_QUEUE, RESULT_QUEUE, STATUS, BEGIN_TIME, FINISH_TIME, TRACE_KAY FROM MSG_" 
+											+ "_BU SELECT ID, UUID, QUEUE_NAME, CONTENT_ID, EXECUTE_QUEUE, RESULT_QUEUE, STATUS, BEGIN_TIME, FINISH_TIME, TRACE_KAY, PARENT_KAY FROM MSG_" 
 											+ queueName.toUpperCase().replace(".", "_") 
 											+ "_IF WHERE ID = ?";
 							backupSqlMap.putIfAbsent(queueName, sqlBackup);
@@ -442,7 +445,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 		
 		String sql = selectSqlMap.get(queueName);
 		if (sql == null) {
-			sql = "SELECT ID, UUID, CONTENT_ID, QUEUE_NAME, EXECUTE_QUEUE, RESULT_QUEUE, STATUS, REDIS_ONE, REDIS_TWO, BEGIN_TIME, FINISH_TIME, TRACE_KAY FROM MSG_" + queueName.toUpperCase().replace(".", "_") 
+			sql = "SELECT ID, UUID, CONTENT_ID, QUEUE_NAME, EXECUTE_QUEUE, RESULT_QUEUE, STATUS, REDIS_ONE, REDIS_TWO, BEGIN_TIME, FINISH_TIME, TRACE_KAY, PARENT_KAY FROM MSG_" + queueName.toUpperCase().replace(".", "_") 
 					+ "_IF WHERE ID >= ? AND ID <= ? AND STATUS = ?";
 			selectSqlMap.putIfAbsent(queueName, sql);
 		}
@@ -472,6 +475,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 					messageDb.setBeginTime(resultSet.getLong("BEGIN_TIME"));
 					messageDb.setFinishTime(resultSet.getLong("FINISH_TIME"));
 					messageDb.setTraceKey(resultSet.getString("TRACE_KAY"));
+					messageDb.setParentKey(resultSet.getString("PARENT_KAY"));
 					return messageDb;
 				}
 			});
@@ -542,7 +546,7 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 		
 		String sql = selectFinishTimeoutSqlMap.get(queueName);
 		if (sql == null) {
-			sql = "SELECT ID, UUID, CONTENT_ID, QUEUE_NAME, EXECUTE_QUEUE, RESULT_QUEUE, STATUS, REDIS_ONE, REDIS_TWO, BEGIN_TIME, FINISH_TIME, TRACE_KAY FROM MSG_" + queueName.toUpperCase().replace(".", "_") 
+			sql = "SELECT ID, UUID, CONTENT_ID, QUEUE_NAME, EXECUTE_QUEUE, RESULT_QUEUE, STATUS, REDIS_ONE, REDIS_TWO, BEGIN_TIME, FINISH_TIME, TRACE_KAY, PARENT_KAY FROM MSG_" + queueName.toUpperCase().replace(".", "_") 
 					+ "_IF WHERE ID >= ? AND ID <= ? AND STATUS = ? AND FINISH_TIME < ?";
 			selectFinishTimeoutSqlMap.putIfAbsent(queueName, sql);
 		}
@@ -572,7 +576,8 @@ public class MysqlDbConnectAgent extends AbstractDbConnectAgent {
 					messageDb.setRedisTwo(resultSet.getLong("REDIS_TWO"));
 					messageDb.setBeginTime(resultSet.getLong("BEGIN_TIME"));
 					messageDb.setFinishTime(resultSet.getLong("FINISH_TIME"));
-					messageDb.setTraceKey("TRACE_KAY");
+					messageDb.setTraceKey(resultSet.getString("TRACE_KAY"));
+					messageDb.setParentKey(resultSet.getString("PARENT_KAY"));
 					return messageDb;
 				}
 			});

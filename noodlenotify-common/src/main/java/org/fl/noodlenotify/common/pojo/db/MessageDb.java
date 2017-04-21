@@ -28,6 +28,7 @@ public class MessageDb extends MessageBase implements Serializable {
 	private boolean bool;
 	
 	private String traceKey;
+	private String parentKey;
 	
 	private List<MessageCallback> messageCallbackList = new ArrayList<MessageCallback>();
 	
@@ -38,12 +39,14 @@ public class MessageDb extends MessageBase implements Serializable {
 			String queueName,
 			String uuid,
 			byte[] content,
-			String traceKey
+			String traceKey,
+			String parentKey
 			) {
 		super.queueName = queueName;
 		super.uuid = uuid;
 		this.content = content;
 		this.traceKey = traceKey;
+		this.parentKey = parentKey;
 	}
 
 	public byte[] getContent() {
@@ -181,7 +184,15 @@ public class MessageDb extends MessageBase implements Serializable {
 	public void setTraceKey(String traceKey) {
 		this.traceKey = traceKey;
 	}
+	
+	public String getParentKey() {
+		return parentKey;
+	}
 
+	public void setParentKey(String parentKey) {
+		this.parentKey = parentKey;
+	}
+	
 	public void addMessageCallback(MessageCallback messageCallback) {
 		this.messageCallbackList.add(messageCallback);
 	}
