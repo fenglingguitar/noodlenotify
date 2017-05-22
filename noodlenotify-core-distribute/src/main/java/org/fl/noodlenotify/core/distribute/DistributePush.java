@@ -217,8 +217,8 @@ public class DistributePush {
 				return;
 			}	
 			
-			TraceInterceptor.setTraceKey(messageDb.getTraceKey());
-			TraceInterceptor.setInvoke("Root");
+			TraceInterceptor.setTraceKey(messageDb.getUuid());
+			TraceInterceptor.setInvoke("Exchange.receive");
 			TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
 			
 			messageDb.setResult(false);

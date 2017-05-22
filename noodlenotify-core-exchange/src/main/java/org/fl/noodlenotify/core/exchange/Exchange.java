@@ -13,6 +13,8 @@ import org.fl.noodle.common.connect.manager.ConnectManagerPool;
 import org.fl.noodle.common.connect.register.ModuleRegister;
 import org.fl.noodle.common.connect.server.ConnectServer;
 import org.fl.noodle.common.trace.TraceInterceptor;
+import org.fl.noodle.common.trace.operation.performance.TracePerformancePrint;
+import org.fl.noodle.common.trace.util.TimeSynchron;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.common.pojo.net.MessageRequest;
@@ -48,6 +50,9 @@ public class Exchange implements NetConnectReceiver, FactoryBean<Object>, Method
 	private Object serviceProxy;	
 	private List<MethodInterceptor> methodInterceptorList;
 	
+	public final static String PRODUCER_METHOD = "ProducerClient.send";
+	public final static String EXCHANGE_METHOD = "Exchange.receive";
+	
 	public void start() throws Exception {
 		
 		if (exchangeName == null || 
@@ -82,6 +87,8 @@ public class Exchange implements NetConnectReceiver, FactoryBean<Object>, Method
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		
+		long startTime = TimeSynchron.currentTimeMillis();
+		boolean isError = false;
 		try {
 			if (invocation.getArguments().length > 0 && invocation.getArguments()[0] instanceof MessageRequest) {
 				MessageRequest messageRequest = (MessageRequest)invocation.getArguments()[0];
@@ -89,12 +96,26 @@ public class Exchange implements NetConnectReceiver, FactoryBean<Object>, Method
 					TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
 				} else {
 					TraceInterceptor.setTraceKey(messageRequest.getUuid());
-					TraceInterceptor.setInvoke(messageRequest.getParentInvoke());
-					TraceInterceptor.setStackKey(messageRequest.getParentStackKey());
+					//TraceInterceptor.setInvoke(messageRequest.getParentInvoke());
+					//TraceInterceptor.setStackKey(messageRequest.getParentStackKey());
 				}
 			}
+			TraceInterceptor.setInvoke(PRODUCER_METHOD);
+			TraceInterceptor.setStackKey(PRODUCER_METHOD);
+			TraceInterceptor.setInvoke(EXCHANGE_METHOD);
+			TraceInterceptor.setStackKey(EXCHANGE_METHOD);
 			return invocation.proceed();
+		} catch (Throwable t){
+			isError = true;
+			throw t;
 		} finally {
+			long endTime = TimeSynchron.currentTimeMillis();
+			TracePerformancePrint.printTraceLog(EXCHANGE_METHOD, TraceInterceptor.getParentInvoke(), startTime, endTime, isError, EXCHANGE_METHOD, TraceInterceptor.getParentStackKey());
+			TraceInterceptor.popInvoke();
+			TraceInterceptor.popStackKey();
+			TraceInterceptor.popInvoke();
+			TraceInterceptor.popStackKey();
+			
 			TraceInterceptor.setTraceKey(null);
 		}
 	}
