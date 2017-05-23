@@ -17,8 +17,11 @@ import org.fl.noodle.common.connect.aop.ConnectThreadLocalStorage;
 import org.fl.noodle.common.connect.cluster.ConnectCluster;
 import org.fl.noodle.common.connect.manager.ConnectManager;
 import org.fl.noodle.common.trace.TraceInterceptor;
+import org.fl.noodle.common.trace.operation.performance.TracePerformancePrint;
+import org.fl.noodle.common.trace.util.TimeSynchron;
 import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.common.pojo.net.MessageRequest;
+import org.fl.noodlenotify.common.util.ConsoleConstant;
 import org.fl.noodlenotify.console.vo.QueueDistributerVo;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.cache.queue.QueueCacheConnectAgent;
@@ -147,21 +150,15 @@ public class DistributePush {
 		@Override
 		public void run() {
 			while (true) {
+				if (stopSign) {
+					stopCount.decrementAndGet();
+					break;
+				}
 				try {
-					if (stopSign) {
-						stopCount.decrementAndGet();
-						break;
-					}
-					TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
-					TraceInterceptor.setInvoke("Root");
-					TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
 					pushGetRunnable.doRun();
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {
-					TraceInterceptor.getTraceStack().pop();
-					TraceInterceptor.getTraceKeyStack().pop();
-					TraceInterceptor.setTraceKey(null);
 				}
 			}
 		}
@@ -181,23 +178,32 @@ public class DistributePush {
 		@Override
 		public void doRun() throws Exception {
 			
-			ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
-			QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
-			MessageDb messageDb = queueCacheConnectAgent.pop(queueName, queueType);
-			
-			if (messageDb == null) {
-				return;
-			}
+			MessageDb messageDb = null;
 			
 			try {
+				
+				TraceInterceptor.setTraceKey(UUID.randomUUID().toString().replaceAll("-", ""));
+				
+				ConnectCluster connectCluster = queueCacheConnectManager.getConnectCluster("DEFALT");
+				QueueCacheConnectAgent queueCacheConnectAgent = (QueueCacheConnectAgent) connectCluster.getProxy();
+				messageDb = queueCacheConnectAgent.pop(queueName, queueType);
+				
+				if (messageDb == null) {
+					return;
+				}
+				
 				if (!executeBlockingQueue.offer(messageDb, 60000, TimeUnit.MILLISECONDS)) {
 					messageDb.setResult(false);
 					messageDb.executeMessageCallback();
 				}
 			} catch (InterruptedException e) {
-				messageDb.setResult(false);
-				messageDb.executeMessageCallback();
-				e.printStackTrace();
+				if (messageDb != null) {
+					messageDb.setResult(false);
+					messageDb.executeMessageCallback();
+				}
+				throw e;
+			} finally {
+				TraceInterceptor.setTraceKey(null);
 			}
 		}
 	}
@@ -217,10 +223,6 @@ public class DistributePush {
 				return;
 			}	
 			
-			TraceInterceptor.setTraceKey(messageDb.getUuid());
-			TraceInterceptor.setInvoke("Exchange.receive");
-			TraceInterceptor.setStackKey(UUID.randomUUID().toString().replaceAll("-", ""));
-			
 			messageDb.setResult(false);
 			messageDb.setBool(queueType);
 			
@@ -229,17 +231,33 @@ public class DistributePush {
 			
 			ConnectThreadLocalStorage.put(LocalStorageType.MESSAGE_DM.getCode(), messageDb);
 			ConnectThreadLocalStorage.put(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode(), queueDistributerVo);
+			
+			long startTime = TimeSynchron.currentTimeMillis();
+			boolean isError = false;
 			try {
+				TraceInterceptor.setTraceKey(messageDb.getUuid());
+				TraceInterceptor.setInvoke(ConsoleConstant.EXCHANGE_METHOD);
+				TraceInterceptor.setStackKey(ConsoleConstant.EXCHANGE_KEY);
+				TraceInterceptor.setInvoke(ConsoleConstant.DISTRIBUTE_METHOD);
+				TraceInterceptor.setStackKey(ConsoleConstant.DISTRIBUTE_KEY);
 				netConnectAgent.send(new MessageRequest(
 						messageDb.getQueueName(), 
 						messageDb.getUuid(), 
 						new String(messageDb.getContent(), "UTF-8")
 						));
 			} catch (Exception e) {
-				e.printStackTrace();
+				isError = true;
 				messageDb.setResult(false);
 				messageDb.executeMessageCallback();
+				throw e;
 			} finally {
+				long endTime = TimeSynchron.currentTimeMillis();
+				TracePerformancePrint.printTraceLog(ConsoleConstant.DISTRIBUTE_METHOD, TraceInterceptor.getParentInvoke(), startTime, endTime, isError, ConsoleConstant.DISTRIBUTE_KEY, TraceInterceptor.getParentStackKey());
+				TraceInterceptor.popInvoke();
+				TraceInterceptor.popStackKey();
+				TraceInterceptor.popInvoke();
+				TraceInterceptor.popStackKey();
+				TraceInterceptor.setTraceKey(null);
 				ConnectThreadLocalStorage.remove(LocalStorageType.MESSAGE_DM.getCode());
 				ConnectThreadLocalStorage.remove(LocalStorageType.QUEUE_DISTRIBUTER_VO.getCode());
 			}

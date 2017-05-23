@@ -15,6 +15,7 @@ import org.fl.noodle.common.trace.util.Postman;
 import org.fl.noodle.common.trace.util.TimeSynchron;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.common.pojo.net.MessageRequest;
+import org.fl.noodlenotify.common.util.ConsoleConstant;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
 import org.fl.noodlenotify.core.connect.net.NetConnectAgent;
@@ -38,7 +39,7 @@ public class ProducerClientImpl implements ProducerClient, FactoryBean<Object>, 
 	
 	public final static String TRACE_KEY_NOTIFY = "trace_key_notify";
 	public final static String MESSAGE_KEY_NOTIFY = "message_key_notify";
-	public final static String PRODUCER_METHOD = "ProducerClient.send";
+	
 	
 	public void start() throws Exception {
 		
@@ -86,15 +87,15 @@ public class ProducerClientImpl implements ProducerClient, FactoryBean<Object>, 
 		boolean isError = false;
 		try {
 			TraceInterceptor.setTraceKey((String)Postman.getParam(MESSAGE_KEY_NOTIFY));
-			TraceInterceptor.setInvoke(PRODUCER_METHOD);
-			TraceInterceptor.setStackKey(PRODUCER_METHOD);
+			TraceInterceptor.setInvoke(ConsoleConstant.PRODUCER_METHOD);
+			TraceInterceptor.setStackKey(ConsoleConstant.PRODUCER_KEY);
 			return invocation.proceed();
 		} catch (Throwable t){
 			isError = true;
 			throw t;
 		} finally {
 			long endTime = TimeSynchron.currentTimeMillis();
-			TracePerformancePrint.printTraceLog(PRODUCER_METHOD, TraceInterceptor.getParentInvoke(), startTime, endTime, isError, PRODUCER_METHOD, TraceInterceptor.getParentStackKey());
+			TracePerformancePrint.printTraceLog(ConsoleConstant.PRODUCER_METHOD, TraceInterceptor.getParentInvoke(), startTime, endTime, isError, ConsoleConstant.PRODUCER_KEY, TraceInterceptor.getParentStackKey());
 			TraceInterceptor.popInvoke();
 			TraceInterceptor.popStackKey();
 			if (!isNewTraceKey) {

@@ -18,6 +18,7 @@ import org.fl.noodle.common.trace.util.TimeSynchron;
 import org.fl.noodle.common.util.net.NetAddressUtil;
 import org.fl.noodlenotify.common.pojo.db.MessageDb;
 import org.fl.noodlenotify.common.pojo.net.MessageRequest;
+import org.fl.noodlenotify.common.util.ConsoleConstant;
 import org.fl.noodlenotify.console.remoting.ConsoleRemotingInvoke;
 import org.fl.noodlenotify.core.connect.aop.LocalStorageType;
 import org.fl.noodlenotify.core.connect.constent.ConnectManagerType;
@@ -49,9 +50,6 @@ public class Exchange implements NetConnectReceiver, FactoryBean<Object>, Method
 	
 	private Object serviceProxy;	
 	private List<MethodInterceptor> methodInterceptorList;
-	
-	public final static String PRODUCER_METHOD = "ProducerClient.send";
-	public final static String EXCHANGE_METHOD = "Exchange.receive";
 	
 	public void start() throws Exception {
 		
@@ -100,17 +98,17 @@ public class Exchange implements NetConnectReceiver, FactoryBean<Object>, Method
 					//TraceInterceptor.setStackKey(messageRequest.getParentStackKey());
 				}
 			}
-			TraceInterceptor.setInvoke(PRODUCER_METHOD);
-			TraceInterceptor.setStackKey(PRODUCER_METHOD);
-			TraceInterceptor.setInvoke(EXCHANGE_METHOD);
-			TraceInterceptor.setStackKey(EXCHANGE_METHOD);
+			TraceInterceptor.setInvoke(ConsoleConstant.PRODUCER_METHOD);
+			TraceInterceptor.setStackKey(ConsoleConstant.PRODUCER_KEY);
+			TraceInterceptor.setInvoke(ConsoleConstant.EXCHANGE_METHOD);
+			TraceInterceptor.setStackKey(ConsoleConstant.EXCHANGE_KEY);
 			return invocation.proceed();
 		} catch (Throwable t){
 			isError = true;
 			throw t;
 		} finally {
 			long endTime = TimeSynchron.currentTimeMillis();
-			TracePerformancePrint.printTraceLog(EXCHANGE_METHOD, TraceInterceptor.getParentInvoke(), startTime, endTime, isError, EXCHANGE_METHOD, TraceInterceptor.getParentStackKey());
+			TracePerformancePrint.printTraceLog(ConsoleConstant.EXCHANGE_METHOD, TraceInterceptor.getParentInvoke(), startTime, endTime, isError, ConsoleConstant.EXCHANGE_KEY, TraceInterceptor.getParentStackKey());
 			TraceInterceptor.popInvoke();
 			TraceInterceptor.popStackKey();
 			TraceInterceptor.popInvoke();
